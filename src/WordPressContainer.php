@@ -1,9 +1,9 @@
 <?php
 
+namespace Fantassin\Core;
+
 use DI\Container;
 use DI\ContainerBuilder;
-use Fantassin\Core\HasAdminHooks;
-use Fantassin\Core\HasHooks;
 
 class WordPressContainer {
 
