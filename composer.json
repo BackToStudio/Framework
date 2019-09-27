@@ -1,0 +1,17 @@
+{
+  "name": "fantassin/core",
+  "authors": [
+    {
+      "name": "Florian Truchot",
+      "email": "florian@fantassin.fr"
+    }
+  ],
+  "require": {
+    "php-di/php-di": "^6.0"
+  },
+  "autoload":{
+    "psr-4": {
+      "Fantassin\\Core\\": "src"
+    }
+  }
+}
