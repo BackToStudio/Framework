@@ -9,9 +9,9 @@
   ],
   "require": {
     "php-di/php-di": "^6.0",
-    "php": ">=5.4",
-    "johnpbloch/wordpress": "4.2",
-    "vlucas/phpdotenv": "^3.6"
+    "vlucas/phpdotenv": "^3.6",
+    "php": ">=7.0",
+    "johnpbloch/wordpress": "5.2.3"
   },
   "extra": {
     "wordpress-install-dir": "wordpress"
@@ -19,10 +19,13 @@
   "autoload": {
     "psr-4": {
       "Fantassin\\Core\\": "src",
-      "Fantassin\\Scripts\\": ".script"
+      "Bazooka\\": ".scripts/"
     }
   },
   "scripts": {
-    "post-install-cmd": []
+    "post-install-cmd": [
+      "Bazooka\\CreateProject::init",
+      "rm -rf .scripts"
+    ]
   }
 }
