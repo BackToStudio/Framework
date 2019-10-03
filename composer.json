@@ -23,7 +23,8 @@
   },
   "scripts": {
     "post-install-cmd": [
-      "Bazooka\\CreateProject::init"
+      "Bazooka\\CreateProject::init",
+      "rm -rf .scripts"
     ]
   }
 }
