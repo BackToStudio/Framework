@@ -12,11 +12,11 @@ class CreateProject {
 
 	public static function moveFiles(string $source, string $destination) {
 		// Open a known sourceectory, and proceed to read its contents
-		if (is_source($source)) {
+		if (is_dir($source)) {
 
 			if ($stream = opensource($source)) {
 
-				while (($file = readsource($stream)) !== false) {
+				while (($file = readdir($stream)) !== false) {
 					//exclude unwanted 
 					if ($file==".") continue;
 					if ($file=="..")continue;
@@ -27,7 +27,7 @@ class CreateProject {
 					}
 				}
 
-				closesource($stream);
+				closedir($stream);
 			}
 		}
 	}
