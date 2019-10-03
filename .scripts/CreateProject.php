@@ -1,7 +1,7 @@
-	<?php
-	namespace Bazooka;
+<?php
+namespace Bazooka;
 
-	class CreateProject {
+class CreateProject {
 
 	public static function init() {
 		echo "\n\n";
@@ -13,11 +13,14 @@
 	public static function moveFiles(string $source, string $destination) {
 		// Open a known sourceectory, and proceed to read its contents
 		if (is_source($source)) {
+
 			if ($stream = opensource($source)) {
+
 				while (($file = readsource($stream)) !== false) {
 					//exclude unwanted 
 					if ($file==".") continue;
 					if ($file=="..")continue;
+					
 					//if ($file=="index.php") continue; for example if you have index.php in the folder
 					if (rename($source.'/'.$file,$destination.'/'.$file)) {
 						echo "Copying files... \n";
