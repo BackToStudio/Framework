@@ -10,14 +10,16 @@
   "require": {
     "php-di/php-di": "^6.0",
     "php": ">=5.4",
-    "johnpbloch/wordpress": "4.2"
+    "johnpbloch/wordpress": "4.2",
+    "vlucas/phpdotenv": "^3.6"
   },
   "extra": {
     "wordpress-install-dir": "wordpress"
   },
   "autoload": {
     "psr-4": {
-      "Fantassin\\Core\\": "src"
+      "Fantassin\\Core\\": "src",
+      "Fantassin\\Scripts\\": ".script"
     }
   },
   "scripts": {
