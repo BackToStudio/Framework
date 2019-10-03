@@ -8,11 +8,19 @@
     }
   ],
   "require": {
-    "php-di/php-di": "^6.0"
+    "php-di/php-di": "^6.0",
+    "php": "<=5.4",
+    "johnpbloch/wordpress": "4.2"
   },
-  "autoload":{
+  "extra": {
+    "wordpress-install-dir": "wordpress"
+  },
+  "autoload": {
     "psr-4": {
       "Fantassin\\Core\\": "src"
     }
+  },
+  "scripts": {
+    "post-install-cmd": []
   }
 }
