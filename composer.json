@@ -10,7 +10,7 @@
   "require": {
     "php-di/php-di": "^6.0",
     "vlucas/phpdotenv": "^3.6",
-    "php": ">=7.0",
+    "php": ">=7.1",
     "johnpbloch/wordpress": "5.2.3"
   },
   "extra": {

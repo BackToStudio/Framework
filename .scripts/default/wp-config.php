@@ -6,16 +6,16 @@
  * WP is hardcoded to look in its own directory or one directory up for wp-config.php.
  */
 
-require_once dirname( __DIR__ ) . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
+require_once __DIR__ . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
 
-$root_dir = __DIR__ . '/public';
+$root_dir = __DIR__ . DIRECTORY_SEPARATOR . 'public';
 
 /**
  * Use Dotenv to set required environment variables and load .env file in root
  */
 $dotenv = Dotenv\Dotenv::create( $root_dir );
 
-if ( file_exists( $root_dir . '/.env' ) ) {
+if ( file_exists( $root_dir . DIRECTORY_SEPARATOR . '.env' ) ) {
 	$dotenv->load();
 	$dotenv->required( [ 'DB_NAME', 'DB_USER', 'DB_PASSWORD', 'DB_HOST' ] );
 }
@@ -67,7 +67,7 @@ define( 'WP_DEBUG', false );
 
 /** Chemin absolu vers le dossier de WordPress. */
 if ( ! defined( 'ABSPATH' ) ) {
-	define( 'ABSPATH', dirname( __FILE__ ) . '/wordpress/' );
+	define( 'ABSPATH', dirname( __FILE__ ) . DIRECTORY_SEPARATOR . 'wordpress' . DIRECTORY_SEPARATOR );
 }
 
 /** Réglage des variables de WordPress et de ses fichiers inclus. */

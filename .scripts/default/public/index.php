@@ -14,4 +14,4 @@
 define( 'WP_USE_THEMES', true );
 
 /** Loads the WordPress Environment and Template */
-require __DIR__ . '/wordpress/wp-blog-header.php';
+require dirname( __DIR__ ) . DIRECTORY_SEPARATOR . 'wordpress' . DIRECTORY_SEPARATOR . 'wp-blog-header.php';
