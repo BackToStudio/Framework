@@ -7,28 +7,27 @@ class CreateProject {
 		echo "\n\n";
 		echo "🧠 Installing Bazooka Core \n\n";	
 
-		CreateProject::moveFiles("default/", "../");
+		$source = __DIR__ . DIRECTORY_SEPARATOR . "default/";
+		$destination =  __DIR__ . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR;
+
+		CreateProject::moveFiles($source, $destination);
 	}
 
 	public static function moveFiles(string $source, string $destination) {
-		// Open a known sourceectory, and proceed to read its contents
-		if (is_dir($source)) {
+		$dir = opendir($source);
+		@mkdir($destination);
 
-			if ($stream = opensource($source)) {
-
-				while (($file = readdir($stream)) !== false) {
-					//exclude unwanted 
-					if ($file==".") continue;
-					if ($file=="..")continue;
-					
-					//if ($file=="index.php") continue; for example if you have index.php in the folder
-					if (rename($source.'/'.$file,$destination.'/'.$file)) {
-						echo "Copying files... \n";
-					}
+		while(( $file = readdir($dir)) ) {
+			if (( $file != '.' ) && ( $file != '..' )) {
+				if ( is_dir($source . '/' . $file) ) {
+					CreateProject::moveFiles($source .'/'. $file, $destination .'/'. $file);
 				}
-
-				closedir($stream);
+				else {
+					copy($source .'/'. $file,$destination .'/'. $file);
+				}
 			}
 		}
+
+		closedir($dir);
 	}
 }
