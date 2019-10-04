@@ -8,7 +8,7 @@
 
 require_once dirname( __DIR__ ) . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
 
-$root_dir = __ DIR__ . '/public';
+$root_dir = __DIR__ . '/public';
 
 /**
  * Use Dotenv to set required environment variables and load .env file in root
