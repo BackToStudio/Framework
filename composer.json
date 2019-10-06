@@ -9,22 +9,11 @@
   ],
   "require": {
     "php-di/php-di": "^6.0",
-    "vlucas/phpdotenv": "^3.6",
-    "php": ">=7.1",
-    "johnpbloch/wordpress": "5.2.3"
-  },
-  "extra": {
-    "wordpress-install-dir": "wordpress"
+    "php": ">=7.1"
   },
   "autoload": {
     "psr-4": {
-      "Fantassin\\Core\\": "src",
-      "Bazooka\\": ".scripts/"
+      "Fantassin\\Core\\": "src"
     }
-  },
-  "scripts": {
-    "post-install-cmd": [
-      "Bazooka\\CreateProject::init"
-    ]
   }
 }
