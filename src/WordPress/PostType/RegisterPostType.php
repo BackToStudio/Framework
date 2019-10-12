@@ -17,6 +17,11 @@ class RegisterPostType implements HasHooks {
 
 	public function hooks() {
 		add_action( 'init', [ $this, 'registerPostType' ] );
+		add_action( 'registered_post_type', [ $this, 'flushRules' ] );
+	}
+
+	public function flushRules() {
+		flush_rewrite_rules();
 	}
 
 	public function registerPostType() {
