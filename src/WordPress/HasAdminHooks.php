@@ -1,12 +1,12 @@
 <?php
 
-namespace Fantassin\Core;
+namespace Fantassin\Core\WordPress;
 
 if ( ! defined( 'ABSPATH' ) ) {
   exit; // Exit if accessed directly
 }
 
-interface HasHooks {
+interface HasAdminHooks {
 
   public function hooks();
 

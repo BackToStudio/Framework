@@ -1,14 +1,14 @@
 <?php
 
-namespace Fantassin\Core;
+namespace Fantassin\Core\WordPress;
 
-use DI\Container;
+use DI\Container as DIContainer;
 use DI\ContainerBuilder;
 
-class WordPressContainer {
+class Container {
 
 	/**
-	 * @var Container
+	 * @var DIContainer
 	 */
 	private $container;
 
@@ -33,10 +33,11 @@ class WordPressContainer {
 		return $this->container->set( $name, $value );
 	}
 
-	public function build() {
+	public function runHooks() {
 
 		foreach ( $this->container->getKnownEntryNames() as $entry ) {
 			$action = $this->get( $entry );
+			//var_dump($action);
 
 			if ( $action instanceof HasHooks ) {
 				$action->hooks();
