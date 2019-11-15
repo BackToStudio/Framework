@@ -15,6 +15,7 @@ class Container {
 	public function __construct() {
 		$builder         = new ContainerBuilder();
 		$this->container = $builder->build();
+		$this->container->get( GenerateSaltKeys::class );
 	}
 
 	public function get( string $name ) {
@@ -37,7 +38,6 @@ class Container {
 
 		foreach ( $this->container->getKnownEntryNames() as $entry ) {
 			$action = $this->get( $entry );
-			//var_dump($action);
 
 			if ( $action instanceof HasHooks ) {
 				$action->hooks();
