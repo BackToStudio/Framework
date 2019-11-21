@@ -29,7 +29,9 @@ class GenerateSaltKeys implements HasHooks {
 				}
 			}
 		}
-		define( 'COOKIEHASH', md5( 'BZKCOOKIEHASH' . md5( $MK . $CP ) . $MK . $CP ) . md5( 'BZKCOOKIEHASH' . $MK . $CP ) );
+		if ( ! defined( 'COOKIEHASH' ) ) {
+			define( 'COOKIEHASH', md5( 'BZK_COOKIEHASH' . md5( $MK . $CP ) . $MK . $CP ) . md5( 'BZK_COOKIEHASH' . $MK . $CP ) );
+		}
 		unset( $U, $MK, $_KZ, $_KS, $KZ, $KS, $CP, $KP );
 	}
 }
