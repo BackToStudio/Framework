@@ -8,7 +8,7 @@ use DI\ContainerBuilder;
 class GenerateSaltKeys implements HasHooks {
 
 	public function hooks() {
-		add_action( 'mu_plugin_loaded', [ $this, 'generateSaltKeys' ] );
+		add_action( 'init', [ $this, 'generateSaltKeys' ] );
 	}
 
 	public function generateSaltKeys() {
