@@ -15,7 +15,7 @@ class Container {
 	public function __construct() {
 		$builder         = new ContainerBuilder();
 		$this->container = $builder->build();
-		$this->container->get( GenerateSaltKeys::class );
+		// $this->container->get( GenerateSaltKeys::class );
 	}
 
 	public function get( string $name ) {
