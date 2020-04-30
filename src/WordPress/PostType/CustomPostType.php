@@ -46,12 +46,28 @@ class CustomPostType {
 
 		if ( empty( $singular ) ) {
 			$singular = $this->postType;
+		} else {
+			trigger_error(
+				sprintf(
+					'Argument $singular is deprecated since %s, instead use RegisterPostType->add($postType, $args) to register a post type.',
+					'2.5.0'
+				),
+				E_USER_DEPRECATED
+			);
 		}
 
 		$this->singular = $singular;
 
 		if ( empty( $plural ) ) {
 			$plural = $this->postType;
+		} else {
+			trigger_error(
+				sprintf(
+					'Argument $plural is deprecated since %s, instead use RegisterPostType->add($postType, $args) to register a post type.',
+					'2.5.0'
+				),
+				E_USER_DEPRECATED
+			);
 		}
 
 		$this->plural = $plural;
@@ -103,6 +119,7 @@ class CustomPostType {
 	}
 
 	/**
+	 * @deprecated Deprecated since version 2.5.0
 	 * @return string
 	 */
 	private function getPlural(): string {
@@ -110,6 +127,7 @@ class CustomPostType {
 	}
 
 	/**
+	 * @deprecated Deprecated since version 2.5.0
 	 * @return string
 	 */
 	private function getSingular(): string {
@@ -118,8 +136,9 @@ class CustomPostType {
 
 
 	/**
-	 * Display minimum labels
+	 * Display minimum labels.
 	 *
+	 * @deprecated Deprecated since version 2.5.0
 	 * @return array
 	 */
 	private function getLabels() {
@@ -128,5 +147,4 @@ class CustomPostType {
 			'singular_name' => $this->getSingular(),
 		];
 	}
-
 }

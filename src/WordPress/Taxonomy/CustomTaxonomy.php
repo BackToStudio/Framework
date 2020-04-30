@@ -52,23 +52,48 @@ class CustomTaxonomy {
 
 		if ( empty( $singular ) ) {
 			$singular = $this->taxonomy;
+		} else {
+			trigger_error(
+				sprintf(
+					'Argument $singular is deprecated since %s, instead use RegisterTaxonomy->add($taxonomy, $postType, $args) to register a taxonomy.',
+					'2.5.0'
+				),
+				E_USER_DEPRECATED
+			);
 		}
 
 		$this->singular = $singular;
 
 		if ( empty( $plural ) ) {
 			$plural = $this->taxonomy;
+		} else {
+			trigger_error(
+				sprintf(
+					'Argument $plural is deprecated since %s, instead use RegisterTaxonomy->add($taxonomy, $postType, $args) to register a taxonomy.',
+					'2.5.0'
+				),
+				E_USER_DEPRECATED
+			);
 		}
 
 		$this->plural    = $plural;
 		$this->postTypes = $postTypes;
 
+		/**
+		 * Prepare labels.
+		 */
+		$labels = $this->getLabels();
+
+		if ( array_key_exists( 'labels', $args ) ) {
+			$labels = array_merge( $labels, $args['labels'] );
+		}
+
 		$this->args = array_merge( $args,
 			[
-				'hierarchical' => true, // Display checkbox in Post Type edit view
-				'show_ui'      => true, // Display in WordPress Admin
-				'show_in_rest' => true, // Allow Gutenberg editor
-				'labels'       => $this->getLabels()
+				'hierarchical' => true, // Display checkbox in Post Type edit view.
+				'show_ui'      => true, // Display in WordPress Admin.
+				'show_in_rest' => true, // Allow Gutenberg editor.
+				'labels'       => $labels
 			]
 		);
 	}
@@ -91,6 +116,7 @@ class CustomTaxonomy {
 	/**
 	 * Display minimum labels
 	 *
+	 * @deprecated Deprecated since version 2.5.0
 	 * @return array
 	 */
 	private function getLabels() {
@@ -101,6 +127,7 @@ class CustomTaxonomy {
 	}
 
 	/**
+	 * @deprecated Deprecated since version 2.5.0
 	 * @return string
 	 */
 	public function getPlural(): string {
@@ -108,6 +135,7 @@ class CustomTaxonomy {
 	}
 
 	/**
+	 * @deprecated Deprecated since version 2.5.0
 	 * @return string
 	 */
 	public function getSingular(): string {

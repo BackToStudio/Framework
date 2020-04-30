@@ -2,6 +2,7 @@
 
 namespace Fantassin\Core\WordPress\Taxonomy;
 
+use Exception;
 use Fantassin\Core\WordPress\HasHooks;
 
 class RegisterTaxonomy implements HasHooks {
@@ -41,5 +42,23 @@ class RegisterTaxonomy implements HasHooks {
 	 */
 	public function getRepository(): TaxonomyRepository {
 		return $this->repository;
+	}
+
+	/**
+	 * Register new Taxonomy on the fly.
+	 *
+	 * @param string $taxonomy
+	 * @param $postTypes
+	 * @param array $args
+	 *
+	 * @return RegisterTaxonomy
+	 * @throws Exception
+	 */
+	public function add( string $taxonomy, $postTypes, $args = [] ) {
+		$repository  = $this->getRepository();
+		$newPostType = new CustomTaxonomy( $taxonomy, '', '', $postTypes, $args );
+		$repository->add( $newPostType );
+
+		return $this;
 	}
 }

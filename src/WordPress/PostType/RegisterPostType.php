@@ -2,6 +2,7 @@
 
 namespace Fantassin\Core\WordPress\PostType;
 
+use Exception;
 use Fantassin\Core\WordPress\HasHooks;
 
 class RegisterPostType implements HasHooks {
@@ -41,5 +42,23 @@ class RegisterPostType implements HasHooks {
 	 */
 	public function getRepository(): PostTypeRepository {
 		return $this->repository;
+	}
+
+
+	/**
+	 * Register new Custom Post Type on the fly.
+	 *
+	 * @param string $postType
+	 * @param array $args
+	 *
+	 * @return $this
+	 * @throws Exception
+	 */
+	public function add( string $postType, $args = [] ) {
+		$repository  = $this->getRepository();
+		$newPostType = new CustomPostType( $postType, '', '', $args );
+		$repository->add( $newPostType );
+
+		return $this;
 	}
 }
