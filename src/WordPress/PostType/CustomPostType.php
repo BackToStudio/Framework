@@ -55,13 +55,37 @@ class CustomPostType {
 		}
 
 		$this->plural = $plural;
-		$this->args   = array_merge( $args,
+
+		/**
+		 * Prepare labels.
+		 */
+		$labels = $this->getLabels();
+
+		if ( array_key_exists( 'labels', $args ) ) {
+			$labels = array_merge( $labels, $args['labels'] );
+		}
+
+		$args = array_merge( $args,
 			[
-				'show_ui'      => true, // Display in WordPress Admin
-				'show_in_rest' => true, // Allow Gutenberg editor
-				'labels'       => $this->getLabels()
+				'show_ui'            => true, // Display in WordPress Admin.
+				'show_in_rest'       => true, // Allow Gutenberg editor.
+				'publicly_queryable' => true, // Allow query.
+				'labels'             => $labels,
 			]
 		);
+
+		/**
+		 * Add right supports when post type is hierarchical.
+		 */
+		if ( array_key_exists( 'hierarchical', $args ) && $args['hierarchical'] ) {
+			$supports = [ 'page-attributes', 'editor', 'title' ];
+			if ( array_key_exists( 'supports', $args ) ) {
+				$supports = array_merge( $supports, $args['supports'] );
+			}
+			$args['supports'] = $supports;
+		}
+
+		$this->args = $args;
 	}
 
 	/**
