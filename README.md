@@ -3,12 +3,14 @@ BZK Core improve WordPress Development Experience
 
 ## Installation
 Use the package manager [composer](https://getcomposer.org/) to install BZK Core.
-```composer require fantassin/core```
+```bash
+composer require fantassin/core
+```
 
 ## Usage
 In `functions.php` file of you WordPress theme you can use Dependency Injection like :
 
-```
+```php
 use Fantassin\Core\WordPress\Container;
 use Fantassin\Core\WordPress\Admin\AddReusableBlockMenu;
 
@@ -20,7 +22,7 @@ $container->runHooks();
 ## Register custom Post Type and Taxonomy
 In `functions.php` file of you WordPress theme you can register custom Post Type like :
 
-```
+```php
 use Fantassin\Core\WordPress\Container;
 use Fantassin\Core\WordPress\PostType\RegisterPostType;
 
@@ -50,7 +52,7 @@ $container->runHooks();
 
 Or register custom Taxonomy with : 
 
-```
+```php
 use Fantassin\Core\WordPress\Container;
 use Fantassin\Core\WordPress\Taxonomy\RegisterTaxonomy;
 
@@ -74,3 +76,6 @@ $taxonomy->add(
 
 $container->runHooks();
 ```
+
+## Contributing
+Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
