@@ -38,7 +38,9 @@ class CustomPostType {
 	 */
 	public function __construct( string $postType, string $singular = '', string $plural = '', array $args = [] ) {
 
-		if ( empty( $postType ) ) {
+        trigger_error( 'Fantassin\Core\WordPress\PostType\CustomPostType is deprecated, you can use Fantassin\Core\WordPress\PostType\PostTypeFactory to create new Post Type', E_USER_DEPRECATED);
+
+        if ( empty( $postType ) ) {
 			throw new Exception( 'WordPress required post type name. (max. 20 characters, cannot contain capital letters, underscores or spaces)' );
 		}
 

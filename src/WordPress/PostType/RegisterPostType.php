@@ -3,62 +3,66 @@
 namespace Fantassin\Core\WordPress\PostType;
 
 use Exception;
-use Fantassin\Core\WordPress\HasHooks;
+use Fantassin\Core\WordPress\Hooks\Hooks;
 
-class RegisterPostType implements HasHooks {
+class RegisterPostType implements Hooks
+{
 
-	/**
-	 * @var PostTypeRepository
-	 */
-	private $repository;
+    /**
+     * @var PostTypeRepository
+     */
+    private $registry;
 
-	public function __construct( PostTypeRepository $postTypeRepository ) {
-		$this->repository = $postTypeRepository;
-	}
+    /**
+     * @var PostTypeFactory
+     */
+    private $factory;
 
-	public function hooks() {
-		add_action( 'init', [ $this, 'registerPostType' ] );
-		add_action( 'registered_post_type', [ $this, 'flushRules' ] );
-	}
+    public function __construct(PostTypeRegistry $postTypeRegistry, PostTypeFactory $postTypeFactory)
+    {
+        $this->registry = $postTypeRegistry;
+        $this->factory = $postTypeFactory;
+    }
 
-	public function flushRules() {
-		flush_rewrite_rules();
-	}
+    public function hooks()
+    {
+        add_action('init', [$this, 'registerCustomPostTypes']);
+        add_action('registered_post_type', [$this, 'flushRules']);
+    }
 
-	public function registerPostType() {
-		$repository = $this->getRepository();
-		foreach ( $repository->getPostTypes() as $postType ) {
+    public function flushRules()
+    {
+        flush_rewrite_rules();
+    }
 
-			if ( post_type_exists( $postType->getPostType() ) ) {
-				return;
-			}
+    public function registerCustomPostTypes()
+    {
+        foreach ($this->registry->getPostTypes() as $postType) {
+            if (post_type_exists($postType->getKey())) {
+                return;
+            }
 
-			register_post_type( $postType->getPostType(), $postType->getArgs() );
-		}
-	}
+            register_post_type($postType->getKey(), $postType->getArgs());
+        }
+    }
 
-	/**
-	 * @return PostTypeRepository
-	 */
-	public function getRepository(): PostTypeRepository {
-		return $this->repository;
-	}
+    /**
+     * Register new Custom Post Type on the fly.
+     *
+     * @param string $name
+     * @param array $args
+     *
+     * @return $this
+     */
+    public function add(string $name, array $args = []): RegisterPostType
+    {
+        try {
+            $newPostType = $this->factory->createPostTypeFromArray($name, $args);
+            $this->registry->add($newPostType);
+        } catch (Exception $e) {
+            error_log($e->getMessage());
+        }
 
-
-	/**
-	 * Register new Custom Post Type on the fly.
-	 *
-	 * @param string $postType
-	 * @param array $args
-	 *
-	 * @return $this
-	 * @throws Exception
-	 */
-	public function add( string $postType, $args = [] ) {
-		$repository  = $this->getRepository();
-		$newPostType = new CustomPostType( $postType, '', '', $args );
-		$repository->add( $newPostType );
-
-		return $this;
-	}
+        return $this;
+    }
 }

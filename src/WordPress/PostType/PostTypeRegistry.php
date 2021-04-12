@@ -2,15 +2,8 @@
 
 namespace Fantassin\Core\WordPress\PostType;
 
-/**
- * @deprecated
- */
-class PostTypeRepository
+class PostTypeRegistry
 {
-
-    public function __construct(){
-        trigger_error('Fantassin\Core\WordPress\PostType\PostTypeRepository is deprecated, use Fantassin\Core\WordPress\PostType\PostTypeRegistry instead.', E_USER_DEPRECATED);
-    }
 
     /**
      * @var PostTypeInterface[]
