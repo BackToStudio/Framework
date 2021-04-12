@@ -1,8 +1,8 @@
 <?php
 
-namespace Fantassin\Core\WordPress\Users;
+namespace Fantassin\Core\WordPress\DependencyInjection\Users;
 
-use Fantassin\Core\WordPress\HasHooks;
+use Fantassin\Core\WordPress\DependencyInjection\HasHooks;
 use WP_Admin_Bar;
 
 class AddMenuForEditors implements HasHooks {

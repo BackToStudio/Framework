@@ -5,6 +5,9 @@ namespace Fantassin\Core\WordPress;
 use DI\Container as DIContainer;
 use DI\ContainerBuilder;
 
+/**
+ * @deprecated
+ */
 class Container {
 
 	/**
