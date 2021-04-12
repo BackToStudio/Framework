@@ -2,17 +2,12 @@
 
 namespace Fantassin\Core\WordPress\Blocks;
 
-class CustomBlock implements HasBlockName {
+use Fantassin\Core\WordPress\Contracts\BlockInterface;
 
-    /**
-     * @var string
-     */
-    protected $name;
+abstract class CustomBlock implements BlockInterface {
 
     /**
      * @return string
      */
-    public function getName(): string {
-        return $this->name;
-    }
+    abstract public function getName(): string;
 }
