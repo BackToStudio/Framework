@@ -112,11 +112,6 @@ abstract class PluginKernel
     {
         try {
             $container = $this->getContainer();
-
-            if (!$container->has(HookRegistry::class)) {
-                return;
-            }
-
             /** @var HookRegistry $hooksRegistry */
             $hooksRegistry = $container->get(HookRegistry::class);
             $hooksRegistry->runHooks();
@@ -137,8 +132,11 @@ abstract class PluginKernel
      * @param ContainerBuilder $containerBuilder
      * @param string $classname
      */
-    private function dumpContainer(ConfigCacheInterface $configCache, ContainerBuilder $containerBuilder, string $classname)
-    {
+    private function dumpContainer(
+        ConfigCacheInterface $configCache,
+        ContainerBuilder $containerBuilder,
+        string $classname
+    ) {
         $dumper = new PhpDumper($containerBuilder);
         $configCache->write(
             $dumper->dump(
@@ -161,7 +159,7 @@ abstract class PluginKernel
     {
         $containerBuilder = new ContainerBuilder();
 
-        $this->loadServices( $containerBuilder );
+        $this->loadServices($containerBuilder);
 
         $containerBuilder->setParameter('plugin.info', \get_plugin_data($this->getPluginFile()));
 
@@ -182,6 +180,9 @@ abstract class PluginKernel
 
     private function loadServices(ContainerBuilder $containerBuilder)
     {
+        if (!$containerBuilder->has(HookRegistry::class)) {
+            $containerBuilder->register(HookRegistry::class)->setPublic(true);
+        }
         $loader = new PhpFileLoader($containerBuilder, new FileLocator($this->getPluginDir()));
         $loader->load('config/services.php');
     }
