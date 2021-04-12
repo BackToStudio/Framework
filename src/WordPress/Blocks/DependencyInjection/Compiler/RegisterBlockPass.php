@@ -1,6 +1,6 @@
 <?php
 
-namespace Fantassin\Core\WordPress\DependencyInjection\Compiler;
+namespace Fantassin\Core\WordPress\Blocks\DependencyInjection\Compiler;
 
 use Fantassin\Core\WordPress\Blocks\BlockRegistry;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
