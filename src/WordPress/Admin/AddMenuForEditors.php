@@ -1,11 +1,11 @@
 <?php
 
-namespace Fantassin\Core\WordPress\DependencyInjection\Users;
+namespace Fantassin\Core\WordPress\Admin;
 
-use Fantassin\Core\WordPress\DependencyInjection\HasHooks;
+use Fantassin\Core\WordPress\Contracts\AdminHooks;
 use WP_Admin_Bar;
 
-class AddMenuForEditors implements HasHooks {
+class AddMenuForEditors implements AdminHooks {
 
 	public function hooks() {
 		add_action( 'admin_head', [ $this, 'display_appearance_menu' ] );
