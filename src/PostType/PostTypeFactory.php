@@ -2,7 +2,7 @@
 
 namespace Fantassin\Core\WordPress\PostType;
 
-use Symfony\Component\Config\Definition\Exception\Exception;
+use Exception;
 
 class PostTypeFactory
 {
@@ -11,6 +11,7 @@ class PostTypeFactory
      * @param array $args
      *
      * @return PostType
+     * @throws Exception
      */
     public function createPostTypeFromArray(string $key, array $args): PostType
     {
@@ -20,11 +21,13 @@ class PostTypeFactory
             );
         }
 
-        $args = $this->prepareHierarchicalArgs($args);
         $args = $this->prepareDefaultArgs($args);
+        $args = $this->prepareHierarchicalArgs($args);
+        $args = $this->prepareEditorArgs($args);
 
         $postType = new PostType();
-        $postType->setKey($key)
+        $postType
+            ->setKey($key)
             ->setArgs($args);
 
         return $postType;
@@ -39,7 +42,7 @@ class PostTypeFactory
      */
     private function prepareHierarchicalArgs(array $args): array
     {
-        if (\array_key_exists('hierarchical', $args) && $args['hierarchical']) {
+        if (\array_key_exists('hierarchical', $args) && boolval($args['hierarchical']) === true) {
             $supports = ['page-attributes', 'editor', 'title'];
             if (\array_key_exists('supports', $args)) {
                 $supports = array_merge($supports, $args['supports']);
@@ -51,7 +54,7 @@ class PostTypeFactory
     }
 
     /**
-     * Add right supports when post type is hierarchical.
+     * Add right supports when post type supports editor.
      *
      * @param array $args
      *
