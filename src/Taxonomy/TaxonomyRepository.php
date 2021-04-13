@@ -1,0 +1,32 @@
+<?php
+
+namespace Fantassin\Core\WordPress\DependencyInjection\Taxonomy;
+
+class TaxonomyRepository
+{
+
+    /**
+     * @var CustomTaxonomy[]
+     */
+    private $taxonomies = [];
+
+    /**
+     * @param CustomTaxonomy $taxonomy
+     *
+     * @return TaxonomyRepository
+     */
+    public function add(CustomTaxonomy $taxonomy): TaxonomyRepository
+    {
+        $this->taxonomies[] = $taxonomy;
+
+        return $this;
+    }
+
+    /**
+     * @return TaxonomyRepository[]
+     */
+    public function getTaxonomies(): array
+    {
+        return $this->taxonomies;
+    }
+}

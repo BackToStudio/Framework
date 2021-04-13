@@ -15,7 +15,7 @@
   },
   "autoload": {
     "psr-4": {
-      "Fantassin\\Core\\": "src"
+      "Fantassin\\Core\\WordPress\\": "src"
     }
   }
 }
