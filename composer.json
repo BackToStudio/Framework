@@ -22,6 +22,7 @@
     "phpunit/phpunit": "^9.5"
   },
   "scripts": {
-    "tests-post-type": "./vendor/bin/phpunit ./src/PostType/Tests --colors=always"
+    "tests-post-type": "./vendor/bin/phpunit ./src/PostType/Tests --colors=always",
+    "tests-blocks": "./vendor/bin/phpunit ./src/Blocks/Tests --colors=always"
   }
 }
