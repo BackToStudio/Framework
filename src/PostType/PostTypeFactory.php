@@ -97,7 +97,7 @@ class PostTypeFactory
     private function addArgIfNotExist(array $args, string $key, $value): array
     {
         if (!\array_key_exists($key, $args)) {
-            $args[$key] = $value; // Display in WordPress Admin.
+            $args[$key] = $value;
         }
 
         return $args;
