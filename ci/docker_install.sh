@@ -8,13 +8,15 @@ set -xe
 # Install git (the php image doesn't have it) which is required by composer
 apt-get update -yqq
 apt-get install git -yqq
-apt-get install -y wget
 
 # Install mysql driver
 # Here you can install any other extension that you need
 docker-php-ext-install pdo_mysql
 
 # Install composer dependencies
+apt-get install -y wget
+docker-php-ext-install zip
+docker-php-ext-install unzip
 wget https://composer.github.io/installer.sig -O - -q | tr -d '\n' > installer.sig
 php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
 php -r "if (hash_file('SHA384', 'composer-setup.php') === file_get_contents('installer.sig')) { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
