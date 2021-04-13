@@ -13,9 +13,9 @@ class PostTypeRegistry
     /**
      * @param PostTypeInterface $postType
      *
-     * @return PostTypeRepository
+     * @return PostTypeRegistry
      */
-    public function add(PostTypeInterface $postType): PostTypeRepository
+    public function add(PostTypeInterface $postType): PostTypeRegistry
     {
         $this->postTypes[] = $postType;
 

@@ -2,19 +2,17 @@
 
 namespace Fantassin\Core\WordPress\Plugin;
 
-use Fantassin\Core\WordPress\Contracts\BlockInterface;
-use Fantassin\Core\WordPress\Contracts\HookInterface;
-use Fantassin\Core\WordPress\DependencyInjection\Compiler\RegisterBlockPass;
-use Fantassin\Core\WordPress\DependencyInjection\Compiler\HookPass;
-use Fantassin\Core\WordPress\Hooks\DependencyInjection\Compiler\RegisterHookPass;
 use Fantassin\Core\WordPress\Hooks\HookRegistry;
+use Fantassin\Core\WordPress\Contracts\HookInterface;
+use Fantassin\Core\WordPress\Contracts\BlockInterface;
+use Fantassin\Core\WordPress\Hooks\DependencyInjection\Compiler\RegisterHookPass;
+use Fantassin\Core\WordPress\Blocks\DependencyInjection\Compiler\RegisterBlockPass;
 use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\Config\ConfigCacheInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
-use Symfony\Component\DependencyInjection\Loader\FileLoader;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 
 abstract class PluginKernel
@@ -161,7 +159,7 @@ abstract class PluginKernel
 
         $this->loadServices($containerBuilder);
 
-        $containerBuilder->setParameter('plugin.info', \get_plugin_data($this->getPluginFile()));
+//        $containerBuilder->setParameter('plugin.info', \get_plugin_data($this->getPluginFile()));
 
         /**
          * TODO: To move in DependencyInjection/Extension
