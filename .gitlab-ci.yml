@@ -22,13 +22,25 @@ before_script:
 #    - php composer.phar run tests-post-type
 
 # We test PHP 7.3
-test:7.3:
+test:post-type:7.3:
   image: php:7.3
   script:
     - php composer.phar run tests-post-type
 
 # We test PHP 7.4
-test:7.4:
+test:post-type:7.4:
   image: php:7.4
   script:
     - php composer.phar run tests-post-type
+
+# We test PHP 7.3
+test:blocks:7.3:
+  image: php:7.3
+  script:
+    - php composer.phar run tests-blocks
+
+# We test PHP 7.4
+test:blocks:7.4:
+  image: php:7.4
+  script:
+    - php composer.phar run tests-blocks

@@ -13,7 +13,7 @@ class PostTypeFactory
      * @return PostType
      * @throws Exception
      */
-    public function createPostTypeFromArray(string $key, array $args): PostType
+    public function createPostType(string $key, array $args): PostType
     {
         if (empty($key)) {
             throw new Exception(
@@ -97,7 +97,7 @@ class PostTypeFactory
     private function addArgIfNotExist(array $args, string $key, $value): array
     {
         if (!\array_key_exists($key, $args)) {
-            $args[$key] = $value; // Display in WordPress Admin.
+            $args[$key] = $value;
         }
 
         return $args;

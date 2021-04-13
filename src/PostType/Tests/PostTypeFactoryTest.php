@@ -55,7 +55,7 @@ class PostTypeFactoryTest extends TestCase
     public function whenImCreatingPostType(string $key, array $args): PostType
     {
         $postType = new PostTypeFactory();
-        return $postType->createPostTypeFromArray($key, $args);
+        return $postType->createPostType($key, $args);
     }
 
     /**
