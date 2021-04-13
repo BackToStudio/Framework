@@ -13,7 +13,7 @@ class PostTypeFactory
      * @return PostType
      * @throws Exception
      */
-    public function createPostTypeFromArray(string $key, array $args): PostType
+    public function createPostType(string $key, array $args): PostType
     {
         if (empty($key)) {
             throw new Exception(

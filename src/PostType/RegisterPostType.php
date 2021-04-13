@@ -3,7 +3,7 @@
 namespace Fantassin\Core\WordPress\PostType;
 
 use Exception;
-use Fantassin\Core\WordPress\Hooks\Hooks;
+use Fantassin\Core\WordPress\Contracts\Hooks;
 
 class RegisterPostType implements Hooks
 {
@@ -57,7 +57,7 @@ class RegisterPostType implements Hooks
     public function add(string $name, array $args = []): RegisterPostType
     {
         try {
-            $newPostType = $this->factory->createPostTypeFromArray($name, $args);
+            $newPostType = $this->factory->createPostType($name, $args);
             $this->registry->add($newPostType);
         } catch (Exception $e) {
             error_log($e->getMessage());
