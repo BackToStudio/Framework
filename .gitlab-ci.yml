@@ -1,0 +1,34 @@
+# Composer stores all downloaded packages in the vendor/ directory.
+# Do not use the following if the vendor/ directory is committed to
+# your git repository.
+cache:
+  paths:
+    - vendor/
+
+before_script:
+  # Install dependencies
+  - bash ci/docker_install.sh > /dev/null
+
+# We test PHP 7.1
+#test:7.1:
+#  image: php:7.1
+#  script:
+#    - php composer.phar run test-post-type
+
+# We test PHP 7.2
+#test:7.2:
+#  image: php:7.2
+#  script:
+#    - php composer.phar run tests-post-type
+
+# We test PHP 7.3
+test:7.3:
+  image: php:7.3
+  script:
+    - php composer.phar run tests-post-type
+
+# We test PHP 7.4
+test:7.4:
+  image: php:7.4
+  script:
+    - php composer.phar run tests-post-type

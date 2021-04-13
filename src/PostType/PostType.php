@@ -18,7 +18,7 @@ class PostType implements PostTypeInterface
     /**
      * @return string
      */
-    public function getKey(): string
+    public function getKey(): ?string
     {
         return $this->key;
     }
