@@ -9,7 +9,7 @@ interface PostTypeInterface
     /**
      * @return string
      */
-    public function getKey(): string;
+    public function getKey(): ?string;
 
     /**
      * @return array
