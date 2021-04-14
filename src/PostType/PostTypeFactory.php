@@ -26,6 +26,16 @@ class PostTypeFactory
         $args = $this->prepareHierarchicalArgs($args);
         $args = $this->prepareEditorArgs($args);
 
+        // Add arbitrary labels if no exists.
+        $args = $this->addArgIfNotExist(
+            $args,
+            'labels',
+            [
+                'name' => $this->getPluralName($key),
+                'singular_name' => $this->getSingularName($key),
+            ]
+        );
+
         $postType = new PostType();
         $postType
             ->setKey($key)
@@ -102,5 +112,17 @@ class PostTypeFactory
         }
 
         return $args;
+    }
+
+    public function getSingularName(string $key): string
+    {
+        $name = str_replace('-', ' ', $key);
+        $name = str_replace('_', ' ', $name);
+        return ucwords($name);
+    }
+
+    public function getPluralName(string $key): string
+    {
+        return $this->getSingularName($key) . 's';
     }
 }

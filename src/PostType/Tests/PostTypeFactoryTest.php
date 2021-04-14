@@ -54,8 +54,8 @@ class PostTypeFactoryTest extends TestCase
      */
     public function whenImCreatingPostType(string $key, array $args): PostType
     {
-        $postType = new PostTypeFactory();
-        return $postType->createPostType($key, $args);
+        $factory = new PostTypeFactory();
+        return $factory->createPostType($key, $args);
     }
 
     /**
@@ -161,6 +161,17 @@ class PostTypeFactoryTest extends TestCase
         $this->thenIShouldHaveCustomFieldSupports($postType->getArgs());
         $this->thenIShouldHaveRevisionsSupports($postType->getArgs());
         $this->thenIShouldHaveTitleSupports($postType->getArgs());
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function testPostTypeNames()
+    {
+        $key = 'abc-def';
+        $factory = new PostTypeFactory();
+        $this->assertSame('Abc Def', $factory->getSingularName($key));
+        $this->assertSame('Abc Defs', $factory->getPluralName($key));
     }
 
 }
