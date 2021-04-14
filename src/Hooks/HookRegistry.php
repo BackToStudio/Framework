@@ -5,8 +5,9 @@ namespace Fantassin\Core\WordPress\Hooks;
 use Fantassin\Core\WordPress\Contracts\HookInterface;
 use Fantassin\Core\WordPress\Contracts\AdminHooks;
 use Fantassin\Core\WordPress\Contracts\Hooks;
+use Fantassin\Core\WordPress\Contracts\RegistryInterface;
 
-class HookRegistry
+class HookRegistry implements RegistryInterface
 {
 
     /**

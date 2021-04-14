@@ -2,7 +2,7 @@
 
 namespace Fantassin\Core\WordPress\PostType\Tests;
 
-use Fantassin\Core\WordPress\PostType\PostType;
+use Fantassin\Core\WordPress\PostType\Entity\PostType;
 use PHPUnit\Framework\TestCase;
 
 class PostTypeTest extends TestCase

@@ -1,6 +1,8 @@
 <?php
 
-namespace Fantassin\Core\WordPress\PostType;
+namespace Fantassin\Core\WordPress\PostType\Entity;
+
+use Fantassin\Core\WordPress\PostType\PostTypeInterface;
 
 class PostType implements PostTypeInterface
 {

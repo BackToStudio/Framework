@@ -5,6 +5,7 @@ namespace Fantassin\Core\WordPress\Blocks\Tests;
 use Fantassin\Core\WordPress\Blocks\BlockRegistry;
 use Fantassin\Core\WordPress\Contracts\BlockInterface;
 use Fantassin\Core\WordPress\Contracts\DynamicBlock;
+use Fantassin\Core\WordPress\Contracts\RegistryInterface;
 use PHPUnit\Framework\TestCase;
 
 class BlockA implements BlockInterface
@@ -65,6 +66,7 @@ class BlockRegistryTest extends TestCase
         $registry = $this->givenNewBlockRegistry();
         $registry = $this->whenThereAreNoBlocksAdded($registry);
         $this->thenRegistryShouldHaveNoBlocks($registry);
+        $this->isInstanceOf(RegistryInterface::class);
     }
 
     public function testAddingBlocks()
