@@ -18,7 +18,7 @@ class RegisterPostType implements Hooks
      */
     private $factory;
 
-    public function __construct(PostTypeRegistry $postTypeRegistry, PostTypeFactory $postTypeFactory)
+    public function __construct(PostTypeRegistryInterface $postTypeRegistry, PostTypeFactory $postTypeFactory)
     {
         $this->registry = $postTypeRegistry;
         $this->factory = $postTypeFactory;
