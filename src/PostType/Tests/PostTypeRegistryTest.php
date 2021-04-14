@@ -2,12 +2,14 @@
 
 namespace Fantassin\Core\WordPress\PostType\Tests;
 
+use Fantassin\Core\WordPress\Contracts\RegistryInterface;
 use Fantassin\Core\WordPress\PostType\PostType;
 use Fantassin\Core\WordPress\PostType\PostTypeInterface;
 use Fantassin\Core\WordPress\PostType\PostTypeRegistry;
 use PHPUnit\Framework\TestCase;
 
-class PostTypeA implements PostTypeInterface{
+class PostTypeA implements PostTypeInterface
+{
 
     public function getKey(): string
     {
@@ -20,7 +22,8 @@ class PostTypeA implements PostTypeInterface{
     }
 }
 
-class PostTypeB implements PostTypeInterface{
+class PostTypeB implements PostTypeInterface
+{
 
     public function getKey(): string
     {
@@ -39,6 +42,7 @@ class PostTypeRegistryTest extends TestCase
     public function testEmptyRegistry()
     {
         $registry = new PostTypeRegistry();
+        $this->isInstanceOf(RegistryInterface::class);
         $this->assertCount(0, $registry->getPostTypes());
     }
 
