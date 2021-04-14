@@ -1,6 +1,6 @@
 <?php
 
-namespace Fantassin\Core\WordPress\DependencyInjection\Taxonomy;
+namespace Fantassin\Core\WordPress\Taxonomy;
 
 use Exception;
 
