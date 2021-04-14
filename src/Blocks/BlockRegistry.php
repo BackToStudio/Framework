@@ -3,8 +3,9 @@
 namespace Fantassin\Core\WordPress\Blocks;
 
 use Fantassin\Core\WordPress\Contracts\BlockInterface;
+use Fantassin\Core\WordPress\Contracts\RegistryInterface;
 
-class BlockRegistry
+class BlockRegistry implements RegistryInterface
 {
 
     /**
