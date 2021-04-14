@@ -178,7 +178,7 @@ abstract class PluginKernel
             ->addTag('wordpress.block');
 
         $containerBuilder->registerForAutoconfiguration(HookInterface::class)
-            ->addTag('wordpress.hooks');
+            ->addTag('wordpress.hook');
 
         $containerBuilder->addCompilerPass(new RegisterPostTypePass());
         $containerBuilder->addCompilerPass(new RegisterBlockPass());
