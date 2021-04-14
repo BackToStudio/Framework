@@ -3,6 +3,7 @@
 namespace Fantassin\Core\WordPress\PostType;
 
 use Exception;
+use Fantassin\Core\WordPress\PostType\Entity\PostType;
 
 class PostTypeFactory
 {

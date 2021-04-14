@@ -3,7 +3,7 @@
 namespace Fantassin\Core\WordPress\PostType\Tests;
 
 use Exception;
-use Fantassin\Core\WordPress\PostType\PostType;
+use Fantassin\Core\WordPress\PostType\Entity\PostType;
 use Fantassin\Core\WordPress\PostType\PostTypeFactory;
 use PHPUnit\Framework\TestCase;
 

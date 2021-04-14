@@ -2,11 +2,13 @@
 
 namespace Fantassin\Core\WordPress\Plugin;
 
+use Fantassin\Core\WordPress\Contracts\RegistryInterface;
 use Fantassin\Core\WordPress\Hooks\HookRegistry;
 use Fantassin\Core\WordPress\Contracts\HookInterface;
 use Fantassin\Core\WordPress\Contracts\BlockInterface;
 use Fantassin\Core\WordPress\Hooks\DependencyInjection\Compiler\RegisterHookPass;
 use Fantassin\Core\WordPress\Blocks\DependencyInjection\Compiler\RegisterBlockPass;
+use Fantassin\Core\WordPress\PostType\PostTypeInterface;
 use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\Config\ConfigCacheInterface;
 use Symfony\Component\Config\FileLocator;
@@ -164,6 +166,13 @@ abstract class PluginKernel
         /**
          * TODO: To move in DependencyInjection/Extension
          */
+
+        $containerBuilder->registerForAutoconfiguration(RegistryInterface::class)
+            ->setPublic(true);
+
+        $containerBuilder->registerForAutoconfiguration(PostTypeInterface::class)
+            ->addTag('wordpress.post_type');
+
         $containerBuilder->registerForAutoconfiguration(BlockInterface::class)
             ->addTag('wordpress.block');
 
@@ -178,10 +187,10 @@ abstract class PluginKernel
 
     private function loadServices(ContainerBuilder $containerBuilder)
     {
-        if (!$containerBuilder->has(HookRegistry::class)) {
-            $containerBuilder->register(HookRegistry::class)->setPublic(true);
-        }
         $loader = new PhpFileLoader($containerBuilder, new FileLocator($this->getPluginDir()));
         $loader->load('config/services.php');
+
+        $loader = new PhpFileLoader($containerBuilder, new FileLocator(__DIR__));
+        $loader->load('Resources/config/services.php');
     }
 }

@@ -4,6 +4,9 @@ namespace Fantassin\Core\WordPress\PostType;
 
 use Exception;
 
+/**
+ * @deprecated
+ */
 class CustomPostType {
 
 	/**
