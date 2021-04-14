@@ -3,7 +3,7 @@
 namespace Fantassin\Core\WordPress\PostType;
 
 use Exception;
-use Fantassin\Core\WordPress\Hooks\Hooks;
+use Fantassin\Core\WordPress\Contracts\Hooks;
 
 class RegisterPostType implements Hooks
 {

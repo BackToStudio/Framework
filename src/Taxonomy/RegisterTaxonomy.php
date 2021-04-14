@@ -1,9 +1,9 @@
 <?php
 
-namespace Fantassin\Core\WordPress\DependencyInjection\Taxonomy;
+namespace Fantassin\Core\WordPress\Taxonomy;
 
 use Exception;
-use Fantassin\Core\WordPress\Hooks\Hooks;
+use Fantassin\Core\WordPress\Contracts\Hooks;
 
 class RegisterTaxonomy implements Hooks
 {
