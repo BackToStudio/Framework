@@ -17,7 +17,7 @@ class RegisterHookPass implements CompilerPassInterface
 
 		$registryDefinition = $container->findDefinition( HookRegistry::class );
 
-		foreach ($container->findTaggedServiceIds('wordpress.hooks') as $id => $tags) {
+		foreach ($container->findTaggedServiceIds('wordpress.hook') as $id => $tags) {
 			$registryDefinition->addMethodCall( 'addHook', [new Reference($id)] );
 		}
 	}

@@ -1,6 +1,8 @@
 <?php
 
-namespace Fantassin\Core\WordPress\PostType;
+namespace Fantassin\Core\WordPress\PostType\Entity;
+
+use Fantassin\Core\WordPress\PostType\PostTypeInterface;
 
 class PostType implements PostTypeInterface
 {
@@ -18,7 +20,7 @@ class PostType implements PostTypeInterface
     /**
      * @return string
      */
-    public function getKey(): string
+    public function getKey(): ?string
     {
         return $this->key;
     }

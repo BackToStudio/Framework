@@ -3,9 +3,10 @@
 namespace Fantassin\Core\WordPress\PostType;
 
 use Exception;
+use Fantassin\Core\WordPress\Contracts\ActivationHooks;
 use Fantassin\Core\WordPress\Contracts\Hooks;
 
-class RegisterPostType implements Hooks
+class RegisterPostType implements Hooks, ActivationHooks
 {
 
     /**
@@ -24,10 +25,17 @@ class RegisterPostType implements Hooks
         $this->factory = $postTypeFactory;
     }
 
+    public function activate()
+    {
+        $this->registerCustomPostTypes();
+        $this->flushRules();
+    }
+
     public function hooks()
     {
         add_action('init', [$this, 'registerCustomPostTypes']);
         add_action('registered_post_type', [$this, 'flushRules']);
+        add_action('unregistered_post_type', [$this, 'flushRules']);
     }
 
     public function flushRules()
@@ -41,8 +49,12 @@ class RegisterPostType implements Hooks
             if (post_type_exists($postType->getKey())) {
                 return;
             }
-
-            register_post_type($postType->getKey(), $postType->getArgs());
+            try {
+                $newPostType = $this->factory->createPostType($postType->getKey(), $postType->getArgs());
+                register_post_type($newPostType->getKey(), $newPostType->getArgs());
+            } catch (Exception $exception) {
+                write_log($exception->getMessage());
+            }
         }
     }
 
@@ -57,7 +69,7 @@ class RegisterPostType implements Hooks
     public function add(string $name, array $args = []): RegisterPostType
     {
         try {
-            $newPostType = $this->factory->createPostTypeFromArray($name, $args);
+            $newPostType = $this->factory->createPostType($name, $args);
             $this->registry->add($newPostType);
         } catch (Exception $e) {
             error_log($e->getMessage());
