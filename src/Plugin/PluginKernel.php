@@ -24,7 +24,7 @@ abstract class PluginKernel
     /**
      * @var string
      */
-    protected $environnement;
+    protected $environment;
 
     /**
      * @var bool
@@ -41,9 +41,9 @@ abstract class PluginKernel
      */
     protected $pluginFile;
 
-    public function __construct(string $environnement, bool $debug)
+    public function __construct(string $environment, bool $debug)
     {
-        $this->environnement = $environnement;
+        $this->environment = $environment;
         $this->debug = $debug;
     }
 
@@ -96,9 +96,9 @@ abstract class PluginKernel
     /**
      * @return string
      */
-    public function getEnvironnement(): string
+    public function getEnvironment(): string
     {
-        return $this->environnement;
+        return $this->environment;
     }
 
     /**
