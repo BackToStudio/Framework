@@ -7,7 +7,49 @@ Use the package manager [composer](https://getcomposer.org/) to install BZK Core
 composer require fantassin/core
 ```
 
-## Usage
+## Usage in WordPress plugin
+If you want to create a plugin you can easily start with :
+
+```php
+use Fantassin\Core\WordPress\Plugin\PluginKernel;
+
+require_once __DIR__ . '/vendor/autoload.php';
+
+class YourPlugin extends PluginKernel
+{
+
+	public function getPluginName(): string
+	{
+		return 'fantassin-conditional-content-block';
+	}
+}
+
+$plugin = new YourPlugin( wp_get_environment_type(), WP_DEBUG );
+$plugin->load();
+```
+To auto-register services you can add into root folder of your plugin `config/services.php` file with this configuration : 
+
+```php
+<?php
+
+use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+
+return function (ContainerConfigurator $configurator) {
+	$services = $configurator->services()
+		->defaults()
+		->autowire()       // Automatically injects dependencies in your services.
+		->autoconfigure(); // Automatically registers your services as commands, event subscribers, etc.
+
+	// Makes classes in your-folder/ available to be used as services.
+	// This creates a service per class whose id is the fully-qualified class name.
+	$services->load('YourNamespace\\', '../your-folder/*')
+		->exclude('../your-folder/{Entity,Tests,OrOtherFolderToNotRegister}');
+};
+
+```
+
+
+## Usage in WordPress theme
 In `functions.php` file of you WordPress theme you can use Dependency Injection like :
 
 ```php
