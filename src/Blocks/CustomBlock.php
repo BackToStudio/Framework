@@ -4,7 +4,7 @@ namespace Fantassin\Core\WordPress\Blocks;
 
 use Fantassin\Core\WordPress\Contracts\BlockInterface;
 
-abstract class CustomBlock implements BlockInterface
+abstract class CustomBlock implements BlockInterface, HasBlockName
 {
 
     protected $name = '';
