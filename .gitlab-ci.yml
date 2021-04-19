@@ -69,7 +69,7 @@ test:taxonomy:7.3:
   artifacts:
     expire_in: 1 week
     reports:
-      junit: .phpunit.cache/blocks.xml
+      junit: .phpunit.cache/taxonomy.xml
 
 # We test PHP 7.4
 test:taxonomy:7.4:
@@ -79,4 +79,4 @@ test:taxonomy:7.4:
   artifacts:
     expire_in: 1 week
     reports:
-      junit: .phpunit.cache/blocks.xml
+      junit: .phpunit.cache/taxonomy.xml
