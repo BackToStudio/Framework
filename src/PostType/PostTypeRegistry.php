@@ -4,7 +4,7 @@ namespace Fantassin\Core\WordPress\PostType;
 
 use Fantassin\Core\WordPress\Contracts\RegistryInterface;
 
-class PostTypeRegistry implements RegistryInterface
+class PostTypeRegistry implements RegistryInterface, PostTypeRegistryInterface
 {
 
     /**
@@ -17,7 +17,7 @@ class PostTypeRegistry implements RegistryInterface
      *
      * @return PostTypeRegistry
      */
-    public function add(PostTypeInterface $postType): PostTypeRegistry
+    public function add(PostTypeInterface $postType): PostTypeRegistryInterface
     {
         $this->postTypes[] = $postType;
 

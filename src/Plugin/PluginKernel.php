@@ -8,6 +8,7 @@ use Fantassin\Core\WordPress\Contracts\HookInterface;
 use Fantassin\Core\WordPress\Contracts\BlockInterface;
 use Fantassin\Core\WordPress\Hooks\DependencyInjection\Compiler\RegisterHookPass;
 use Fantassin\Core\WordPress\Blocks\DependencyInjection\Compiler\RegisterBlockPass;
+use Fantassin\Core\WordPress\PostType\DependencyInjection\Compiler\RegisterPostTypePass;
 use Fantassin\Core\WordPress\PostType\PostTypeInterface;
 use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\Config\ConfigCacheInterface;
@@ -177,10 +178,11 @@ abstract class PluginKernel
             ->addTag('wordpress.block');
 
         $containerBuilder->registerForAutoconfiguration(HookInterface::class)
-            ->addTag('wordpress.hooks');
+            ->addTag('wordpress.hook');
 
-        $containerBuilder->addCompilerPass(new RegisterHookPass());
+        $containerBuilder->addCompilerPass(new RegisterPostTypePass());
         $containerBuilder->addCompilerPass(new RegisterBlockPass());
+        $containerBuilder->addCompilerPass(new RegisterHookPass());
 
         return $containerBuilder;
     }

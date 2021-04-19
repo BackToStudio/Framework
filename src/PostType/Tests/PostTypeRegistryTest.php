@@ -39,10 +39,15 @@ class PostTypeB implements PostTypeInterface
 class PostTypeRegistryTest extends TestCase
 {
 
+    public function testPostTypeRegistryShouldImplementsRegistryInterface()
+    {
+        $registry = new PostTypeRegistry();
+        $this->assertInstanceOf(RegistryInterface::class, $registry);
+    }
+
     public function testEmptyRegistry()
     {
         $registry = new PostTypeRegistry();
-        $this->isInstanceOf(RegistryInterface::class);
         $this->assertCount(0, $registry->getPostTypes());
     }
 

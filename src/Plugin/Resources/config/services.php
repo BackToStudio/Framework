@@ -8,13 +8,11 @@ return function (ContainerConfigurator $configurator) {
         ->autowire()       // Automatically injects dependencies in your services.
         ->autoconfigure(); // Automatically registers your services as commands, event subscribers, etc.
 
-    // Makes classes in includes/ available to be used as services.
-    // This creates a service per class whose id is the fully-qualified class name.
     $services->load('Fantassin\\Core\\WordPress\\Hooks\\', '../Hooks/*')
-        ->exclude('../Hooks/{DependencyInjection,Entity}');
+        ->exclude('../Hooks/{DependencyInjection,Entity,Tests}');
     $services->load('Fantassin\\Core\\WordPress\\Blocks\\', '../Blocks/*')
-        ->exclude('../Blocks/{DependencyInjection,Entity}');
+        ->exclude('../Blocks/{DependencyInjection,Entity,Tests}');
     $services->load('Fantassin\\Core\\WordPress\\PostType\\', '../PostType/*')
-        ->exclude('../PostType/{DependencyInjection,Entity}');
+        ->exclude('../PostType/{DependencyInjection,Entity,Tests}');
 
 };

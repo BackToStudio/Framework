@@ -6,6 +6,7 @@ use Fantassin\Core\WordPress\Blocks\BlockRegistry;
 use Fantassin\Core\WordPress\Contracts\BlockInterface;
 use Fantassin\Core\WordPress\Contracts\DynamicBlock;
 use Fantassin\Core\WordPress\Contracts\RegistryInterface;
+use Fantassin\Core\WordPress\PostType\PostTypeRegistry;
 use PHPUnit\Framework\TestCase;
 
 class BlockA implements BlockInterface
@@ -59,6 +60,13 @@ class BlockRegistryTest extends TestCase
         $registry->add($block);
 
         return $registry;
+    }
+
+
+    public function testBlockRegistryShouldImplementsRegistryInterface()
+    {
+        $registry = $this->givenNewBlockRegistry();
+        $this->assertInstanceOf(RegistryInterface::class, $registry);
     }
 
     public function testEmptyBlocks()
