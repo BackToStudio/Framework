@@ -10,6 +10,7 @@ use Fantassin\Core\WordPress\Hooks\DependencyInjection\Compiler\RegisterHookPass
 use Fantassin\Core\WordPress\Blocks\DependencyInjection\Compiler\RegisterBlockPass;
 use Fantassin\Core\WordPress\PostType\DependencyInjection\Compiler\RegisterPostTypePass;
 use Fantassin\Core\WordPress\PostType\PostTypeInterface;
+use Fantassin\Core\WordPress\Taxonomy\DependencyInjection\Compiler\RegisterTaxonomyPass;
 use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\Config\ConfigCacheInterface;
 use Symfony\Component\Config\FileLocator;
@@ -181,6 +182,7 @@ abstract class PluginKernel
             ->addTag('wordpress.hook');
 
         $containerBuilder->addCompilerPass(new RegisterPostTypePass());
+        $containerBuilder->addCompilerPass(new RegisterTaxonomyPass());
         $containerBuilder->addCompilerPass(new RegisterBlockPass());
         $containerBuilder->addCompilerPass(new RegisterHookPass());
 
