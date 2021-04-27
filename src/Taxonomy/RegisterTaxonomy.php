@@ -47,14 +47,6 @@ class RegisterTaxonomy implements Hooks
     }
 
     /**
-     * @return TaxonomyRepository
-     */
-    public function getRepository(): TaxonomyRepository
-    {
-        return $this->repository;
-    }
-
-    /**
      * Register new Taxonomy on the fly.
      *
      * @param string $name
