@@ -10,6 +10,8 @@ use Fantassin\Core\WordPress\Hooks\DependencyInjection\Compiler\RegisterHookPass
 use Fantassin\Core\WordPress\Blocks\DependencyInjection\Compiler\RegisterBlockPass;
 use Fantassin\Core\WordPress\PostType\DependencyInjection\Compiler\RegisterPostTypePass;
 use Fantassin\Core\WordPress\PostType\PostTypeInterface;
+use Fantassin\Core\WordPress\Taxonomy\DependencyInjection\Compiler\RegisterTaxonomyPass;
+use Fantassin\Core\WordPress\Taxonomy\TaxonomyInterface;
 use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\Config\ConfigCacheInterface;
 use Symfony\Component\Config\FileLocator;
@@ -24,7 +26,7 @@ abstract class PluginKernel
     /**
      * @var string
      */
-    protected $environnement;
+    protected $environment;
 
     /**
      * @var bool
@@ -41,9 +43,9 @@ abstract class PluginKernel
      */
     protected $pluginFile;
 
-    public function __construct(string $environnement, bool $debug)
+    public function __construct(string $environment, bool $debug)
     {
-        $this->environnement = $environnement;
+        $this->environment = $environment;
         $this->debug = $debug;
     }
 
@@ -96,9 +98,9 @@ abstract class PluginKernel
     /**
      * @return string
      */
-    public function getEnvironnement(): string
+    public function getEnvironment(): string
     {
-        return $this->environnement;
+        return $this->environment;
     }
 
     /**
@@ -174,6 +176,9 @@ abstract class PluginKernel
         $containerBuilder->registerForAutoconfiguration(PostTypeInterface::class)
             ->addTag('wordpress.post_type');
 
+        $containerBuilder->registerForAutoconfiguration(TaxonomyInterface::class)
+            ->addTag('wordpress.taxonomy');
+
         $containerBuilder->registerForAutoconfiguration(BlockInterface::class)
             ->addTag('wordpress.block');
 
@@ -181,6 +186,7 @@ abstract class PluginKernel
             ->addTag('wordpress.hook');
 
         $containerBuilder->addCompilerPass(new RegisterPostTypePass());
+        $containerBuilder->addCompilerPass(new RegisterTaxonomyPass());
         $containerBuilder->addCompilerPass(new RegisterBlockPass());
         $containerBuilder->addCompilerPass(new RegisterHookPass());
 

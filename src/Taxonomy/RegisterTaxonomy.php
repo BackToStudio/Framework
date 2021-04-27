@@ -9,13 +9,19 @@ class RegisterTaxonomy implements Hooks
 {
 
     /**
-     * @var TaxonomyRepository
+     * @var TaxonomyRegistry
      */
-    private $repository;
+    private $registry;
 
-    public function __construct(TaxonomyRepository $taxonomyRepository)
+    /**
+     * @var TaxonomyFactory
+     */
+    private $factory;
+
+    public function __construct(TaxonomyRegistry $taxonomyRegistry, TaxonomyFactory $taxonomyFactory)
     {
-        $this->repository = $taxonomyRepository;
+        $this->registry = $taxonomyRegistry;
+        $this->factory = $taxonomyFactory;
     }
 
     public function hooks()
@@ -31,21 +37,19 @@ class RegisterTaxonomy implements Hooks
 
     public function registerTaxonomy()
     {
-        foreach ($this->getRepository()->getTaxonomies() as $taxonomy) {
-            if (\taxonomy_exists($taxonomy->getTaxonomy())) {
+        foreach ($this->registry->getTaxonomies() as $taxonomy) {
+            if (\taxonomy_exists($taxonomy->getKey())) {
                 return;
             }
+            
+            try {
+                $newTaxonomy = $this->factory->createTaxonomy($taxonomy->getKey(), $taxonomy->getPostTypes(), $taxonomy->getArgs());
+                \register_taxonomy($newTaxonomy->getKey(), $newTaxonomy->getPostTypes(), $newTaxonomy->getArgs());
+            } catch (Exception $exception) {
+                write_log($exception->getMessage());
+            }
 
-            \register_taxonomy($taxonomy->getTaxonomy(), $taxonomy->getPostTypes(), $taxonomy->getArgs());
         }
-    }
-
-    /**
-     * @return TaxonomyRepository
-     */
-    public function getRepository(): TaxonomyRepository
-    {
-        return $this->repository;
     }
 
     /**
@@ -60,8 +64,8 @@ class RegisterTaxonomy implements Hooks
      */
     public function add(string $name, array $relatedPostTypes, array $args = []): RegisterTaxonomy
     {
-        $newTaxonomy = new CustomTaxonomy($name, '', '', $relatedPostTypes, $args);
-        $this->getRepository()->add($newTaxonomy);
+        $newTaxonomy = $this->factory->createTaxonomy($name, $relatedPostTypes, $args);
+        $this->registry->add($newTaxonomy);
 
         return $this;
     }

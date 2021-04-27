@@ -22,7 +22,9 @@
     "phpunit/phpunit": "^9.5"
   },
   "scripts": {
-    "tests-post-type": "./vendor/bin/phpunit ./src/PostType/Tests --colors=always",
-    "tests-blocks": "./vendor/bin/phpunit ./src/Blocks/Tests --colors=always"
+    "tests-report": "vendor/bin/phpunit --colors=always --coverage-html .phpunit.cache/report",
+    "tests-taxonomy": "vendor/bin/phpunit --testsuite \"taxonomy\" --colors=always",
+    "tests-post-type": "./vendor/bin/phpunit --testsuite \"post-type\" --colors=always",
+    "tests-blocks": "./vendor/bin/phpunit --testsuite \"blocks\" --colors=always"
   }
 }

@@ -14,5 +14,7 @@ return function (ContainerConfigurator $configurator) {
         ->exclude('../Blocks/{DependencyInjection,Entity,Tests}');
     $services->load('Fantassin\\Core\\WordPress\\PostType\\', '../PostType/*')
         ->exclude('../PostType/{DependencyInjection,Entity,Tests}');
+    $services->load('Fantassin\\Core\\WordPress\\Taxonomy\\', '../Taxonomy/*')
+        ->exclude('../Taxonomy/{DependencyInjection,Entity,Tests}');
 
 };

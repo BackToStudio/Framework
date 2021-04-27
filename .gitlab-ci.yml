@@ -25,22 +25,58 @@ before_script:
 test:post-type:7.3:
   image: php:7.3
   script:
-    - php composer.phar run tests-post-type
+    - vendor/bin/phpunit --testsuite "post-type" --log-junit .phpunit.cache/post-type.xml
+  artifacts:
+    expire_in: 1 week
+    reports:
+      junit: .phpunit.cache/post-type.xml
 
 # We test PHP 7.4
 test:post-type:7.4:
   image: php:7.4
   script:
-    - php composer.phar run tests-post-type
+    - vendor/bin/phpunit --testsuite "post-type" --log-junit .phpunit.cache/post-type.xml
+  artifacts:
+    expire_in: 1 week
+    reports:
+      junit: .phpunit.cache/post-type.xml
 
 # We test PHP 7.3
 test:blocks:7.3:
   image: php:7.3
   script:
-    - php composer.phar run tests-blocks
+    - vendor/bin/phpunit --testsuite "blocks" --log-junit .phpunit.cache/blocks.xml
+  artifacts:
+    expire_in: 1 week
+    reports:
+      junit: .phpunit.cache/blocks.xml
 
 # We test PHP 7.4
 test:blocks:7.4:
   image: php:7.4
   script:
-    - php composer.phar run tests-blocks
+    - vendor/bin/phpunit --testsuite "blocks" --log-junit .phpunit.cache/blocks.xml
+  artifacts:
+    expire_in: 1 week
+    reports:
+      junit: .phpunit.cache/blocks.xml
+
+# We test PHP 7.3
+test:taxonomy:7.3:
+  image: php:7.3
+  script:
+    - vendor/bin/phpunit --testsuite "taxonomy" --log-junit .phpunit.cache/taxonomy.xml
+  artifacts:
+    expire_in: 1 week
+    reports:
+      junit: .phpunit.cache/taxonomy.xml
+
+# We test PHP 7.4
+test:taxonomy:7.4:
+  image: php:7.4
+  script:
+    - vendor/bin/phpunit --testsuite "taxonomy" --log-junit .phpunit.cache/taxonomy.xml
+  artifacts:
+    expire_in: 1 week
+    reports:
+      junit: .phpunit.cache/taxonomy.xml
