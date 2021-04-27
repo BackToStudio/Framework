@@ -9,13 +9,19 @@ class RegisterTaxonomy implements Hooks
 {
 
     /**
-     * @var TaxonomyRepository
+     * @var TaxonomyRegistry
      */
-    private $repository;
+    private $registry;
 
-    public function __construct(TaxonomyRepository $taxonomyRepository)
+    /**
+     * @var TaxonomyFactory
+     */
+    private $factory;
+
+    public function __construct(TaxonomyRegistry $taxonomyRegistry, TaxonomyFactory $taxonomyFactory)
     {
-        $this->repository = $taxonomyRepository;
+        $this->registry = $taxonomyRegistry;
+        $this->factory = $taxonomyFactory;
     }
 
     public function hooks()
@@ -60,8 +66,8 @@ class RegisterTaxonomy implements Hooks
      */
     public function add(string $name, array $relatedPostTypes, array $args = []): RegisterTaxonomy
     {
-        $newTaxonomy = new CustomTaxonomy($name, '', '', $relatedPostTypes, $args);
-        $this->getRepository()->add($newTaxonomy);
+        $newTaxonomy = $this->factory->createTaxonomy($name, $relatedPostTypes, $args);
+        $this->registry->add($newTaxonomy);
 
         return $this;
     }

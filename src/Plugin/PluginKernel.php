@@ -11,6 +11,7 @@ use Fantassin\Core\WordPress\Blocks\DependencyInjection\Compiler\RegisterBlockPa
 use Fantassin\Core\WordPress\PostType\DependencyInjection\Compiler\RegisterPostTypePass;
 use Fantassin\Core\WordPress\PostType\PostTypeInterface;
 use Fantassin\Core\WordPress\Taxonomy\DependencyInjection\Compiler\RegisterTaxonomyPass;
+use Fantassin\Core\WordPress\Taxonomy\TaxonomyInterface;
 use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\Config\ConfigCacheInterface;
 use Symfony\Component\Config\FileLocator;
@@ -174,6 +175,9 @@ abstract class PluginKernel
 
         $containerBuilder->registerForAutoconfiguration(PostTypeInterface::class)
             ->addTag('wordpress.post_type');
+
+        $containerBuilder->registerForAutoconfiguration(TaxonomyInterface::class)
+            ->addTag('wordpress.taxonomy');
 
         $containerBuilder->registerForAutoconfiguration(BlockInterface::class)
             ->addTag('wordpress.block');

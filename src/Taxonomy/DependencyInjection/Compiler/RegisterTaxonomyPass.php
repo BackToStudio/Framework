@@ -15,8 +15,7 @@ class RegisterTaxonomyPass implements CompilerPassInterface
 
     public function process(ContainerBuilder $container)
     {
-
-        if ( ! $container->hasDefinition(TaxonomyRegistry::class)) {
+        if (!$container->hasDefinition(TaxonomyRegistry::class)) {
             return;
         }
 
