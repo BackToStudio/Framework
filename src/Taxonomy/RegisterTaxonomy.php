@@ -37,12 +37,18 @@ class RegisterTaxonomy implements Hooks
 
     public function registerTaxonomy()
     {
-        foreach ($this->getRepository()->getTaxonomies() as $taxonomy) {
-            if (\taxonomy_exists($taxonomy->getTaxonomy())) {
+        foreach ($this->registry->getTaxonomies() as $taxonomy) {
+            if (\taxonomy_exists($taxonomy->getKey())) {
                 return;
             }
+            
+            try {
+                $newTaxonomy = $this->factory->createTaxonomy($taxonomy->getKey(), $taxonomy->getPostTypes(), $taxonomy->getArgs());
+                \register_taxonomy($newTaxonomy->getKey(), $newTaxonomy->getPostTypes(), $newTaxonomy->getArgs());
+            } catch (Exception $exception) {
+                write_log($exception->getMessage());
+            }
 
-            \register_taxonomy($taxonomy->getTaxonomy(), $taxonomy->getPostTypes(), $taxonomy->getArgs());
         }
     }
 
