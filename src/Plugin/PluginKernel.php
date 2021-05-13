@@ -178,7 +178,6 @@ abstract class PluginKernel
     {
         $containerBuilder = new ContainerBuilder();
 
-        $this->loadBundles($containerBuilder);
         $this->loadServices($containerBuilder);
 
 //        $containerBuilder->setParameter('plugin.info', \get_plugin_data($this->getPluginFile()));
@@ -223,20 +222,4 @@ abstract class PluginKernel
             $loader->load('config/services.php');
         }
     }
-
-    /**
-     * @param ContainerBuilder $containerBuilder
-     */
-    public function loadBundles(ContainerBuilder $containerBuilder)
-    {
-        foreach ($this->getBundles() as $bundle) {
-            $bundle->setContainer($containerBuilder);
-            $bundle->boot();
-        }
-    }
-
-    /**
-     * @return array
-     */
-    abstract public function getBundles(): array;
 }
