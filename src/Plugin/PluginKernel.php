@@ -217,9 +217,7 @@ abstract class PluginKernel
         $loader = new PhpFileLoader($containerBuilder, new FileLocator(__DIR__));
         $loader->load('Resources/config/services.php');
 
-        if ($containerBuilder->fileExists($this->getPluginDir() . 'config/services.php')) {
-            $loader = new PhpFileLoader($containerBuilder, new FileLocator($this->getPluginDir()));
-            $loader->load('config/services.php');
-        }
+        $loader = new PhpFileLoader($containerBuilder, new FileLocator($this->getPluginDir()));
+        $loader->load('config/services.php');
     }
 }
