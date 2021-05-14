@@ -41,7 +41,7 @@ class RegisterTaxonomy implements Hooks
             if (\taxonomy_exists($taxonomy->getKey())) {
                 return;
             }
-            
+
             try {
                 $newTaxonomy = $this->factory->createTaxonomy($taxonomy->getKey(), $taxonomy->getPostTypes(), $taxonomy->getArgs());
                 \register_taxonomy($newTaxonomy->getKey(), $newTaxonomy->getPostTypes(), $newTaxonomy->getArgs());

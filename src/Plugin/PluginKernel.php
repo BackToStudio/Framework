@@ -2,6 +2,7 @@
 
 namespace Fantassin\Core\WordPress\Plugin;
 
+use Exception;
 use Fantassin\Core\WordPress\Contracts\RegistryInterface;
 use Fantassin\Core\WordPress\Hooks\HookRegistry;
 use Fantassin\Core\WordPress\Contracts\HookInterface;
@@ -43,13 +44,20 @@ abstract class PluginKernel
      */
     protected $pluginFile;
 
+    /**
+     * @param string $environment
+     * @param bool $debug
+     */
     public function __construct(string $environment, bool $debug)
     {
         $this->environment = $environment;
         $this->debug = $debug;
     }
 
-    public function getPluginFile()
+    /**
+     * @return string
+     */
+    public function getPluginFile(): string
     {
         if (null === $this->pluginFile) {
             $reflected = new \ReflectionObject($this);
@@ -74,22 +82,26 @@ abstract class PluginKernel
 
     /**
      * @return ContainerInterface|null
-     * @throws \Exception
+     * @throws Exception
      */
     public function getContainer()
     {
         $file = $this->getPluginDir() . '/var/container.php';
         $containerConfigCache = new ConfigCache($file, $this->isDebug());
+        $classname = 'Container' . md5($this->getPluginFile());
 
         if (!$containerConfigCache->isFresh()) {
             $containerBuilder = $this->getContainerBuilder();
             $containerBuilder->compile();
-            $this->dumpContainer($containerConfigCache, $containerBuilder, 'CachedContainer');
+            $options = [
+                'class' => $classname
+            ];
+            $this->dumpContainer($containerConfigCache, $containerBuilder, $options);
         }
 
         if (is_file($file)) {
             require_once $file;
-            $container = new \CachedContainer();
+            $container = new $classname();
         }
 
         return $container;
@@ -118,7 +130,7 @@ abstract class PluginKernel
             /** @var HookRegistry $hooksRegistry */
             $hooksRegistry = $container->get(HookRegistry::class);
             $hooksRegistry->runHooks();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             if ($this->isDebug()) {
                 throw $e;
             }
@@ -126,6 +138,9 @@ abstract class PluginKernel
         }
     }
 
+    /**
+     * @return string
+     */
     abstract public function getPluginName(): string;
 
     /**
@@ -138,16 +153,17 @@ abstract class PluginKernel
     private function dumpContainer(
         ConfigCacheInterface $configCache,
         ContainerBuilder $containerBuilder,
-        string $classname
+        array $options
     ) {
         $dumper = new PhpDumper($containerBuilder);
+        $options = array_merge(
+            [
+                'debug' => $this->isDebug()
+            ],
+            $options
+        );
         $configCache->write(
-            $dumper->dump(
-                [
-                    'class' => $classname,
-                    'debug' => $this->isDebug()
-                ]
-            ),
+            $dumper->dump($options),
             $containerBuilder->getResources()
         );
     }
@@ -156,7 +172,7 @@ abstract class PluginKernel
      * Prepare Container settings.
      *
      * @return ContainerBuilder
-     * @throws \Exception
+     * @throws Exception
      */
     private function getContainerBuilder(): ContainerBuilder
     {
@@ -169,7 +185,6 @@ abstract class PluginKernel
         /**
          * TODO: To move in DependencyInjection/Extension
          */
-
         $containerBuilder->registerForAutoconfiguration(RegistryInterface::class)
             ->setPublic(true);
 
@@ -193,12 +208,16 @@ abstract class PluginKernel
         return $containerBuilder;
     }
 
+    /**
+     * @param ContainerBuilder $containerBuilder
+     * @throws Exception
+     */
     private function loadServices(ContainerBuilder $containerBuilder)
     {
-        $loader = new PhpFileLoader($containerBuilder, new FileLocator($this->getPluginDir()));
-        $loader->load('config/services.php');
-
         $loader = new PhpFileLoader($containerBuilder, new FileLocator(__DIR__));
         $loader->load('Resources/config/services.php');
+
+        $loader = new PhpFileLoader($containerBuilder, new FileLocator($this->getPluginDir()));
+        $loader->load('config/services.php');
     }
 }
