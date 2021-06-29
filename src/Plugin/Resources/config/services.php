@@ -8,6 +8,7 @@ return function (ContainerConfigurator $configurator) {
         ->autowire()       // Automatically injects dependencies in your services.
         ->autoconfigure(); // Automatically registers your services as commands, event subscribers, etc.
 
+
     $services->load('Fantassin\\Core\\WordPress\\Hooks\\', '../Hooks/*')
         ->exclude('../Hooks/{DependencyInjection,Entity,Tests}');
     $services->load('Fantassin\\Core\\WordPress\\Blocks\\', '../Blocks/*')
@@ -16,5 +17,6 @@ return function (ContainerConfigurator $configurator) {
         ->exclude('../PostType/{DependencyInjection,Entity,Tests}');
     $services->load('Fantassin\\Core\\WordPress\\Taxonomy\\', '../Taxonomy/*')
         ->exclude('../Taxonomy/{DependencyInjection,Entity,Tests}');
+    $services->load('Fantassin\\Core\\WordPress\\Plugins\\', 'I18n/*');
 
 };

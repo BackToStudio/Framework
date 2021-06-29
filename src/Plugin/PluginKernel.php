@@ -139,9 +139,18 @@ abstract class PluginKernel
     }
 
     /**
+     * @deprecated
      * @return string
      */
-    abstract public function getPluginName(): string;
+    public function getPluginName(): string {
+        trigger_error('getPluginName() method is deprecated use getPluginTextDomain() method instead.', E_USER_DEPRECATED);
+        return $this->getPluginTextDomain();
+    }
+
+    /**
+     * @return string
+     */
+    abstract public function getPluginTextDomain(): string;
 
     /**
      * Store Container in PHP version.
@@ -180,7 +189,8 @@ abstract class PluginKernel
 
         $this->loadServices($containerBuilder);
 
-//        $containerBuilder->setParameter('plugin.info', \get_plugin_data($this->getPluginFile()));
+        $containerBuilder->setParameter('$pluginDirectory', $this->getPluginDir());
+        $containerBuilder->setParameter('$pluginTextDomain', $this->getPluginTextDomain());
 
         /**
          * TODO: To move in DependencyInjection/Extension
