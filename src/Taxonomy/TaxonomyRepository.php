@@ -23,7 +23,7 @@ class TaxonomyRepository
     }
 
     /**
-     * @return TaxonomyRepository[]
+     * @return CustomTaxonomy[]
      */
     public function getTaxonomies(): array
     {
