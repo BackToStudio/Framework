@@ -41,3 +41,4 @@
       "prefix-symfony": "php ./vendor/bin/php-scoper add-prefix --prefix=FantassinCoreWordPressVendor --output-dir=./vendor-scoped/symfony/dependency-injection --config=config/php-scoper/dependency-injection.inc.php --quiet"
     }
   }
+}
