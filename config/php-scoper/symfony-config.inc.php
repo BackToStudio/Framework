@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 use Isolated\Symfony\Component\Finder\Finder;
 
 return array(
@@ -12,10 +10,17 @@ return array(
      *
      * For more see: https://github.com/humbug/php-scoper#finders-and-paths
      */
-    'finders' => [
+    'finders'  => [
         Finder::create()
-            ->files()
-            ->in('vendor/symfony/config')
+              ->files()
+              ->in('vendor/symfony/config')
+              ->name(
+                  [
+                      'ConfigCache.php',
+                      'ConfigCacheInterface.php',
+                      'FileLocator.php'
+                  ]
+              )
     ],
     /*
      * When scoping PHP files, there will be scenarios where some of the code being scoped indirectly references the

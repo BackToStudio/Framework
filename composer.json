@@ -19,7 +19,7 @@
   "autoload": {
     "psr-4": {
       "Fantassin\\Core\\WordPress\\": "src",
-      "FantassinCoreWordPressVendor\\Symfony\\": "vendor-scoped"
+      "FantassinCoreWordPressVendor\\": "vendor-scoped"
     }
   },
   "scripts": {
