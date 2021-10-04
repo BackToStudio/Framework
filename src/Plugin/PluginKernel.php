@@ -3,19 +3,14 @@
 namespace Fantassin\Core\WordPress\Plugin;
 
 use Exception;
+use Fantassin\Core\WordPress\Compose\HasTextDomain;
 use Fantassin\Core\WordPress\Compose\WordPressContainer;
 use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\ContainerInterface;
 
 abstract class PluginKernel
 {
-
+    use HasTextDomain;
     use WordPressContainer;
-
-    /**
-     * @var string
-     */
-    protected $pluginDir;
 
     /**
      * @param string $environment
@@ -28,43 +23,9 @@ abstract class PluginKernel
     }
 
     /**
-     * Get Plugin directory from root plugin instanciation.
-     *
      * @return string
      */
-    public function getPluginDir(): string
-    {
-        if (null === $this->pluginDir) {
-            $this->pluginDir = \dirname($this->getKernelFile());
-        }
-
-        return $this->pluginDir;
-    }
-
-    /**
-     * @return ContainerInterface|null
-     * @throws Exception
-     */
-    public function getContainer()
-    {
-        $file = $this->getPluginDir() . '/var/container.php';
-
-        return $this->generateContainer($file);
-    }
-
-    /**
-     * @deprecated
-     * @return string
-     */
-    public function getPluginName(): string {
-        trigger_error('getPluginName() method is deprecated use getPluginTextDomain() method instead.', E_USER_DEPRECATED);
-        return $this->getPluginTextDomain();
-    }
-
-    /**
-     * @return string
-     */
-    abstract public function getPluginTextDomain(): string;
+    abstract public function getTextDomain(): string;
 
     /**
      * Prepare Container settings.
@@ -76,10 +37,10 @@ abstract class PluginKernel
     {
         $containerBuilder = new ContainerBuilder();
 
-        $this->loadServices($containerBuilder);
+        $containerBuilder->setParameter('pluginDirectory', $this->getKernelDir());
+        $containerBuilder->setParameter('pluginTextDomain', $this->getTextDomain());
 
-        $containerBuilder->setParameter('$pluginDirectory', $this->getPluginDir());
-        $containerBuilder->setParameter('$pluginTextDomain', $this->getPluginTextDomain());
+        $this->loadServices($containerBuilder);
 
         return $this->wordPressContainerBuilder($containerBuilder);
     }
