@@ -7,6 +7,7 @@ namespace Fantassin\Core\WordPress\Compose;
 use Exception;
 use Fantassin\Core\WordPress\Blocks\DependencyInjection\Compiler\RegisterBlockPass;
 use Fantassin\Core\WordPress\Blocks\DependencyInjection\Compiler\RegisterBlockStylePass;
+use Fantassin\Core\WordPress\Compose\DependencyInjection\Compiler\ResolveInstanceOfContiditionalPassWithVendorPrefix;
 use Fantassin\Core\WordPress\Contracts\BlockInterface;
 use Fantassin\Core\WordPress\Contracts\BlockStyleInterface;
 use Fantassin\Core\WordPress\Contracts\HookInterface;
@@ -14,10 +15,11 @@ use Fantassin\Core\WordPress\Contracts\RegistryInterface;
 use Fantassin\Core\WordPress\Hooks\DependencyInjection\Compiler\RegisterHookPass;
 use Fantassin\Core\WordPress\Hooks\HookRegistry;
 use Fantassin\Core\WordPress\PostType\DependencyInjection\Compiler\RegisterPostTypePass;
-use Fantassin\Core\WordPress\PostType\PostTypeInterface;
 use Fantassin\Core\WordPress\Taxonomy\DependencyInjection\Compiler\RegisterTaxonomyPass;
-use Fantassin\Core\WordPress\Taxonomy\TaxonomyInterface;
+use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Compiler\ResolveInstanceofConditionalsPass;
 use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
+use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\ContainerInterface;
 use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use ReflectionObject;
@@ -44,6 +46,11 @@ trait WordPressContainer
     protected $kernelFile;
 
     /**
+     * @var string
+     */
+    protected $kernelDir;
+
+    /**
      * @return bool
      */
     public function isDebug(): bool
@@ -60,18 +67,51 @@ trait WordPressContainer
     }
 
     /**
+     * Get Kernel file from root Kernel instanciation.
+     *
      * @return string
      */
     public function getKernelFile(): string
     {
         if (null === $this->kernelFile) {
-            $reflected = new ReflectionObject($this);
+            $reflected        = new ReflectionObject($this);
             $this->kernelFile = $reflected->getFileName();
         }
+
         return $this->kernelFile;
     }
 
-    public function generateContainer(string $file)
+    /**
+     * Get Kernel directory from root Kernel instanciation.
+     *
+     * @return string
+     */
+    public function getKernelDir(): string
+    {
+        if (null === $this->kernelDir) {
+            $this->kernelDir = \dirname($this->getKernelFile());
+        }
+
+        return $this->kernelDir;
+    }
+
+    /**
+     * @return ContainerInterface|null
+     * @throws Exception
+     */
+    public function getContainer(): ?ContainerInterface
+    {
+        $file = $this->getKernelDir() . '/var/container.php';
+
+        return $this->generateContainer($file);
+    }
+
+    /**
+     * @param string $file
+     *
+     * @return ContainerInterface|null
+     */
+    public function generateContainer(string $file): ?ContainerInterface
     {
         $containerConfigCache = new ConfigCache($file, $this->isDebug());
         $classname            = 'Container' . md5($this->getKernelFile());
@@ -98,7 +138,7 @@ trait WordPressContainer
      *
      * @param ConfigCacheInterface $configCache
      * @param ContainerBuilder $containerBuilder
-     * @param string $classname
+     * @param array $options
      */
     protected function dumpContainer(
         ConfigCacheInterface $configCache,
@@ -161,6 +201,8 @@ trait WordPressContainer
         $containerBuilder->registerForAutoconfiguration(HookInterface::class)
                          ->addTag('wordpress.hook');
 
+        $containerBuilder = $this->replaceResolveInstanceofConditionalsPass( $containerBuilder );
+
         $containerBuilder->addCompilerPass(new RegisterPostTypePass());
         $containerBuilder->addCompilerPass(new RegisterTaxonomyPass());
         $containerBuilder->addCompilerPass(new RegisterBlockPass());
@@ -173,6 +215,7 @@ trait WordPressContainer
 
     /**
      * @param ContainerBuilder $containerBuilder
+     *
      * @throws Exception
      */
     protected function loadServices(ContainerBuilder $containerBuilder)
@@ -180,15 +223,39 @@ trait WordPressContainer
         $loader = new PhpFileLoader($containerBuilder, new FileLocator(__DIR__));
         $loader->load('Resources/config/services.php');
 
-        $fileLocator = new FileLocator($this->getThemeDir());
-        $loader = new PhpFileLoader($containerBuilder, $fileLocator);
+        $fileLocator = new FileLocator($this->getKernelDir());
+        $loader      = new PhpFileLoader($containerBuilder, $fileLocator);
         $loader->load('config/services.php');
 
-        $allowedblockJson = $fileLocator->locate( 'config/allowed_blocks.json' );
-        $allowedBlocks = json_decode($allowedblockJson, true);
+        // $allowedblockJson = $fileLocator->locate( 'config/allowed_blocks.json' );
+        // $allowedBlocks = json_decode($allowedblockJson, true);
 
-        $containerBuilder->setParameter('allowedBlocks', $allowedBlocks);
+        // $containerBuilder->setParameter('allowedBlocks', $allowedBlocks);
 
+    }
+
+    /**
+     * @param ContainerBuilder $containerBuilder
+     *
+     * @return ContainerBuilder
+     */
+    private function replaceResolveInstanceofConditionalsPass(ContainerBuilder $containerBuilder): ContainerBuilder
+    {
+        $beforeOptimizationPasses = $containerBuilder->getCompilerPassConfig()->getBeforeOptimizationPasses();
+
+        $beforeOptimizationPasses = array_filter(
+            $beforeOptimizationPasses,
+            function (CompilerPassInterface $compilerPass) {
+                return (get_class($compilerPass) !== ResolveInstanceofConditionalsPass::class);
+            }
+        );
+
+        $containerBuilder->getCompilerPassConfig()->setBeforeOptimizationPasses($beforeOptimizationPasses);
+
+        $containerBuilder->addCompilerPass(new ResolveInstanceOfContiditionalPassWithVendorPrefix());
+
+
+        return $containerBuilder;
     }
 
 }
