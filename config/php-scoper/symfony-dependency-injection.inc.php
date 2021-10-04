@@ -14,17 +14,7 @@ return array(
         Finder::create()
               ->files()
               ->in('vendor/symfony/dependency-injection')
-              ->name(
-                  [
-                      'ContainerBuilder.php',
-                      'PhpDumper.php',
-                      'PhpFileLoader.php',
-                      'CompilerPassInterface.php',
-                      'Reference.php',
-                      'ContainerConfigurator.php',
-                      'ContainerInterface.php',
-                  ]
-              )
+              ->name('*.php')
     ],
     /*
      * When scoping PHP files, there will be scenarios where some of the code being scoped indirectly references the

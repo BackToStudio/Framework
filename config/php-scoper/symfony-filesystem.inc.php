@@ -13,7 +13,7 @@ return array(
     'finders'  => [
         Finder::create()
               ->files()
-              ->in('vendor/symfony/config')
+              ->in('vendor/symfony/filesystem')
               ->name('*.php')
     ],
     /*

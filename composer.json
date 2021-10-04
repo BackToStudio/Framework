@@ -9,17 +9,24 @@
   ],
   "require": {
     "php": ">=7.3",
-    "symfony/dependency-injection": "^5.2",
-    "symfony/config": "^5.2"
+    "symfony/dependency-injection": "^5.3.8",
+    "symfony/config": "^5.3.4",
+    "symfony/filesystem": "^5.3",
+    "symfony/service-contracts": "^2.4"
   },
   "require-dev": {
     "phpunit/phpunit": "^9.5",
-    "bamarni/composer-bin-plugin": "^1.4"
+    "bamarni/composer-bin-plugin": "^1.4",
+    "psr/container": "1.1.1"
   },
   "autoload": {
     "psr-4": {
       "Fantassin\\Core\\WordPress\\": "src",
-      "FantassinCoreWordPressVendor\\": "vendor-scoped"
+      "FantassinCoreWordPressVendor\\Symfony\\Contracts\\Service\\": "vendor-scoped/symfony/service-contracts/",
+      "FantassinCoreWordPressVendor\\Symfony\\Component\\Config\\": "vendor-scoped/symfony/config/",
+      "FantassinCoreWordPressVendor\\Symfony\\Component\\FileSystem\\": "vendor-scoped/symfony/filesystem/",
+      "FantassinCoreWordPressVendor\\Symfony\\Component\\DependencyInjection\\": "vendor-scoped/symfony/dependency-injection/",
+      "FantassinCoreWordPressVendor\\Psr\\Container\\": "vendor-scoped/psr/container/"
     }
   },
   "scripts": {
@@ -38,9 +45,15 @@
       "composer bin php-scoper config prefer-stable true",
       "composer bin php-scoper require --dev humbug/php-scoper",
       "composer prefix-symfony-dependency-injection",
-      "composer prefix-symfony-config"
+      "composer prefix-symfony-service-contracts",
+      "composer prefix-symfony-config",
+      "composer prefix-symfony-filesystem",
+      "composer prefix-psr-container"
     ],
     "prefix-symfony-dependency-injection": "php ./vendor/bin/php-scoper add-prefix --prefix=FantassinCoreWordPressVendor --output-dir=./vendor-scoped/symfony/dependency-injection --config=config/php-scoper/symfony-dependency-injection.inc.php --quiet",
-    "prefix-symfony-config": "php ./vendor/bin/php-scoper add-prefix --prefix=FantassinCoreWordPressVendor --output-dir=./vendor-scoped/symfony/config --config=config/php-scoper/symfony-config.inc.php --quiet"
+    "prefix-symfony-config": "php ./vendor/bin/php-scoper add-prefix --prefix=FantassinCoreWordPressVendor --output-dir=./vendor-scoped/symfony/config --config=config/php-scoper/symfony-config.inc.php --quiet",
+    "prefix-symfony-filesystem": "php ./vendor/bin/php-scoper add-prefix --prefix=FantassinCoreWordPressVendor --output-dir=./vendor-scoped/symfony/filesystem --config=config/php-scoper/symfony-filesystem.inc.php --quiet",
+    "prefix-symfony-service-contracts": "php ./vendor/bin/php-scoper add-prefix --prefix=FantassinCoreWordPressVendor --output-dir=./vendor-scoped/symfony/service-contracts --config=config/php-scoper/symfony-service-contracts.inc.php --quiet",
+    "prefix-psr-container": "php ./vendor/bin/php-scoper add-prefix --prefix=FantassinCoreWordPressVendor --output-dir=./vendor-scoped/psr/container --config=config/php-scoper/psr-container.inc.php --quiet"
   }
 }
