@@ -19,11 +19,6 @@ abstract class PluginKernel
     protected $pluginDir;
 
     /**
-     * @var string
-     */
-    protected $pluginFile;
-
-    /**
      * @param string $environment
      * @param bool $debug
      */
@@ -34,18 +29,6 @@ abstract class PluginKernel
     }
 
     /**
-     * @return string
-     */
-    public function getPluginFile(): string
-    {
-        if (null === $this->pluginFile) {
-            $reflected = new ReflectionObject($this);
-            $this->pluginFile = $reflected->getFileName();
-        }
-        return $this->pluginFile;
-    }
-
-    /**
      * Get Plugin directory from root plugin instanciation.
      *
      * @return string
@@ -53,7 +36,7 @@ abstract class PluginKernel
     public function getPluginDir(): string
     {
         if (null === $this->pluginDir) {
-            $this->pluginDir = \dirname($this->getPluginFile());
+            $this->pluginDir = \dirname($this->getKernelFile());
         }
 
         return $this->pluginDir;

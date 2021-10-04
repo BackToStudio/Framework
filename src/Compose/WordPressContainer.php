@@ -20,6 +20,7 @@ use Fantassin\Core\WordPress\Taxonomy\TaxonomyInterface;
 use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
 use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
+use ReflectionObject;
 use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\Config\ConfigCacheInterface;
 use Symfony\Component\Config\FileLocator;
@@ -38,6 +39,11 @@ trait WordPressContainer
     protected $environment;
 
     /**
+     * @var string
+     */
+    protected $kernelFile;
+
+    /**
      * @return bool
      */
     public function isDebug(): bool
@@ -53,10 +59,22 @@ trait WordPressContainer
         return $this->environment;
     }
 
+    /**
+     * @return string
+     */
+    public function getKernelFile(): string
+    {
+        if (null === $this->kernelFile) {
+            $reflected = new ReflectionObject($this);
+            $this->kernelFile = $reflected->getFileName();
+        }
+        return $this->kernelFile;
+    }
+
     public function generateContainer(string $file)
     {
         $containerConfigCache = new ConfigCache($file, $this->isDebug());
-        $classname            = 'Container' . md5($this->getPluginFile());
+        $classname            = 'Container' . md5($this->getKernelFile());
 
         if ( ! $containerConfigCache->isFresh()) {
             $containerBuilder = $this->getContainerBuilder();

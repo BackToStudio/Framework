@@ -18,11 +18,6 @@ abstract class ThemeKernel
     protected $themeDir;
 
     /**
-     * @var string
-     */
-    protected $themeFile;
-
-    /**
      * @param string $environment
      * @param bool $debug
      */
@@ -33,18 +28,6 @@ abstract class ThemeKernel
     }
 
     /**
-     * @return string
-     */
-    public function getThemeFile(): string
-    {
-        if (null === $this->themeFile) {
-            $reflected = new \ReflectionObject($this);
-            $this->themeFile = $reflected->getFileName();
-        }
-        return $this->themeFile;
-    }
-
-    /**
      * Get Plugin directory from root plugin instanciation.
      *
      * @return string
@@ -52,7 +35,7 @@ abstract class ThemeKernel
     public function getThemeDir(): string
     {
         if (null === $this->themeDir) {
-            $this->themeDir = \dirname($this->getThemeFile());
+            $this->themeDir = \dirname($this->getKernelFile());
         }
 
         return $this->themeDir;
