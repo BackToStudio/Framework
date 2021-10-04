@@ -1,14 +1,13 @@
 <?php
 
-namespace Fantassin\Core\WordPress\Plugin;
+namespace Fantassin\Core\WordPress\Theme;
 
 use Exception;
 use Fantassin\Core\WordPress\Compose\WordPressContainer;
 use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
 use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\ContainerInterface;
-use ReflectionObject;
 
-abstract class PluginKernel
+abstract class ThemeKernel
 {
 
     use WordPressContainer;
@@ -16,12 +15,12 @@ abstract class PluginKernel
     /**
      * @var string
      */
-    protected $pluginDir;
+    protected $themeDir;
 
     /**
      * @var string
      */
-    protected $pluginFile;
+    protected $themeFile;
 
     /**
      * @param string $environment
@@ -36,13 +35,13 @@ abstract class PluginKernel
     /**
      * @return string
      */
-    public function getPluginFile(): string
+    public function getThemeFile(): string
     {
-        if (null === $this->pluginFile) {
-            $reflected = new ReflectionObject($this);
-            $this->pluginFile = $reflected->getFileName();
+        if (null === $this->themeFile) {
+            $reflected = new \ReflectionObject($this);
+            $this->themeFile = $reflected->getFileName();
         }
-        return $this->pluginFile;
+        return $this->themeFile;
     }
 
     /**
@@ -50,13 +49,13 @@ abstract class PluginKernel
      *
      * @return string
      */
-    public function getPluginDir(): string
+    public function getThemeDir(): string
     {
-        if (null === $this->pluginDir) {
-            $this->pluginDir = \dirname($this->getPluginFile());
+        if (null === $this->themeDir) {
+            $this->themeDir = \dirname($this->getThemeFile());
         }
 
-        return $this->pluginDir;
+        return $this->themeDir;
     }
 
     /**
@@ -65,24 +64,15 @@ abstract class PluginKernel
      */
     public function getContainer()
     {
-        $file = $this->getPluginDir() . '/var/container.php';
+        $file = $this->getThemeDir() . '/var/container.php';
 
         return $this->generateContainer($file);
     }
 
     /**
-     * @deprecated
      * @return string
      */
-    public function getPluginName(): string {
-        trigger_error('getPluginName() method is deprecated use getPluginTextDomain() method instead.', E_USER_DEPRECATED);
-        return $this->getPluginTextDomain();
-    }
-
-    /**
-     * @return string
-     */
-    abstract public function getPluginTextDomain(): string;
+    abstract public function getThemeTextDomain(): string;
 
     /**
      * Prepare Container settings.
@@ -96,8 +86,8 @@ abstract class PluginKernel
 
         $this->loadServices($containerBuilder);
 
-        $containerBuilder->setParameter('$pluginDirectory', $this->getPluginDir());
-        $containerBuilder->setParameter('$pluginTextDomain', $this->getPluginTextDomain());
+        $containerBuilder->setParameter('$themeDirectory', $this->getThemeDir());
+        $containerBuilder->setParameter('$themeTextDomain', $this->getThemeTextDomain());
 
         return $this->wordPressContainerBuilder($containerBuilder);
     }

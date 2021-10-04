@@ -15,32 +15,32 @@ class LoadPluginTextDomain implements Hooks
     /**
      * @var string
      */
-    protected $pluginName;
+    protected $textDomain;
 
     /**
      * Params are auto-injected by Dependency Injection.
      *
      * @param string $pluginDirectory
-     * @param string $pluginName
+     * @param string $textDomain
      */
-    public function __construct(string $pluginDirectory, string $pluginName)
+    public function __construct(string $pluginDirectory, string $pluginTextDomain)
     {
         $this->pluginDirectory = $pluginDirectory;
-        $this->pluginName = $pluginName;
+        $this->textDomain = $pluginTextDomain;
     }
 
     public function hooks()
     {
-        add_action('init', [$this, 'load_translations']);
+        add_action('init', [$this, 'loadTranslations']);
     }
 
     /**
      * Load plugin translations.
      */
-    public function load_translations()
+    public function loadTranslations()
     {
         load_plugin_textdomain(
-            $this->pluginName,
+            $this->textDomain,
             false,
             basename($this->pluginDirectory) . DIRECTORY_SEPARATOR . 'languages'
         );
