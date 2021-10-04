@@ -21,9 +21,9 @@ use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Container
 use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use ReflectionObject;
-use Symfony\Component\Config\ConfigCache;
-use Symfony\Component\Config\ConfigCacheInterface;
-use Symfony\Component\Config\FileLocator;
+use FantassinCoreWordPressVendor\Symfony\Component\Config\ConfigCache;
+use FantassinCoreWordPressVendor\Symfony\Component\Config\ConfigCacheInterface;
+use FantassinCoreWordPressVendor\Symfony\Component\Config\FileLocator;
 
 trait WordPressContainer
 {

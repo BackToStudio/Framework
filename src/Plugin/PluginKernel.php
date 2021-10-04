@@ -6,7 +6,6 @@ use Exception;
 use Fantassin\Core\WordPress\Compose\WordPressContainer;
 use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
 use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\ContainerInterface;
-use ReflectionObject;
 
 abstract class PluginKernel
 {

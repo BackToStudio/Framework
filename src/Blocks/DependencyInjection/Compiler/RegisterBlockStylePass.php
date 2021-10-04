@@ -3,9 +3,9 @@
 namespace Fantassin\Core\WordPress\Blocks\DependencyInjection\Compiler;
 
 use Fantassin\Core\WordPress\Blocks\BlockStyleRegistry;
-use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Reference;
+use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
+use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Reference;
 
 class RegisterBlockStylePass implements CompilerPassInterface
 {
