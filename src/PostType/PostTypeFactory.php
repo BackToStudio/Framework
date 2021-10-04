@@ -3,6 +3,7 @@
 namespace Fantassin\Core\WordPress\PostType;
 
 use Exception;
+use Fantassin\Core\WordPress\PostType\Contracts\PostTypeInterface;
 use Fantassin\Core\WordPress\PostType\Entity\PostType;
 
 class PostTypeFactory
@@ -14,7 +15,7 @@ class PostTypeFactory
      * @return PostType
      * @throws Exception
      */
-    public function createPostType(string $key, array $args): PostType
+    public function createPostType(string $key, array $args): PostTypeInterface
     {
         if (empty($key)) {
             throw new Exception(

@@ -1,7 +1,6 @@
 <?php
 
-
-namespace Fantassin\Core\WordPress\PostType;
+namespace Fantassin\Core\WordPress\PostType\Contracts;
 
 interface PostTypeInterface
 {

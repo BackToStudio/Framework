@@ -28,32 +28,27 @@ class RegisterPostType implements Hooks, ActivationHooks
     public function activate()
     {
         $this->registerCustomPostTypes();
-        $this->flushRules();
+        \flush_rewrite_rules();
     }
 
     public function hooks()
     {
-        add_action('init', [$this, 'registerCustomPostTypes']);
-        add_action('registered_post_type', [$this, 'flushRules']);
-        add_action('unregistered_post_type', [$this, 'flushRules']);
-    }
-
-    public function flushRules()
-    {
-        flush_rewrite_rules();
+        \add_action('init', [$this, 'registerCustomPostTypes']);
+        \add_action('registered_post_type', 'flush_rewrite_rules');
+        \add_action('unregistered_post_type', 'flush_rewrite_rules');
     }
 
     public function registerCustomPostTypes()
     {
         foreach ($this->registry->getPostTypes() as $postType) {
-            if (post_type_exists($postType->getKey())) {
+            if (\post_type_exists($postType->getKey())) {
                 return;
             }
             try {
                 $newPostType = $this->factory->createPostType($postType->getKey(), $postType->getArgs());
-                register_post_type($newPostType->getKey(), $newPostType->getArgs());
+                \register_post_type($newPostType->getKey(), $newPostType->getArgs());
             } catch (Exception $exception) {
-                write_log($exception->getMessage());
+                \write_log($exception->getMessage());
             }
         }
     }
