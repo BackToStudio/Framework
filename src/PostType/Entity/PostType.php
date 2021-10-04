@@ -2,7 +2,7 @@
 
 namespace Fantassin\Core\WordPress\PostType\Entity;
 
-use Fantassin\Core\WordPress\PostType\PostTypeInterface;
+use Fantassin\Core\WordPress\PostType\Contracts\PostTypeInterface;
 
 class PostType implements PostTypeInterface
 {
