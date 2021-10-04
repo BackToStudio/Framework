@@ -2,6 +2,9 @@
 
 namespace Fantassin\Core\WordPress\Taxonomy;
 
+/**
+ * @deprecated
+ */
 class TaxonomyRepository
 {
 

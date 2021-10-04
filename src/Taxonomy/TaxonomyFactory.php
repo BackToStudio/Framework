@@ -3,6 +3,7 @@
 namespace Fantassin\Core\WordPress\Taxonomy;
 
 use Exception;
+use Fantassin\Core\WordPress\Taxonomy\Contracts\TaxonomyInterface;
 use Fantassin\Core\WordPress\Taxonomy\Entity\Taxonomy;
 
 class TaxonomyFactory
@@ -15,7 +16,7 @@ class TaxonomyFactory
      * @return Taxonomy
      * @throws Exception
      */
-    public function createTaxonomy(string $key, array $postTypes, array $args): Taxonomy
+    public function createTaxonomy(string $key, array $postTypes, array $args): TaxonomyInterface
     {
         if (empty($key)) {
             throw new Exception(

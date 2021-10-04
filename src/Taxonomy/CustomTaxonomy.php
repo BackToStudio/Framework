@@ -4,6 +4,9 @@ namespace Fantassin\Core\WordPress\Taxonomy;
 
 use Exception;
 
+/**
+ * @deprecated
+ */
 class CustomTaxonomy {
 
 	/**

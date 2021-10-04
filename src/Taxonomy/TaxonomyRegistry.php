@@ -3,6 +3,7 @@
 namespace Fantassin\Core\WordPress\Taxonomy;
 
 use Fantassin\Core\WordPress\Contracts\RegistryInterface;
+use Fantassin\Core\WordPress\Taxonomy\Contracts\TaxonomyInterface;
 
 class TaxonomyRegistry implements RegistryInterface
 {
