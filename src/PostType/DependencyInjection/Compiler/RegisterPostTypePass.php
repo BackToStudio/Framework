@@ -2,7 +2,6 @@
 
 namespace Fantassin\Core\WordPress\PostType\DependencyInjection\Compiler;
 
-use Fantassin\Core\WordPress\Blocks\BlockRegistry;
 use Fantassin\Core\WordPress\PostType\PostTypeRegistry;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;

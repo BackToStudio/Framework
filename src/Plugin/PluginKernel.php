@@ -3,6 +3,9 @@
 namespace Fantassin\Core\WordPress\Plugin;
 
 use Exception;
+use Fantassin\Core\WordPress\Blocks\DependencyInjection\Compiler\RegisterBlockStylePass;
+use Fantassin\Core\WordPress\Blocks\RegisterBlockStyles;
+use Fantassin\Core\WordPress\Contracts\BlockStyleInterface;
 use Fantassin\Core\WordPress\Contracts\RegistryInterface;
 use Fantassin\Core\WordPress\Hooks\HookRegistry;
 use Fantassin\Core\WordPress\Contracts\HookInterface;
@@ -207,12 +210,16 @@ abstract class PluginKernel
         $containerBuilder->registerForAutoconfiguration(BlockInterface::class)
             ->addTag('wordpress.block');
 
+        $containerBuilder->registerForAutoconfiguration(BlockStyleInterface::class)
+            ->addTag('wordpress.block_style');
+
         $containerBuilder->registerForAutoconfiguration(HookInterface::class)
             ->addTag('wordpress.hook');
 
         $containerBuilder->addCompilerPass(new RegisterPostTypePass());
         $containerBuilder->addCompilerPass(new RegisterTaxonomyPass());
         $containerBuilder->addCompilerPass(new RegisterBlockPass());
+        $containerBuilder->addCompilerPass(new RegisterBlockStylePass());
         $containerBuilder->addCompilerPass(new RegisterHookPass());
 
         return $containerBuilder;
@@ -227,7 +234,14 @@ abstract class PluginKernel
         $loader = new PhpFileLoader($containerBuilder, new FileLocator(__DIR__));
         $loader->load('Resources/config/services.php');
 
-        $loader = new PhpFileLoader($containerBuilder, new FileLocator($this->getPluginDir()));
+        $fileLocator = new FileLocator($this->getPluginDir());
+        $loader = new PhpFileLoader($containerBuilder, $fileLocator);
         $loader->load('config/services.php');
+
+        $allowedblockJson = $fileLocator->locate( 'config/allowed_blocks.json' );
+        $allowedBlocks = json_decode($allowedblockJson, true);
+
+        $containerBuilder->setParameter('allowedBlocks', $allowedBlocks);
+
     }
 }
