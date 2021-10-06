@@ -38,7 +38,7 @@ class YoastOptionsStrategy implements SocialLinksStrategyInterface
      */
     public function getPinterestLink(): ?string
     {
-        return $this->getKey('twitter_site');
+        return $this->getKey('pinterest_url');
     }
 
     /**
