@@ -45,7 +45,7 @@ class SeoPressOptionsStrategy implements SocialLinksStrategyInterface
      */
     public function getInstagramLink(): ?string
     {
-        return null;
+        return $this->getKey('seopress_social_accounts_instagram');
     }
 
     /**
@@ -61,7 +61,7 @@ class SeoPressOptionsStrategy implements SocialLinksStrategyInterface
      */
     public function getYouTubeLink(): ?string
     {
-        return null;
+        return $this->getKey('seopress_social_accounts_youtube');
     }
 }
 
