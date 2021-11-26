@@ -2,7 +2,7 @@
 
 namespace Fantassin\Core\WordPress\Taxonomy\Entity;
 
-use Fantassin\Core\WordPress\Taxonomy\TaxonomyInterface;
+use Fantassin\Core\WordPress\Taxonomy\Contracts\TaxonomyInterface;
 
 class Taxonomy implements TaxonomyInterface
 {
