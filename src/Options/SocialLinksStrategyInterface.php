@@ -4,31 +4,32 @@ namespace Fantassin\Core\WordPress\Options;
 
 use Fantassin\Core\WordPress\Contracts\Hooks;
 
-interface SocialLinksStrategyInterface {
+interface SocialLinksStrategyInterface
+{
 
     /**
      * @return string|null
      */
-    public function getTwitterLink() : ?string;
+    public function getTwitterLink(): ?string;
 
     /**
      * @return string|null
      */
-    public function getPinterestLink() : ?string;
+    public function getPinterestLink(): ?string;
 
     /**
      * @return string|null
      */
-    public function getInstagramLink() : ?string;
+    public function getInstagramLink(): ?string;
 
     /**
      * @return string|null
      */
-    public function getLinkedInLink() : ?string;
+    public function getLinkedInLink(): ?string;
 
     /**
      * @return string|null
      */
-    public function getYouTubeLink() : ?string;
+    public function getYouTubeLink(): ?string;
 }
 

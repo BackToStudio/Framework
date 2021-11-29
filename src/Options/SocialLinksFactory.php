@@ -24,14 +24,13 @@ class SocialLinksFactory
      * @param string $pluginName
      * @return bool
      */
-    public function isPluginActive( string $pluginName ): bool
+    public function isPluginActive(string $pluginName): bool
     {
-        return $this->isInOptions(  $pluginName );
+        return $this->isInOptions($pluginName);
     }
 
     public function createSocialLinkStrategy(): ?SocialLinksStrategyInterface
     {
-
         $strategy = null;
 
         if ($this->isPluginActive('wp-seopress/seopress.php')) {
