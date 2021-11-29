@@ -1,4 +1,5 @@
 /vendor/
+/vendor-bin/
 /.idea/
 /.phpunit.cache/
 .DS_Store

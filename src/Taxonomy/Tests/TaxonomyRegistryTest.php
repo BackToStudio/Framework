@@ -3,7 +3,7 @@
 namespace Fantassin\Core\WordPress\Taxonomy\Tests;
 
 use Fantassin\Core\WordPress\Contracts\RegistryInterface;
-use Fantassin\Core\WordPress\Taxonomy\TaxonomyInterface;
+use Fantassin\Core\WordPress\Taxonomy\Contracts\TaxonomyInterface;
 use Fantassin\Core\WordPress\Taxonomy\TaxonomyRegistry;
 use PHPUnit\Framework\TestCase;
 

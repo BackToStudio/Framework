@@ -27,12 +27,8 @@ class RegisterTaxonomy implements Hooks
     public function hooks()
     {
         \add_action('init', [$this, 'registerTaxonomy']);
-        \add_action('registered_taxonomy', [$this, 'flushRules']);
-    }
-
-    public function flushRules()
-    {
-        \flush_rewrite_rules();
+        \add_action('registered_taxonomy', 'flush_rewrite_rules');
+        \add_action('unregistered_taxonomy', 'flush_rewrite_rules');
     }
 
     public function registerTaxonomy()

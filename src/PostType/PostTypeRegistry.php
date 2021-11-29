@@ -3,6 +3,8 @@
 namespace Fantassin\Core\WordPress\PostType;
 
 use Fantassin\Core\WordPress\Contracts\RegistryInterface;
+use Fantassin\Core\WordPress\PostType\Contracts\PostTypeInterface;
+use Fantassin\Core\WordPress\PostType\Contracts\PostTypeRegistryInterface;
 
 class PostTypeRegistry implements RegistryInterface, PostTypeRegistryInterface
 {

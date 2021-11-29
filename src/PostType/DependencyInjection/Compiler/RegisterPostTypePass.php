@@ -2,14 +2,13 @@
 
 namespace Fantassin\Core\WordPress\PostType\DependencyInjection\Compiler;
 
-use Fantassin\Core\WordPress\Blocks\BlockRegistry;
 use Fantassin\Core\WordPress\PostType\PostTypeRegistry;
-use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Reference;
+use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
+use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Reference;
 
 /**
- * Register all Custom Post Type that have the "wordpress.post_type" tag into the container.
+ * Register all Custom Post Types that have the "wordpress.post_type" tag into the container.
  */
 class RegisterPostTypePass implements CompilerPassInterface
 {

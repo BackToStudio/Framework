@@ -3,12 +3,12 @@
 namespace Fantassin\Core\WordPress\Taxonomy\DependencyInjection\Compiler;
 
 use Fantassin\Core\WordPress\Taxonomy\TaxonomyRegistry;
-use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Reference;
+use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
+use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Reference;
 
 /**
- * Register all Custom Post Type that have the "wordpress.post_type" tag into the container.
+ * Register all Custom Taxonomies that have the "wordpress.taxonomy" tag into the container.
  */
 class RegisterTaxonomyPass implements CompilerPassInterface
 {

@@ -2,7 +2,7 @@
 
 namespace Fantassin\Core\WordPress\PostType\Entity;
 
-use Fantassin\Core\WordPress\PostType\PostTypeInterface;
+use Fantassin\Core\WordPress\PostType\Contracts\PostTypeInterface;
 
 class PostType implements PostTypeInterface
 {
@@ -30,7 +30,7 @@ class PostType implements PostTypeInterface
      *
      * @return PostType
      */
-    public function setKey(string $key): PostType
+    public function setKey(string $key): PostTypeInterface
     {
         $this->key = $key;
 
@@ -50,7 +50,7 @@ class PostType implements PostTypeInterface
      *
      * @return PostType
      */
-    public function setArgs(array $args): PostType
+    public function setArgs(array $args): PostTypeInterface
     {
         $this->args = $args;
 

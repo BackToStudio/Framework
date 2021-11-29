@@ -2,6 +2,9 @@
 
 namespace Fantassin\Core\WordPress\Taxonomy;
 
+/**
+ * @deprecated
+ */
 class TaxonomyRepository
 {
 
@@ -23,7 +26,7 @@ class TaxonomyRepository
     }
 
     /**
-     * @return TaxonomyRepository[]
+     * @return CustomTaxonomy[]
      */
     public function getTaxonomies(): array
     {

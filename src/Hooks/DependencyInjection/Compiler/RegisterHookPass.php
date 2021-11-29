@@ -3,9 +3,9 @@
 namespace Fantassin\Core\WordPress\Hooks\DependencyInjection\Compiler;
 
 use Fantassin\Core\WordPress\Hooks\HookRegistry;
-use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Reference;
+use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
+use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Reference;
 
 class RegisterHookPass implements CompilerPassInterface
 {
