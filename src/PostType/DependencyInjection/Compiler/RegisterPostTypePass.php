@@ -8,7 +8,7 @@ use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Container
 use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Reference;
 
 /**
- * Register all Custom Post Type that have the "wordpress.post_type" tag into the container.
+ * Register all Custom Post Types that have the "wordpress.post_type" tag into the container.
  */
 class RegisterPostTypePass implements CompilerPassInterface
 {
