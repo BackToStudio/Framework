@@ -24,7 +24,7 @@
       "Fantassin\\Core\\WordPress\\": "src",
       "FantassinCoreWordPressVendor\\Symfony\\Contracts\\Service\\": "vendor-scoped/symfony/service-contracts/",
       "FantassinCoreWordPressVendor\\Symfony\\Component\\Config\\": "vendor-scoped/symfony/config/",
-      "FantassinCoreWordPressVendor\\Symfony\\Component\\FileSystem\\": "vendor-scoped/symfony/filesystem/",
+      "FantassinCoreWordPressVendor\\Symfony\\Component\\Filesystem\\": "vendor-scoped/symfony/filesystem/",
       "FantassinCoreWordPressVendor\\Symfony\\Component\\DependencyInjection\\": "vendor-scoped/symfony/dependency-injection/",
       "FantassinCoreWordPressVendor\\Psr\\Container\\": "vendor-scoped/psr/container/"
     }
