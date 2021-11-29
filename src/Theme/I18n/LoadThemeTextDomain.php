@@ -31,7 +31,7 @@ class LoadThemeTextDomain implements Hooks
 
     public function hooks()
     {
-        \add_action('init', [$this, 'loadTranslations']);
+        \add_action('after_setup_theme', [$this, 'loadTranslations']);
     }
 
     /**
@@ -41,7 +41,7 @@ class LoadThemeTextDomain implements Hooks
     {
         \load_theme_textdomain(
             $this->textDomain,
-            basename($this->themeDirectory) . DIRECTORY_SEPARATOR . 'languages'
+            $this->themeDirectory . DIRECTORY_SEPARATOR . 'languages'
         );
     }
 }
