@@ -32,9 +32,9 @@ class Taxonomy implements TaxonomyInterface
 
     /**
      * @param string $key
-     * @return Taxonomy
+     * @return TaxonomyInterface
      */
-    public function setKey(string $key): Taxonomy
+    public function setKey(string $key): TaxonomyInterface
     {
         $this->key = $key;
 
@@ -51,9 +51,9 @@ class Taxonomy implements TaxonomyInterface
 
     /**
      * @param array $args
-     * @return Taxonomy
+     * @return TaxonomyInterface
      */
-    public function setArgs(array $args): Taxonomy
+    public function setArgs(array $args): TaxonomyInterface
     {
         $this->args = $args;
 
@@ -72,7 +72,7 @@ class Taxonomy implements TaxonomyInterface
      * @param array $postTypes
      * @return Taxonomy
      */
-    public function setPostTypes(array $postTypes): Taxonomy
+    public function setPostTypes(array $postTypes): TaxonomyInterface
     {
         $this->postTypes = $postTypes;
 
@@ -84,7 +84,7 @@ class Taxonomy implements TaxonomyInterface
      *
      * @return Taxonomy
      */
-    public function addPostType(string $postType): Taxonomy
+    public function addPostType(string $postType): TaxonomyInterface
     {
         $this->postTypes[] = $postType;
 

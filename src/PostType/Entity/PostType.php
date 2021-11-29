@@ -30,7 +30,7 @@ class PostType implements PostTypeInterface
      *
      * @return PostType
      */
-    public function setKey(string $key): PostType
+    public function setKey(string $key): PostTypeInterface
     {
         $this->key = $key;
 
@@ -50,7 +50,7 @@ class PostType implements PostTypeInterface
      *
      * @return PostType
      */
-    public function setArgs(array $args): PostType
+    public function setArgs(array $args): PostTypeInterface
     {
         $this->args = $args;
 
