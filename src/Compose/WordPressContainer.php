@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Fantassin\Core\WordPress\Compose;
-
 
 use Exception;
 use LogicException;
