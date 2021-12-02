@@ -30,7 +30,7 @@ class BooleanNodeDefinition extends ScalarNodeDefinition
     /**
      * Instantiate a Node.
      *
-     * @return BooleanNode The node
+     * @return BooleanNode
      */
     protected function instantiateNode()
     {

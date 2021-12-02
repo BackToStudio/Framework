@@ -18,6 +18,7 @@ use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Exception
  */
 class AutoAliasServicePass implements CompilerPassInterface
 {
+    private $privateAliases = [];
     /**
      * {@inheritdoc}
      */
@@ -30,9 +31,23 @@ class AutoAliasServicePass implements CompilerPassInterface
                 }
                 $aliasId = $container->getParameterBag()->resolveValue($tag['format']);
                 if ($container->hasDefinition($aliasId) || $container->hasAlias($aliasId)) {
-                    $container->setAlias($serviceId, new Alias($aliasId, \true));
+                    $alias = new Alias($aliasId, $container->getDefinition($serviceId)->isPublic());
+                    $container->setAlias($serviceId, $alias);
+                    if (!$alias->isPublic()) {
+                        $alias->setPublic(\true);
+                        $this->privateAliases[] = $alias;
+                    }
                 }
             }
         }
+    }
+    /**
+     * @internal to be removed in Symfony 6.0
+     */
+    public function getPrivateAliases() : array
+    {
+        $privateAliases = $this->privateAliases;
+        $this->privateAliases = [];
+        return $privateAliases;
     }
 }

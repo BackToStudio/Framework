@@ -26,6 +26,7 @@ class GlobFileLoader extends FileLoader
             $this->import($path);
         }
         $this->container->addResource($globResource);
+        return null;
     }
     /**
      * {@inheritdoc}

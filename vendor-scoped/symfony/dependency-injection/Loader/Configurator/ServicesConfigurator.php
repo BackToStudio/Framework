@@ -84,6 +84,8 @@ class ServicesConfigurator extends AbstractConfigurator
     }
     /**
      * Removes an already defined service definition or alias.
+     *
+     * @return $this
      */
     public final function remove(string $id) : self
     {

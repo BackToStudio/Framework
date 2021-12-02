@@ -58,6 +58,7 @@ class XmlFileLoader extends FileLoader
                 }
             }
         }
+        return null;
     }
     private function loadXml(\DOMDocument $xml, string $path, \DOMNode $root = null) : void
     {
@@ -175,7 +176,7 @@ class XmlFileLoader extends FileLoader
     {
         if ($alias = $service->getAttribute('alias')) {
             $this->validateAlias($service, $file);
-            $this->container->setAlias((string) $service->getAttribute('id'), $alias = new Alias($alias));
+            $this->container->setAlias($service->getAttribute('id'), $alias = new Alias($alias));
             if ($publicAttr = $service->getAttribute('public')) {
                 $alias->setPublic(XmlUtils::phpize($publicAttr));
             } elseif ($defaults->getChanges()['public'] ?? \false) {
@@ -287,7 +288,7 @@ class XmlFileLoader extends FileLoader
                 $parameters[$name] = XmlUtils::phpize($node->nodeValue);
             }
             if ('' === $tagName && '' === ($tagName = $tag->getAttribute('name'))) {
-                throw new InvalidArgumentException(\sprintf('The tag name for service "%s" in "%s" must be a non-empty string.', (string) $service->getAttribute('id'), $file));
+                throw new InvalidArgumentException(\sprintf('The tag name for service "%s" in "%s" must be a non-empty string.', $service->getAttribute('id'), $file));
             }
             $definition->addTag($tagName, $parameters);
         }
@@ -311,7 +312,7 @@ class XmlFileLoader extends FileLoader
             } elseif ('null' === $decorationOnInvalid) {
                 $invalidBehavior = ContainerInterface::NULL_ON_INVALID_REFERENCE;
             } else {
-                throw new InvalidArgumentException(\sprintf('Invalid value "%s" for attribute "decoration-on-invalid" on service "%s". Did you mean "exception", "ignore" or "null" in "%s"?', $decorationOnInvalid, (string) $service->getAttribute('id'), $file));
+                throw new InvalidArgumentException(\sprintf('Invalid value "%s" for attribute "decoration-on-invalid" on service "%s". Did you mean "exception", "ignore" or "null" in "%s"?', $decorationOnInvalid, $service->getAttribute('id'), $file));
             }
             $renameId = $service->hasAttribute('decoration-inner-name') ? $service->getAttribute('decoration-inner-name') : null;
             $priority = $service->hasAttribute('decoration-priority') ? $service->getAttribute('decoration-priority') : 0;

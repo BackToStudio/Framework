@@ -12,7 +12,6 @@ namespace FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Loa
 
 use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Alias;
 use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Argument\AbstractArgument;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Argument\ArgumentInterface;
 use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Argument\BoundArgument;
 use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
@@ -56,7 +55,7 @@ class YamlFileLoader extends FileLoader
         $this->container->fileExists($path);
         // empty file
         if (null === $content) {
-            return;
+            return null;
         }
         $this->loadContent($content, $path);
         // per-env configuration
@@ -72,6 +71,7 @@ class YamlFileLoader extends FileLoader
                 $this->env = $env;
             }
         }
+        return null;
     }
     private function loadContent(array $content, string $path)
     {
@@ -520,7 +520,7 @@ class YamlFileLoader extends FileLoader
      *
      * @throws InvalidArgumentException When errors occur
      *
-     * @return string|array|Reference A parsed callable
+     * @return string|array|Reference
      */
     private function parseCallable($callable, string $parameter, string $id, string $file)
     {
@@ -547,7 +547,7 @@ class YamlFileLoader extends FileLoader
     /**
      * Loads a YAML file.
      *
-     * @return array The file content
+     * @return array|null
      *
      * @throws InvalidArgumentException when the given file is not a local file or when it does not exist
      */
@@ -599,9 +599,7 @@ class YamlFileLoader extends FileLoader
         return $content;
     }
     /**
-     * Resolves services.
-     *
-     * @return array|string|Reference|ArgumentInterface
+     * @return mixed
      */
     private function resolveServices($value, string $file, bool $isParameter = \false)
     {

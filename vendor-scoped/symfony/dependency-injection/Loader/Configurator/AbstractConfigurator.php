@@ -13,6 +13,7 @@ namespace FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Loa
 use FantassinCoreWordPressVendor\Symfony\Component\Config\Loader\ParamConfigurator;
 use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Argument\AbstractArgument;
 use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Argument\ArgumentInterface;
+use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Definition;
 use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Parameter;
@@ -65,7 +66,8 @@ abstract class AbstractConfigurator
             $value = (self::$valuePreProcessor)($value, $allowServices);
         }
         if ($value instanceof ReferenceConfigurator) {
-            return new Reference($value->id, $value->invalidBehavior);
+            $reference = new Reference($value->id, $value->invalidBehavior);
+            return $value instanceof ClosureReferenceConfigurator ? new ServiceClosureArgument($reference) : $reference;
         }
         if ($value instanceof InlineServiceConfigurator) {
             $def = $value->definition;
