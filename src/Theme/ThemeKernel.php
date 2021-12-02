@@ -41,7 +41,7 @@ abstract class ThemeKernel
     {
         $containerBuilder = new ContainerBuilder();
 
-        $containerBuilder->setParameter('themeDirectory', $this->getKernelDir() );
+        $containerBuilder->setParameter('themeDirectory', $this->getProjectDir() );
         $containerBuilder->setParameter('themeTextDomain', $this->getTextDomain() );
 
         $this->loadServices($containerBuilder);

@@ -37,7 +37,7 @@ abstract class PluginKernel
     {
         $containerBuilder = new ContainerBuilder();
 
-        $containerBuilder->setParameter('pluginDirectory', $this->getKernelDir());
+        $containerBuilder->setParameter('pluginDirectory', $this->getProjectDir());
         $containerBuilder->setParameter('pluginTextDomain', $this->getTextDomain());
 
         $this->loadServices($containerBuilder);
