@@ -3,13 +3,13 @@
 namespace Fantassin\Core\WordPress\Plugin;
 
 use Exception;
-use Fantassin\Core\WordPress\Compose\HasTextDomain;
+use Fantassin\Core\WordPress\Compose\TextDomain;
 use Fantassin\Core\WordPress\Compose\WordPressContainer;
 use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
 
 abstract class PluginKernel
 {
-    use HasTextDomain;
+    use TextDomain;
     use WordPressContainer;
 
     /**
@@ -37,7 +37,7 @@ abstract class PluginKernel
     {
         $containerBuilder = new ContainerBuilder();
 
-        $containerBuilder->setParameter('pluginDirectory', $this->getKernelDir());
+        $containerBuilder->setParameter('pluginDirectory', $this->getProjectDir());
         $containerBuilder->setParameter('pluginTextDomain', $this->getTextDomain());
 
         $this->loadServices($containerBuilder);

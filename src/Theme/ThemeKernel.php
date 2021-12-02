@@ -3,17 +3,14 @@
 namespace Fantassin\Core\WordPress\Theme;
 
 use Exception;
-use Fantassin\Core\WordPress\Compose\HasTextDomain;
+use Fantassin\Core\WordPress\Compose\TextDomain;
 use Fantassin\Core\WordPress\Compose\WordPressContainer;
-use FantassinCoreWordPressVendor\Symfony\Component\Config\FileLocator;
 use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\ContainerInterface;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 
 abstract class ThemeKernel
 {
 
-    use HasTextDomain;
+    use TextDomain;
     use WordPressContainer;
 
     /**
@@ -41,7 +38,7 @@ abstract class ThemeKernel
     {
         $containerBuilder = new ContainerBuilder();
 
-        $containerBuilder->setParameter('themeDirectory', $this->getKernelDir() );
+        $containerBuilder->setParameter('themeDirectory', $this->getProjectDir() );
         $containerBuilder->setParameter('themeTextDomain', $this->getTextDomain() );
 
         $this->loadServices($containerBuilder);
