@@ -258,11 +258,14 @@ trait WordPressContainer
     protected function loadServices(ContainerBuilder $containerBuilder)
     {
         $configBuilderGenerator = ConfigBuilderGenerator::class ? new ConfigBuilderGenerator($this->getBuildDir()) : null;
-        $loader = new PhpFileLoader($containerBuilder, new FileLocator(__DIR__), $this->getEnvironment(), $configBuilderGenerator);
+        // TODO: refactor with bundles.
+        $fileLocator = new FileLocator(__DIR__);
+        $loader = new PhpFileLoader($containerBuilder, $fileLocator, $this->getEnvironment(), $configBuilderGenerator);
         $loader->load('Resources/config/services.php');
 
+        // Get configuration.
         $fileLocator = new FileLocator($this->getProjectDir());
-        $loader = new PhpFileLoader($containerBuilder, $fileLocator);
+        $loader = new PhpFileLoader($containerBuilder, $fileLocator, $this->getEnvironment(), $configBuilderGenerator);
         $loader->load('config/services.php');
     }
 
