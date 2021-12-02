@@ -26,12 +26,12 @@ class ResourceCheckerConfigCache implements ConfigCacheInterface
      */
     private $file;
     /**
-     * @var iterable|ResourceCheckerInterface[]
+     * @var iterable<mixed, ResourceCheckerInterface>
      */
     private $resourceCheckers;
     /**
-     * @param string                              $file             The absolute cache path
-     * @param iterable|ResourceCheckerInterface[] $resourceCheckers The ResourceCheckers to use for the freshness check
+     * @param string                                    $file             The absolute cache path
+     * @param iterable<mixed, ResourceCheckerInterface> $resourceCheckers The ResourceCheckers to use for the freshness check
      */
     public function __construct(string $file, iterable $resourceCheckers = [])
     {
@@ -54,7 +54,7 @@ class ResourceCheckerConfigCache implements ConfigCacheInterface
      * The first ResourceChecker that supports a given resource is considered authoritative.
      * Resources with no matching ResourceChecker will silently be ignored and considered fresh.
      *
-     * @return bool true if the cache is fresh, false otherwise
+     * @return bool
      */
     public function isFresh()
     {
@@ -78,7 +78,6 @@ class ResourceCheckerConfigCache implements ConfigCacheInterface
         }
         $time = \filemtime($this->file);
         foreach ($meta as $resource) {
-            /* @var ResourceInterface $resource */
             foreach ($this->resourceCheckers as $checker) {
                 if (!$checker->supports($resource)) {
                     continue;

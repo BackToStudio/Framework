@@ -55,7 +55,7 @@ abstract class FileLoader extends BaseFileLoader
             throw new \TypeError(\sprintf('Invalid argument $ignoreErrors provided to "%s::import()": boolean or "not_found" expected, "%s" given.', static::class, \get_debug_type($ignoreErrors)));
         }
         try {
-            parent::import(...$args);
+            return parent::import(...$args);
         } catch (LoaderLoadException $e) {
             if (!$ignoreNotFound || !($prev = $e->getPrevious()) instanceof FileLocatorFileNotFoundException) {
                 throw $e;
@@ -69,6 +69,7 @@ abstract class FileLoader extends BaseFileLoader
                 throw $e;
             }
         }
+        return null;
     }
     /**
      * Registers a set of classes as services using PSR-4 for discovery.

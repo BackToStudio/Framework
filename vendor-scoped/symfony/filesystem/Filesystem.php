@@ -90,7 +90,7 @@ class Filesystem
      *
      * @param string|iterable $files A filename, an array of files, or a \Traversable instance to check
      *
-     * @return bool true if the file exists, false otherwise
+     * @return bool
      */
     public function exists($files)
     {
@@ -386,7 +386,7 @@ class Filesystem
     /**
      * Given an existing path, convert it to a path relative to a given starting path.
      *
-     * @return string Path of target relative to starting path
+     * @return string
      */
     public function makePathRelative(string $endPath, string $startPath)
     {
@@ -588,6 +588,7 @@ class Filesystem
      * Appends content to an existing file.
      *
      * @param string|resource $content The content to append
+     * @param bool            $lock    Whether the file should be locked when writing to it
      *
      * @throws IOException If the file is not writable
      */
@@ -600,7 +601,8 @@ class Filesystem
         if (!\is_dir($dir)) {
             $this->mkdir($dir);
         }
-        if (\false === self::box('file_put_contents', $filename, $content, \FILE_APPEND)) {
+        $lock = \func_num_args() > 2 && \func_get_arg(2);
+        if (\false === self::box('file_put_contents', $filename, $content, \FILE_APPEND | ($lock ? \LOCK_EX : 0))) {
             throw new IOException(\sprintf('Failed to write file "%s": ', $filename) . self::$lastError, 0, null, $filename);
         }
     }
@@ -626,13 +628,10 @@ class Filesystem
         self::$lastError = null;
         \set_error_handler(__CLASS__ . '::handleError');
         try {
-            $result = $func(...$args);
+            return $func(...$args);
+        } finally {
             \restore_error_handler();
-            return $result;
-        } catch (\Throwable $e) {
         }
-        \restore_error_handler();
-        throw $e;
     }
     /**
      * @internal

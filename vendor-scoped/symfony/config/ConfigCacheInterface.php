@@ -21,7 +21,7 @@ interface ConfigCacheInterface
     /**
      * Gets the cache file path.
      *
-     * @return string The cache file path
+     * @return string
      */
     public function getPath();
     /**
@@ -29,7 +29,7 @@ interface ConfigCacheInterface
      *
      * This check should take the metadata passed to the write() method into consideration.
      *
-     * @return bool Whether the cache is still fresh
+     * @return bool
      */
     public function isFresh();
     /**

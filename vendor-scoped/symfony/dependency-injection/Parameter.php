@@ -23,7 +23,7 @@ class Parameter
         $this->id = $id;
     }
     /**
-     * @return string The parameter key
+     * @return string
      */
     public function __toString()
     {

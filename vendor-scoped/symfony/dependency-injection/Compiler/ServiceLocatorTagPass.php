@@ -13,6 +13,7 @@ namespace FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Com
 use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Alias;
 use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
+use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
 use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Definition;
 use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
@@ -40,12 +41,15 @@ final class ServiceLocatorTagPass extends AbstractRecursivePass
         if (!$value->getClass()) {
             $value->setClass(ServiceLocator::class);
         }
-        $arguments = $value->getArguments();
-        if (!isset($arguments[0]) || !\is_array($arguments[0])) {
+        $services = $value->getArguments()[0] ?? null;
+        if ($services instanceof TaggedIteratorArgument) {
+            $services = $this->findAndSortTaggedServices($services, $this->container);
+        }
+        if (!\is_array($services)) {
             throw new InvalidArgumentException(\sprintf('Invalid definition for service "%s": an array of references is expected as first argument when the "container.service_locator" tag is set.', $this->currentId));
         }
         $i = 0;
-        foreach ($arguments[0] as $k => $v) {
+        foreach ($services as $k => $v) {
             if ($v instanceof ServiceClosureArgument) {
                 continue;
             }
@@ -53,16 +57,16 @@ final class ServiceLocatorTagPass extends AbstractRecursivePass
                 throw new InvalidArgumentException(\sprintf('Invalid definition for service "%s": an array of references is expected as first argument when the "container.service_locator" tag is set, "%s" found for key "%s".', $this->currentId, \get_debug_type($v), $k));
             }
             if ($i === $k) {
-                unset($arguments[0][$k]);
+                unset($services[$k]);
                 $k = (string) $v;
                 ++$i;
             } elseif (\is_int($k)) {
                 $i = null;
             }
-            $arguments[0][$k] = new ServiceClosureArgument($v);
+            $services[$k] = new ServiceClosureArgument($v);
         }
-        \ksort($arguments[0]);
-        $value->setArguments($arguments);
+        \ksort($services);
+        $value->setArgument(0, $services);
         $id = '.service_locator.' . ContainerBuilder::hash($value);
         if ($isRoot) {
             if ($id !== $this->currentId) {
@@ -84,7 +88,6 @@ final class ServiceLocatorTagPass extends AbstractRecursivePass
             }
             $refMap[$id] = new ServiceClosureArgument($ref);
         }
-        \ksort($refMap);
         $locator = (new Definition(ServiceLocator::class))->addArgument($refMap)->addTag('container.service_locator');
         if (null !== $callerId && $container->hasDefinition($callerId)) {
             $locator->setBindings($container->getDefinition($callerId)->getBindings());

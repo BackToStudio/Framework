@@ -35,16 +35,13 @@ class ClassExistenceResource implements SelfCheckingResourceInterface
     {
         $this->resource = $resource;
         if (null !== $exists) {
-            $this->exists = [(bool) $exists, null];
+            $this->exists = [$exists, null];
         }
     }
     public function __toString() : string
     {
         return $this->resource;
     }
-    /**
-     * @return string The file path to the resource
-     */
     public function getResource() : string
     {
         return $this->resource;

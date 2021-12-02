@@ -30,6 +30,7 @@ class ClassBuilder
     private $require = [];
     private $use = [];
     private $implements = [];
+    private $allowExtraKeys = \false;
     public function __construct(string $namespace, string $name)
     {
         $this->namespace = $namespace;
@@ -83,8 +84,6 @@ USE
 
 /**
  * This class is automatically generated to help creating config.
- *
- * @experimental in 5.3
  */
 class CLASS IMPLEMENTS
 {
@@ -111,7 +110,7 @@ BODY
     }
     public function addProperty(string $name, string $classType = null) : Property
     {
-        $property = new Property($name, $this->camelCase($name));
+        $property = new Property($name, '_' !== $name[0] ? $this->camelCase($name) : $name);
         if (null !== $classType) {
             $property->setType($classType);
         }
@@ -139,5 +138,13 @@ BODY
     public function getFqcn() : string
     {
         return '\\' . $this->namespace . '\\' . $this->name;
+    }
+    public function setAllowExtraKeys(bool $allowExtraKeys) : void
+    {
+        $this->allowExtraKeys = $allowExtraKeys;
+    }
+    public function shouldAllowExtraKeys() : bool
+    {
+        return $this->allowExtraKeys;
     }
 }

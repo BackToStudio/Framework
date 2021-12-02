@@ -39,16 +39,10 @@ class DirectoryResource implements SelfCheckingResourceInterface
     {
         return \md5(\serialize([$this->resource, $this->pattern]));
     }
-    /**
-     * @return string The file path to the resource
-     */
     public function getResource() : string
     {
         return $this->resource;
     }
-    /**
-     * Returns the pattern to restrict monitored files.
-     */
     public function getPattern() : ?string
     {
         return $this->pattern;

@@ -64,6 +64,7 @@ class ProxyHelper
                 $types[] = ($parent = $r->getDeclaringClass()->getParentClass()) ? $prefix . $parent->name : null;
             }
         }
+        \sort($types);
         return $types ? \implode($glue, $types) : null;
     }
 }
