@@ -16,6 +16,7 @@ use Fantassin\Core\WordPress\Hooks\DependencyInjection\Compiler\RegisterHookPass
 use Fantassin\Core\WordPress\Hooks\HookRegistry;
 use Fantassin\Core\WordPress\PostType\DependencyInjection\Compiler\RegisterPostTypePass;
 use Fantassin\Core\WordPress\Taxonomy\DependencyInjection\Compiler\RegisterTaxonomyPass;
+use FantassinCoreWordPressVendor\Symfony\Component\Config\Builder\ConfigBuilderGenerator;
 use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Compiler\ResolveInstanceofConditionalsPass;
 use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -74,7 +75,7 @@ trait WordPressContainer
     public function getKernelFile(): string
     {
         if (null === $this->kernelFile) {
-            $reflected        = new ReflectionObject($this);
+            $reflected = new ReflectionObject($this);
             $this->kernelFile = $reflected->getFileName();
         }
 
@@ -96,14 +97,32 @@ trait WordPressContainer
     }
 
     /**
+     * @return string
+     */
+    public function getBuildDir(): string
+    {
+        return $this->getKernelDir() . '/var/';
+    }
+
+    /**
      * @return ContainerInterface|null
      * @throws Exception
      */
     public function getContainer(): ?ContainerInterface
     {
-        $file = $this->getKernelDir() . '/var/container.php';
+        $file = $this->getBuildDir() . 'container.php';
 
         return $this->generateContainer($file);
+    }
+
+    /**
+     * Gets the container's base class.
+     *
+     * All names except Container must be fully qualified.
+     */
+    protected function getContainerBaseClass(): string
+    {
+        return 'Container';
     }
 
     /**
@@ -113,16 +132,13 @@ trait WordPressContainer
      */
     public function generateContainer(string $file): ?ContainerInterface
     {
-        $containerConfigCache = new ConfigCache($file, $this->isDebug());
-        $classname            = 'Container' . md5($this->getKernelFile());
+        $cache = new ConfigCache($file, $this->isDebug());
+        $classname = 'Container' . ContainerBuilder::hash($this->getKernelFile());
 
-        if ( ! $containerConfigCache->isFresh()) {
+        if (!$cache->isFresh()) {
             $containerBuilder = $this->getContainerBuilder();
             $containerBuilder->compile();
-            $options = [
-                'class' => $classname
-            ];
-            $this->dumpContainer($containerConfigCache, $containerBuilder, $options);
+            $this->dumpContainer($cache, $containerBuilder);
         }
 
         if (is_file($file)) {
@@ -136,25 +152,27 @@ trait WordPressContainer
     /**
      * Store Container in PHP version.
      *
-     * @param ConfigCacheInterface $configCache
-     * @param ContainerBuilder $containerBuilder
-     * @param array $options
+     * @param ConfigCacheInterface $cache
+     * @param ContainerBuilder $container
      */
     protected function dumpContainer(
-        ConfigCacheInterface $configCache,
-        ContainerBuilder $containerBuilder,
-        array $options
+        ConfigCacheInterface $cache,
+        ContainerBuilder $container
     ) {
-        $dumper  = new PhpDumper($containerBuilder);
-        $options = array_merge(
-            [
-                'debug' => $this->isDebug()
-            ],
-            $options
-        );
-        $configCache->write(
+        $containerBaseClass = $this->getContainerBaseClass();
+        $classname = $containerBaseClass . ContainerBuilder::hash($this->getKernelFile());
+        $dumper = new PhpDumper($container);
+        $options = [
+            'class' => $classname,
+            'base_class' => $containerBaseClass,
+            'debug' => $this->isDebug(),
+            'file' => $cache->getPath(),
+            'build_time' => time(),
+        ];
+
+        $cache->write(
             $dumper->dump($options),
-            $containerBuilder->getResources()
+            $container->getResources()
         );
     }
 
@@ -184,24 +202,24 @@ trait WordPressContainer
     public function wordPressContainerBuilder(ContainerBuilder $containerBuilder): ContainerBuilder
     {
         $containerBuilder->registerForAutoconfiguration(RegistryInterface::class)
-                         ->setPublic(true);
+            ->setPublic(true);
 
         $containerBuilder->registerForAutoconfiguration(PostTypeInterface::class)
-                         ->addTag('wordpress.post_type');
+            ->addTag('wordpress.post_type');
 
         $containerBuilder->registerForAutoconfiguration(TaxonomyInterface::class)
-                         ->addTag('wordpress.taxonomy');
+            ->addTag('wordpress.taxonomy');
 
         $containerBuilder->registerForAutoconfiguration(BlockInterface::class)
-                         ->addTag('wordpress.block');
+            ->addTag('wordpress.block');
 
         $containerBuilder->registerForAutoconfiguration(BlockStyleInterface::class)
-                         ->addTag('wordpress.block_style');
+            ->addTag('wordpress.block_style');
 
         $containerBuilder->registerForAutoconfiguration(HookInterface::class)
-                         ->addTag('wordpress.hook');
+            ->addTag('wordpress.hook');
 
-        $containerBuilder = $this->replaceResolveInstanceofConditionalsPass( $containerBuilder );
+        $containerBuilder = $this->replaceResolveInstanceofConditionalsPass($containerBuilder);
 
         $containerBuilder->addCompilerPass(new RegisterPostTypePass());
         $containerBuilder->addCompilerPass(new RegisterTaxonomyPass());
@@ -220,11 +238,12 @@ trait WordPressContainer
      */
     protected function loadServices(ContainerBuilder $containerBuilder)
     {
-        $loader = new PhpFileLoader($containerBuilder, new FileLocator(__DIR__));
+        $configBuilderGenerator = ConfigBuilderGenerator::class ? new ConfigBuilderGenerator($this->get) : null;
+        $loader = new PhpFileLoader($containerBuilder, new FileLocator(__DIR__), $this->getEnvironment(), null);
         $loader->load('Resources/config/services.php');
 
         $fileLocator = new FileLocator($this->getKernelDir());
-        $loader      = new PhpFileLoader($containerBuilder, $fileLocator);
+        $loader = new PhpFileLoader($containerBuilder, $fileLocator);
         $loader->load('config/services.php');
 
         // $allowedblockJson = $fileLocator->locate( 'config/allowed_blocks.json' );
