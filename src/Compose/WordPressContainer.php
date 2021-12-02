@@ -275,6 +275,7 @@ trait WordPressContainer
     {
         $beforeOptimizationPasses = $containerBuilder->getCompilerPassConfig()->getBeforeOptimizationPasses();
 
+        // Remove ResolveInstanceofConditionalsPass because of substr_replace() L97;
         $beforeOptimizationPasses = array_filter(
             $beforeOptimizationPasses,
             function (CompilerPassInterface $compilerPass) {
@@ -283,9 +284,7 @@ trait WordPressContainer
         );
 
         $containerBuilder->getCompilerPassConfig()->setBeforeOptimizationPasses($beforeOptimizationPasses);
-
         $containerBuilder->addCompilerPass(new ResolveInstanceOfContiditionalPassWithVendorPrefix());
-
 
         return $containerBuilder;
     }
