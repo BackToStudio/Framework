@@ -5,6 +5,8 @@ namespace Fantassin\Core\WordPress\Compose;
 
 
 use Exception;
+use LogicException;
+use ReflectionObject;
 use Fantassin\Core\WordPress\Blocks\DependencyInjection\Compiler\RegisterBlockPass;
 use Fantassin\Core\WordPress\Blocks\DependencyInjection\Compiler\RegisterBlockStylePass;
 use Fantassin\Core\WordPress\Compose\DependencyInjection\Compiler\ResolveInstanceOfContiditionalPassWithVendorPrefix;
@@ -23,10 +25,14 @@ use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Container
 use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\ContainerInterface;
 use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
-use ReflectionObject;
 use FantassinCoreWordPressVendor\Symfony\Component\Config\ConfigCache;
 use FantassinCoreWordPressVendor\Symfony\Component\Config\ConfigCacheInterface;
 use FantassinCoreWordPressVendor\Symfony\Component\Config\FileLocator;
+
+use function dirname;
+use function is_file;
+use function is_null;
+use function get_class;
 
 trait WordPressContainer
 {
@@ -74,8 +80,15 @@ trait WordPressContainer
      */
     public function getKernelFile(): string
     {
-        if (null === $this->kernelFile) {
+        if (is_null($this->kernelFile)) {
             $reflected = new ReflectionObject($this);
+
+            if (!is_file($reflected->getFileName())) {
+                throw new LogicException(
+                    sprintf('Cannot auto-detect project dir for kernel of class "%s".', $reflected->name)
+                );
+            }
+
             $this->kernelFile = $reflected->getFileName();
         }
 
@@ -87,10 +100,18 @@ trait WordPressContainer
      *
      * @return string
      */
-    public function getKernelDir(): string
+    public function getProjectDir(): string
     {
-        if (null === $this->kernelDir) {
-            $this->kernelDir = \dirname($this->getKernelFile());
+        if (is_null($this->kernelDir)) {
+            $kernelFile = $this->getKernelFile();
+            $dir = $rootDir = dirname($kernelFile);
+            while (!is_file($dir.'/composer.json')) {
+                if ($dir === dirname($dir)) {
+                    return $this->kernelDir = $rootDir;
+                }
+                $dir = dirname($dir);
+            }
+            $this->kernelDir = $dir;
         }
 
         return $this->kernelDir;
@@ -101,7 +122,7 @@ trait WordPressContainer
      */
     public function getBuildDir(): string
     {
-        return $this->getKernelDir() . '/var/';
+        return $this->getProjectDir() . '/var/';
     }
 
     /**
@@ -238,19 +259,13 @@ trait WordPressContainer
      */
     protected function loadServices(ContainerBuilder $containerBuilder)
     {
-        $configBuilderGenerator = ConfigBuilderGenerator::class ? new ConfigBuilderGenerator($this->get) : null;
-        $loader = new PhpFileLoader($containerBuilder, new FileLocator(__DIR__), $this->getEnvironment(), null);
+        $configBuilderGenerator = ConfigBuilderGenerator::class ? new ConfigBuilderGenerator($this->getBuildDir()) : null;
+        $loader = new PhpFileLoader($containerBuilder, new FileLocator(__DIR__), $this->getEnvironment(), $configBuilderGenerator);
         $loader->load('Resources/config/services.php');
 
-        $fileLocator = new FileLocator($this->getKernelDir());
+        $fileLocator = new FileLocator($this->getProjectDir());
         $loader = new PhpFileLoader($containerBuilder, $fileLocator);
         $loader->load('config/services.php');
-
-        // $allowedblockJson = $fileLocator->locate( 'config/allowed_blocks.json' );
-        // $allowedBlocks = json_decode($allowedblockJson, true);
-
-        // $containerBuilder->setParameter('allowedBlocks', $allowedBlocks);
-
     }
 
     /**
