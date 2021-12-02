@@ -2,7 +2,7 @@
 
 namespace Fantassin\Core\WordPress\Compose;
 
-trait HasTextDomain
+trait TextDomain
 {
 
 	/**
