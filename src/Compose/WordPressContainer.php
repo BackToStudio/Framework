@@ -103,7 +103,7 @@ trait WordPressContainer
         if (is_null($this->kernelDir)) {
             $kernelFile = $this->getKernelFile();
             $dir = $rootDir = dirname($kernelFile);
-            while (!is_file($dir.'/composer.json')) {
+            while (!is_file($dir . '/composer.json')) {
                 if ($dir === dirname($dir)) {
                     return $this->kernelDir = $rootDir;
                 }
@@ -145,14 +145,23 @@ trait WordPressContainer
     }
 
     /**
+     * @return string
+     */
+    protected function getContainerHash(): string
+    {
+        return \str_replace('.', '_', ContainerBuilder::hash($this->getKernelFile()));
+    }
+
+    /**
      * @param string $file
      *
      * @return ContainerInterface|null
+     * @throws Exception
      */
     public function generateContainer(string $file): ?ContainerInterface
     {
         $cache = new ConfigCache($file, $this->isDebug());
-        $classname = 'Container' . ContainerBuilder::hash($this->getKernelFile());
+        $classname = 'Container' . $this->getContainerHash();
 
         if (!$cache->isFresh()) {
             $containerBuilder = $this->getContainerBuilder();
@@ -179,7 +188,7 @@ trait WordPressContainer
         ContainerBuilder $container
     ) {
         $containerBaseClass = $this->getContainerBaseClass();
-        $classname = $containerBaseClass . ContainerBuilder::hash($this->getKernelFile());
+        $classname = $containerBaseClass . $this->getContainerHash();
         $dumper = new PhpDumper($container);
         $options = [
             'class' => $classname,
@@ -257,7 +266,9 @@ trait WordPressContainer
      */
     protected function loadServices(ContainerBuilder $containerBuilder)
     {
-        $configBuilderGenerator = ConfigBuilderGenerator::class ? new ConfigBuilderGenerator($this->getBuildDir()) : null;
+        $configBuilderGenerator = ConfigBuilderGenerator::class ? new ConfigBuilderGenerator(
+            $this->getBuildDir()
+        ) : null;
         // TODO: refactor with bundles.
         $fileLocator = new FileLocator(__DIR__);
         $loader = new PhpFileLoader($containerBuilder, $fileLocator, $this->getEnvironment(), $configBuilderGenerator);
