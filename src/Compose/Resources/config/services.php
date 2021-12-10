@@ -10,11 +10,11 @@ return function (ContainerConfigurator $configurator) {
         ); // Automatically registers your services as commands, event subscribers, etc.
 
     $services->load('Fantassin\\Core\\WordPress\\Hooks\\', '../../../Hooks/*')
-             ->exclude('../../../Hooks/{ DependencyInjection, Entity, Tests, Contracts}');
+             ->exclude('../../../Hooks/{DependencyInjection,Entity,Tests,Contracts}');
     $services->load('Fantassin\\Core\\WordPress\\Blocks\\', '../../../Blocks/*')
-             ->exclude('../../../Blocks/{ DependencyInjection, Entity, Tests, Contracts}');
+             ->exclude('../../../Blocks/{DependencyInjection,Entity,Tests,Contracts}');
     $services->load('Fantassin\\Core\\WordPress\\PostType\\', '../../../PostType/*')
-             ->exclude('../../../PostType/{ DependencyInjection, Entity, Tests, Contracts}');
+             ->exclude('../../../PostType/{DependencyInjection,Entity,Tests,Contracts}');
     $services->load('Fantassin\\Core\\WordPress\\Taxonomy\\', '../../../Taxonomy/*')
-             ->exclude('../../../Taxonomy/{ DependencyInjection, Entity, Tests, Contracts }');
+             ->exclude('../../../Taxonomy/{DependencyInjection,Entity,Tests,Contracts}');
 };
