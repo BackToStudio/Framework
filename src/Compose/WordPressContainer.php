@@ -3,10 +3,10 @@
 namespace Fantassin\Core\WordPress\Compose;
 
 use Exception;
-use Fantassin\Core\WordPress\PostType\Contracts\PostTypeInterface;
-use Fantassin\Core\WordPress\Taxonomy\Contracts\TaxonomyInterface;
 use LogicException;
 use ReflectionObject;
+use Fantassin\Core\WordPress\PostType\Contracts\PostTypeInterface;
+use Fantassin\Core\WordPress\Taxonomy\Contracts\TaxonomyInterface;
 use Fantassin\Core\WordPress\Blocks\DependencyInjection\Compiler\RegisterBlockPass;
 use Fantassin\Core\WordPress\Blocks\DependencyInjection\Compiler\RegisterBlockStylePass;
 use Fantassin\Core\WordPress\Compose\DependencyInjection\Compiler\ResolveInstanceOfContiditionalPassWithVendorPrefix;

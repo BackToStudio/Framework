@@ -19,10 +19,10 @@ class SocialLinksInTimberContext implements Hooks
 
     public function hooks()
     {
-        add_filter('timber/context', [$this, 'addSocialLinksToContext']);
+        \add_filter('timber/context', [$this, 'addSocialLinksToContext']);
     }
 
-    function addSocialLinksToContext(array $context): array
+    public function addSocialLinksToContext(array $context): array
     {
         $strategy = $this->factory->createSocialLinkStrategy();
 

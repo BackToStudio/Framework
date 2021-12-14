@@ -12,8 +12,9 @@ class SeoPressOptionsStrategy implements SocialLinksStrategyInterface
     /**
      * @param array $options
      */
-    public function __construct(array $options){
-        $this->setOptions( $options );
+    public function __construct(array $options)
+    {
+        $this->setOptions($options);
     }
 
     /**
@@ -21,7 +22,7 @@ class SeoPressOptionsStrategy implements SocialLinksStrategyInterface
      */
     public function getFacebookLink(): ?string
     {
-        return $this->getKey('seopress_social_accounts_facebook');
+        return $this->getString('seopress_social_accounts_facebook');
     }
 
     /**
@@ -29,7 +30,7 @@ class SeoPressOptionsStrategy implements SocialLinksStrategyInterface
      */
     public function getTwitterLink(): ?string
     {
-        return $this->getKey('seopress_social_accounts_twitter');
+        return $this->getString('seopress_social_accounts_twitter');
     }
 
     /**
@@ -37,7 +38,7 @@ class SeoPressOptionsStrategy implements SocialLinksStrategyInterface
      */
     public function getPinterestLink(): ?string
     {
-        return $this->getKey('seopress_social_accounts_pinterest');
+        return $this->getString('seopress_social_accounts_pinterest');
     }
 
     /**
@@ -45,7 +46,7 @@ class SeoPressOptionsStrategy implements SocialLinksStrategyInterface
      */
     public function getInstagramLink(): ?string
     {
-        return $this->getKey('seopress_social_accounts_instagram');
+        return $this->getString('seopress_social_accounts_instagram');
     }
 
     /**
@@ -53,7 +54,7 @@ class SeoPressOptionsStrategy implements SocialLinksStrategyInterface
      */
     public function getLinkedInLink(): ?string
     {
-        return $this->getKey('seopress_social_accounts_linkedin');
+        return $this->getString('seopress_social_accounts_linkedin');
     }
 
     /**
@@ -61,7 +62,7 @@ class SeoPressOptionsStrategy implements SocialLinksStrategyInterface
      */
     public function getYouTubeLink(): ?string
     {
-        return $this->getKey('seopress_social_accounts_youtube');
+        return $this->getString('seopress_social_accounts_youtube');
     }
 }
 

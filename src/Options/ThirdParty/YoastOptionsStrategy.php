@@ -13,7 +13,8 @@ class YoastOptionsStrategy implements SocialLinksStrategyInterface
     /**
      * @param array $options
      */
-    public function __construct(array $options){
+    public function __construct(array $options)
+    {
         $this->setOptions($options);
     }
 
@@ -22,7 +23,7 @@ class YoastOptionsStrategy implements SocialLinksStrategyInterface
      */
     public function getFacebookLink(): ?string
     {
-        return $this->getKey('facebook_site');
+        return $this->getString('facebook_site');
     }
 
     /**
@@ -30,7 +31,7 @@ class YoastOptionsStrategy implements SocialLinksStrategyInterface
      */
     public function getTwitterLink(): ?string
     {
-        return $this->getKey('twitter_site');
+        return $this->getString('twitter_site');
     }
 
     /**
@@ -38,7 +39,7 @@ class YoastOptionsStrategy implements SocialLinksStrategyInterface
      */
     public function getPinterestLink(): ?string
     {
-        return $this->getKey('pinterest_url');
+        return $this->getString('pinterest_url');
     }
 
     /**
@@ -46,7 +47,7 @@ class YoastOptionsStrategy implements SocialLinksStrategyInterface
      */
     public function getInstagramLink(): ?string
     {
-        return $this->getKey('instagram_url');
+        return $this->getString('instagram_url');
     }
 
     /**
@@ -54,7 +55,7 @@ class YoastOptionsStrategy implements SocialLinksStrategyInterface
      */
     public function getLinkedInLink(): ?string
     {
-        return $this->getKey('linkedin_url');
+        return $this->getString('linkedin_url');
     }
 
     /**
@@ -62,7 +63,7 @@ class YoastOptionsStrategy implements SocialLinksStrategyInterface
      */
     public function getYouTubeLink(): ?string
     {
-        return $this->getKey('youtube_url');
+        return $this->getString('youtube_url');
     }
 }
 
