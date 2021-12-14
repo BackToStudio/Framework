@@ -11,7 +11,7 @@ class OptionsRepository
      */
     public function find(string $key)
     {
-        return get_option($key, []);
+        return \get_option($key, []);
     }
 
 }
