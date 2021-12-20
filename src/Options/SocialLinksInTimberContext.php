@@ -26,6 +26,10 @@ class SocialLinksInTimberContext implements Hooks
     {
         $strategy = $this->factory->createSocialLinkStrategy();
 
+        if (is_null($strategy)) {
+            return $context;
+        }
+
         $context['facebook'] = $strategy->getFacebookLink();
         $context['twitter'] = $strategy->getTwitterLink();
         $context['pinterest'] = $strategy->getPinterestLink();
