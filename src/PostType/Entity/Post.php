@@ -3,15 +3,17 @@
 namespace Fantassin\Core\WordPress\PostType\Entity;
 
 use DateTimeInterface;
+use Fantassin\Core\WordPress\Compose\HasId;
+use Fantassin\Core\WordPress\Compose\HasParentId;
+use Fantassin\Core\WordPress\Compose\HasSlug;
 use Fantassin\Core\WordPress\PostType\Contracts\PostInterface;
 
 class Post implements PostInterface
 {
 
-    /**
-     * @var int
-     */
-    protected $id = null;
+    use HasId;
+    use HasSlug;
+    use HasParentId;
 
     /**
      * @var string
@@ -34,11 +36,6 @@ class Post implements PostInterface
     protected $content = '';
 
     /**
-     * @var string
-     */
-    protected $slug = '';
-
-    /**
      * @var int
      */
     protected $parentId = null;
@@ -57,17 +54,6 @@ class Post implements PostInterface
      * @var DateTimeInterface
      */
     protected $modifiedAt = null;
-
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
-
-    public function setId(int $id): PostInterface
-    {
-        $this->id = $id;
-        return $this;
-    }
 
     public function getTitle(): string
     {
@@ -110,28 +96,6 @@ class Post implements PostInterface
     public function setContent(string $content): PostInterface
     {
         $this->content = $content;
-        return $this;
-    }
-
-    public function getSlug(): string
-    {
-        return $this->slug;
-    }
-
-    public function setSlug(string $slug): PostInterface
-    {
-        $this->slug = $slug;
-        return $this;
-    }
-
-    public function getParentId(): ?int
-    {
-        return $this->parentId;
-    }
-
-    public function setParentId(int $parentId): PostInterface
-    {
-        $this->parentId = $parentId;
         return $this;
     }
 

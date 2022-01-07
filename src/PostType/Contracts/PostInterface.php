@@ -3,20 +3,12 @@
 namespace Fantassin\Core\WordPress\PostType\Contracts;
 
 use DateTimeInterface;
+use Fantassin\Core\WordPress\Contracts\IdInterface;
+use Fantassin\Core\WordPress\Contracts\ParentIdInterface;
+use Fantassin\Core\WordPress\Contracts\SlugInterface;
 
-interface PostInterface
+interface PostInterface extends IdInterface, SlugInterface, ParentIdInterface
 {
-
-    /**
-     * @return int
-     */
-    public function getId(): ?int;
-
-    /**
-     * @param int $id
-     * @return PostInterface
-     */
-    public function setId(int $id): PostInterface;
 
     /**
      * @return string
@@ -61,28 +53,6 @@ interface PostInterface
      * @return PostInterface
      */
     public function setStatus(string $status): PostInterface;
-
-    /**
-     * @return string
-     */
-    public function getSlug(): string;
-
-    /**
-     * @param string $slug
-     * @return PostInterface
-     */
-    public function setSlug(string $slug): PostInterface;
-
-    /**
-     * @return int
-     */
-    public function getParentId(): ?int;
-
-    /**
-     * @param int $parentId
-     * @return PostInterface
-     */
-    public function setParentId(int $parentId): PostInterface;
 
     /**
      * @return string
