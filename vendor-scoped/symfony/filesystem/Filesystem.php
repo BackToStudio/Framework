@@ -61,6 +61,8 @@ class Filesystem
             if ($originIsLocal) {
                 // Like `cp`, preserve executable permission bits
                 self::box('chmod', $targetFile, \fileperms($targetFile) | \fileperms($originFile) & 0111);
+                // Like `cp`, preserve the file modification time
+                self::box('touch', $targetFile, \filemtime($originFile));
                 if ($bytesCopied !== ($bytesOrigin = \filesize($originFile))) {
                     throw new IOException(\sprintf('Failed to copy the whole content of "%s" to "%s" (%g of %g bytes copied).', $originFile, $targetFile, $bytesCopied, $bytesOrigin), 0, null, $originFile);
                 }
@@ -114,7 +116,7 @@ class Filesystem
      *
      * @throws IOException When touch fails
      */
-    public function touch($files, int $time = null, int $atime = null)
+    public function touch($files, ?int $time = null, ?int $atime = null)
     {
         foreach ($this->toIterable($files) as $file) {
             if (!($time ? self::box('touch', $file, $time, $atime) : self::box('touch', $file))) {
@@ -149,7 +151,7 @@ class Filesystem
                 }
             } elseif (\is_dir($file)) {
                 if (!$isRecursive) {
-                    $tmpName = \dirname(\realpath($file)) . '/.' . \strrev(\strtr(\base64_encode(\random_bytes(2)), '/=', '-.'));
+                    $tmpName = \dirname(\realpath($file)) . '/.' . \strrev(\strtr(\base64_encode(\random_bytes(2)), '/=', '-_'));
                     if (\file_exists($tmpName)) {
                         try {
                             self::doRemove([$tmpName], \true);
@@ -172,7 +174,7 @@ class Filesystem
                     }
                     throw new IOException(\sprintf('Failed to remove directory "%s": ', $file) . $lastError);
                 }
-            } elseif (!self::box('unlink', $file) && (\str_contains(self::$lastError, 'Permission denied') || \file_exists($file))) {
+            } elseif (!self::box('unlink', $file) && (self::$lastError && \str_contains(self::$lastError, 'Permission denied') || \file_exists($file))) {
                 throw new IOException(\sprintf('Failed to remove file "%s": ', $file) . self::$lastError);
             }
         }
@@ -292,6 +294,7 @@ class Filesystem
      */
     public function symlink(string $originDir, string $targetDir, bool $copyOnWindows = \false)
     {
+        self::assertFunctionExists('symlink');
         if ('\\' === \DIRECTORY_SEPARATOR) {
             $originDir = \strtr($originDir, '/', '\\');
             $targetDir = \strtr($targetDir, '/', '\\');
@@ -321,6 +324,7 @@ class Filesystem
      */
     public function hardlink(string $originFile, $targetFiles)
     {
+        self::assertFunctionExists('link');
         if (!$this->exists($originFile)) {
             throw new FileNotFoundException(null, 0, null, $originFile);
         }
@@ -458,7 +462,7 @@ class Filesystem
      *
      * @throws IOException When file type is unknown
      */
-    public function mirror(string $originDir, string $targetDir, \Traversable $iterator = null, array $options = [])
+    public function mirror(string $originDir, string $targetDir, ?\Traversable $iterator = null, array $options = [])
     {
         $targetDir = \rtrim($targetDir, '/\\');
         $originDir = \rtrim($originDir, '/\\');
@@ -566,6 +570,10 @@ class Filesystem
             throw new \TypeError(\sprintf('Argument 2 passed to "%s()" must be string or resource, array given.', __METHOD__));
         }
         $dir = \dirname($filename);
+        if (\is_link($filename) && ($linkTarget = $this->readlink($filename))) {
+            $this->dumpFile(Path::makeAbsolute($linkTarget, $dir), $content);
+            return;
+        }
         if (!\is_dir($dir)) {
             $this->mkdir($dir);
         }
@@ -576,7 +584,7 @@ class Filesystem
             if (\false === self::box('file_put_contents', $tmpFile, $content)) {
                 throw new IOException(\sprintf('Failed to write file "%s": ', $filename) . self::$lastError, 0, null, $filename);
             }
-            self::box('chmod', $tmpFile, \file_exists($filename) ? \fileperms($filename) : 0666 & ~\umask());
+            self::box('chmod', $tmpFile, self::box('fileperms', $filename) ?: 0666 & ~\umask());
             $this->rename($tmpFile, $filename, \true);
         } finally {
             if (\file_exists($tmpFile)) {
@@ -618,13 +626,20 @@ class Filesystem
         $components = \explode('://', $filename, 2);
         return 2 === \count($components) ? [$components[0], $components[1]] : [null, $components[0]];
     }
+    private static function assertFunctionExists(string $func) : void
+    {
+        if (!\function_exists($func)) {
+            throw new IOException(\sprintf('Unable to perform filesystem operation because the "%s()" function has been disabled.', $func));
+        }
+    }
     /**
      * @param mixed ...$args
      *
      * @return mixed
      */
-    private static function box(callable $func, ...$args)
+    private static function box(string $func, ...$args)
     {
+        self::assertFunctionExists($func);
         self::$lastError = null;
         \set_error_handler(__CLASS__ . '::handleError');
         try {

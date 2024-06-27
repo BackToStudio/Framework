@@ -31,7 +31,7 @@ class ExprBuilder
      *
      * @return $this
      */
-    public function always(\Closure $then = null)
+    public function always(?\Closure $then = null)
     {
         $this->ifPart = function () {
             return \true;
@@ -48,7 +48,7 @@ class ExprBuilder
      *
      * @return $this
      */
-    public function ifTrue(\Closure $closure = null)
+    public function ifTrue(?\Closure $closure = null)
     {
         if (null === $closure) {
             $closure = function ($v) {
@@ -85,7 +85,7 @@ class ExprBuilder
     /**
      * Tests if the value is empty.
      *
-     * @return ExprBuilder
+     * @return $this
      */
     public function ifEmpty()
     {

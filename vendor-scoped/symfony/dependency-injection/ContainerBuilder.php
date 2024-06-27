@@ -129,7 +129,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     private $removedBindingIds = [];
     private const INTERNAL_TYPES = ['int' => \true, 'float' => \true, 'string' => \true, 'bool' => \true, 'resource' => \true, 'object' => \true, 'array' => \true, 'null' => \true, 'callable' => \true, 'iterable' => \true, 'mixed' => \true];
-    public function __construct(ParameterBagInterface $parameterBag = null)
+    public function __construct(?ParameterBagInterface $parameterBag = null)
     {
         parent::__construct($parameterBag);
         $this->trackResources = \interface_exists(ResourceInterface::class);
@@ -369,7 +369,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @throws BadMethodCallException When this ContainerBuilder is compiled
      * @throws \LogicException        if the extension is not registered
      */
-    public function loadFromExtension(string $extension, array $values = null)
+    public function loadFromExtension(string $extension, ?array $values = null)
     {
         if ($this->isCompiled()) {
             throw new BadMethodCallException('Cannot load from an extension on a compiled container.');
@@ -460,12 +460,12 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      */
     public function get(string $id, int $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE)
     {
-        if ($this->isCompiled() && isset($this->removedIds[$id]) && ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE >= $invalidBehavior) {
-            return parent::get($id);
+        if ($this->isCompiled() && isset($this->removedIds[$id])) {
+            return ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE >= $invalidBehavior ? parent::get($id) : null;
         }
         return $this->doGet($id, $invalidBehavior);
     }
-    private function doGet(string $id, int $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, array &$inlineServices = null, bool $isConstructorArgument = \false)
+    private function doGet(string $id, int $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, ?array &$inlineServices = null, bool $isConstructorArgument = \false)
     {
         if (isset($inlineServices[$id])) {
             return $inlineServices[$id];
@@ -476,9 +476,9 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
         try {
             if (ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE === $invalidBehavior) {
-                return parent::get($id, $invalidBehavior);
+                return $this->privates[$id] ?? parent::get($id, $invalidBehavior);
             }
-            if ($service = parent::get($id, ContainerInterface::NULL_ON_INVALID_REFERENCE)) {
+            if (null !== ($service = $this->privates[$id] ?? parent::get($id, ContainerInterface::NULL_ON_INVALID_REFERENCE))) {
                 return $service;
             }
         } catch (ServiceCircularReferenceException $e) {
@@ -764,7 +764,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * @return Definition
      */
-    public function register(string $id, string $class = null)
+    public function register(string $id, ?string $class = null)
     {
         return $this->setDefinition($id, new Definition($class));
     }
@@ -776,7 +776,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * @return Definition
      */
-    public function autowire(string $id, string $class = null)
+    public function autowire(string $id, ?string $class = null)
     {
         return $this->setDefinition($id, (new Definition($class))->setAutowired(\true));
     }
@@ -884,7 +884,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * @throws RuntimeException         When the service is a synthetic service
      * @throws InvalidArgumentException When configure callable is not callable
      */
-    private function createService(Definition $definition, array &$inlineServices, bool $isConstructorArgument = \false, string $id = null, bool $tryProxy = \true)
+    private function createService(Definition $definition, array &$inlineServices, bool $isConstructorArgument = \false, ?string $id = null, bool $tryProxy = \true)
     {
         if (null === $id && isset($inlineServices[$h = \spl_object_hash($definition)])) {
             return $inlineServices[$h];
@@ -918,8 +918,13 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
                 throw new RuntimeException(\sprintf('Cannot create service "%s" because of invalid factory.', $id));
             }
         }
-        if (null !== $id && $definition->isShared() && isset($this->services[$id]) && ($tryProxy || !$definition->isLazy())) {
-            return $this->services[$id];
+        if (null !== $id && $definition->isShared() && (isset($this->services[$id]) || isset($this->privates[$id])) && ($tryProxy || !$definition->isLazy())) {
+            return $this->services[$id] ?? $this->privates[$id];
+        }
+        if (!\array_is_list($arguments)) {
+            $arguments = \array_combine(\array_map(function ($k) {
+                return \preg_replace('/^.*\\$/', '', $k);
+            }, \array_keys($arguments)), $arguments);
         }
         if (null !== $factory) {
             $service = $factory(...$arguments);
@@ -931,7 +936,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             }
         } else {
             $r = new \ReflectionClass($parameterBag->resolveValue($definition->getClass()));
-            $service = null === $r->getConstructor() ? $r->newInstance() : $r->newInstanceArgs(\array_values($arguments));
+            $service = null === $r->getConstructor() ? $r->newInstance() : $r->newInstanceArgs($arguments);
             if (!$definition->isDeprecated() && 0 < \strpos($r->getDocComment(), "\n * @deprecated ")) {
                 trigger_deprecation('', '', 'The "%s" service relies on the deprecated "%s" class. It should either be deprecated or its implementation upgraded.', $id, $r->name);
             }
@@ -1150,7 +1155,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * "$fooBar"-named arguments with $type as type-hint. Such arguments will
      * receive the service $id when autowiring is used.
      */
-    public function registerAliasForArgument(string $id, string $type, string $name = null) : Alias
+    public function registerAliasForArgument(string $id, string $type, ?string $name = null) : Alias
     {
         $name = (new Target($name ?? $id))->name;
         if (!\preg_match('/^[a-zA-Z_\\x7f-\\xff]/', $name)) {
@@ -1185,7 +1190,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *
      * @return mixed The value with env parameters resolved if a string or an array is passed
      */
-    public function resolveEnvPlaceholders($value, $format = null, array &$usedEnvs = null)
+    public function resolveEnvPlaceholders($value, $format = null, ?array &$usedEnvs = null)
     {
         if (null === $format) {
             $format = '%%env(%s)%%';
@@ -1204,7 +1209,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             }
             return $result;
         }
-        if (!\is_string($value) || 38 > \strlen($value)) {
+        if (!\is_string($value) || 38 > \strlen($value) || !\preg_match('/env[_(]/i', $value)) {
             return $value;
         }
         $envPlaceholders = $bag instanceof EnvPlaceholderParameterBag ? $bag->getEnvPlaceholders() : $this->envPlaceholders;
@@ -1420,7 +1425,11 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     {
         $inlineServices[$id ?? \spl_object_hash($definition)] = $service;
         if (null !== $id && $definition->isShared()) {
-            $this->services[$id] = $service;
+            if ($definition->isPrivate() && $this->isCompiled()) {
+                $this->privates[$id] = $service;
+            } else {
+                $this->services[$id] = $service;
+            }
             unset($this->loading[$id]);
         }
     }

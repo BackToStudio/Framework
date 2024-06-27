@@ -71,9 +71,6 @@ class MergeExtensionConfigurationPass implements CompilerPassInterface
                 if ($resolvingBag instanceof MergeExtensionConfigurationParameterBag) {
                     $container->getParameterBag()->mergeEnvPlaceholders($resolvingBag);
                 }
-                if ($configAvailable) {
-                    BaseNode::resetPlaceholders();
-                }
                 throw $e;
             }
             if ($resolvingBag instanceof MergeExtensionConfigurationParameterBag) {
@@ -82,9 +79,6 @@ class MergeExtensionConfigurationPass implements CompilerPassInterface
             }
             $container->merge($tmpContainer);
             $container->getParameterBag()->add($parameters);
-        }
-        if ($configAvailable) {
-            BaseNode::resetPlaceholders();
         }
         $container->addDefinitions($definitions);
         $container->addAliases($aliases);
@@ -139,7 +133,7 @@ class MergeExtensionConfigurationParameterBag extends EnvPlaceholderParameterBag
 class MergeExtensionConfigurationContainerBuilder extends ContainerBuilder
 {
     private $extensionClass;
-    public function __construct(ExtensionInterface $extension, ParameterBagInterface $parameterBag = null)
+    public function __construct(ExtensionInterface $extension, ?ParameterBagInterface $parameterBag = null)
     {
         parent::__construct($parameterBag);
         $this->extensionClass = \get_class($extension);
@@ -168,7 +162,7 @@ class MergeExtensionConfigurationContainerBuilder extends ContainerBuilder
     /**
      * {@inheritdoc}
      */
-    public function resolveEnvPlaceholders($value, $format = null, array &$usedEnvs = null)
+    public function resolveEnvPlaceholders($value, $format = null, ?array &$usedEnvs = null)
     {
         if (\true !== $format || !\is_string($value)) {
             return parent::resolveEnvPlaceholders($value, $format, $usedEnvs);

@@ -18,10 +18,10 @@ namespace BackToVendor\Symfony\Component\DependencyInjection;
 trait ContainerAwareTrait
 {
     /**
-     * @var ContainerInterface
+     * @var ContainerInterface|null
      */
     protected $container;
-    public function setContainer(ContainerInterface $container = null)
+    public function setContainer(?ContainerInterface $container = null)
     {
         $this->container = $container;
     }

@@ -62,7 +62,7 @@ final class RegisterAutoconfigureAttributesPass implements CompilerPassInterface
                     $attribute['tags'][$i] = [$class->name => $tag[0]];
                 }
             }
-            $parseDefinitions->invoke($yamlLoader, ['services' => ['_instanceof' => [$class->name => [$container->registerForAutoconfiguration($class->name)] + $attribute]]], $class->getFileName());
+            $parseDefinitions->invoke($yamlLoader, ['services' => ['_instanceof' => [$class->name => [$container->registerForAutoconfiguration($class->name)] + $attribute]]], $class->getFileName(), \false);
         };
         return (self::$registerForAutoconfiguration)($container, $class, $attribute);
     }

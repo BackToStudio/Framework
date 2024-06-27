@@ -33,11 +33,12 @@ use BackToVendor\Symfony\Contracts\Service\ResetInterface;
  * The container can have four possible behaviors when a service
  * does not exist (or is not initialized for the last case):
  *
- *  * EXCEPTION_ON_INVALID_REFERENCE: Throws an exception (the default)
+ *  * EXCEPTION_ON_INVALID_REFERENCE: Throws an exception at compilation time (the default)
  *  * NULL_ON_INVALID_REFERENCE:      Returns null
  *  * IGNORE_ON_INVALID_REFERENCE:    Ignores the wrapping command asking for the reference
  *                                    (for instance, ignore a setter if the service does not exist)
  *  * IGNORE_ON_UNINITIALIZED_REFERENCE: Ignores/returns null for uninitialized services or invalid references
+ *  * RUNTIME_EXCEPTION_ON_INVALID_REFERENCE: Throws an exception at runtime
  *
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
@@ -57,7 +58,7 @@ class Container implements ContainerInterface, ResetInterface
     private $envCache = [];
     private $compiled = \false;
     private $getEnv;
-    public function __construct(ParameterBagInterface $parameterBag = null)
+    public function __construct(?ParameterBagInterface $parameterBag = null)
     {
         $this->parameterBag = $parameterBag ?? new EnvPlaceholderParameterBag();
     }
@@ -96,7 +97,7 @@ class Container implements ContainerInterface, ResetInterface
     /**
      * Gets a parameter.
      *
-     * @return array|bool|string|int|float|null
+     * @return array|bool|string|int|float|\UnitEnum|null
      *
      * @throws InvalidArgumentException if the parameter is not defined
      */
@@ -114,8 +115,8 @@ class Container implements ContainerInterface, ResetInterface
     /**
      * Sets a parameter.
      *
-     * @param string                           $name  The parameter name
-     * @param array|bool|string|int|float|null $value The parameter value
+     * @param string                                     $name  The parameter name
+     * @param array|bool|string|int|float|\UnitEnum|null $value The parameter value
      */
     public function setParameter(string $name, $value)
     {
@@ -345,6 +346,9 @@ class Container implements ContainerInterface, ResetInterface
             $localName = $name;
         }
         $processor = $processors->has($prefix) ? $processors->get($prefix) : new EnvVarProcessor($this);
+        if (\false === $i) {
+            $prefix = '';
+        }
         $this->resolving[$envName] = \true;
         try {
             return $this->envCache[$name] = $processor->getEnv($prefix, $localName, $this->getEnv);

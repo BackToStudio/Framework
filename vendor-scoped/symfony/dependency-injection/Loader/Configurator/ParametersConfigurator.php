@@ -11,6 +11,8 @@
 namespace BackToVendor\Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use BackToVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
+use BackToVendor\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use BackToVendor\Symfony\Component\ExpressionLanguage\Expression;
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  */
@@ -29,6 +31,9 @@ class ParametersConfigurator extends AbstractConfigurator
      */
     public final function set(string $name, $value) : self
     {
+        if ($value instanceof Expression) {
+            throw new InvalidArgumentException(\sprintf('Using an expression in parameter "%s" is not allowed.', $name));
+        }
         $this->container->setParameter($name, static::processValue($value, \true));
         return $this;
     }

@@ -22,7 +22,7 @@ class IniFileLoader extends FileLoader
     /**
      * {@inheritdoc}
      */
-    public function load($resource, string $type = null)
+    public function load($resource, ?string $type = null)
     {
         $path = $this->locator->locate($resource);
         $this->container->fileExists($path);
@@ -48,7 +48,7 @@ class IniFileLoader extends FileLoader
     /**
      * {@inheritdoc}
      */
-    public function supports($resource, string $type = null)
+    public function supports($resource, ?string $type = null)
     {
         if (!\is_string($resource)) {
             return \false;

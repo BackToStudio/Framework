@@ -208,13 +208,10 @@ class XmlUtils
             case 'null' === $lowercaseValue:
                 return null;
             case \ctype_digit($value):
-                $raw = $value;
-                $cast = (int) $value;
-                return '0' == $value[0] ? \octdec($value) : ($raw === (string) $cast ? $cast : $raw);
             case isset($value[1]) && '-' === $value[0] && \ctype_digit(\substr($value, 1)):
                 $raw = $value;
                 $cast = (int) $value;
-                return '0' == $value[1] ? \octdec($value) : ($raw === (string) $cast ? $cast : $raw);
+                return self::isOctal($value) ? \intval($value, 8) : ($raw === (string) $cast ? $cast : $raw);
             case 'true' === $lowercaseValue:
                 return \true;
             case 'false' === $lowercaseValue:
@@ -240,5 +237,12 @@ class XmlUtils
         \libxml_clear_errors();
         \libxml_use_internal_errors($internalErrors);
         return $errors;
+    }
+    private static function isOctal(string $str) : bool
+    {
+        if ('-' === $str[0]) {
+            $str = \substr($str, 1);
+        }
+        return $str === '0' . \decoct(\intval($str, 8));
     }
 }

@@ -29,7 +29,7 @@ class InlineServiceDefinitionsPass extends AbstractRecursivePass
     private $inlinedIds = [];
     private $notInlinableIds = [];
     private $graph;
-    public function __construct(AnalyzeServiceReferencesPass $analyzingPass = null)
+    public function __construct(?AnalyzeServiceReferencesPass $analyzingPass = null)
     {
         $this->analyzingPass = $analyzingPass;
     }
@@ -142,7 +142,7 @@ class InlineServiceDefinitionsPass extends AbstractRecursivePass
      */
     private function isInlineableDefinition(string $id, Definition $definition) : bool
     {
-        if ($definition->hasErrors() || $definition->isDeprecated() || $definition->isLazy() || $definition->isSynthetic()) {
+        if ($definition->hasErrors() || $definition->isDeprecated() || $definition->isLazy() || $definition->isSynthetic() || $definition->hasTag('container.do_not_inline')) {
             return \false;
         }
         if (!$definition->isShared()) {

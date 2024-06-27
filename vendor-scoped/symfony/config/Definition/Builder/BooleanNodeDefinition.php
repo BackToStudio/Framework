@@ -22,7 +22,7 @@ class BooleanNodeDefinition extends ScalarNodeDefinition
     /**
      * {@inheritdoc}
      */
-    public function __construct(?string $name, NodeParentInterface $parent = null)
+    public function __construct(?string $name, ?NodeParentInterface $parent = null)
     {
         parent::__construct($name, $parent);
         $this->nullEquivalent = \true;

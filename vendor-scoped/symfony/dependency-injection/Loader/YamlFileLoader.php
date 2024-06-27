@@ -48,7 +48,7 @@ class YamlFileLoader extends FileLoader
     /**
      * {@inheritdoc}
      */
-    public function load($resource, string $type = null)
+    public function load($resource, ?string $type = null)
     {
         $path = $this->locator->locate($resource);
         $content = $this->loadFile($path);
@@ -102,7 +102,7 @@ class YamlFileLoader extends FileLoader
     /**
      * {@inheritdoc}
      */
-    public function supports($resource, string $type = null)
+    public function supports($resource, ?string $type = null)
     {
         if (!\is_string($resource)) {
             return \false;
@@ -132,7 +132,7 @@ class YamlFileLoader extends FileLoader
             $this->import($import['resource'], $import['type'] ?? null, $import['ignore_errors'] ?? \false, $file);
         }
     }
-    private function parseDefinitions(array $content, string $file)
+    private function parseDefinitions(array $content, string $file, bool $trackBindings = \true)
     {
         if (!isset($content['services'])) {
             return;
@@ -155,13 +155,13 @@ class YamlFileLoader extends FileLoader
                 if (\is_string($service) && \str_starts_with($service, '@')) {
                     throw new InvalidArgumentException(\sprintf('Type definition "%s" cannot be an alias within "_instanceof" in "%s". Check your YAML syntax.', $id, $file));
                 }
-                $this->parseDefinition($id, $service, $file, []);
+                $this->parseDefinition($id, $service, $file, [], \false, $trackBindings);
             }
         }
         $this->isLoadingInstanceof = \false;
         $defaults = $this->parseDefaults($content, $file);
         foreach ($content['services'] as $id => $service) {
-            $this->parseDefinition($id, $service, $file, $defaults);
+            $this->parseDefinition($id, $service, $file, $defaults, \false, $trackBindings);
         }
     }
     /**
@@ -236,7 +236,7 @@ class YamlFileLoader extends FileLoader
      *
      * @throws InvalidArgumentException When tags are invalid
      */
-    private function parseDefinition(string $id, $service, string $file, array $defaults, bool $return = \false)
+    private function parseDefinition(string $id, $service, string $file, array $defaults, bool $return = \false, bool $trackBindings = \true)
     {
         if (\preg_match('/^_[a-zA-Z0-9_]*$/', $id)) {
             throw new InvalidArgumentException(\sprintf('Service names that start with an underscore are reserved. Rename the "%s" service or define it in XML instead.', $id));
@@ -484,7 +484,7 @@ class YamlFileLoader extends FileLoader
                 $bindingType = $this->isLoadingInstanceof ? BoundArgument::INSTANCEOF_BINDING : BoundArgument::SERVICE_BINDING;
                 foreach ($bindings as $argument => $value) {
                     if (!$value instanceof BoundArgument) {
-                        $bindings[$argument] = new BoundArgument($value, \true, $bindingType, $file);
+                        $bindings[$argument] = new BoundArgument($value, $trackBindings, $bindingType, $file);
                     }
                 }
             }
@@ -518,9 +518,9 @@ class YamlFileLoader extends FileLoader
      *
      * @param string|array $callable A callable reference
      *
-     * @throws InvalidArgumentException When errors occur
-     *
      * @return string|array|Reference
+     *
+     * @throws InvalidArgumentException When errors occur
      */
     private function parseCallable($callable, string $parameter, string $id, string $file)
     {
@@ -679,6 +679,9 @@ class YamlFileLoader extends FileLoader
                 $value[$k] = $this->resolveServices($v, $file, $isParameter);
             }
         } elseif (\is_string($value) && \str_starts_with($value, '@=')) {
+            if ($isParameter) {
+                throw new InvalidArgumentException(\sprintf('Using expressions in parameters is not allowed in "%s".', $file));
+            }
             if (!\class_exists(Expression::class)) {
                 throw new \LogicException('The "@=" expression syntax cannot be used without the ExpressionLanguage component. Try running "composer require symfony/expression-language".');
             }

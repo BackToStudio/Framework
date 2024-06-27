@@ -35,7 +35,7 @@ abstract class NodeDefinition implements NodeParentInterface
     protected $pathSeparator = BaseNode::DEFAULT_PATH_SEPARATOR;
     protected $parent;
     protected $attributes = [];
-    public function __construct(?string $name, NodeParentInterface $parent = null)
+    public function __construct(?string $name, ?NodeParentInterface $parent = null)
     {
         $this->parent = $parent;
         $this->name = $name;

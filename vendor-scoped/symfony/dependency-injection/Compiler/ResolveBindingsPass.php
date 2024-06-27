@@ -106,10 +106,14 @@ class ResolveBindingsPass extends AbstractRecursivePass
             } elseif (!isset($this->usedBindings[$bindingId])) {
                 $this->unusedBindings[$bindingId] = [$key, $this->currentId, $bindingType, $file];
             }
-            if (\preg_match('/^(?:(?:array|bool|float|int|string|([^ $]++)) )\\$/', $key, $m)) {
+            if (\preg_match('/^(?:(?:array|bool|float|int|string|iterable|([^ $]++)) )\\$/', $key, $m)) {
                 $bindingNames[\substr($key, \strlen($m[0]))] = $binding;
             }
             if (!isset($m[1])) {
+                continue;
+            }
+            if (\is_subclass_of($m[1], \UnitEnum::class)) {
+                $bindingNames[\substr($key, \strlen($m[0]))] = $binding;
                 continue;
             }
             if (null !== $bindingValue && !$bindingValue instanceof Reference && !$bindingValue instanceof Definition && !$bindingValue instanceof TaggedIteratorArgument && !$bindingValue instanceof ServiceLocatorArgument) {
@@ -143,8 +147,13 @@ class ResolveBindingsPass extends AbstractRecursivePass
                     throw $e;
                 }
             }
+            $names = [];
             foreach ($reflectionMethod->getParameters() as $key => $parameter) {
+                $names[$key] = $parameter->name;
                 if (\array_key_exists($key, $arguments) && '' !== $arguments[$key]) {
+                    continue;
+                }
+                if (\array_key_exists($parameter->name, $arguments) && '' !== $arguments[$parameter->name]) {
                     continue;
                 }
                 $typeHint = ProxyHelper::getTypeHint($reflectionMethod, $parameter);
@@ -167,8 +176,14 @@ class ResolveBindingsPass extends AbstractRecursivePass
                     $this->errorMessages[] = \sprintf('Did you forget to add the type "%s" to argument "$%s" of method "%s::%s()"?', $argumentType, $parameter->name, $reflectionMethod->class, $reflectionMethod->name);
                 }
             }
+            foreach ($names as $key => $name) {
+                if (\array_key_exists($name, $arguments) && (0 === $key || \array_key_exists($key - 1, $arguments))) {
+                    $arguments[$key] = $arguments[$name];
+                    unset($arguments[$name]);
+                }
+            }
             if ($arguments !== $call[1]) {
-                \ksort($arguments);
+                \ksort($arguments, \SORT_NATURAL);
                 $calls[$i][1] = $arguments;
             }
         }

@@ -27,7 +27,7 @@ class InstanceofConfigurator extends AbstractServiceConfigurator
     use Traits\TagTrait;
     public const FACTORY = 'instanceof';
     private $path;
-    public function __construct(ServicesConfigurator $parent, Definition $definition, string $id, string $path = null)
+    public function __construct(ServicesConfigurator $parent, Definition $definition, string $id, ?string $path = null)
     {
         parent::__construct($parent, $definition, $id, []);
         $this->path = $path;
