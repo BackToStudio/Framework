@@ -9,7 +9,7 @@ use BackTo\Framework\PostType\Contracts\PostTypeInterface;
 use BackTo\Framework\Taxonomy\Contracts\TaxonomyInterface;
 use BackTo\Framework\Blocks\DependencyInjection\Compiler\RegisterBlockPass;
 use BackTo\Framework\Blocks\DependencyInjection\Compiler\RegisterBlockStylePass;
-use BackTo\Framework\Compose\DependencyInjection\Compiler\ResolveInstanceOfContiditionalPassWithVendorPrefix;
+use BackTo\Framework\Compose\DependencyInjection\Compiler\ResolveInstanceOfConditionalPassWithVendorPrefix;
 use BackTo\Framework\Contracts\BlockInterface;
 use BackTo\Framework\Contracts\BlockStyleInterface;
 use BackTo\Framework\Contracts\HookInterface;
@@ -300,7 +300,7 @@ trait WordPressContainer
         );
 
         $containerBuilder->getCompilerPassConfig()->setBeforeOptimizationPasses($beforeOptimizationPasses);
-        $containerBuilder->addCompilerPass(new ResolveInstanceOfContiditionalPassWithVendorPrefix());
+        $containerBuilder->addCompilerPass(new ResolveInstanceOfConditionalPassWithVendorPrefix());
 
         return $containerBuilder;
     }

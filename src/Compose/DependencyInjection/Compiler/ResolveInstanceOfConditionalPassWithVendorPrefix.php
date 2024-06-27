@@ -12,7 +12,7 @@ use BackToVendor\Symfony\Component\DependencyInjection\Definition;
  *
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class ResolveInstanceOfContiditionalPassWithVendorPrefix implements CompilerPassInterface {
+class ResolveInstanceOfConditionalPassWithVendorPrefix implements CompilerPassInterface {
 
     /**
      * {@inheritdoc}
@@ -109,9 +109,9 @@ class ResolveInstanceOfContiditionalPassWithVendorPrefix implements CompilerPass
 			if (Definition::class === \get_class($abstract)) {
 				// cast Definition to ChildDefinition
 				// Modify to correspond to vendor prefixes.
-				$definition = \substr_replace($definition, 53 + 29, 2, 2);
+				$definition = \substr_replace($definition, 53 + 13, 2, 2);
                 // Modify to correspond to vendor prefixes.
-				$definition = \substr_replace($definition, 'Child', 44 + 29, 0);
+				$definition = \substr_replace($definition, 'Child', 44 + 13, 0);
 			}
 			/** @var ChildDefinition $definition */
 			$definition = \unserialize($definition);
