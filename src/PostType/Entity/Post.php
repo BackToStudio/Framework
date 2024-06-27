@@ -15,45 +15,25 @@ class Post implements PostInterface
     use HasSlug;
     use HasParentId;
 
-    /**
-     * @var string
-     */
-    protected $title = '';
+    protected string $title = '';
 
-    /**
-     * @var string
-     */
-    protected $author = '';
+    protected string $author = '';
 
-    /**
-     * @var string
-     */
-    protected $status = '';
+    protected string $status = '';
 
-    /**
-     * @var string
-     */
-    protected $content = '';
+    protected string $content = '';
+    private string $excerpt = '';
 
     /**
      * @var int
      */
     protected $parentId = null;
 
-    /**
-     * @var string
-     */
-    protected $postType = '';
+    protected string $postType = '';
 
-    /**
-     * @var DateTimeInterface
-     */
-    protected $publishedAt = null;
+    protected ?DateTimeInterface $publishedAt = null;
 
-    /**
-     * @var DateTimeInterface
-     */
-    protected $modifiedAt = null;
+    protected ?DateTimeInterface $modifiedAt = null;
 
     public function getTitle(): string
     {
@@ -96,6 +76,17 @@ class Post implements PostInterface
     public function setContent(string $content): PostInterface
     {
         $this->content = $content;
+        return $this;
+    }
+
+    public function getExcerpt(): string
+    {
+        return $this->excerpt;
+    }
+
+    public function setExcerpt(string $excerpt): PostInterface
+    {
+        $this->excerpt = $excerpt;
         return $this;
     }
 
