@@ -8,11 +8,11 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Compiler;
+namespace BackToVendor\Symfony\Component\DependencyInjection\Compiler;
 
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Reference;
+use BackToVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
+use BackToVendor\Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
+use BackToVendor\Symfony\Component\DependencyInjection\Reference;
 /**
  * Replaces all references to aliases with references to the actual service.
  *

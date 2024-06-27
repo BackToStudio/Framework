@@ -8,16 +8,16 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection;
+namespace BackToVendor\Symfony\Component\DependencyInjection;
 
-use FantassinCoreWordPressVendor\Psr\Container\ContainerExceptionInterface;
-use FantassinCoreWordPressVendor\Psr\Container\NotFoundExceptionInterface;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Exception\RuntimeException;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
-use FantassinCoreWordPressVendor\Symfony\Contracts\Service\ServiceLocatorTrait;
-use FantassinCoreWordPressVendor\Symfony\Contracts\Service\ServiceProviderInterface;
-use FantassinCoreWordPressVendor\Symfony\Contracts\Service\ServiceSubscriberInterface;
+use BackToVendor\Psr\Container\ContainerExceptionInterface;
+use BackToVendor\Psr\Container\NotFoundExceptionInterface;
+use BackToVendor\Symfony\Component\DependencyInjection\Exception\RuntimeException;
+use BackToVendor\Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
+use BackToVendor\Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
+use BackToVendor\Symfony\Contracts\Service\ServiceLocatorTrait;
+use BackToVendor\Symfony\Contracts\Service\ServiceProviderInterface;
+use BackToVendor\Symfony\Contracts\Service\ServiceSubscriberInterface;
 /**
  * @author Robin Chalas <robin.chalas@gmail.com>
  * @author Nicolas Grekas <p@tchwork.com>

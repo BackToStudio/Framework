@@ -8,11 +8,11 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Config;
+namespace BackToVendor\Symfony\Component\DependencyInjection\Config;
 
-use FantassinCoreWordPressVendor\Symfony\Component\Config\Resource\ResourceInterface;
-use FantassinCoreWordPressVendor\Symfony\Component\Config\ResourceCheckerInterface;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\ContainerInterface;
+use BackToVendor\Symfony\Component\Config\Resource\ResourceInterface;
+use BackToVendor\Symfony\Component\Config\ResourceCheckerInterface;
+use BackToVendor\Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * @author Maxime Steinhausser <maxime.steinhausser@gmail.com>
  */

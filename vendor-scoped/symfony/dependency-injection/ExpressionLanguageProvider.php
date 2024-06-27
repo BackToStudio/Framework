@@ -8,10 +8,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection;
+namespace BackToVendor\Symfony\Component\DependencyInjection;
 
-use FantassinCoreWordPressVendor\Symfony\Component\ExpressionLanguage\ExpressionFunction;
-use FantassinCoreWordPressVendor\Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
+use BackToVendor\Symfony\Component\ExpressionLanguage\ExpressionFunction;
+use BackToVendor\Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
 /**
  * Define some ExpressionLanguage functions.
  *

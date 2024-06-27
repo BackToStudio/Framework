@@ -1,8 +1,8 @@
 <?php
 
-namespace Fantassin\Core\WordPress\Blocks;
+namespace BackTo\Framework\Blocks;
 
-use Fantassin\Core\WordPress\Contracts\BlockStyleInterface;
+use BackTo\Framework\Contracts\BlockStyleInterface;
 
 abstract class CustomBlockStyle implements BlockStyleInterface
 {

@@ -1,9 +1,9 @@
 <?php
 
-namespace Fantassin\Core\WordPress\Options\ThirdParty;
+namespace BackTo\Framework\Options\ThirdParty;
 
-use Fantassin\Core\WordPress\Options\HasArrayOptions;
-use Fantassin\Core\WordPress\Options\SocialLinksStrategyInterface;
+use BackTo\Framework\Options\HasArrayOptions;
+use BackTo\Framework\Options\SocialLinksStrategyInterface;
 
 class YoastOptionsStrategy implements SocialLinksStrategyInterface
 {

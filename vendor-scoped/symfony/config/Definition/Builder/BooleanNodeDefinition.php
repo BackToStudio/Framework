@@ -8,10 +8,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace FantassinCoreWordPressVendor\Symfony\Component\Config\Definition\Builder;
+namespace BackToVendor\Symfony\Component\Config\Definition\Builder;
 
-use FantassinCoreWordPressVendor\Symfony\Component\Config\Definition\BooleanNode;
-use FantassinCoreWordPressVendor\Symfony\Component\Config\Definition\Exception\InvalidDefinitionException;
+use BackToVendor\Symfony\Component\Config\Definition\BooleanNode;
+use BackToVendor\Symfony\Component\Config\Definition\Exception\InvalidDefinitionException;
 /**
  * This class provides a fluent interface for defining a node.
  *

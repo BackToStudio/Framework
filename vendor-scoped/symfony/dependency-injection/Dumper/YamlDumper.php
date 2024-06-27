@@ -8,26 +8,26 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Dumper;
+namespace BackToVendor\Symfony\Component\DependencyInjection\Dumper;
 
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Alias;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Argument\AbstractArgument;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Argument\ArgumentInterface;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Argument\IteratorArgument;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\ContainerInterface;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Definition;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Exception\LogicException;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Exception\RuntimeException;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Parameter;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Reference;
-use FantassinCoreWordPressVendor\Symfony\Component\ExpressionLanguage\Expression;
-use FantassinCoreWordPressVendor\Symfony\Component\Yaml\Dumper as YmlDumper;
-use FantassinCoreWordPressVendor\Symfony\Component\Yaml\Parser;
-use FantassinCoreWordPressVendor\Symfony\Component\Yaml\Tag\TaggedValue;
-use FantassinCoreWordPressVendor\Symfony\Component\Yaml\Yaml;
+use BackToVendor\Symfony\Component\DependencyInjection\Alias;
+use BackToVendor\Symfony\Component\DependencyInjection\Argument\AbstractArgument;
+use BackToVendor\Symfony\Component\DependencyInjection\Argument\ArgumentInterface;
+use BackToVendor\Symfony\Component\DependencyInjection\Argument\IteratorArgument;
+use BackToVendor\Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
+use BackToVendor\Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
+use BackToVendor\Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
+use BackToVendor\Symfony\Component\DependencyInjection\ContainerInterface;
+use BackToVendor\Symfony\Component\DependencyInjection\Definition;
+use BackToVendor\Symfony\Component\DependencyInjection\Exception\LogicException;
+use BackToVendor\Symfony\Component\DependencyInjection\Exception\RuntimeException;
+use BackToVendor\Symfony\Component\DependencyInjection\Parameter;
+use BackToVendor\Symfony\Component\DependencyInjection\Reference;
+use BackToVendor\Symfony\Component\ExpressionLanguage\Expression;
+use BackToVendor\Symfony\Component\Yaml\Dumper as YmlDumper;
+use BackToVendor\Symfony\Component\Yaml\Parser;
+use BackToVendor\Symfony\Component\Yaml\Tag\TaggedValue;
+use BackToVendor\Symfony\Component\Yaml\Yaml;
 /**
  * YamlDumper dumps a service container as a YAML string.
  *
@@ -43,7 +43,7 @@ class YamlDumper extends Dumper
      */
     public function dump(array $options = [])
     {
-        if (!\class_exists(\FantassinCoreWordPressVendor\Symfony\Component\Yaml\Dumper::class)) {
+        if (!\class_exists(\BackToVendor\Symfony\Component\Yaml\Dumper::class)) {
             throw new LogicException('Unable to dump the container as the Symfony Yaml Component is not installed.');
         }
         if (null === $this->dumper) {
@@ -253,7 +253,7 @@ class YamlDumper extends Dumper
             return $this->getExpressionCall((string) $value);
         } elseif ($value instanceof Definition) {
             return new TaggedValue('service', (new Parser())->parse("_:\n" . $this->addService('_', $value), Yaml::PARSE_CUSTOM_TAGS)['_']['_']);
-        } elseif ($value instanceof \FantassinCoreWordPressVendor\UnitEnum) {
+        } elseif ($value instanceof \UnitEnum) {
             return new TaggedValue('php/const', \sprintf('%s::%s', \get_class($value), $value->name));
         } elseif ($value instanceof AbstractArgument) {
             return new TaggedValue('abstract', $value->getText());

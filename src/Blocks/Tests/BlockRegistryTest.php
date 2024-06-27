@@ -1,12 +1,12 @@
 <?php
 
-namespace Fantassin\Core\WordPress\Blocks\Tests;
+namespace BackTo\Framework\Blocks\Tests;
 
-use Fantassin\Core\WordPress\Blocks\BlockRegistry;
-use Fantassin\Core\WordPress\Contracts\BlockInterface;
-use Fantassin\Core\WordPress\Contracts\DynamicBlock;
-use Fantassin\Core\WordPress\Contracts\RegistryInterface;
-use Fantassin\Core\WordPress\PostType\PostTypeRegistry;
+use BackTo\Framework\Blocks\BlockRegistry;
+use BackTo\Framework\Contracts\BlockInterface;
+use BackTo\Framework\Contracts\DynamicBlock;
+use BackTo\Framework\Contracts\RegistryInterface;
+use BackTo\Framework\PostType\PostTypeRegistry;
 use PHPUnit\Framework\TestCase;
 
 class BlockA implements BlockInterface

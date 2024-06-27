@@ -8,12 +8,12 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Compiler;
+namespace BackToVendor\Symfony\Component\DependencyInjection\Compiler;
 
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\ContainerInterface;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Definition;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Exception\RuntimeException;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Reference;
+use BackToVendor\Symfony\Component\DependencyInjection\ContainerInterface;
+use BackToVendor\Symfony\Component\DependencyInjection\Definition;
+use BackToVendor\Symfony\Component\DependencyInjection\Exception\RuntimeException;
+use BackToVendor\Symfony\Component\DependencyInjection\Reference;
 /**
  * Throws an exception for any Definitions that have errors and still exist.
  *

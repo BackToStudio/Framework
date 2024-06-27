@@ -1,10 +1,10 @@
 <?php
 
-namespace Fantassin\Core\WordPress\PostType;
+namespace BackTo\Framework\PostType;
 
 use Exception;
-use Fantassin\Core\WordPress\PostType\Contracts\PostTypeInterface;
-use Fantassin\Core\WordPress\PostType\Entity\PostType;
+use BackTo\Framework\PostType\Contracts\PostTypeInterface;
+use BackTo\Framework\PostType\Entity\PostType;
 
 class PostTypeFactory
 {

@@ -8,9 +8,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace FantassinCoreWordPressVendor\Symfony\Contracts\Service;
+namespace BackToVendor\Symfony\Contracts\Service;
 
-use FantassinCoreWordPressVendor\Psr\Container\ContainerInterface;
+use BackToVendor\Psr\Container\ContainerInterface;
 /**
  * A ServiceProviderInterface exposes the identifiers and the types of services provided by a container.
  *

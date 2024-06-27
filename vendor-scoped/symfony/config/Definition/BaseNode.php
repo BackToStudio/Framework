@@ -8,13 +8,13 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace FantassinCoreWordPressVendor\Symfony\Component\Config\Definition;
+namespace BackToVendor\Symfony\Component\Config\Definition;
 
-use FantassinCoreWordPressVendor\Symfony\Component\Config\Definition\Exception\Exception;
-use FantassinCoreWordPressVendor\Symfony\Component\Config\Definition\Exception\ForbiddenOverwriteException;
-use FantassinCoreWordPressVendor\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
-use FantassinCoreWordPressVendor\Symfony\Component\Config\Definition\Exception\InvalidTypeException;
-use FantassinCoreWordPressVendor\Symfony\Component\Config\Definition\Exception\UnsetKeyException;
+use BackToVendor\Symfony\Component\Config\Definition\Exception\Exception;
+use BackToVendor\Symfony\Component\Config\Definition\Exception\ForbiddenOverwriteException;
+use BackToVendor\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use BackToVendor\Symfony\Component\Config\Definition\Exception\InvalidTypeException;
+use BackToVendor\Symfony\Component\Config\Definition\Exception\UnsetKeyException;
 /**
  * The base node class.
  *

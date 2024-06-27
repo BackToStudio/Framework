@@ -8,11 +8,11 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace FantassinCoreWordPressVendor\Symfony\Component\Config\Resource;
+namespace BackToVendor\Symfony\Component\Config\Resource;
 
-use FantassinCoreWordPressVendor\Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use FantassinCoreWordPressVendor\Symfony\Component\Messenger\Handler\MessageSubscriberInterface;
-use FantassinCoreWordPressVendor\Symfony\Contracts\Service\ServiceSubscriberInterface;
+use BackToVendor\Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use BackToVendor\Symfony\Component\Messenger\Handler\MessageSubscriberInterface;
+use BackToVendor\Symfony\Contracts\Service\ServiceSubscriberInterface;
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  *

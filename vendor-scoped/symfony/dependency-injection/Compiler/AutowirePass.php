@@ -8,20 +8,20 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Compiler;
+namespace BackToVendor\Symfony\Component\DependencyInjection\Compiler;
 
-use FantassinCoreWordPressVendor\Symfony\Component\Config\Resource\ClassExistenceResource;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Attribute\TaggedLocator;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Attribute\Target;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Definition;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Exception\AutowiringFailedException;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Exception\RuntimeException;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\LazyProxy\ProxyHelper;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\TypedReference;
+use BackToVendor\Symfony\Component\Config\Resource\ClassExistenceResource;
+use BackToVendor\Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
+use BackToVendor\Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
+use BackToVendor\Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
+use BackToVendor\Symfony\Component\DependencyInjection\Attribute\TaggedLocator;
+use BackToVendor\Symfony\Component\DependencyInjection\Attribute\Target;
+use BackToVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
+use BackToVendor\Symfony\Component\DependencyInjection\Definition;
+use BackToVendor\Symfony\Component\DependencyInjection\Exception\AutowiringFailedException;
+use BackToVendor\Symfony\Component\DependencyInjection\Exception\RuntimeException;
+use BackToVendor\Symfony\Component\DependencyInjection\LazyProxy\ProxyHelper;
+use BackToVendor\Symfony\Component\DependencyInjection\TypedReference;
 /**
  * Inspects existing service definitions and wires the autowired ones using the type hints of their classes.
  *

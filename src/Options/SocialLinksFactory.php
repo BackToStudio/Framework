@@ -1,9 +1,9 @@
 <?php
 
-namespace Fantassin\Core\WordPress\Options;
+namespace BackTo\Framework\Options;
 
-use Fantassin\Core\WordPress\Options\ThirdParty\SeoPressOptionsStrategy;
-use Fantassin\Core\WordPress\Options\ThirdParty\YoastOptionsStrategy;
+use BackTo\Framework\Options\ThirdParty\SeoPressOptionsStrategy;
+use BackTo\Framework\Options\ThirdParty\YoastOptionsStrategy;
 
 class SocialLinksFactory
 {

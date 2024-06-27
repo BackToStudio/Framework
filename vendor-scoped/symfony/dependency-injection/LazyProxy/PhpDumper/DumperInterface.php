@@ -8,9 +8,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\LazyProxy\PhpDumper;
+namespace BackToVendor\Symfony\Component\DependencyInjection\LazyProxy\PhpDumper;
 
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Definition;
+use BackToVendor\Symfony\Component\DependencyInjection\Definition;
 /**
  * Lazy proxy dumper capable of generating the instantiation logic PHP code for proxied services.
  *

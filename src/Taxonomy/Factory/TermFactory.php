@@ -1,11 +1,11 @@
 <?php
 
-namespace Fantassin\Core\WordPress\Taxonomy\Factory;
+namespace BackTo\Framework\Taxonomy\Factory;
 
 use DateTimeImmutable;
 use Exception;
-use Fantassin\Core\WordPress\Taxonomy\Contracts\TermInterface;
-use Fantassin\Core\WordPress\Taxonomy\Entity\Term;
+use BackTo\Framework\Taxonomy\Contracts\TermInterface;
+use BackTo\Framework\Taxonomy\Entity\Term;
 use WP_Term;
 
 class TermFactory

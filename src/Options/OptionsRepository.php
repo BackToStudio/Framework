@@ -1,6 +1,6 @@
 <?php
 
-namespace Fantassin\Core\WordPress\Options;
+namespace BackTo\Framework\Options;
 
 class OptionsRepository
 {

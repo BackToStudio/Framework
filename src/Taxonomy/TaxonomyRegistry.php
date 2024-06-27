@@ -1,9 +1,9 @@
 <?php
 
-namespace Fantassin\Core\WordPress\Taxonomy;
+namespace BackTo\Framework\Taxonomy;
 
-use Fantassin\Core\WordPress\Contracts\RegistryInterface;
-use Fantassin\Core\WordPress\Taxonomy\Contracts\TaxonomyInterface;
+use BackTo\Framework\Contracts\RegistryInterface;
+use BackTo\Framework\Taxonomy\Contracts\TaxonomyInterface;
 
 class TaxonomyRegistry implements RegistryInterface
 {

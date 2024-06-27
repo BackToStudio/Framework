@@ -1,9 +1,9 @@
 <?php
 
-namespace Fantassin\Core\WordPress\Taxonomy\Repository;
+namespace BackTo\Framework\Taxonomy\Repository;
 
-use Fantassin\Core\WordPress\Taxonomy\Contracts\TermInterface;
-use Fantassin\Core\WordPress\Taxonomy\Factory\TermFactory;
+use BackTo\Framework\Taxonomy\Contracts\TermInterface;
+use BackTo\Framework\Taxonomy\Factory\TermFactory;
 
 use function get_term;
 use function get_terms;

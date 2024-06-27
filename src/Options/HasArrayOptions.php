@@ -1,8 +1,8 @@
 <?php
 
-namespace Fantassin\Core\WordPress\Options;
+namespace BackTo\Framework\Options;
 
-use Fantassin\Core\WordPress\Contracts\Hooks;
+use BackTo\Framework\Contracts\Hooks;
 
 trait HasArrayOptions
 {

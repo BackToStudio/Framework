@@ -8,10 +8,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Loader;
+namespace BackToVendor\Symfony\Component\DependencyInjection\Loader;
 
-use FantassinCoreWordPressVendor\Symfony\Component\Config\Loader\Loader;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
+use BackToVendor\Symfony\Component\Config\Loader\Loader;
+use BackToVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
 /**
  * ClosureLoader loads service definitions from a PHP closure.
  *

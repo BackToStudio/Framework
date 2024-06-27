@@ -8,18 +8,18 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Compiler;
+namespace BackToVendor\Symfony\Component\DependencyInjection\Compiler;
 
-use FantassinCoreWordPressVendor\Symfony\Component\Config\Definition\BaseNode;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Exception\LogicException;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Exception\RuntimeException;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Extension\ConfigurationExtensionInterface;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Extension\Extension;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use BackToVendor\Symfony\Component\Config\Definition\BaseNode;
+use BackToVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
+use BackToVendor\Symfony\Component\DependencyInjection\Exception\LogicException;
+use BackToVendor\Symfony\Component\DependencyInjection\Exception\RuntimeException;
+use BackToVendor\Symfony\Component\DependencyInjection\Extension\ConfigurationExtensionInterface;
+use BackToVendor\Symfony\Component\DependencyInjection\Extension\Extension;
+use BackToVendor\Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
+use BackToVendor\Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
+use BackToVendor\Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
+use BackToVendor\Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 /**
  * Merges extension configs into the container builder.
  *

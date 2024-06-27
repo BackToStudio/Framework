@@ -8,10 +8,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection;
+namespace BackToVendor\Symfony\Component\DependencyInjection;
 
-use FantassinCoreWordPressVendor\Psr\Container\ContainerInterface;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
+use BackToVendor\Psr\Container\ContainerInterface;
+use BackToVendor\Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 /**
  * Turns public and "container.reversible" services back to their ids.
  *

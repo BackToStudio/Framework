@@ -8,20 +8,20 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Loader;
+namespace BackToVendor\Symfony\Component\DependencyInjection\Loader;
 
-use FantassinCoreWordPressVendor\Symfony\Component\Config\Exception\FileLocatorFileNotFoundException;
-use FantassinCoreWordPressVendor\Symfony\Component\Config\Exception\LoaderLoadException;
-use FantassinCoreWordPressVendor\Symfony\Component\Config\FileLocatorInterface;
-use FantassinCoreWordPressVendor\Symfony\Component\Config\Loader\FileLoader as BaseFileLoader;
-use FantassinCoreWordPressVendor\Symfony\Component\Config\Loader\Loader;
-use FantassinCoreWordPressVendor\Symfony\Component\Config\Resource\GlobResource;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Attribute\When;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\ChildDefinition;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Compiler\RegisterAutoconfigureAttributesPass;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Definition;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use BackToVendor\Symfony\Component\Config\Exception\FileLocatorFileNotFoundException;
+use BackToVendor\Symfony\Component\Config\Exception\LoaderLoadException;
+use BackToVendor\Symfony\Component\Config\FileLocatorInterface;
+use BackToVendor\Symfony\Component\Config\Loader\FileLoader as BaseFileLoader;
+use BackToVendor\Symfony\Component\Config\Loader\Loader;
+use BackToVendor\Symfony\Component\Config\Resource\GlobResource;
+use BackToVendor\Symfony\Component\DependencyInjection\Attribute\When;
+use BackToVendor\Symfony\Component\DependencyInjection\ChildDefinition;
+use BackToVendor\Symfony\Component\DependencyInjection\Compiler\RegisterAutoconfigureAttributesPass;
+use BackToVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
+use BackToVendor\Symfony\Component\DependencyInjection\Definition;
+use BackToVendor\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 /**
  * FileLoader is the abstract class used by all built-in loaders that are file based.
  *

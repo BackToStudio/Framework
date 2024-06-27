@@ -8,10 +8,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Compiler;
+namespace BackToVendor\Symfony\Component\DependencyInjection\Compiler;
 
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Reference;
+use BackToVendor\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use BackToVendor\Symfony\Component\DependencyInjection\Reference;
 /**
  * This is a directed graph of your services.
  *

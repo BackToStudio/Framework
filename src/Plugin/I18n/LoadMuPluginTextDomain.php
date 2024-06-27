@@ -1,8 +1,8 @@
 <?php
 
-namespace Fantassin\Core\WordPress\Plugin\I18n;
+namespace BackTo\Framework\Plugin\I18n;
 
-use Fantassin\Core\WordPress\Contracts\Hooks;
+use BackTo\Framework\Contracts\Hooks;
 
 class LoadMuPluginTextDomain implements Hooks
 {

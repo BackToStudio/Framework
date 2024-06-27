@@ -1,8 +1,8 @@
 <?php
 
-namespace Fantassin\Core\WordPress\Compose;
+namespace BackTo\Framework\Compose;
 
-use Fantassin\Core\WordPress\Contracts\SlugInterface;
+use BackTo\Framework\Contracts\SlugInterface;
 
 trait HasSlug
 {

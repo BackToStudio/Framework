@@ -1,11 +1,11 @@
 <?php
 
-namespace Fantassin\Core\WordPress\Blocks\DependencyInjection\Compiler;
+namespace BackTo\Framework\Blocks\DependencyInjection\Compiler;
 
-use Fantassin\Core\WordPress\Blocks\BlockRegistry;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Reference;
+use BackTo\Framework\Blocks\BlockRegistry;
+use BackToVendor\Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use BackToVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
+use BackToVendor\Symfony\Component\DependencyInjection\Reference;
 
 class RegisterBlockPass implements CompilerPassInterface
 {

@@ -8,43 +8,43 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection;
+namespace BackToVendor\Symfony\Component\DependencyInjection;
 
-use FantassinCoreWordPressVendor\Composer\InstalledVersions;
-use FantassinCoreWordPressVendor\Psr\Container\ContainerInterface as PsrContainerInterface;
-use FantassinCoreWordPressVendor\Symfony\Component\Config\Resource\ClassExistenceResource;
-use FantassinCoreWordPressVendor\Symfony\Component\Config\Resource\ComposerResource;
-use FantassinCoreWordPressVendor\Symfony\Component\Config\Resource\DirectoryResource;
-use FantassinCoreWordPressVendor\Symfony\Component\Config\Resource\FileExistenceResource;
-use FantassinCoreWordPressVendor\Symfony\Component\Config\Resource\FileResource;
-use FantassinCoreWordPressVendor\Symfony\Component\Config\Resource\GlobResource;
-use FantassinCoreWordPressVendor\Symfony\Component\Config\Resource\ReflectionClassResource;
-use FantassinCoreWordPressVendor\Symfony\Component\Config\Resource\ResourceInterface;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Argument\AbstractArgument;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Argument\IteratorArgument;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Argument\ServiceLocator;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Attribute\Target;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Compiler\Compiler;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Compiler\PassConfig;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Compiler\ResolveEnvPlaceholdersPass;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Exception\BadMethodCallException;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Exception\LogicException;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Exception\RuntimeException;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\LazyProxy\Instantiator\InstantiatorInterface;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\LazyProxy\Instantiator\RealServiceInstantiator;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
-use FantassinCoreWordPressVendor\Symfony\Component\ExpressionLanguage\Expression;
-use FantassinCoreWordPressVendor\Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
+use BackToVendor\Composer\InstalledVersions;
+use BackToVendor\Psr\Container\ContainerInterface as PsrContainerInterface;
+use BackToVendor\Symfony\Component\Config\Resource\ClassExistenceResource;
+use BackToVendor\Symfony\Component\Config\Resource\ComposerResource;
+use BackToVendor\Symfony\Component\Config\Resource\DirectoryResource;
+use BackToVendor\Symfony\Component\Config\Resource\FileExistenceResource;
+use BackToVendor\Symfony\Component\Config\Resource\FileResource;
+use BackToVendor\Symfony\Component\Config\Resource\GlobResource;
+use BackToVendor\Symfony\Component\Config\Resource\ReflectionClassResource;
+use BackToVendor\Symfony\Component\Config\Resource\ResourceInterface;
+use BackToVendor\Symfony\Component\DependencyInjection\Argument\AbstractArgument;
+use BackToVendor\Symfony\Component\DependencyInjection\Argument\IteratorArgument;
+use BackToVendor\Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
+use BackToVendor\Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
+use BackToVendor\Symfony\Component\DependencyInjection\Argument\ServiceLocator;
+use BackToVendor\Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
+use BackToVendor\Symfony\Component\DependencyInjection\Attribute\Target;
+use BackToVendor\Symfony\Component\DependencyInjection\Compiler\Compiler;
+use BackToVendor\Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use BackToVendor\Symfony\Component\DependencyInjection\Compiler\PassConfig;
+use BackToVendor\Symfony\Component\DependencyInjection\Compiler\ResolveEnvPlaceholdersPass;
+use BackToVendor\Symfony\Component\DependencyInjection\Exception\BadMethodCallException;
+use BackToVendor\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use BackToVendor\Symfony\Component\DependencyInjection\Exception\LogicException;
+use BackToVendor\Symfony\Component\DependencyInjection\Exception\RuntimeException;
+use BackToVendor\Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
+use BackToVendor\Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
+use BackToVendor\Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
+use BackToVendor\Symfony\Component\DependencyInjection\LazyProxy\Instantiator\InstantiatorInterface;
+use BackToVendor\Symfony\Component\DependencyInjection\LazyProxy\Instantiator\RealServiceInstantiator;
+use BackToVendor\Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
+use BackToVendor\Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
+use BackToVendor\Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use BackToVendor\Symfony\Component\ExpressionLanguage\Expression;
+use BackToVendor\Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
 /**
  * ContainerBuilder is a DI container that provides an API to easily describe services.
  *
@@ -1427,7 +1427,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     private function getExpressionLanguage() : ExpressionLanguage
     {
         if (null === $this->expressionLanguage) {
-            if (!\class_exists(\FantassinCoreWordPressVendor\Symfony\Component\ExpressionLanguage\ExpressionLanguage::class)) {
+            if (!\class_exists(\BackToVendor\Symfony\Component\ExpressionLanguage\ExpressionLanguage::class)) {
                 throw new LogicException('Unable to use expressions as the Symfony ExpressionLanguage component is not installed.');
             }
             $this->expressionLanguage = new ExpressionLanguage(null, $this->expressionLanguageProviders);

@@ -1,6 +1,6 @@
 <?php
 
-namespace Fantassin\Core\WordPress\Blocks;
+namespace BackTo\Framework\Blocks;
 
 /**
  * @deprecated

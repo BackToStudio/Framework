@@ -1,10 +1,10 @@
 <?php
 
-namespace Fantassin\Core\WordPress\PostType;
+namespace BackTo\Framework\PostType;
 
-use Fantassin\Core\WordPress\Contracts\RegistryInterface;
-use Fantassin\Core\WordPress\PostType\Contracts\PostTypeInterface;
-use Fantassin\Core\WordPress\PostType\Contracts\PostTypeRegistryInterface;
+use BackTo\Framework\Contracts\RegistryInterface;
+use BackTo\Framework\PostType\Contracts\PostTypeInterface;
+use BackTo\Framework\PostType\Contracts\PostTypeRegistryInterface;
 
 class PostTypeRegistry implements RegistryInterface, PostTypeRegistryInterface
 {

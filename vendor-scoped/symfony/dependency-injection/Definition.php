@@ -8,11 +8,11 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection;
+namespace BackToVendor\Symfony\Component\DependencyInjection;
 
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Argument\BoundArgument;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Exception\OutOfBoundsException;
+use BackToVendor\Symfony\Component\DependencyInjection\Argument\BoundArgument;
+use BackToVendor\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use BackToVendor\Symfony\Component\DependencyInjection\Exception\OutOfBoundsException;
 /**
  * Definition represents a service definition.
  *

@@ -1,8 +1,8 @@
 <?php
 
-namespace Fantassin\Core\WordPress\Taxonomy\Entity;
+namespace BackTo\Framework\Taxonomy\Entity;
 
-use Fantassin\Core\WordPress\Taxonomy\Contracts\TaxonomyInterface;
+use BackTo\Framework\Taxonomy\Contracts\TaxonomyInterface;
 
 class Taxonomy implements TaxonomyInterface
 {

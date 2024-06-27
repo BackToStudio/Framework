@@ -8,10 +8,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection;
+namespace BackToVendor\Symfony\Component\DependencyInjection;
 
-use FantassinCoreWordPressVendor\Psr\Cache\CacheItemPoolInterface;
-use FantassinCoreWordPressVendor\Symfony\Component\ExpressionLanguage\ExpressionLanguage as BaseExpressionLanguage;
+use BackToVendor\Psr\Cache\CacheItemPoolInterface;
+use BackToVendor\Symfony\Component\ExpressionLanguage\ExpressionLanguage as BaseExpressionLanguage;
 if (!\class_exists(BaseExpressionLanguage::class)) {
     return;
 }

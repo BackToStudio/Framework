@@ -1,11 +1,11 @@
 <?php
 
-namespace Fantassin\Core\WordPress\Taxonomy\DependencyInjection\Compiler;
+namespace BackTo\Framework\Taxonomy\DependencyInjection\Compiler;
 
-use Fantassin\Core\WordPress\Taxonomy\TaxonomyRegistry;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Reference;
+use BackTo\Framework\Taxonomy\TaxonomyRegistry;
+use BackToVendor\Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use BackToVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
+use BackToVendor\Symfony\Component\DependencyInjection\Reference;
 
 /**
  * Register all Custom Taxonomies that have the "wordpress.taxonomy" tag into the container.

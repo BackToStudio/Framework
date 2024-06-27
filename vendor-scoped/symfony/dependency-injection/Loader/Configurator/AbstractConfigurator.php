@@ -8,17 +8,17 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Loader\Configurator;
+namespace BackToVendor\Symfony\Component\DependencyInjection\Loader\Configurator;
 
-use FantassinCoreWordPressVendor\Symfony\Component\Config\Loader\ParamConfigurator;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Argument\AbstractArgument;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Argument\ArgumentInterface;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Definition;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Parameter;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Reference;
-use FantassinCoreWordPressVendor\Symfony\Component\ExpressionLanguage\Expression;
+use BackToVendor\Symfony\Component\Config\Loader\ParamConfigurator;
+use BackToVendor\Symfony\Component\DependencyInjection\Argument\AbstractArgument;
+use BackToVendor\Symfony\Component\DependencyInjection\Argument\ArgumentInterface;
+use BackToVendor\Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
+use BackToVendor\Symfony\Component\DependencyInjection\Definition;
+use BackToVendor\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use BackToVendor\Symfony\Component\DependencyInjection\Parameter;
+use BackToVendor\Symfony\Component\DependencyInjection\Reference;
+use BackToVendor\Symfony\Component\ExpressionLanguage\Expression;
 abstract class AbstractConfigurator
 {
     public const FACTORY = 'unknown';

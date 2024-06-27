@@ -1,9 +1,9 @@
 <?php
 
-namespace Fantassin\Core\WordPress\PostType\Repository;
+namespace BackTo\Framework\PostType\Repository;
 
-use Fantassin\Core\WordPress\PostType\Contracts\PostInterface;
-use Fantassin\Core\WordPress\PostType\Factory\PostFactory;
+use BackTo\Framework\PostType\Contracts\PostInterface;
+use BackTo\Framework\PostType\Factory\PostFactory;
 
 use function get_post;
 

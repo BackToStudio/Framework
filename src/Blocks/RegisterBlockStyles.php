@@ -1,8 +1,8 @@
 <?php
 
-namespace Fantassin\Core\WordPress\Blocks;
+namespace BackTo\Framework\Blocks;
 
-use Fantassin\Core\WordPress\Contracts\Hooks;
+use BackTo\Framework\Contracts\Hooks;
 
 class RegisterBlockStyles implements Hooks
 {

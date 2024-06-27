@@ -1,33 +1,33 @@
 <?php
 
-namespace Fantassin\Core\WordPress\Compose;
+namespace BackTo\Framework\Compose;
 
 use Exception;
 use LogicException;
 use ReflectionObject;
-use Fantassin\Core\WordPress\PostType\Contracts\PostTypeInterface;
-use Fantassin\Core\WordPress\Taxonomy\Contracts\TaxonomyInterface;
-use Fantassin\Core\WordPress\Blocks\DependencyInjection\Compiler\RegisterBlockPass;
-use Fantassin\Core\WordPress\Blocks\DependencyInjection\Compiler\RegisterBlockStylePass;
-use Fantassin\Core\WordPress\Compose\DependencyInjection\Compiler\ResolveInstanceOfContiditionalPassWithVendorPrefix;
-use Fantassin\Core\WordPress\Contracts\BlockInterface;
-use Fantassin\Core\WordPress\Contracts\BlockStyleInterface;
-use Fantassin\Core\WordPress\Contracts\HookInterface;
-use Fantassin\Core\WordPress\Contracts\RegistryInterface;
-use Fantassin\Core\WordPress\Hooks\DependencyInjection\Compiler\RegisterHookPass;
-use Fantassin\Core\WordPress\Hooks\HookRegistry;
-use Fantassin\Core\WordPress\PostType\DependencyInjection\Compiler\RegisterPostTypePass;
-use Fantassin\Core\WordPress\Taxonomy\DependencyInjection\Compiler\RegisterTaxonomyPass;
-use FantassinCoreWordPressVendor\Symfony\Component\Config\Builder\ConfigBuilderGenerator;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Compiler\ResolveInstanceofConditionalsPass;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\ContainerInterface;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Dumper\PhpDumper;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
-use FantassinCoreWordPressVendor\Symfony\Component\Config\ConfigCache;
-use FantassinCoreWordPressVendor\Symfony\Component\Config\ConfigCacheInterface;
-use FantassinCoreWordPressVendor\Symfony\Component\Config\FileLocator;
+use BackTo\Framework\PostType\Contracts\PostTypeInterface;
+use BackTo\Framework\Taxonomy\Contracts\TaxonomyInterface;
+use BackTo\Framework\Blocks\DependencyInjection\Compiler\RegisterBlockPass;
+use BackTo\Framework\Blocks\DependencyInjection\Compiler\RegisterBlockStylePass;
+use BackTo\Framework\Compose\DependencyInjection\Compiler\ResolveInstanceOfContiditionalPassWithVendorPrefix;
+use BackTo\Framework\Contracts\BlockInterface;
+use BackTo\Framework\Contracts\BlockStyleInterface;
+use BackTo\Framework\Contracts\HookInterface;
+use BackTo\Framework\Contracts\RegistryInterface;
+use BackTo\Framework\Hooks\DependencyInjection\Compiler\RegisterHookPass;
+use BackTo\Framework\Hooks\HookRegistry;
+use BackTo\Framework\PostType\DependencyInjection\Compiler\RegisterPostTypePass;
+use BackTo\Framework\Taxonomy\DependencyInjection\Compiler\RegisterTaxonomyPass;
+use BackToVendor\Symfony\Component\Config\Builder\ConfigBuilderGenerator;
+use BackToVendor\Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use BackToVendor\Symfony\Component\DependencyInjection\Compiler\ResolveInstanceofConditionalsPass;
+use BackToVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
+use BackToVendor\Symfony\Component\DependencyInjection\ContainerInterface;
+use BackToVendor\Symfony\Component\DependencyInjection\Dumper\PhpDumper;
+use BackToVendor\Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
+use BackToVendor\Symfony\Component\Config\ConfigCache;
+use BackToVendor\Symfony\Component\Config\ConfigCacheInterface;
+use BackToVendor\Symfony\Component\Config\FileLocator;
 
 use function dirname;
 use function is_file;

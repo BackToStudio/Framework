@@ -8,14 +8,14 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace FantassinCoreWordPressVendor\Symfony\Component\Config\Loader;
+namespace BackToVendor\Symfony\Component\Config\Loader;
 
-use FantassinCoreWordPressVendor\Symfony\Component\Config\Exception\FileLoaderImportCircularReferenceException;
-use FantassinCoreWordPressVendor\Symfony\Component\Config\Exception\FileLocatorFileNotFoundException;
-use FantassinCoreWordPressVendor\Symfony\Component\Config\Exception\LoaderLoadException;
-use FantassinCoreWordPressVendor\Symfony\Component\Config\FileLocatorInterface;
-use FantassinCoreWordPressVendor\Symfony\Component\Config\Resource\FileExistenceResource;
-use FantassinCoreWordPressVendor\Symfony\Component\Config\Resource\GlobResource;
+use BackToVendor\Symfony\Component\Config\Exception\FileLoaderImportCircularReferenceException;
+use BackToVendor\Symfony\Component\Config\Exception\FileLocatorFileNotFoundException;
+use BackToVendor\Symfony\Component\Config\Exception\LoaderLoadException;
+use BackToVendor\Symfony\Component\Config\FileLocatorInterface;
+use BackToVendor\Symfony\Component\Config\Resource\FileExistenceResource;
+use BackToVendor\Symfony\Component\Config\Resource\GlobResource;
 /**
  * FileLoader is the abstract class used by all built-in loaders that are file based.
  *

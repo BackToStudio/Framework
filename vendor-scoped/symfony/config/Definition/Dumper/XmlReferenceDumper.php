@@ -8,14 +8,14 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace FantassinCoreWordPressVendor\Symfony\Component\Config\Definition\Dumper;
+namespace BackToVendor\Symfony\Component\Config\Definition\Dumper;
 
-use FantassinCoreWordPressVendor\Symfony\Component\Config\Definition\ArrayNode;
-use FantassinCoreWordPressVendor\Symfony\Component\Config\Definition\BaseNode;
-use FantassinCoreWordPressVendor\Symfony\Component\Config\Definition\ConfigurationInterface;
-use FantassinCoreWordPressVendor\Symfony\Component\Config\Definition\EnumNode;
-use FantassinCoreWordPressVendor\Symfony\Component\Config\Definition\NodeInterface;
-use FantassinCoreWordPressVendor\Symfony\Component\Config\Definition\PrototypedArrayNode;
+use BackToVendor\Symfony\Component\Config\Definition\ArrayNode;
+use BackToVendor\Symfony\Component\Config\Definition\BaseNode;
+use BackToVendor\Symfony\Component\Config\Definition\ConfigurationInterface;
+use BackToVendor\Symfony\Component\Config\Definition\EnumNode;
+use BackToVendor\Symfony\Component\Config\Definition\NodeInterface;
+use BackToVendor\Symfony\Component\Config\Definition\PrototypedArrayNode;
 /**
  * Dumps an XML reference configuration for the given configuration/node instance.
  *

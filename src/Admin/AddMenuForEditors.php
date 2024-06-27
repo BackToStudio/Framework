@@ -1,8 +1,8 @@
 <?php
 
-namespace Fantassin\Core\WordPress\Admin;
+namespace BackTo\Framework\Admin;
 
-use Fantassin\Core\WordPress\Contracts\AdminHooks;
+use BackTo\Framework\Contracts\AdminHooks;
 use WP_Admin_Bar;
 
 class AddMenuForEditors implements AdminHooks {

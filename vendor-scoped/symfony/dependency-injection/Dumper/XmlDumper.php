@@ -8,20 +8,20 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Dumper;
+namespace BackToVendor\Symfony\Component\DependencyInjection\Dumper;
 
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Alias;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Argument\AbstractArgument;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Argument\IteratorArgument;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\ContainerInterface;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Definition;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Exception\RuntimeException;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Parameter;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Reference;
-use FantassinCoreWordPressVendor\Symfony\Component\ExpressionLanguage\Expression;
+use BackToVendor\Symfony\Component\DependencyInjection\Alias;
+use BackToVendor\Symfony\Component\DependencyInjection\Argument\AbstractArgument;
+use BackToVendor\Symfony\Component\DependencyInjection\Argument\IteratorArgument;
+use BackToVendor\Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
+use BackToVendor\Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
+use BackToVendor\Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
+use BackToVendor\Symfony\Component\DependencyInjection\ContainerInterface;
+use BackToVendor\Symfony\Component\DependencyInjection\Definition;
+use BackToVendor\Symfony\Component\DependencyInjection\Exception\RuntimeException;
+use BackToVendor\Symfony\Component\DependencyInjection\Parameter;
+use BackToVendor\Symfony\Component\DependencyInjection\Reference;
+use BackToVendor\Symfony\Component\ExpressionLanguage\Expression;
 /**
  * XmlDumper dumps a service container as an XML string.
  *
@@ -231,7 +231,7 @@ class XmlDumper extends Dumper
     }
     private function convertParameters(array $parameters, string $type, \DOMElement $parent, string $keyAttribute = 'key')
     {
-        $withKeys = !array_is_list($parameters);
+        $withKeys = !\array_is_list($parameters);
         foreach ($parameters as $key => $value) {
             $element = $this->document->createElement($type);
             if ($withKeys) {
@@ -284,7 +284,7 @@ class XmlDumper extends Dumper
                 $element->setAttribute('type', 'binary');
                 $text = $this->document->createTextNode(self::phpToXml(\base64_encode($value)));
                 $element->appendChild($text);
-            } elseif ($value instanceof \FantassinCoreWordPressVendor\UnitEnum) {
+            } elseif ($value instanceof \UnitEnum) {
                 $element->setAttribute('type', 'constant');
                 $element->appendChild($this->document->createTextNode(self::phpToXml($value)));
             } elseif ($value instanceof AbstractArgument) {
@@ -339,7 +339,7 @@ class XmlDumper extends Dumper
                 return 'false';
             case $value instanceof Parameter:
                 return '%' . $value . '%';
-            case $value instanceof \FantassinCoreWordPressVendor\UnitEnum:
+            case $value instanceof \UnitEnum:
                 return \sprintf('%s::%s', \get_class($value), $value->name);
             case \is_object($value) || \is_resource($value):
                 throw new RuntimeException('Unable to dump a service container if a parameter is an object or a resource.');

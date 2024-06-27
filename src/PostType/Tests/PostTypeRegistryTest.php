@@ -1,11 +1,11 @@
 <?php
 
-namespace Fantassin\Core\WordPress\PostType\Tests;
+namespace BackTo\Framework\PostType\Tests;
 
-use Fantassin\Core\WordPress\Contracts\RegistryInterface;
-use Fantassin\Core\WordPress\PostType\Contracts\PostTypeInterface;
-use Fantassin\Core\WordPress\PostType\PostType;
-use Fantassin\Core\WordPress\PostType\PostTypeRegistry;
+use BackTo\Framework\Contracts\RegistryInterface;
+use BackTo\Framework\PostType\Contracts\PostTypeInterface;
+use BackTo\Framework\PostType\PostType;
+use BackTo\Framework\PostType\PostTypeRegistry;
 use PHPUnit\Framework\TestCase;
 
 class PostTypeA implements PostTypeInterface

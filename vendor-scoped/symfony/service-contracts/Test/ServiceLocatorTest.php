@@ -8,11 +8,11 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace FantassinCoreWordPressVendor\Symfony\Contracts\Service\Test;
+namespace BackToVendor\Symfony\Contracts\Service\Test;
 
-use FantassinCoreWordPressVendor\PHPUnit\Framework\TestCase;
-use FantassinCoreWordPressVendor\Psr\Container\ContainerInterface;
-use FantassinCoreWordPressVendor\Symfony\Contracts\Service\ServiceLocatorTrait;
+use BackToVendor\PHPUnit\Framework\TestCase;
+use BackToVendor\Psr\Container\ContainerInterface;
+use BackToVendor\Symfony\Contracts\Service\ServiceLocatorTrait;
 abstract class ServiceLocatorTest extends TestCase
 {
     /**
@@ -62,7 +62,7 @@ abstract class ServiceLocatorTest extends TestCase
     public function testThrowsOnUndefinedInternalService()
     {
         if (!$this->getExpectedException()) {
-            $this->expectException(\FantassinCoreWordPressVendor\Psr\Container\NotFoundExceptionInterface::class);
+            $this->expectException(\BackToVendor\Psr\Container\NotFoundExceptionInterface::class);
             $this->expectExceptionMessage('The service "foo" has a dependency on a non-existent service "bar". This locator only knows about the "foo" service.');
         }
         $locator = $this->getServiceLocator(['foo' => function () use(&$locator) {
@@ -72,7 +72,7 @@ abstract class ServiceLocatorTest extends TestCase
     }
     public function testThrowsOnCircularReference()
     {
-        $this->expectException(\FantassinCoreWordPressVendor\Psr\Container\ContainerExceptionInterface::class);
+        $this->expectException(\BackToVendor\Psr\Container\ContainerExceptionInterface::class);
         $this->expectExceptionMessage('Circular reference detected for service "bar", path: "bar -> baz -> bar".');
         $locator = $this->getServiceLocator(['foo' => function () use(&$locator) {
             return $locator->get('bar');

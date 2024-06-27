@@ -1,8 +1,8 @@
 <?php
 
-namespace Fantassin\Core\WordPress\PostType\Tests;
+namespace BackTo\Framework\PostType\Tests;
 
-use Fantassin\Core\WordPress\PostType\Entity\PostType;
+use BackTo\Framework\PostType\Entity\PostType;
 use PHPUnit\Framework\TestCase;
 
 class PostTypeTest extends TestCase

@@ -1,6 +1,6 @@
 <?php
 
-namespace Fantassin\Core\WordPress;
+namespace BackTo\Framework;
 
 if ( ! defined( 'ABSPATH' ) ) {
   exit; // Exit if accessed directly

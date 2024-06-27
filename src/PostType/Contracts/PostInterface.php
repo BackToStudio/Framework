@@ -1,11 +1,11 @@
 <?php
 
-namespace Fantassin\Core\WordPress\PostType\Contracts;
+namespace BackTo\Framework\PostType\Contracts;
 
 use DateTimeInterface;
-use Fantassin\Core\WordPress\Contracts\IdInterface;
-use Fantassin\Core\WordPress\Contracts\ParentIdInterface;
-use Fantassin\Core\WordPress\Contracts\SlugInterface;
+use BackTo\Framework\Contracts\IdInterface;
+use BackTo\Framework\Contracts\ParentIdInterface;
+use BackTo\Framework\Contracts\SlugInterface;
 
 interface PostInterface extends IdInterface, SlugInterface, ParentIdInterface
 {

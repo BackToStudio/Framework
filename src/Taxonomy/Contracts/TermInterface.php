@@ -1,10 +1,10 @@
 <?php
 
-namespace Fantassin\Core\WordPress\Taxonomy\Contracts;
+namespace BackTo\Framework\Taxonomy\Contracts;
 
-use Fantassin\Core\WordPress\Contracts\IdInterface;
-use Fantassin\Core\WordPress\Contracts\ParentIdInterface;
-use Fantassin\Core\WordPress\Contracts\SlugInterface;
+use BackTo\Framework\Contracts\IdInterface;
+use BackTo\Framework\Contracts\ParentIdInterface;
+use BackTo\Framework\Contracts\SlugInterface;
 
 interface TermInterface extends IdInterface, SlugInterface, ParentIdInterface
 {

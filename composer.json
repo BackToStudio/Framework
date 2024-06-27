@@ -1,14 +1,14 @@
 {
-  "name": "fantassin/core",
+  "name": "backto/framework",
   "minimum-stability": "stable",
   "authors": [
     {
       "name": "Florian Truchot",
-      "email": "florian@fantassin.fr"
+      "email": "florian@truchot.co"
     }
   ],
   "require": {
-    "php": ">=7.3"
+    "php": ">=7.4"
   },
   "require-dev": {
     "phpunit/phpunit": "^9.5",
@@ -21,12 +21,12 @@
   },
   "autoload": {
     "psr-4": {
-      "Fantassin\\Core\\WordPress\\": "src",
-      "FantassinCoreWordPressVendor\\Symfony\\Contracts\\Service\\": "vendor-scoped/symfony/service-contracts/",
-      "FantassinCoreWordPressVendor\\Symfony\\Component\\Config\\": "vendor-scoped/symfony/config/",
-      "FantassinCoreWordPressVendor\\Symfony\\Component\\Filesystem\\": "vendor-scoped/symfony/filesystem/",
-      "FantassinCoreWordPressVendor\\Symfony\\Component\\DependencyInjection\\": "vendor-scoped/symfony/dependency-injection/",
-      "FantassinCoreWordPressVendor\\Psr\\Container\\": "vendor-scoped/psr/container/"
+      "BackTo\\Framework\\": "src",
+      "BackToVendor\\Symfony\\Contracts\\Service\\": "vendor-scoped/symfony/service-contracts/",
+      "BackToVendor\\Symfony\\Component\\Config\\": "vendor-scoped/symfony/config/",
+      "BackToVendor\\Symfony\\Component\\Filesystem\\": "vendor-scoped/symfony/filesystem/",
+      "BackToVendor\\Symfony\\Component\\DependencyInjection\\": "vendor-scoped/symfony/dependency-injection/",
+      "BackToVendor\\Psr\\Container\\": "vendor-scoped/psr/container/"
     }
   },
   "scripts": {
@@ -50,10 +50,10 @@
       "composer prefix-symfony-filesystem",
       "composer prefix-psr-container"
     ],
-    "prefix-symfony-dependency-injection": "php ./vendor/bin/php-scoper add-prefix --prefix=FantassinCoreWordPressVendor --output-dir=./vendor-scoped/symfony/dependency-injection --config=config/php-scoper/symfony-dependency-injection.inc.php --quiet",
-    "prefix-symfony-config": "php ./vendor/bin/php-scoper add-prefix --prefix=FantassinCoreWordPressVendor --output-dir=./vendor-scoped/symfony/config --config=config/php-scoper/symfony-config.inc.php --quiet",
-    "prefix-symfony-filesystem": "php ./vendor/bin/php-scoper add-prefix --prefix=FantassinCoreWordPressVendor --output-dir=./vendor-scoped/symfony/filesystem --config=config/php-scoper/symfony-filesystem.inc.php --quiet",
-    "prefix-symfony-service-contracts": "php ./vendor/bin/php-scoper add-prefix --prefix=FantassinCoreWordPressVendor --output-dir=./vendor-scoped/symfony/service-contracts --config=config/php-scoper/symfony-service-contracts.inc.php --quiet",
-    "prefix-psr-container": "php ./vendor/bin/php-scoper add-prefix --prefix=FantassinCoreWordPressVendor --output-dir=./vendor-scoped/psr/container --config=config/php-scoper/psr-container.inc.php --quiet"
+    "prefix-symfony-dependency-injection": "php ./vendor/bin/php-scoper add-prefix --prefix=BackToVendor --output-dir=./vendor-scoped/symfony/dependency-injection --config=config/php-scoper/symfony-dependency-injection.inc.php --quiet",
+    "prefix-symfony-config": "php ./vendor/bin/php-scoper add-prefix --prefix=BackToVendor --output-dir=./vendor-scoped/symfony/config --config=config/php-scoper/symfony-config.inc.php --quiet",
+    "prefix-symfony-filesystem": "php ./vendor/bin/php-scoper add-prefix --prefix=BackToVendor --output-dir=./vendor-scoped/symfony/filesystem --config=config/php-scoper/symfony-filesystem.inc.php --quiet",
+    "prefix-symfony-service-contracts": "php ./vendor/bin/php-scoper add-prefix --prefix=BackToVendor --output-dir=./vendor-scoped/symfony/service-contracts --config=config/php-scoper/symfony-service-contracts.inc.php --quiet",
+    "prefix-psr-container": "php ./vendor/bin/php-scoper add-prefix --prefix=BackToVendor --output-dir=./vendor-scoped/psr/container --config=config/php-scoper/psr-container.inc.php --quiet"
   }
 }

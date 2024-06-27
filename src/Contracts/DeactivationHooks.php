@@ -1,6 +1,6 @@
 <?php
 
-namespace Fantassin\Core\WordPress\Contracts;
+namespace BackTo\Framework\Contracts;
 
 interface DeactivationHooks extends HookInterface
 {

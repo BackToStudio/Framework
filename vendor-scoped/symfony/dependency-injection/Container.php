@@ -8,20 +8,20 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection;
+namespace BackToVendor\Symfony\Component\DependencyInjection;
 
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Argument\ServiceLocator as ArgumentServiceLocator;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Exception\EnvNotFoundException;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Exception\ParameterCircularReferenceException;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Exception\RuntimeException;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
-use FantassinCoreWordPressVendor\Symfony\Contracts\Service\ResetInterface;
+use BackToVendor\Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
+use BackToVendor\Symfony\Component\DependencyInjection\Argument\ServiceLocator as ArgumentServiceLocator;
+use BackToVendor\Symfony\Component\DependencyInjection\Exception\EnvNotFoundException;
+use BackToVendor\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use BackToVendor\Symfony\Component\DependencyInjection\Exception\ParameterCircularReferenceException;
+use BackToVendor\Symfony\Component\DependencyInjection\Exception\RuntimeException;
+use BackToVendor\Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
+use BackToVendor\Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
+use BackToVendor\Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
+use BackToVendor\Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
+use BackToVendor\Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use BackToVendor\Symfony\Contracts\Service\ResetInterface;
 // Help opcache.preload discover always-needed symbols
 \class_exists(RewindableGenerator::class);
 \class_exists(ArgumentServiceLocator::class);

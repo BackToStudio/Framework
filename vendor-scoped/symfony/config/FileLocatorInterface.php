@@ -8,9 +8,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace FantassinCoreWordPressVendor\Symfony\Component\Config;
+namespace BackToVendor\Symfony\Component\Config;
 
-use FantassinCoreWordPressVendor\Symfony\Component\Config\Exception\FileLocatorFileNotFoundException;
+use BackToVendor\Symfony\Component\Config\Exception\FileLocatorFileNotFoundException;
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  */

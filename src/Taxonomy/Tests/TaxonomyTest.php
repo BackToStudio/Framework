@@ -1,8 +1,8 @@
 <?php
 
-namespace Fantassin\Core\WordPress\Taxonomy\Tests;
+namespace BackTo\Framework\Taxonomy\Tests;
 
-use Fantassin\Core\WordPress\Taxonomy\Entity\Taxonomy;
+use BackTo\Framework\Taxonomy\Entity\Taxonomy;
 use PHPUnit\Framework\TestCase;
 
 class TaxonomyTest extends TestCase

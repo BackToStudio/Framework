@@ -1,6 +1,6 @@
 <?php
 
-namespace FantassinCoreWordPressVendor\Psr\Container;
+namespace BackToVendor\Psr\Container;
 
 /**
  * Base interface representing a generic exception in a container.

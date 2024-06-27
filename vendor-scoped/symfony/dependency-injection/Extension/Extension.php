@@ -8,15 +8,15 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Extension;
+namespace BackToVendor\Symfony\Component\DependencyInjection\Extension;
 
-use FantassinCoreWordPressVendor\Symfony\Component\Config\Definition\ConfigurationInterface;
-use FantassinCoreWordPressVendor\Symfony\Component\Config\Definition\Processor;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Container;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Exception\BadMethodCallException;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Exception\LogicException;
+use BackToVendor\Symfony\Component\Config\Definition\ConfigurationInterface;
+use BackToVendor\Symfony\Component\Config\Definition\Processor;
+use BackToVendor\Symfony\Component\DependencyInjection\Container;
+use BackToVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
+use BackToVendor\Symfony\Component\DependencyInjection\Exception\BadMethodCallException;
+use BackToVendor\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use BackToVendor\Symfony\Component\DependencyInjection\Exception\LogicException;
 /**
  * Provides useful features shared by many extensions.
  *

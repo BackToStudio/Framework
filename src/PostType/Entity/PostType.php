@@ -1,8 +1,8 @@
 <?php
 
-namespace Fantassin\Core\WordPress\PostType\Entity;
+namespace BackTo\Framework\PostType\Entity;
 
-use Fantassin\Core\WordPress\PostType\Contracts\PostTypeInterface;
+use BackTo\Framework\PostType\Contracts\PostTypeInterface;
 
 class PostType implements PostTypeInterface
 {

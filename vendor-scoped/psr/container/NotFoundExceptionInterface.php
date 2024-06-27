@@ -1,6 +1,6 @@
 <?php
 
-namespace FantassinCoreWordPressVendor\Psr\Container;
+namespace BackToVendor\Psr\Container;
 
 /**
  * No entry was found in the container.

@@ -1,10 +1,10 @@
 <?php
 
-namespace Fantassin\Core\WordPress\PostType;
+namespace BackTo\Framework\PostType;
 
 use Exception;
-use Fantassin\Core\WordPress\Contracts\ActivationHooks;
-use Fantassin\Core\WordPress\Contracts\Hooks;
+use BackTo\Framework\Contracts\ActivationHooks;
+use BackTo\Framework\Contracts\Hooks;
 
 class RegisterPostType implements Hooks, ActivationHooks
 {

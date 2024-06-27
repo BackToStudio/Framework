@@ -1,6 +1,6 @@
 <?php
 
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+use BackToVendor\Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
 return function (ContainerConfigurator $configurator) {
     $services = $configurator->services()
@@ -9,12 +9,12 @@ return function (ContainerConfigurator $configurator) {
                              ->autoconfigure(
         ); // Automatically registers your services as commands, event subscribers, etc.
 
-    $services->load('Fantassin\\Core\\WordPress\\Hooks\\', '../../../Hooks/*')
+    $services->load('BackTo\\Framework\\Hooks\\', '../../../Hooks/*')
              ->exclude('../../../Hooks/{DependencyInjection,Entity,Tests,Contracts}');
-    $services->load('Fantassin\\Core\\WordPress\\Blocks\\', '../../../Blocks/*')
+    $services->load('BackTo\\Framework\\Blocks\\', '../../../Blocks/*')
              ->exclude('../../../Blocks/{DependencyInjection,Entity,Tests,Contracts}');
-    $services->load('Fantassin\\Core\\WordPress\\PostType\\', '../../../PostType/*')
+    $services->load('BackTo\\Framework\\PostType\\', '../../../PostType/*')
              ->exclude('../../../PostType/{DependencyInjection,Entity,Tests,Contracts}');
-    $services->load('Fantassin\\Core\\WordPress\\Taxonomy\\', '../../../Taxonomy/*')
+    $services->load('BackTo\\Framework\\Taxonomy\\', '../../../Taxonomy/*')
              ->exclude('../../../Taxonomy/{DependencyInjection,Entity,Tests,Contracts}');
 };

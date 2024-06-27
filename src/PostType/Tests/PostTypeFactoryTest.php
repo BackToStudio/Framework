@@ -1,10 +1,10 @@
 <?php
 
-namespace Fantassin\Core\WordPress\PostType\Tests;
+namespace BackTo\Framework\PostType\Tests;
 
 use Exception;
-use Fantassin\Core\WordPress\PostType\Entity\PostType;
-use Fantassin\Core\WordPress\PostType\PostTypeFactory;
+use BackTo\Framework\PostType\Entity\PostType;
+use BackTo\Framework\PostType\PostTypeFactory;
 use PHPUnit\Framework\TestCase;
 
 class PostTypeFactoryTest extends TestCase

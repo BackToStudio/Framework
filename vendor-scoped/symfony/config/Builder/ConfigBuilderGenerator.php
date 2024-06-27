@@ -8,20 +8,20 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace FantassinCoreWordPressVendor\Symfony\Component\Config\Builder;
+namespace BackToVendor\Symfony\Component\Config\Builder;
 
-use FantassinCoreWordPressVendor\Symfony\Component\Config\Definition\ArrayNode;
-use FantassinCoreWordPressVendor\Symfony\Component\Config\Definition\BooleanNode;
-use FantassinCoreWordPressVendor\Symfony\Component\Config\Definition\ConfigurationInterface;
-use FantassinCoreWordPressVendor\Symfony\Component\Config\Definition\EnumNode;
-use FantassinCoreWordPressVendor\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
-use FantassinCoreWordPressVendor\Symfony\Component\Config\Definition\FloatNode;
-use FantassinCoreWordPressVendor\Symfony\Component\Config\Definition\IntegerNode;
-use FantassinCoreWordPressVendor\Symfony\Component\Config\Definition\NodeInterface;
-use FantassinCoreWordPressVendor\Symfony\Component\Config\Definition\PrototypedArrayNode;
-use FantassinCoreWordPressVendor\Symfony\Component\Config\Definition\ScalarNode;
-use FantassinCoreWordPressVendor\Symfony\Component\Config\Definition\VariableNode;
-use FantassinCoreWordPressVendor\Symfony\Component\Config\Loader\ParamConfigurator;
+use BackToVendor\Symfony\Component\Config\Definition\ArrayNode;
+use BackToVendor\Symfony\Component\Config\Definition\BooleanNode;
+use BackToVendor\Symfony\Component\Config\Definition\ConfigurationInterface;
+use BackToVendor\Symfony\Component\Config\Definition\EnumNode;
+use BackToVendor\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use BackToVendor\Symfony\Component\Config\Definition\FloatNode;
+use BackToVendor\Symfony\Component\Config\Definition\IntegerNode;
+use BackToVendor\Symfony\Component\Config\Definition\NodeInterface;
+use BackToVendor\Symfony\Component\Config\Definition\PrototypedArrayNode;
+use BackToVendor\Symfony\Component\Config\Definition\ScalarNode;
+use BackToVendor\Symfony\Component\Config\Definition\VariableNode;
+use BackToVendor\Symfony\Component\Config\Loader\ParamConfigurator;
 /**
  * Generate ConfigBuilders to help create valid config.
  *
@@ -42,7 +42,7 @@ class ConfigBuilderGenerator implements ConfigBuilderGeneratorInterface
     {
         $this->classes = [];
         $rootNode = $configuration->getConfigTreeBuilder()->buildTree();
-        $rootClass = new ClassBuilder('FantassinCoreWordPressVendor\\Symfony\\Config', $rootNode->getName());
+        $rootClass = new ClassBuilder('BackToVendor\\Symfony\\Config', $rootNode->getName());
         $path = $this->getFullPath($rootClass);
         if (!\is_file($path)) {
             // Generate the class if the file not exists

@@ -1,11 +1,11 @@
 <?php
 
-namespace Fantassin\Core\WordPress\Hooks;
+namespace BackTo\Framework\Hooks;
 
-use Fantassin\Core\WordPress\Contracts\HookInterface;
-use Fantassin\Core\WordPress\Contracts\AdminHooks;
-use Fantassin\Core\WordPress\Contracts\Hooks;
-use Fantassin\Core\WordPress\Contracts\RegistryInterface;
+use BackTo\Framework\Contracts\HookInterface;
+use BackTo\Framework\Contracts\AdminHooks;
+use BackTo\Framework\Contracts\Hooks;
+use BackTo\Framework\Contracts\RegistryInterface;
 
 class HookRegistry implements RegistryInterface
 {

@@ -1,11 +1,11 @@
 <?php
 
-namespace Fantassin\Core\WordPress\Taxonomy\Entity;
+namespace BackTo\Framework\Taxonomy\Entity;
 
-use Fantassin\Core\WordPress\Compose\HasId;
-use Fantassin\Core\WordPress\Compose\HasParentId;
-use Fantassin\Core\WordPress\Compose\HasSlug;
-use Fantassin\Core\WordPress\Taxonomy\Contracts\TermInterface;
+use BackTo\Framework\Compose\HasId;
+use BackTo\Framework\Compose\HasParentId;
+use BackTo\Framework\Compose\HasSlug;
+use BackTo\Framework\Taxonomy\Contracts\TermInterface;
 
 class Term implements TermInterface
 {

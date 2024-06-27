@@ -8,10 +8,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\ParameterBag;
+namespace BackToVendor\Symfony\Component\DependencyInjection\ParameterBag;
 
-use FantassinCoreWordPressVendor\Psr\Container\ContainerInterface;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
+use BackToVendor\Psr\Container\ContainerInterface;
+use BackToVendor\Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 /**
  * ContainerBagInterface is the interface implemented by objects that manage service container parameters.
  *

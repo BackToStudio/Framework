@@ -8,19 +8,19 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Loader\Configurator;
+namespace BackToVendor\Symfony\Component\DependencyInjection\Loader\Configurator;
 
-use FantassinCoreWordPressVendor\Symfony\Component\Config\Loader\ParamConfigurator;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Argument\AbstractArgument;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Argument\IteratorArgument;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Definition;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
-use FantassinCoreWordPressVendor\Symfony\Component\ExpressionLanguage\Expression;
+use BackToVendor\Symfony\Component\Config\Loader\ParamConfigurator;
+use BackToVendor\Symfony\Component\DependencyInjection\Argument\AbstractArgument;
+use BackToVendor\Symfony\Component\DependencyInjection\Argument\IteratorArgument;
+use BackToVendor\Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
+use BackToVendor\Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
+use BackToVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
+use BackToVendor\Symfony\Component\DependencyInjection\Definition;
+use BackToVendor\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use BackToVendor\Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
+use BackToVendor\Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
+use BackToVendor\Symfony\Component\ExpressionLanguage\Expression;
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  */

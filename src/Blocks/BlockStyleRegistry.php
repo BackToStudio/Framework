@@ -1,9 +1,9 @@
 <?php
 
-namespace Fantassin\Core\WordPress\Blocks;
+namespace BackTo\Framework\Blocks;
 
-use Fantassin\Core\WordPress\Contracts\BlockStyleInterface;
-use Fantassin\Core\WordPress\Contracts\RegistryInterface;
+use BackTo\Framework\Contracts\BlockStyleInterface;
+use BackTo\Framework\Contracts\RegistryInterface;
 
 class BlockStyleRegistry implements RegistryInterface
 {

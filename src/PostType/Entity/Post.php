@@ -1,12 +1,12 @@
 <?php
 
-namespace Fantassin\Core\WordPress\PostType\Entity;
+namespace BackTo\Framework\PostType\Entity;
 
 use DateTimeInterface;
-use Fantassin\Core\WordPress\Compose\HasId;
-use Fantassin\Core\WordPress\Compose\HasParentId;
-use Fantassin\Core\WordPress\Compose\HasSlug;
-use Fantassin\Core\WordPress\PostType\Contracts\PostInterface;
+use BackTo\Framework\Compose\HasId;
+use BackTo\Framework\Compose\HasParentId;
+use BackTo\Framework\Compose\HasSlug;
+use BackTo\Framework\PostType\Contracts\PostInterface;
 
 class Post implements PostInterface
 {

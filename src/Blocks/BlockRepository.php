@@ -1,6 +1,6 @@
 <?php
 
-namespace Fantassin\Core\WordPress\Blocks;
+namespace BackTo\Framework\Blocks;
 
 /**
  * @deprecated
@@ -8,7 +8,7 @@ namespace Fantassin\Core\WordPress\Blocks;
 class BlockRepository {
 
     public function __construct(){
-        trigger_error('Fantassin\Core\WordPress\Blocks\BlockRepository is deprecated, use Fantassin\Core\WordPress\Blocks\BlockRegistry instead.', E_USER_DEPRECATED);
+        trigger_error('BackTo\Framework\Blocks\BlockRepository is deprecated, use BackTo\Framework\Blocks\BlockRegistry instead.', E_USER_DEPRECATED);
     }
 
 	/**

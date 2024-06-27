@@ -8,11 +8,11 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace FantassinCoreWordPressVendor\Symfony\Component\Config\Definition\Builder;
+namespace BackToVendor\Symfony\Component\Config\Definition\Builder;
 
-use FantassinCoreWordPressVendor\Symfony\Component\Config\Definition\ArrayNode;
-use FantassinCoreWordPressVendor\Symfony\Component\Config\Definition\Exception\InvalidDefinitionException;
-use FantassinCoreWordPressVendor\Symfony\Component\Config\Definition\PrototypedArrayNode;
+use BackToVendor\Symfony\Component\Config\Definition\ArrayNode;
+use BackToVendor\Symfony\Component\Config\Definition\Exception\InvalidDefinitionException;
+use BackToVendor\Symfony\Component\Config\Definition\PrototypedArrayNode;
 /**
  * This class provides a fluent interface for defining an array node.
  *

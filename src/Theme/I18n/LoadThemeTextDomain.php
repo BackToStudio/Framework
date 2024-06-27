@@ -1,8 +1,8 @@
 <?php
 
-namespace Fantassin\Core\WordPress\Theme\I18n;
+namespace BackTo\Framework\Theme\I18n;
 
-use Fantassin\Core\WordPress\Contracts\Hooks;
+use BackTo\Framework\Contracts\Hooks;
 
 class LoadThemeTextDomain implements Hooks
 {

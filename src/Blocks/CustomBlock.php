@@ -1,8 +1,8 @@
 <?php
 
-namespace Fantassin\Core\WordPress\Blocks;
+namespace BackTo\Framework\Blocks;
 
-use Fantassin\Core\WordPress\Contracts\BlockInterface;
+use BackTo\Framework\Contracts\BlockInterface;
 
 abstract class CustomBlock implements BlockInterface, HasBlockName
 {

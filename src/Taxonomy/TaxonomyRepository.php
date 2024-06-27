@@ -1,6 +1,6 @@
 <?php
 
-namespace Fantassin\Core\WordPress\Taxonomy;
+namespace BackTo\Framework\Taxonomy;
 
 /**
  * @deprecated

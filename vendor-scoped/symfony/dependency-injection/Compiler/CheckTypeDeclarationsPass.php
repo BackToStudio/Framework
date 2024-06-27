@@ -8,23 +8,23 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Compiler;
+namespace BackToVendor\Symfony\Component\DependencyInjection\Compiler;
 
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Argument\IteratorArgument;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Container;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Definition;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Exception\InvalidParameterTypeException;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Exception\RuntimeException;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\ExpressionLanguage;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Parameter;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Reference;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\ServiceLocator;
-use FantassinCoreWordPressVendor\Symfony\Component\ExpressionLanguage\Expression;
+use BackToVendor\Symfony\Component\DependencyInjection\Argument\IteratorArgument;
+use BackToVendor\Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
+use BackToVendor\Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
+use BackToVendor\Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
+use BackToVendor\Symfony\Component\DependencyInjection\Container;
+use BackToVendor\Symfony\Component\DependencyInjection\Definition;
+use BackToVendor\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use BackToVendor\Symfony\Component\DependencyInjection\Exception\InvalidParameterTypeException;
+use BackToVendor\Symfony\Component\DependencyInjection\Exception\RuntimeException;
+use BackToVendor\Symfony\Component\DependencyInjection\ExpressionLanguage;
+use BackToVendor\Symfony\Component\DependencyInjection\Parameter;
+use BackToVendor\Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
+use BackToVendor\Symfony\Component\DependencyInjection\Reference;
+use BackToVendor\Symfony\Component\DependencyInjection\ServiceLocator;
+use BackToVendor\Symfony\Component\ExpressionLanguage\Expression;
 /**
  * Checks whether injected parameters are compatible with type declarations.
  *
@@ -133,7 +133,7 @@ final class CheckTypeDeclarationsPass extends AbstractRecursivePass
             }
             throw new InvalidParameterTypeException($this->currentId, $e->getCode(), $parameter);
         }
-        if ($reflectionType instanceof \FantassinCoreWordPressVendor\ReflectionIntersectionType) {
+        if ($reflectionType instanceof \ReflectionIntersectionType) {
             foreach ($reflectionType->getTypes() as $t) {
                 $this->checkType($checkedDefinition, $value, $parameter, $envPlaceholderUniquePrefix, $t);
             }

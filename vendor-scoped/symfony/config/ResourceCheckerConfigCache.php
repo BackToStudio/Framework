@@ -8,11 +8,11 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace FantassinCoreWordPressVendor\Symfony\Component\Config;
+namespace BackToVendor\Symfony\Component\Config;
 
-use FantassinCoreWordPressVendor\Symfony\Component\Config\Resource\ResourceInterface;
-use FantassinCoreWordPressVendor\Symfony\Component\Filesystem\Exception\IOException;
-use FantassinCoreWordPressVendor\Symfony\Component\Filesystem\Filesystem;
+use BackToVendor\Symfony\Component\Config\Resource\ResourceInterface;
+use BackToVendor\Symfony\Component\Filesystem\Exception\IOException;
+use BackToVendor\Symfony\Component\Filesystem\Filesystem;
 /**
  * ResourceCheckerConfigCache uses instances of ResourceCheckerInterface
  * to check whether cached data is still fresh.

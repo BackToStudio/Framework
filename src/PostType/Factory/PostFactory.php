@@ -1,9 +1,9 @@
 <?php
 
-namespace Fantassin\Core\WordPress\PostType\Factory;
+namespace BackTo\Framework\PostType\Factory;
 
-use Fantassin\Core\WordPress\PostType\Contracts\PostInterface;
-use Fantassin\Core\WordPress\PostType\Entity\Post;
+use BackTo\Framework\PostType\Contracts\PostInterface;
+use BackTo\Framework\PostType\Entity\Post;
 use DateTimeImmutable;
 use Exception;
 use WP_Post;

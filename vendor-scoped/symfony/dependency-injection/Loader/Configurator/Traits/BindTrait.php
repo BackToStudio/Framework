@@ -8,13 +8,13 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Loader\Configurator\Traits;
+namespace BackToVendor\Symfony\Component\DependencyInjection\Loader\Configurator\Traits;
 
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Argument\BoundArgument;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Loader\Configurator\DefaultsConfigurator;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Loader\Configurator\InstanceofConfigurator;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Reference;
+use BackToVendor\Symfony\Component\DependencyInjection\Argument\BoundArgument;
+use BackToVendor\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use BackToVendor\Symfony\Component\DependencyInjection\Loader\Configurator\DefaultsConfigurator;
+use BackToVendor\Symfony\Component\DependencyInjection\Loader\Configurator\InstanceofConfigurator;
+use BackToVendor\Symfony\Component\DependencyInjection\Reference;
 trait BindTrait
 {
     /**

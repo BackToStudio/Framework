@@ -8,19 +8,19 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Loader;
+namespace BackToVendor\Symfony\Component\DependencyInjection\Loader;
 
-use FantassinCoreWordPressVendor\Symfony\Component\Config\Builder\ConfigBuilderGenerator;
-use FantassinCoreWordPressVendor\Symfony\Component\Config\Builder\ConfigBuilderGeneratorInterface;
-use FantassinCoreWordPressVendor\Symfony\Component\Config\Builder\ConfigBuilderInterface;
-use FantassinCoreWordPressVendor\Symfony\Component\Config\FileLocatorInterface;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Attribute\When;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Container;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Extension\ConfigurationExtensionInterface;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+use BackToVendor\Symfony\Component\Config\Builder\ConfigBuilderGenerator;
+use BackToVendor\Symfony\Component\Config\Builder\ConfigBuilderGeneratorInterface;
+use BackToVendor\Symfony\Component\Config\Builder\ConfigBuilderInterface;
+use BackToVendor\Symfony\Component\Config\FileLocatorInterface;
+use BackToVendor\Symfony\Component\DependencyInjection\Attribute\When;
+use BackToVendor\Symfony\Component\DependencyInjection\Container;
+use BackToVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
+use BackToVendor\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use BackToVendor\Symfony\Component\DependencyInjection\Extension\ConfigurationExtensionInterface;
+use BackToVendor\Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
+use BackToVendor\Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 /**
  * PhpFileLoader loads service definitions from a PHP file.
  *

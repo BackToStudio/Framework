@@ -8,10 +8,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace FantassinCoreWordPressVendor\Symfony\Component\Filesystem;
+namespace BackToVendor\Symfony\Component\Filesystem;
 
-use FantassinCoreWordPressVendor\Symfony\Component\Filesystem\Exception\InvalidArgumentException;
-use FantassinCoreWordPressVendor\Symfony\Component\Filesystem\Exception\RuntimeException;
+use BackToVendor\Symfony\Component\Filesystem\Exception\InvalidArgumentException;
+use BackToVendor\Symfony\Component\Filesystem\Exception\RuntimeException;
 /**
  * Contains utility methods for handling path strings.
  *

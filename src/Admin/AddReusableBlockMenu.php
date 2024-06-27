@@ -1,8 +1,8 @@
 <?php
 
-namespace Fantassin\Core\WordPress\Admin;
+namespace BackTo\Framework\Admin;
 
-use Fantassin\Core\WordPress\HasAdminHooks;
+use BackTo\Framework\HasAdminHooks;
 
 class AddReusableBlockMenu implements HasAdminHooks {
 

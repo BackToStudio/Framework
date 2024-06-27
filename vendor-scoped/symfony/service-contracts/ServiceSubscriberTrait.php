@@ -8,10 +8,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace FantassinCoreWordPressVendor\Symfony\Contracts\Service;
+namespace BackToVendor\Symfony\Contracts\Service;
 
-use FantassinCoreWordPressVendor\Psr\Container\ContainerInterface;
-use FantassinCoreWordPressVendor\Symfony\Contracts\Service\Attribute\SubscribedService;
+use BackToVendor\Psr\Container\ContainerInterface;
+use BackToVendor\Symfony\Contracts\Service\Attribute\SubscribedService;
 /**
  * Implementation of ServiceSubscriberInterface that determines subscribed services from
  * method return types. Service ids are available as "ClassName::methodName".

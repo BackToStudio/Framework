@@ -1,6 +1,6 @@
 <?php
 
-namespace Fantassin\Core\WordPress\Compose;
+namespace BackTo\Framework\Compose;
 
 trait TextDomain
 {

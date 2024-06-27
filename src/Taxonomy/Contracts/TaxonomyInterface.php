@@ -1,6 +1,6 @@
 <?php
 
-namespace Fantassin\Core\WordPress\Taxonomy\Contracts;
+namespace BackTo\Framework\Taxonomy\Contracts;
 
 interface TaxonomyInterface
 {

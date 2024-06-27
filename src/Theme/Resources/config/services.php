@@ -1,8 +1,8 @@
 <?php
 
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
-use Fantassin\Core\WordPress\Contracts\ThemeInterface;
-use Fantassin\Core\WordPress\Theme\Entity\Theme;
+use BackToVendor\Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+use BackTo\Framework\Contracts\ThemeInterface;
+use BackTo\Framework\Theme\Entity\Theme;
 
 return function (ContainerConfigurator $configurator) {
 	$services = $configurator->services()
@@ -13,5 +13,5 @@ return function (ContainerConfigurator $configurator) {
 	                         ->autoconfigure(
 		); // Automatically registers your services as commands, event subscribers, etc.
 
-	$services->load('Fantassin\\Core\\WordPress\\Theme\\I18n\\', 'I18n/*');
+	$services->load('BackTo\\Framework\\Theme\\I18n\\', 'I18n/*');
 };

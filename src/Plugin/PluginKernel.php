@@ -1,11 +1,11 @@
 <?php
 
-namespace Fantassin\Core\WordPress\Plugin;
+namespace BackTo\Framework\Plugin;
 
 use Exception;
-use Fantassin\Core\WordPress\Compose\TextDomain;
-use Fantassin\Core\WordPress\Compose\WordPressContainer;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
+use BackTo\Framework\Compose\TextDomain;
+use BackTo\Framework\Compose\WordPressContainer;
+use BackToVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
 
 abstract class PluginKernel
 {

@@ -1,10 +1,10 @@
 <?php
 
-namespace Fantassin\Core\WordPress\Taxonomy\Tests;
+namespace BackTo\Framework\Taxonomy\Tests;
 
 use Exception;
-use Fantassin\Core\WordPress\Taxonomy\Entity\Taxonomy;
-use Fantassin\Core\WordPress\Taxonomy\TaxonomyFactory;
+use BackTo\Framework\Taxonomy\Entity\Taxonomy;
+use BackTo\Framework\Taxonomy\TaxonomyFactory;
 use PHPUnit\Framework\TestCase;
 
 class TaxonomyFactoryTest extends TestCase

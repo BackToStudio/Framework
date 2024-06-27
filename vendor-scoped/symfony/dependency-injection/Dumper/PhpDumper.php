@@ -8,40 +8,40 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Dumper;
+namespace BackToVendor\Symfony\Component\DependencyInjection\Dumper;
 
-use FantassinCoreWordPressVendor\Composer\Autoload\ClassLoader;
-use FantassinCoreWordPressVendor\Symfony\Component\Debug\DebugClassLoader as LegacyDebugClassLoader;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Argument\AbstractArgument;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Argument\ArgumentInterface;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Argument\IteratorArgument;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Argument\ServiceLocator;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Compiler\AnalyzeServiceReferencesPass;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Compiler\CheckCircularReferencesPass;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Compiler\ServiceReferenceGraphNode;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Container;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\ContainerInterface;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Definition;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Exception\EnvParameterException;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Exception\LogicException;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Exception\RuntimeException;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\ExpressionLanguage;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\DumperInterface as ProxyDumper;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\NullDumper;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Loader\FileLoader;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Parameter;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Reference;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\ServiceLocator as BaseServiceLocator;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\TypedReference;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Variable;
-use FantassinCoreWordPressVendor\Symfony\Component\ErrorHandler\DebugClassLoader;
-use FantassinCoreWordPressVendor\Symfony\Component\ExpressionLanguage\Expression;
-use FantassinCoreWordPressVendor\Symfony\Component\HttpKernel\Kernel;
+use BackToVendor\Composer\Autoload\ClassLoader;
+use BackToVendor\Symfony\Component\Debug\DebugClassLoader as LegacyDebugClassLoader;
+use BackToVendor\Symfony\Component\DependencyInjection\Argument\AbstractArgument;
+use BackToVendor\Symfony\Component\DependencyInjection\Argument\ArgumentInterface;
+use BackToVendor\Symfony\Component\DependencyInjection\Argument\IteratorArgument;
+use BackToVendor\Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
+use BackToVendor\Symfony\Component\DependencyInjection\Argument\ServiceLocator;
+use BackToVendor\Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
+use BackToVendor\Symfony\Component\DependencyInjection\Compiler\AnalyzeServiceReferencesPass;
+use BackToVendor\Symfony\Component\DependencyInjection\Compiler\CheckCircularReferencesPass;
+use BackToVendor\Symfony\Component\DependencyInjection\Compiler\ServiceReferenceGraphNode;
+use BackToVendor\Symfony\Component\DependencyInjection\Container;
+use BackToVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
+use BackToVendor\Symfony\Component\DependencyInjection\ContainerInterface;
+use BackToVendor\Symfony\Component\DependencyInjection\Definition;
+use BackToVendor\Symfony\Component\DependencyInjection\Exception\EnvParameterException;
+use BackToVendor\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use BackToVendor\Symfony\Component\DependencyInjection\Exception\LogicException;
+use BackToVendor\Symfony\Component\DependencyInjection\Exception\RuntimeException;
+use BackToVendor\Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
+use BackToVendor\Symfony\Component\DependencyInjection\ExpressionLanguage;
+use BackToVendor\Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\DumperInterface as ProxyDumper;
+use BackToVendor\Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\NullDumper;
+use BackToVendor\Symfony\Component\DependencyInjection\Loader\FileLoader;
+use BackToVendor\Symfony\Component\DependencyInjection\Parameter;
+use BackToVendor\Symfony\Component\DependencyInjection\Reference;
+use BackToVendor\Symfony\Component\DependencyInjection\ServiceLocator as BaseServiceLocator;
+use BackToVendor\Symfony\Component\DependencyInjection\TypedReference;
+use BackToVendor\Symfony\Component\DependencyInjection\Variable;
+use BackToVendor\Symfony\Component\ErrorHandler\DebugClassLoader;
+use BackToVendor\Symfony\Component\ExpressionLanguage\Expression;
+use BackToVendor\Symfony\Component\HttpKernel\Kernel;
 /**
  * PhpDumper dumps a service container as a PHP class.
  *
@@ -193,8 +193,8 @@ class PhpDumper extends Dumper
             $fileTemplate = <<<EOF
 <?php
 
-use FantassinCoreWordPressVendor\\Symfony\\Component\\DependencyInjection\\Argument\\RewindableGenerator;
-use FantassinCoreWordPressVendor\\Symfony\\Component\\DependencyInjection\\Exception\\RuntimeException;
+use BackToVendor\\Symfony\\Component\\DependencyInjection\\Argument\\RewindableGenerator;
+use BackToVendor\\Symfony\\Component\\DependencyInjection\\Exception\\RuntimeException;
 
 /*{$this->docStar}
  * @internal This class has been auto-generated by the Symfony Dependency Injection Component.
@@ -263,7 +263,7 @@ EOF;
 // This file has been auto-generated by the Symfony Dependency Injection Component
 // You can reference it in the "opcache.preload" php.ini setting on PHP >= 7.4 when preloading is desired
 
-use FantassinCoreWordPressVendor\\Symfony\\Component\\DependencyInjection\\Dumper\\Preloader;
+use BackToVendor\\Symfony\\Component\\DependencyInjection\\Dumper\\Preloader;
 
 if (in_array(PHP_SAPI, ['cli', 'phpdbg'], true)) {
     return;
@@ -983,14 +983,14 @@ EOTXT
         $code = <<<EOF
 <?php
 {$namespaceLine}
-use FantassinCoreWordPressVendor\\Symfony\\Component\\DependencyInjection\\Argument\\RewindableGenerator;
-use FantassinCoreWordPressVendor\\Symfony\\Component\\DependencyInjection\\ContainerInterface;
-use FantassinCoreWordPressVendor\\Symfony\\Component\\DependencyInjection\\Container;
-use FantassinCoreWordPressVendor\\Symfony\\Component\\DependencyInjection\\Exception\\InvalidArgumentException;
-use FantassinCoreWordPressVendor\\Symfony\\Component\\DependencyInjection\\Exception\\LogicException;
-use FantassinCoreWordPressVendor\\Symfony\\Component\\DependencyInjection\\Exception\\RuntimeException;
-use FantassinCoreWordPressVendor\\Symfony\\Component\\DependencyInjection\\ParameterBag\\FrozenParameterBag;
-use FantassinCoreWordPressVendor\\Symfony\\Component\\DependencyInjection\\ParameterBag\\ParameterBagInterface;
+use BackToVendor\\Symfony\\Component\\DependencyInjection\\Argument\\RewindableGenerator;
+use BackToVendor\\Symfony\\Component\\DependencyInjection\\ContainerInterface;
+use BackToVendor\\Symfony\\Component\\DependencyInjection\\Container;
+use BackToVendor\\Symfony\\Component\\DependencyInjection\\Exception\\InvalidArgumentException;
+use BackToVendor\\Symfony\\Component\\DependencyInjection\\Exception\\LogicException;
+use BackToVendor\\Symfony\\Component\\DependencyInjection\\Exception\\RuntimeException;
+use BackToVendor\\Symfony\\Component\\DependencyInjection\\ParameterBag\\FrozenParameterBag;
+use BackToVendor\\Symfony\\Component\\DependencyInjection\\ParameterBag\\ParameterBagInterface;
 
 /*{$this->docStar}
  * @internal This class has been auto-generated by the Symfony Dependency Injection Component.
@@ -1583,7 +1583,7 @@ EOF;
                 $code = \str_replace('%%', '%', \preg_replace_callback('/(?<!%)(%)([^%]+)\\1/', $replaceParameters, $this->export($value)));
                 return $code;
             }
-        } elseif ($value instanceof \FantassinCoreWordPressVendor\UnitEnum) {
+        } elseif ($value instanceof \UnitEnum) {
             return \sprintf('\\%s::%s', \get_class($value), $value->name);
         } elseif ($value instanceof AbstractArgument) {
             throw new RuntimeException($value->getTextWithContext());
@@ -1734,7 +1734,7 @@ EOF;
     private function getExpressionLanguage() : ExpressionLanguage
     {
         if (null === $this->expressionLanguage) {
-            if (!\class_exists(\FantassinCoreWordPressVendor\Symfony\Component\ExpressionLanguage\ExpressionLanguage::class)) {
+            if (!\class_exists(\BackToVendor\Symfony\Component\ExpressionLanguage\ExpressionLanguage::class)) {
                 throw new LogicException('Unable to use expressions as the Symfony ExpressionLanguage component is not installed.');
             }
             $providers = $this->container->getExpressionLanguageProviders();

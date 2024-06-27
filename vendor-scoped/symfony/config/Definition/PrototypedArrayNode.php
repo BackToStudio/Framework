@@ -8,12 +8,12 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace FantassinCoreWordPressVendor\Symfony\Component\Config\Definition;
+namespace BackToVendor\Symfony\Component\Config\Definition;
 
-use FantassinCoreWordPressVendor\Symfony\Component\Config\Definition\Exception\DuplicateKeyException;
-use FantassinCoreWordPressVendor\Symfony\Component\Config\Definition\Exception\Exception;
-use FantassinCoreWordPressVendor\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
-use FantassinCoreWordPressVendor\Symfony\Component\Config\Definition\Exception\UnsetKeyException;
+use BackToVendor\Symfony\Component\Config\Definition\Exception\DuplicateKeyException;
+use BackToVendor\Symfony\Component\Config\Definition\Exception\Exception;
+use BackToVendor\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use BackToVendor\Symfony\Component\Config\Definition\Exception\UnsetKeyException;
 /**
  * Represents a prototyped Array node in the config tree.
  *
@@ -181,7 +181,7 @@ class PrototypedArrayNode extends ArrayNode
             return $value;
         }
         $value = $this->remapXml($value);
-        $isList = array_is_list($value);
+        $isList = \array_is_list($value);
         $normalized = [];
         foreach ($value as $k => $v) {
             if (null !== $this->keyAttribute && \is_array($v)) {
@@ -241,7 +241,7 @@ class PrototypedArrayNode extends ArrayNode
         if (\false === $leftSide || !$this->performDeepMerging) {
             return $rightSide;
         }
-        $isList = array_is_list($rightSide);
+        $isList = \array_is_list($rightSide);
         foreach ($rightSide as $k => $v) {
             // prototype, and key is irrelevant there are no named keys, append the element
             if (null === $this->keyAttribute && $isList) {

@@ -8,9 +8,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace FantassinCoreWordPressVendor\Symfony\Component\Config\Definition\Builder;
+namespace BackToVendor\Symfony\Component\Config\Definition\Builder;
 
-use FantassinCoreWordPressVendor\Symfony\Component\Config\Definition\Exception\InvalidDefinitionException;
+use BackToVendor\Symfony\Component\Config\Definition\Exception\InvalidDefinitionException;
 /**
  * Abstract class that contains common code of integer and float node definitions.
  *

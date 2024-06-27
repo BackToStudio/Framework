@@ -8,10 +8,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace FantassinCoreWordPressVendor\Symfony\Component\Config\Resource;
+namespace BackToVendor\Symfony\Component\Config\Resource;
 
-use FantassinCoreWordPressVendor\Symfony\Component\Finder\Finder;
-use FantassinCoreWordPressVendor\Symfony\Component\Finder\Glob;
+use BackToVendor\Symfony\Component\Finder\Finder;
+use BackToVendor\Symfony\Component\Finder\Glob;
 /**
  * GlobResource represents a set of resources stored on the filesystem.
  *

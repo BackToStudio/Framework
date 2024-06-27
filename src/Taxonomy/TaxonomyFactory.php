@@ -1,10 +1,10 @@
 <?php
 
-namespace Fantassin\Core\WordPress\Taxonomy;
+namespace BackTo\Framework\Taxonomy;
 
 use Exception;
-use Fantassin\Core\WordPress\Taxonomy\Contracts\TaxonomyInterface;
-use Fantassin\Core\WordPress\Taxonomy\Entity\Taxonomy;
+use BackTo\Framework\Taxonomy\Contracts\TaxonomyInterface;
+use BackTo\Framework\Taxonomy\Entity\Taxonomy;
 
 class TaxonomyFactory
 {

@@ -1,11 +1,11 @@
 <?php
 
-namespace Fantassin\Core\WordPress\PostType\DependencyInjection\Compiler;
+namespace BackTo\Framework\PostType\DependencyInjection\Compiler;
 
-use Fantassin\Core\WordPress\PostType\PostTypeRegistry;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
-use FantassinCoreWordPressVendor\Symfony\Component\DependencyInjection\Reference;
+use BackTo\Framework\PostType\PostTypeRegistry;
+use BackToVendor\Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use BackToVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
+use BackToVendor\Symfony\Component\DependencyInjection\Reference;
 
 /**
  * Register all Custom Post Types that have the "wordpress.post_type" tag into the container.

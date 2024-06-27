@@ -8,9 +8,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace FantassinCoreWordPressVendor\Symfony\Component\Config\Definition;
+namespace BackToVendor\Symfony\Component\Config\Definition;
 
-use FantassinCoreWordPressVendor\Symfony\Component\Config\Definition\Builder\TreeBuilder;
+use BackToVendor\Symfony\Component\Config\Definition\Builder\TreeBuilder;
 /**
  * Configuration interface.
  *
