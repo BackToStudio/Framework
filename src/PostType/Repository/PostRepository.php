@@ -32,13 +32,17 @@ class PostRepository
         return $this->factory->create($wpPost);
     }
 
-    public function findAll(): array
+    /**
+     * @param $args
+     *
+     * @return PostInterface[]
+     */
+    public function findAll($args = []): array
     {
-        $wpPosts = get_posts(
-            [
-                'numberposts' => -1
-            ]
-        );
+        $defaultArgs = [
+            'numberposts' => -1
+        ];
+        $wpPosts = get_posts(array_merge($defaultArgs, $args));
         return $this->factory->createFromPosts($wpPosts);
     }
 
