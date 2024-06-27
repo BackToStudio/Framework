@@ -41,9 +41,12 @@ class PostFactory
      */
     public function createFromPosts(array $wpPosts): array
     {
-        return array_map(function (WP_Post $wpPost) {
-            return $this->create($wpPost);
-        });
+        return array_map(
+            function (WP_Post $wpPost) {
+                return $this->create($wpPost);
+            },
+            $wpPosts
+        );
     }
 
 }
