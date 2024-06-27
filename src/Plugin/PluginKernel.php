@@ -7,7 +7,7 @@ use BackTo\Framework\Compose\TextDomain;
 use BackTo\Framework\Compose\WordPressContainer;
 use BackToVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
 
-abstract class PluginKernel
+class PluginKernel
 {
     use TextDomain;
     use WordPressContainer;
@@ -21,11 +21,6 @@ abstract class PluginKernel
         $this->environment = $environment;
         $this->debug = $debug;
     }
-
-    /**
-     * @return string
-     */
-    abstract public function getTextDomain(): string;
 
     /**
      * Prepare Container settings.
