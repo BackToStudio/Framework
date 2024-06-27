@@ -1,10 +1,10 @@
 # Bazooka Core
-Bazooka Core improve WordPress Development Experience
+BackTo Framework improve WordPress Development Experience
 
 ## Installation
 Use the package manager [composer](https://getcomposer.org/) to install Bazooka Core.
 ```bash
-composer require fantassin/core
+composer require backto/framework
 ```
 
 ## Documentation
