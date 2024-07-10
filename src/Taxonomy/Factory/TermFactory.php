@@ -16,7 +16,8 @@ class TermFactory
         $term = (new Term())
             ->setId($wpTerm->term_id)
             ->setName($wpTerm->name)
-            ->setDe($wpTerm->post_content)
+            ->setDescription($wpTerm->description)
+            ->setTaxonomy($wpTerm->taxonomy)
             ->setSlug($wpTerm->slug)
             ->setParentId($wpTerm->parent);
 
@@ -25,13 +26,16 @@ class TermFactory
 
     /**
      * @param WP_Term[] $wpPosts
+     *
      * @return TermInterface[]
      */
     public function createFromTerms(array $wpTerms): array
     {
-        return array_map(function (WP_Term $wpPost) {
-            return $this->create($wpPost);
-        });
+        return array_map(
+            function (WP_Term $wpPost) {
+                return $this->create($wpPost);
+            },
+            $wpTerms
+        );
     }
-
 }
