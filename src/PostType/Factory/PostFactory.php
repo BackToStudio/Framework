@@ -19,6 +19,7 @@ class PostFactory
             ->setContent($wpPost->post_content)
             ->setStatus($wpPost->post_status)
             ->setSlug($wpPost->post_name)
+            ->setExcerpt($wpPost->post_excerpt)
             ->setParentId($wpPost->post_parent)
             ->setPostType($wpPost->post_type)
             ->setAuthor($wpPost->post_author);

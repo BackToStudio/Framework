@@ -22,7 +22,7 @@ class Post implements PostInterface
     protected string $status = '';
 
     protected string $content = '';
-    private string $excerpt = '';
+    protected string $excerpt = '';
 
     /**
      * @var int
