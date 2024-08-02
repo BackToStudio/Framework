@@ -2,15 +2,18 @@
 
 namespace BackTo\Framework\Admin;
 
-use BackTo\Framework\HasAdminHooks;
+use BackTo\Framework\Contracts\AdminHooks;
 
-class AddReusableBlockMenu implements HasAdminHooks {
+use function add_action;
+use function add_menu_page;
+
+class AddReusableBlockMenu implements AdminHooks {
 
 	public function hooks() {
-		add_action( 'admin_menu', [ $this, 'add_reusable_block_menu' ] );
+		add_action( 'admin_menu', [ $this, 'addReusableBlockMenu'] );
 	}
 
-	function add_reusable_block_menu() {
+	function addReusableBlockMenu() {
 		add_menu_page(
 			__( 'Reusable Blocks', 'gutenberg' ),
 			__( 'Reusable Blocks', 'gutenberg' ),

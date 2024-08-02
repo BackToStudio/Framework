@@ -5,14 +5,19 @@ namespace BackTo\Framework\Admin;
 use BackTo\Framework\Contracts\AdminHooks;
 use WP_Admin_Bar;
 
+use function add_action;
+use function current_user_can;
+use function get_role;
+use function remove_submenu_page;
+
 class AddMenuForEditors implements AdminHooks {
 
 	public function hooks() {
-		add_action( 'admin_head', [ $this, 'display_appearance_menu' ] );
-		add_action( 'admin_bar_menu', [ $this, 'remove_customizer' ], 999 );
+		add_action( 'admin_head', [ $this, 'displayAppearanceMenu'] );
+		add_action( 'admin_bar_menu', [ $this, 'removeCustomizer'], 999 );
 	}
 
-	public function display_appearance_menu() {
+	public function displayAppearanceMenu() {
 		// Do this only once. Can go anywhere inside your functions.php file
 		$role_object = get_role( 'editor' );
 		$role_object->add_cap( 'edit_theme_options' );
@@ -32,9 +37,8 @@ class AddMenuForEditors implements AdminHooks {
 
 	/**
 	 * Remove customizer from admin bar
-	 * @param WP_Admin_Bar $wp_adminbar
 	 */
-	public function remove_customizer( WP_Admin_Bar $wp_adminbar ) {
+	public function removeCustomizer( WP_Admin_Bar $wp_adminbar ) {
 		$wp_adminbar->remove_node( 'customize' );
 	}
 }
