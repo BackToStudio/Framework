@@ -7,10 +7,7 @@ use BackTo\Framework\Contracts\Hooks;
 class RegisterBlockStyles implements Hooks
 {
 
-    /**
-     * @var BlockStyleRegistry
-     */
-    protected $registry;
+    protected BlockStyleRegistry $registry;
 
     public function __construct(BlockStyleRegistry $registry)
     {

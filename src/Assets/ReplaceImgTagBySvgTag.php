@@ -5,6 +5,9 @@ namespace BackTo\Framework\Assets;
 
 use Exception;
 
+use function array_key_exists;
+use function preg_match;
+use function str_ends_with;
 use function str_replace;
 
 class ReplaceImgTagBySvgTag
