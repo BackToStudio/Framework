@@ -7,11 +7,11 @@ use BackTo\Framework\Contracts\BlockStyleInterface;
 abstract class CustomBlockStyle implements BlockStyleInterface
 {
 
-    protected $blocks = [];
+    protected array $blocks = [];
 
-    protected $styleName = '';
+    protected string $styleName = '';
 
-    protected $label = '';
+    protected string $label = '';
 
     /**
      * @return string

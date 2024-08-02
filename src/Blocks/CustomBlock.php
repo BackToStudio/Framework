@@ -4,10 +4,10 @@ namespace BackTo\Framework\Blocks;
 
 use BackTo\Framework\Contracts\BlockInterface;
 
-abstract class CustomBlock implements BlockInterface, HasBlockName
+abstract class CustomBlock implements BlockInterface
 {
 
-    protected $name = '';
+    protected string $name = '';
 
     /**
      * @return string
