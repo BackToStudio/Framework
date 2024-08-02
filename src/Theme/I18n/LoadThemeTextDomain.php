@@ -4,6 +4,9 @@ namespace BackTo\Framework\Theme\I18n;
 
 use BackTo\Framework\Contracts\Hooks;
 
+use function add_action;
+use function load_theme_textdomain;
+
 class LoadThemeTextDomain implements Hooks
 {
 
@@ -31,7 +34,7 @@ class LoadThemeTextDomain implements Hooks
 
     public function hooks()
     {
-        \add_action('after_setup_theme', [$this, 'loadTranslations']);
+        add_action('after_setup_theme', [$this, 'loadTranslations']);
     }
 
     /**
@@ -39,7 +42,7 @@ class LoadThemeTextDomain implements Hooks
      */
     public function loadTranslations()
     {
-        \load_theme_textdomain(
+        load_theme_textdomain(
             $this->textDomain,
             $this->themeDirectory . DIRECTORY_SEPARATOR . 'languages'
         );

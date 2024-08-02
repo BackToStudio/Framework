@@ -1,8 +1,6 @@
 <?php
 
 use BackToVendor\Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
-use BackTo\Framework\Contracts\ThemeInterface;
-use BackTo\Framework\Theme\Entity\Theme;
 
 return function (ContainerConfigurator $configurator) {
 	$services = $configurator->services()
@@ -10,8 +8,7 @@ return function (ContainerConfigurator $configurator) {
 							 ->bind('$themeDirectory', '%themeDirectory%')
 							 ->bind('$themeTextDomain', '%themeTextDomain%')
 	                         ->autowire()       // Automatically injects dependencies in your services.
-	                         ->autoconfigure(
-		); // Automatically registers your services as commands, event subscribers, etc.
+	                         ->autoconfigure(); // Automatically registers your services as commands, event subscribers, etc.
 
 	$services->load('BackTo\\Framework\\Theme\\I18n\\', 'I18n/*');
 };
