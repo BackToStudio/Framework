@@ -48,6 +48,11 @@ class WordPressScriptsAssets
         wp_enqueue_script($handle, $asset['uri'], $asset['dependencies'], $asset['version'], $inFooter);
     }
 
+    public function localizeScript(string $handle, string $objectName, array $data)
+    {
+        wp_localize_script($handle, $objectName, $data);
+    }
+
     public function getAsset(string $relativePath)
     {
         $pathWithoutExtension = explode('.', $relativePath);
