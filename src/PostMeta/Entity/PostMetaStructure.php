@@ -10,7 +10,8 @@ class PostMetaStructure implements PostMetaStructureInterface
     private string $metaKey;
     private array $args = [];
     private string $objectSubtype = '';
-    private PostMetaType $type;
+    /** @see PostMetaType::class */
+    private string $type;
     private string $label;
     private string $description;
     private bool $single = true;
@@ -66,12 +67,12 @@ class PostMetaStructure implements PostMetaStructureInterface
         return $this;
     }
 
-    public function getType(): PostMetaType
+    public function getType(): string
     {
         return $this->type;
     }
 
-    public function setType(PostMetaType $type): PostMetaStructureInterface
+    public function setType(string $type): PostMetaStructureInterface
     {
         $this->type = $type;
         return $this;
