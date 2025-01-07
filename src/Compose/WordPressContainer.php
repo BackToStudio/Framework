@@ -2,6 +2,7 @@
 
 namespace BackTo\Framework\Compose;
 
+use BackTo\Framework\PostMeta\Contracts\PostMetaStructureInterface;
 use Exception;
 use LogicException;
 use ReflectionObject;
@@ -16,6 +17,7 @@ use BackTo\Framework\Contracts\HookInterface;
 use BackTo\Framework\Contracts\RegistryInterface;
 use BackTo\Framework\Hooks\DependencyInjection\Compiler\RegisterHookPass;
 use BackTo\Framework\Hooks\HookRegistry;
+use BackTo\Framework\PostMeta\DependencyInjection\Compiler\RegisterPostMetaStructurePass;
 use BackTo\Framework\PostType\DependencyInjection\Compiler\RegisterPostTypePass;
 use BackTo\Framework\Taxonomy\DependencyInjection\Compiler\RegisterTaxonomyPass;
 use BackToVendor\Symfony\Component\Config\Builder\ConfigBuilderGenerator;
@@ -237,6 +239,9 @@ trait WordPressContainer
         $containerBuilder->registerForAutoconfiguration(PostTypeInterface::class)
             ->addTag('wordpress.post_type');
 
+        $containerBuilder->registerForAutoconfiguration(PostMetaStructureInterface::class)
+            ->addTag('wordpress.post_meta');
+
         $containerBuilder->registerForAutoconfiguration(TaxonomyInterface::class)
             ->addTag('wordpress.taxonomy');
 
@@ -252,6 +257,7 @@ trait WordPressContainer
         $containerBuilder = $this->replaceResolveInstanceofConditionalsPass($containerBuilder);
 
         $containerBuilder->addCompilerPass(new RegisterPostTypePass());
+        $containerBuilder->addCompilerPass(new RegisterPostMetaStructurePass());
         $containerBuilder->addCompilerPass(new RegisterTaxonomyPass());
         $containerBuilder->addCompilerPass(new RegisterBlockPass());
         $containerBuilder->addCompilerPass(new RegisterBlockStylePass());
