@@ -7,6 +7,7 @@ use BackTo\Framework\PostMeta\Contracts\PostMetaInterface;
 interface PostMetaStructureInterface
 {
     public function getObjectType(): string;
+    
     public function setObjectType(string $objectType): PostMetaStructureInterface;
 
     public function getMetaKey(): string;
