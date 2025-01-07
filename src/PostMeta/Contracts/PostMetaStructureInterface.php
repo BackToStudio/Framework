@@ -16,7 +16,7 @@ interface PostMetaStructureInterface
 
     public function setArgs(array $args): PostMetaStructureInterface;
 
-    public function getObjectSubtype(): ?string;
+    public function getObjectSubtype(): string;
 
     public function setObjectSubtype(string $objectSubtype): PostMetaStructureInterface;
 
@@ -24,9 +24,9 @@ interface PostMetaStructureInterface
 
     public function setLabel(string $label): PostMetaStructureInterface;
 
-    public function getDescription(): ?string;
+    public function getDescription(): string;
 
-    public function setDescription(?string $description): PostMetaStructureInterface;
+    public function setDescription(string $description): PostMetaStructureInterface;
 
     public function isSingle(): bool;
 
@@ -44,7 +44,7 @@ interface PostMetaStructureInterface
 
     public function setAuthCallback(callable $callback): PostMetaStructureInterface;
 
-    public function isShowInRest();
+    public function isShowInRest(): bool;
 
     public function dontShowInRest(): PostMetaStructureInterface;
 
