@@ -15,7 +15,7 @@ class PostMetaStructure implements PostMetaStructureInterface
     private string $label = '';
     private string $description = '';
     private bool $single = true;
-    private mixed $default;
+    private mixed $default = null;
     /** @var callable|null $sanitizeCallback */
     private $sanitizeCallback = null;
     /** @var callable|null $authCallback */
