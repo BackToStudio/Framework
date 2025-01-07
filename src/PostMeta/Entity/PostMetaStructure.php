@@ -144,7 +144,7 @@ class PostMetaStructure implements PostMetaStructureInterface
         return $this;
     }
 
-    public function isShowInRest()
+    public function isShowInRest(): bool
     {
         return $this->showInRest;
     }
