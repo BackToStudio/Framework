@@ -7,13 +7,13 @@ use BackTo\Framework\PostMeta\Contracts\PostMetaStructureInterface;
 class PostMetaStructure implements PostMetaStructureInterface
 {
     private string $objectType = 'post';
-    private string $metaKey;
+    private string $metaKey = '';
     private array $args = [];
     private string $objectSubtype = '';
     /** @see PostMetaType::class */
-    private string $type;
-    private string $label;
-    private string $description;
+    private string $type = '';
+    private string $label = '';
+    private string $description = '';
     private bool $single = true;
     private mixed $default;
     /** @var callable|null $sanitizeCallback */
@@ -89,12 +89,12 @@ class PostMetaStructure implements PostMetaStructureInterface
         return $this;
     }
 
-    public function getDescription(): ?string
+    public function getDescription(): string
     {
         return $this->description;
     }
 
-    public function setDescription(?string $description): PostMetaStructureInterface
+    public function setDescription(string $description): PostMetaStructureInterface
     {
         $this->description = $description;
         return $this;
