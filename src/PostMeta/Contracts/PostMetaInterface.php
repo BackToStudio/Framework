@@ -2,66 +2,55 @@
 
 namespace BackTo\Framework\PostMeta\Contracts;
 
+use BackTo\Framework\PostType\Contracts\PostInterface;
+
 interface PostMetaInterface
 {
     /**
+     * @return PostInterface
+     */
+    public function getPost(): PostInterface;
+
+    /**
+     * @param PostInterface $post
+     *
+     * @return PostMetaInterface
+     */
+    public function setPost(PostInterface $post): PostMetaInterface;
+
+    /**
+     * @return int
+     */
+    public function getPostId(): int;
+
+    /**
+     * @param int $postId
+     *
+     * @return PostMetaInterface
+     */
+    public function setPostId(int $postId): PostMetaInterface;
+
+    /**
      * @return string
      */
-    public function getKey(): string;
+    public function getMetaKey(): string;
 
     /**
-     * @param string $key
+     * @param string $metaKey
+     *
      * @return PostMetaInterface
      */
-    public function setKey(string $key): PostMetaInterface;
+    public function setMetaKey(string $metaKey): PostMetaInterface;
 
     /**
-     * @return string
+     * @return mixed
      */
-    public function getLabel(): string;
+    public function getMetaValue(): mixed;
 
     /**
-     * @param string $label
+     * @param mixed $value
+     *
      * @return PostMetaInterface
      */
-    public function setLabel(string $label): PostMetaInterface;
-
-    /**
-     * @return string
-     */
-    public function getType(): string;
-
-    /**
-     * @param string $type
-     * @return PostMetaInterface
-     */
-    public function setType(string $type): PostMetaInterface;
-
-    /**
-     * @return array
-     */
-    public function getArgs(): array;
-
-    /**
-     * @param array $args
-     * @return PostMetaInterface
-     */
-    public function setArgs(array $args): PostMetaInterface;
-
-    /**
-     * @return array
-     */
-    public function getPostTypes(): array;
-
-    /**
-     * @param array $postTypes
-     * @return PostMetaInterface
-     */
-    public function setPostTypes(array $postTypes): PostMetaInterface;
-
-    /**
-     * @param string $postType
-     * @return PostMetaInterface
-     */
-    public function addPostType(string $postType): PostMetaInterface;
+    public function setMetaValue(mixed $value): PostMetaInterface;
 } 

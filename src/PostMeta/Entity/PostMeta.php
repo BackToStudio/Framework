@@ -3,193 +3,69 @@
 namespace BackTo\Framework\PostMeta\Entity;
 
 use BackTo\Framework\PostMeta\Contracts\PostMetaInterface;
-use Exception;
+use BackTo\Framework\PostType\Contracts\PostInterface;
 
 class PostMeta implements PostMetaInterface
 {
-    /**
-     * @var string
-     */
-    private $key;
+    private int $id;
+    private PostInterface $post;
+    private int $postId;
+    private string $metaKey;
+    private mixed $metaValue;
 
-    /**
-     * @var string
-     */
-    private $label;
-
-    /**
-     * @var string
-     */
-    private $type = 'text';
-
-    /**
-     * @var array
-     */
-    private $args = [
-        'description' => '',
-        'single' => true,
-        'show_in_rest' => true,
-        'sanitize_callback' => null,
-        'auth_callback' => null,
-        'default' => '',
-        'required' => false,
-        'show_in_admin_column' => false,
-        'meta_box_position' => 'normal',
-        'meta_box_priority' => 'default',
-        'custom_render' => null,
-    ];
-
-    /**
-     * @var array
-     */
-    private $postTypes = [];
-
-    /**
-     * @return string
-     */
-    public function getKey(): string
+    public function getId(): int
     {
-        return $this->key;
+        return $this->id;
     }
 
-    /**
-     * @param string $key
-     * @return PostMetaInterface
-     * @throws Exception
-     */
-    public function setKey(string $key): PostMetaInterface
+    public function setId(int $id): PostMetaInterface
     {
-        if (empty($key)) {
-            throw new Exception('PostMeta key is required and should only contain lowercase letters and underscores.');
-        }
-
-        $this->key = $key;
+        $this->id = $id;
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getLabel(): string
+    public function getPost(): PostInterface
     {
-        return $this->label;
+        return $this->post;
     }
 
-    /**
-     * @param string $label
-     * @return PostMetaInterface
-     */
-    public function setLabel(string $label): PostMetaInterface
+    public function setPost(PostInterface $post): PostMetaInterface
     {
-        $this->label = $label;
+        $this->post = $post;
+        $this->postId = $post->getId();
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getType(): string
+    public function getPostId(): int
     {
-        return $this->type;
+        return $this->postId;
     }
 
-    /**
-     * @param string $type
-     * @return PostMetaInterface
-     */
-    public function setType(string $type): PostMetaInterface
+    public function setPostId(int $postId): PostMetaInterface
     {
-        $this->type = $type;
-        $this->args['type'] = $type;
+        $this->postId = $postId;
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getArgs(): array
+    public function getMetaKey(): string
     {
-        return $this->args;
+        return $this->metaKey;
     }
 
-    /**
-     * @param array $args
-     * @return PostMetaInterface
-     */
-    public function setArgs(array $args): PostMetaInterface
+    public function setMetaKey(string $metaKey): PostMetaInterface
     {
-        $this->args = array_merge($this->args, $args);
+        $this->metaKey = $metaKey;
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getPostTypes(): array
+    public function getMetaValue(): mixed
     {
-        return $this->postTypes;
+        return $this->metaValue;
     }
 
-    /**
-     * @param array $postTypes
-     * @return PostMetaInterface
-     */
-    public function setPostTypes(array $postTypes): PostMetaInterface
+    public function setMetaValue(mixed $value): PostMetaInterface
     {
-        $this->postTypes = $postTypes;
+        $this->metaValue = $value;
         return $this;
     }
-
-    /**
-     * @param string $postType
-     * @return PostMetaInterface
-     */
-    public function addPostType(string $postType): PostMetaInterface
-    {
-        if (!in_array($postType, $this->postTypes)) {
-            $this->postTypes[] = $postType;
-        }
-        return $this;
-    }
-
-    /**
-     * Hook method called before the meta value is saved
-     * Can be overridden by child classes
-     * 
-     * @param int $post_id
-     * @param mixed $value
-     * @param mixed $old_value
-     * @return void
-     */
-    public function beforeSave(int $post_id, $value, $old_value): void
-    {
-        // Override in child class if needed
-    }
-
-    /**
-     * Hook method called after the meta value is saved
-     * Can be overridden by child classes
-     * 
-     * @param int $post_id
-     * @param mixed $value
-     * @param mixed $old_value
-     * @return void
-     */
-    public function afterSave(int $post_id, $value, $old_value): void
-    {
-        // Override in child class if needed
-    }
-
-    /**
-     * Custom render method for the meta box
-     * Can be overridden by child classes
-     * 
-     * @param \WP_Post $post
-     * @param array $metabox
-     * @return void
-     */
-    public function renderCustomMetaBox($post, $metabox): void
-    {
-        // Override in child class if needed
-    }
-} 
+}
