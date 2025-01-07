@@ -2,8 +2,6 @@
 
 namespace BackTo\Framework\PostMeta\Contracts;
 
-use BackTo\Framework\PostMeta\Contracts\PostMetaInterface;
-
 interface PostMetaStructureInterface
 {
     public function getObjectType(): string;
@@ -49,6 +47,7 @@ interface PostMetaStructureInterface
     public function isShowInRest();
 
     public function dontShowInRest(): PostMetaStructureInterface;
+
     public function showInRest(): PostMetaStructureInterface;
 
     function setShowInRest(bool $showInRest): PostMetaStructureInterface;

@@ -2,7 +2,6 @@
 
 namespace BackTo\Framework\PostMeta\Entity;
 
-use BackTo\Framework\PostMeta\Contracts\PostMetaInterface;
 use BackTo\Framework\PostMeta\Contracts\PostMetaStructureInterface;
 
 class PostMetaStructure implements PostMetaStructureInterface

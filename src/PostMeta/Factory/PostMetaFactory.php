@@ -2,7 +2,6 @@
 
 namespace BackTo\Framework\PostMeta\Factory;
 
-use Exception;
 use BackTo\Framework\PostMeta\Contracts\PostMetaInterface;
 use BackTo\Framework\PostMeta\Entity\PostMeta;
 

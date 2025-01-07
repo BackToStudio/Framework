@@ -3,7 +3,8 @@
 namespace BackTo\Framework\PostMeta;
 
 use BackTo\Framework\Contracts\Hooks;
-use BackTo\Framework\PostType\PostMetaStructureRegistry;
+use function add_action;
+use function register_post_meta;
 
 class RegisterPostMetaStructure implements Hooks {
 
@@ -16,13 +17,13 @@ class RegisterPostMetaStructure implements Hooks {
 
     public function hooks()
     {
-        \add_action('init', [$this, 'registerPostMeta']);
+        add_action('init', [$this, 'registerPostMeta']);
     }
 
     public function registerPostMeta(): void
     {
         foreach ($this->registry->getPostMetaStructures() as $postMetaStructure) {
-            \register_post_meta($postMetaStructure->getObjectType(), $postMetaStructure->getMetaKey(), [
+            register_post_meta($postMetaStructure->getObjectType(), $postMetaStructure->getMetaKey(), [
                 'object_subtype' => $postMetaStructure->getObjectSubtype(),
                 'type' => $postMetaStructure->getType(),
                 'label' => $postMetaStructure->getLabel(),

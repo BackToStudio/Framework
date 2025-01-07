@@ -3,8 +3,10 @@
 namespace BackTo\Framework\PostMeta\Repository;
 
 use BackTo\Framework\PostMeta\Contracts\PostMetaInterface;
-use BackTo\Framework\PostMeta\Entity\PostMeta;
 use BackTo\Framework\PostMeta\Factory\PostMetaFactory;
+use function get_post_meta;
+use function update_post_meta;
+use function delete_post_meta;
 
 class PostMetaRepository
 {
