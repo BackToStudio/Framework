@@ -35,6 +35,7 @@ class {{className}} implements RestRouteInterface
 
     public function getPermissionCallback(): ?callable
     {
+        // TODO: implement permission check — returning null makes this route public.
         return null;
     }
 }

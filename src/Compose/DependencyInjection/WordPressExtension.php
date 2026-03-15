@@ -7,6 +7,15 @@ namespace BackTo\Framework\Compose\DependencyInjection;
 use BackTo\Framework\Admin\Contracts\AdminPageInterface;
 use BackTo\Framework\Compose\Configuration\FrameworkConfiguration;
 use BackTo\Framework\Admin\Contracts\AdminPageRegistrarInterface;
+use BackTo\Framework\Observability\Contracts\ErrorHandlerInterface;
+use BackTo\Framework\Observability\Contracts\HealthCheckInterface;
+use BackTo\Framework\Observability\Contracts\LoggerInterface;
+use BackTo\Framework\Observability\Contracts\PerformanceCollectorInterface;
+use BackTo\Framework\Observability\DependencyInjection\Compiler\RegisterHealthCheckPass;
+use BackTo\Framework\Observability\ErrorHandler;
+use BackTo\Framework\Observability\Infrastructure\NullLogger;
+use BackTo\Framework\Observability\Infrastructure\WordPressLogger;
+use BackTo\Framework\Observability\PerformanceCollector;
 use BackTo\Framework\Admin\DependencyInjection\Compiler\RegisterAdminPagePass;
 use BackTo\Framework\Admin\Infrastructure\WordPressAdminPageRegistrar;
 use BackTo\Framework\Assets\Contracts\FileLocatorInterface;
@@ -78,6 +87,9 @@ class WordPressExtension
 
         $containerBuilder->registerForAutoconfiguration(RestRouteInterface::class)
             ->addTag('wordpress.rest_route');
+
+        $containerBuilder->registerForAutoconfiguration(HealthCheckInterface::class)
+            ->addTag('wordpress.health_check');
     }
 
     /**
@@ -95,6 +107,7 @@ class WordPressExtension
         $containerBuilder->addCompilerPass(new RegisterHookPass());
         $containerBuilder->addCompilerPass(new RegisterAdminPagePass());
         $containerBuilder->addCompilerPass(new RegisterRestRoutePass());
+        $containerBuilder->addCompilerPass(new RegisterHealthCheckPass());
     }
 
     /**
@@ -130,6 +143,16 @@ class WordPressExtension
 
         $containerBuilder->register(RestRouteRegistrarInterface::class, WordPressRestRouteRegistrar::class);
         $containerBuilder->setAlias(WordPressRestRouteRegistrar::class, RestRouteRegistrarInterface::class);
+
+        $containerBuilder->register(LoggerInterface::class, WordPressLogger::class);
+        $containerBuilder->setAlias(WordPressLogger::class, LoggerInterface::class);
+
+        $containerBuilder->register(ErrorHandlerInterface::class, ErrorHandler::class)
+            ->setAutowired(true);
+        $containerBuilder->setAlias(ErrorHandler::class, ErrorHandlerInterface::class);
+
+        $containerBuilder->register(PerformanceCollectorInterface::class, PerformanceCollector::class);
+        $containerBuilder->setAlias(PerformanceCollector::class, PerformanceCollectorInterface::class);
     }
 
     /**

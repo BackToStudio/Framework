@@ -35,6 +35,10 @@ class FrameworkConfiguration
 
             // Assets
             'framework.assets.version_strategy' => 'file',
+
+            // Observability
+            'framework.observability.log_level' => 'error',
+            'framework.observability.performance_tracking' => false,
         ];
     }
 

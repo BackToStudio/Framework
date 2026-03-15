@@ -253,6 +253,11 @@ trait WordPressContainer
                 'namespace' => 'BackTo\\Framework\\RestApi\\',
                 'exclude' => '{DependencyInjection,Tests,Contracts,Infrastructure}',
             ],
+            [
+                'dir' => dirname(__DIR__) . '/Observability',
+                'namespace' => 'BackTo\\Framework\\Observability\\',
+                'exclude' => '{DependencyInjection,Tests,Contracts,Infrastructure,HealthCheck}',
+            ],
         ];
     }
 

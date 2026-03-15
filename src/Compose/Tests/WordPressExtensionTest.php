@@ -14,6 +14,8 @@ use BackTo\Framework\Contracts\BlockInterface;
 use BackTo\Framework\Contracts\BlockStyleInterface;
 use BackTo\Framework\Contracts\HookInterface;
 use BackTo\Framework\Contracts\RegistryInterface;
+use BackTo\Framework\Observability\Contracts\HealthCheckInterface;
+use BackTo\Framework\Observability\DependencyInjection\Compiler\RegisterHealthCheckPass;
 use BackTo\Framework\Hooks\DependencyInjection\Compiler\RegisterHookPass;
 use BackTo\Framework\PostMeta\Contracts\PostMetaStructureInterface;
 use BackTo\Framework\PostMeta\DependencyInjection\Compiler\RegisterPostMetaStructurePass;
@@ -72,6 +74,7 @@ class WordPressExtensionTest extends TestCase
             'Hook' => [HookInterface::class, 'wordpress.hook'],
             'AdminPage' => [AdminPageInterface::class, 'wordpress.admin_page'],
             'RestRoute' => [RestRouteInterface::class, 'wordpress.rest_route'],
+            'HealthCheck' => [HealthCheckInterface::class, 'wordpress.health_check'],
         ];
     }
 
@@ -90,6 +93,7 @@ class WordPressExtensionTest extends TestCase
         $this->assertContains(RegisterHookPass::class, $passClasses);
         $this->assertContains(RegisterAdminPagePass::class, $passClasses);
         $this->assertContains(RegisterRestRoutePass::class, $passClasses);
+        $this->assertContains(RegisterHealthCheckPass::class, $passClasses);
     }
 
     public function testReplacesResolveInstanceofConditionalsPass(): void
@@ -109,7 +113,7 @@ class WordPressExtensionTest extends TestCase
 
         // Autoconfiguration registered
         $autoconfigured = $this->containerBuilder->getAutoconfiguredInstanceof();
-        $this->assertCount(9, $autoconfigured);
+        $this->assertCount(10, $autoconfigured);
 
         // Compiler passes registered
         $passes = $this->containerBuilder->getCompilerPassConfig()->getBeforeOptimizationPasses();

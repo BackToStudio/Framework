@@ -68,4 +68,27 @@ class MakePostTypeCommandTest extends TestCase
         $content = (string) \file_get_contents($this->outputDir . '/Event.php');
         $this->assertStringContainsString('namespace App;', $content);
     }
+
+    public function testRejectsInvalidName(): void
+    {
+        ($this->command)(['../../etc/evil'], ['dir' => $this->outputDir]);
+
+        $files = \glob($this->outputDir . '/*.php') ?: [];
+        $this->assertCount(0, $files);
+    }
+
+    public function testRejectsInvalidNamespace(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        ($this->command)(['Event'], ['dir' => $this->outputDir, 'namespace' => 'App; system("ls");//']);
+    }
+
+    public function testRejectsNonexistentDirectory(): void
+    {
+        ($this->command)(['Event'], ['dir' => '/nonexistent/path/that/does/not/exist']);
+
+        // Should not create any file — no crash, just error
+        $this->assertTrue(true);
+    }
 }

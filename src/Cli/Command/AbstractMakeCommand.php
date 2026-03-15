@@ -24,9 +24,6 @@ abstract class AbstractMakeCommand
 
     abstract protected function getComponentType(): string;
 
-    /**
-     * @param array<string, string> $extraReplacements
-     */
     protected function getTemplate(): string
     {
         $templatePath = \dirname(__DIR__) . '/Generator/Templates/' . $this->getTemplateName() . '.php.tpl';
@@ -50,6 +47,10 @@ abstract class AbstractMakeCommand
         $key = $this->generator->toKey($className);
         $namespace = $assocArgs['namespace'] ?? 'App';
 
+        if (!\preg_match('/^[A-Za-z][A-Za-z0-9\\\\]*$/', $namespace)) {
+            throw new \InvalidArgumentException('Invalid namespace: must be a valid PHP namespace.');
+        }
+
         return [
             '{{namespace}}' => $namespace,
             '{{className}}' => $className,
@@ -71,6 +72,11 @@ abstract class AbstractMakeCommand
             return;
         }
 
+        if (!\preg_match('/^[A-Za-z][A-Za-z0-9_\- ]*$/', $name)) {
+            $this->error('Invalid name: use only letters, numbers, hyphens, underscores, and spaces.');
+            return;
+        }
+
         $replacements = $this->buildReplacements($name, $assocArgs);
         $template = $this->getTemplate();
 
@@ -83,6 +89,14 @@ abstract class AbstractMakeCommand
         $outputDir = $assocArgs['dir'] ?? '.';
         $className = $replacements['{{className}}'];
         $filePath = \rtrim($outputDir, '/') . '/' . $className . '.php';
+
+        $realOutputDir = \realpath($outputDir);
+        if ($realOutputDir === false) {
+            $this->error("Output directory does not exist: {$outputDir}");
+            return;
+        }
+
+        $filePath = $realOutputDir . '/' . $className . '.php';
 
         if (\file_exists($filePath) && !isset($assocArgs['force'])) {
             $this->error("File {$filePath} already exists. Use --force to overwrite.");
