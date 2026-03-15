@@ -89,6 +89,26 @@ When `$debug` is `false`:
 | `%pluginDirectory%` | Project root directory (auto-detected) |
 | `%pluginTextDomain%` | Text domain set via `setTextDomain()` |
 
+### Framework defaults
+
+These parameters are set by `FrameworkConfiguration` and can be overridden in your `config/services.php`:
+
+```php
+$container->parameters()->set('framework.cache.ttl', 7200);
+```
+
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `framework.cache.ttl` | `3600` | Default cache TTL in seconds |
+| `framework.cache.enabled` | `true` | Enable/disable cache |
+| `framework.seo.title_separator` | `\|` | SEO title separator |
+| `framework.seo.robots_default` | `index, follow` | Default robots meta |
+| `framework.rest_api.default_namespace` | `app/v1` | Default REST namespace |
+| `framework.rest_api.default_per_page` | `10` | Default results per page |
+| `framework.assets.version_strategy` | `file` | Asset versioning strategy |
+| `framework.observability.log_level` | `error` | Minimum log level |
+| `framework.observability.performance_tracking` | `false` | Enable performance collection |
+
 ## Binding parameters in services.php
 
 Use `bind()` to inject scalar parameters:
