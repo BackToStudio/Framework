@@ -55,8 +55,8 @@ class SecurityAuditLogRoute implements RestRouteInterface
             $filters['severity'] = $severity;
         }
 
-        $perPage = (int) ($request->get_param('per_page') ?? 50);
-        $page = (int) ($request->get_param('page') ?? 1);
+        $perPage = max(1, min(100, (int) ($request->get_param('per_page') ?? 50)));
+        $page = max(1, (int) ($request->get_param('page') ?? 1));
         $offset = ($page - 1) * $perPage;
 
         $events = $this->repository->getEvents($filters, $perPage, $offset);

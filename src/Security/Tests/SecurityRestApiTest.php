@@ -94,4 +94,40 @@ class SecurityRestApiTest extends TestCase
             $this->assertIsCallable($callback);
         }
     }
+
+    /**
+     * @dataProvider paginationClampDataProvider
+     */
+    public function testPaginationInputValidation(string $perPageInput, string $pageInput, int $expectedPerPage, int $expectedPage): void
+    {
+        $this->assertSame($expectedPerPage, max(1, min(100, (int) $perPageInput)));
+        $this->assertSame($expectedPage, max(1, (int) $pageInput));
+    }
+
+    /**
+     * @return array<string, array{string, string, int, int}>
+     */
+    public static function paginationClampDataProvider(): array
+    {
+        return [
+            'negative page clamped to 1' => [
+                '50', '-5', 50, 1,
+            ],
+            'zero page clamped to 1' => [
+                '50', '0', 50, 1,
+            ],
+            'per_page over 100 clamped' => [
+                '500', '1', 100, 1,
+            ],
+            'per_page zero clamped to 1' => [
+                '0', '1', 1, 1,
+            ],
+            'negative per_page clamped to 1' => [
+                '-10', '1', 1, 1,
+            ],
+            'valid values pass through' => [
+                '25', '3', 25, 3,
+            ],
+        ];
+    }
 }

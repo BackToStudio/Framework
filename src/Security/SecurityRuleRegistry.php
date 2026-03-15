@@ -14,7 +14,13 @@ class SecurityRuleRegistry implements RegistryInterface
 
     public function add(SecurityRuleInterface $rule): self
     {
-        $this->rules[] = $rule;
+        $name = $rule->getName();
+
+        if (isset($this->rules[$name])) {
+            return $this;
+        }
+
+        $this->rules[$name] = $rule;
 
         return $this;
     }
@@ -24,7 +30,17 @@ class SecurityRuleRegistry implements RegistryInterface
      */
     public function getRules(): array
     {
-        return $this->rules;
+        return array_values($this->rules);
+    }
+
+    public function has(string $name): bool
+    {
+        return isset($this->rules[$name]);
+    }
+
+    public function count(): int
+    {
+        return count($this->rules);
     }
 
     /**
@@ -32,9 +48,6 @@ class SecurityRuleRegistry implements RegistryInterface
      */
     public function getActiveRuleNames(): array
     {
-        return array_map(
-            static fn (SecurityRuleInterface $rule): string => $rule->getName(),
-            $this->rules
-        );
+        return array_keys($this->rules);
     }
 }

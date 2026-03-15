@@ -22,6 +22,9 @@ class SecurityHealthCheck implements HealthCheckInterface
         'hide_wordpress_version',
         'login_hardening',
         'upload_security',
+        'capability_hardening',
+        'security_audit_logger',
+        'disable_file_editor',
     ];
 
     public function __construct(SecurityRuleRegistry $ruleRegistry)

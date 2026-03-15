@@ -116,7 +116,7 @@ class SecurityHealthCheckTest extends TestCase
 
         $this->assertArrayHasKey('active_rules', $metadata);
         $this->assertArrayHasKey('active_rules_count', $metadata);
-        $this->assertSame(5, $metadata['active_rules_count']);
+        $this->assertSame(8, $metadata['active_rules_count']);
     }
 
     public function testMetadataContainsPhpVersion(): void
@@ -152,6 +152,9 @@ class SecurityHealthCheckTest extends TestCase
             'hide_wordpress_version',
             'login_hardening',
             'upload_security',
+            'capability_hardening',
+            'security_audit_logger',
+            'disable_file_editor',
         ];
 
         foreach ($criticalNames as $name) {
