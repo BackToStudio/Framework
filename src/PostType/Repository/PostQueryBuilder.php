@@ -61,10 +61,10 @@ class PostQueryBuilder
         return $this;
     }
 
-    public function orderBy(string $field, string $direction = 'DESC'): self
+    public function orderBy(string $field, SortDirection $direction = SortDirection::DESC): self
     {
         $this->args['orderby'] = $field;
-        $this->args['order'] = $direction;
+        $this->args['order'] = $direction->value;
         return $this;
     }
 
@@ -104,7 +104,7 @@ class PostQueryBuilder
         return $this;
     }
 
-    public function whereMeta(string $key, mixed $value, string $compare = '='): self
+    public function whereMeta(string $key, mixed $value, MetaCompare $compare = MetaCompare::EQUAL): self
     {
         if (!isset($this->args['meta_query'])) {
             $this->args['meta_query'] = [];
@@ -113,7 +113,7 @@ class PostQueryBuilder
         $this->args['meta_query'][] = [
             'key' => $key,
             'value' => $value,
-            'compare' => $compare,
+            'compare' => $compare->value,
         ];
 
         return $this;
@@ -127,28 +127,48 @@ class PostQueryBuilder
 
         $this->args['meta_query'][] = [
             'key' => $key,
-            'compare' => 'EXISTS',
+            'compare' => MetaCompare::EXISTS->value,
+        ];
+
+        return $this;
+    }
+
+    public function whereMetaNotExists(string $key): self
+    {
+        if (!isset($this->args['meta_query'])) {
+            $this->args['meta_query'] = [];
+        }
+
+        $this->args['meta_query'][] = [
+            'key' => $key,
+            'compare' => MetaCompare::NOT_EXISTS->value,
         ];
 
         return $this;
     }
 
     /**
-     * @param int|string|array<int, int|string> $terms
+     * @param int[] $termIds
      */
-    public function inTaxonomy(string $taxonomy, int|string|array $terms, string $field = 'term_id'): self
+    public function inTaxonomyByIds(string $taxonomy, array $termIds): self
     {
-        if (!isset($this->args['tax_query'])) {
-            $this->args['tax_query'] = [];
-        }
+        return $this->addTaxQuery($taxonomy, 'term_id', $termIds);
+    }
 
-        $this->args['tax_query'][] = [
-            'taxonomy' => $taxonomy,
-            'field' => $field,
-            'terms' => $terms,
-        ];
+    /**
+     * @param string[] $slugs
+     */
+    public function inTaxonomyBySlugs(string $taxonomy, array $slugs): self
+    {
+        return $this->addTaxQuery($taxonomy, 'slug', $slugs);
+    }
 
-        return $this;
+    /**
+     * @param string[] $names
+     */
+    public function inTaxonomyByNames(string $taxonomy, array $names): self
+    {
+        return $this->addTaxQuery($taxonomy, 'name', $names);
     }
 
     /**
@@ -193,5 +213,23 @@ class PostQueryBuilder
     public function getArgs(): array
     {
         return $this->args;
+    }
+
+    /**
+     * @param int[]|string[] $terms
+     */
+    private function addTaxQuery(string $taxonomy, string $field, array $terms): self
+    {
+        if (!isset($this->args['tax_query'])) {
+            $this->args['tax_query'] = [];
+        }
+
+        $this->args['tax_query'][] = [
+            'taxonomy' => $taxonomy,
+            'field' => $field,
+            'terms' => $terms,
+        ];
+
+        return $this;
     }
 }

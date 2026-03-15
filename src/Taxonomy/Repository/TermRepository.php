@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace BackTo\Framework\Taxonomy\Repository;
 
 use BackTo\Framework\Exception\TermNotFoundException;
+use BackTo\Framework\PostType\Repository\SortDirection;
 use BackTo\Framework\Taxonomy\Contracts\TermInterface;
 use BackTo\Framework\Taxonomy\Factory\TermFactory;
 use WP_Term;
@@ -65,7 +66,7 @@ class TermRepository
     /**
      * @return TermInterface[]
      */
-    public function findBy(string $taxonomy, ?string $orderBy = null, string $order = 'ASC', ?int $limit = null): array
+    public function findBy(string $taxonomy, ?string $orderBy = null, SortDirection $order = SortDirection::ASC, ?int $limit = null): array
     {
         return $this->query()
             ->taxonomy($taxonomy)

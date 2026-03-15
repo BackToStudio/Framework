@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace BackTo\Framework\PostType\Tests;
 
 use BackTo\Framework\PostType\Factory\PostFactory;
+use BackTo\Framework\PostType\Repository\MetaCompare;
 use BackTo\Framework\PostType\Repository\PostQueryBuilder;
+use BackTo\Framework\PostType\Repository\SortDirection;
 use PHPUnit\Framework\TestCase;
 
 class PostQueryBuilderTest extends TestCase
@@ -62,9 +64,16 @@ class PostQueryBuilderTest extends TestCase
     public function testOrderBy(): void
     {
         $qb = $this->createQueryBuilder();
-        $qb->orderBy('title', 'ASC');
+        $qb->orderBy('title', SortDirection::ASC);
         $this->assertSame('title', $qb->getArgs()['orderby']);
         $this->assertSame('ASC', $qb->getArgs()['order']);
+    }
+
+    public function testOrderByDefaultsToDesc(): void
+    {
+        $qb = $this->createQueryBuilder();
+        $qb->orderBy('date');
+        $this->assertSame('DESC', $qb->getArgs()['order']);
     }
 
     public function testAuthor(): void
@@ -112,6 +121,13 @@ class PostQueryBuilderTest extends TestCase
         $this->assertSame('=', $qb->getArgs()['meta_query'][0]['compare']);
     }
 
+    public function testWhereMetaWithCompare(): void
+    {
+        $qb = $this->createQueryBuilder();
+        $qb->whereMeta('price', 100, MetaCompare::GREATER_THAN);
+        $this->assertSame('>', $qb->getArgs()['meta_query'][0]['compare']);
+    }
+
     public function testWhereMetaExists(): void
     {
         $qb = $this->createQueryBuilder();
@@ -119,13 +135,37 @@ class PostQueryBuilderTest extends TestCase
         $this->assertSame('EXISTS', $qb->getArgs()['meta_query'][0]['compare']);
     }
 
-    public function testInTaxonomy(): void
+    public function testWhereMetaNotExists(): void
     {
         $qb = $this->createQueryBuilder();
-        $qb->inTaxonomy('category', [1, 2]);
+        $qb->whereMetaNotExists('deprecated_field');
+        $this->assertSame('NOT EXISTS', $qb->getArgs()['meta_query'][0]['compare']);
+    }
+
+    public function testInTaxonomyByIds(): void
+    {
+        $qb = $this->createQueryBuilder();
+        $qb->inTaxonomyByIds('category', [1, 2]);
         $this->assertCount(1, $qb->getArgs()['tax_query']);
         $this->assertSame('category', $qb->getArgs()['tax_query'][0]['taxonomy']);
+        $this->assertSame('term_id', $qb->getArgs()['tax_query'][0]['field']);
         $this->assertSame([1, 2], $qb->getArgs()['tax_query'][0]['terms']);
+    }
+
+    public function testInTaxonomyBySlugs(): void
+    {
+        $qb = $this->createQueryBuilder();
+        $qb->inTaxonomyBySlugs('category', ['tech', 'science']);
+        $this->assertSame('slug', $qb->getArgs()['tax_query'][0]['field']);
+        $this->assertSame(['tech', 'science'], $qb->getArgs()['tax_query'][0]['terms']);
+    }
+
+    public function testInTaxonomyByNames(): void
+    {
+        $qb = $this->createQueryBuilder();
+        $qb->inTaxonomyByNames('post_tag', ['PHP', 'WordPress']);
+        $this->assertSame('name', $qb->getArgs()['tax_query'][0]['field']);
+        $this->assertSame(['PHP', 'WordPress'], $qb->getArgs()['tax_query'][0]['terms']);
     }
 
     public function testFluentChaining(): void
@@ -135,8 +175,8 @@ class PostQueryBuilderTest extends TestCase
             ->postType('product')
             ->status('publish')
             ->limit(10)
-            ->orderBy('date', 'DESC')
-            ->whereMeta('price', '100', '>');
+            ->orderBy('date', SortDirection::DESC)
+            ->whereMeta('price', '100', MetaCompare::GREATER_THAN);
 
         $this->assertInstanceOf(PostQueryBuilder::class, $result);
         $args = $qb->getArgs();

@@ -7,6 +7,7 @@ namespace BackTo\Framework\PostType\Repository;
 use BackTo\Framework\Exception\PostNotFoundException;
 use BackTo\Framework\PostType\Contracts\PostInterface;
 use BackTo\Framework\PostType\Factory\PostFactory;
+use BackTo\Framework\PostType\Repository\SortDirection;
 
 use function get_post;
 use function get_posts;
@@ -54,7 +55,7 @@ class PostRepository
      * @param array<string, mixed> $criteria
      * @return PostInterface[]
      */
-    public function findBy(array $criteria, ?string $orderBy = null, string $order = 'DESC', ?int $limit = null): array
+    public function findBy(array $criteria, ?string $orderBy = null, SortDirection $order = SortDirection::DESC, ?int $limit = null): array
     {
         return $this->query()
             ->postType($criteria['post_type'] ?? 'post')
@@ -69,7 +70,7 @@ class PostRepository
      */
     public function findOneBy(array $criteria): ?PostInterface
     {
-        $results = $this->findBy($criteria, null, 'DESC', 1);
+        $results = $this->findBy($criteria);
 
         return $results[0] ?? null;
     }

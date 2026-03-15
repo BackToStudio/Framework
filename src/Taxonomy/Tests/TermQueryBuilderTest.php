@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Taxonomy\Tests;
 
+use BackTo\Framework\PostType\Repository\MetaCompare;
+use BackTo\Framework\PostType\Repository\SortDirection;
 use BackTo\Framework\Taxonomy\Factory\TermFactory;
 use BackTo\Framework\Taxonomy\Repository\TermQueryBuilder;
 use PHPUnit\Framework\TestCase;
@@ -54,9 +56,16 @@ class TermQueryBuilderTest extends TestCase
     public function testOrderBy(): void
     {
         $qb = $this->createQueryBuilder();
-        $qb->orderBy('count', 'DESC');
+        $qb->orderBy('count', SortDirection::DESC);
         $this->assertSame('count', $qb->getArgs()['orderby']);
         $this->assertSame('DESC', $qb->getArgs()['order']);
+    }
+
+    public function testOrderByDefaultsToAsc(): void
+    {
+        $qb = $this->createQueryBuilder();
+        $qb->orderBy('name');
+        $this->assertSame('ASC', $qb->getArgs()['order']);
     }
 
     public function testParent(): void
@@ -104,11 +113,18 @@ class TermQueryBuilderTest extends TestCase
     public function testWhereMeta(): void
     {
         $qb = $this->createQueryBuilder();
-        $qb->whereMeta('icon', 'star', 'LIKE');
+        $qb->whereMeta('icon', 'star', MetaCompare::LIKE);
         $this->assertCount(1, $qb->getArgs()['meta_query']);
         $this->assertSame('icon', $qb->getArgs()['meta_query'][0]['key']);
         $this->assertSame('star', $qb->getArgs()['meta_query'][0]['value']);
         $this->assertSame('LIKE', $qb->getArgs()['meta_query'][0]['compare']);
+    }
+
+    public function testWhereMetaExists(): void
+    {
+        $qb = $this->createQueryBuilder();
+        $qb->whereMetaExists('featured');
+        $this->assertSame('EXISTS', $qb->getArgs()['meta_query'][0]['compare']);
     }
 
     public function testFluentChaining(): void
@@ -118,7 +134,7 @@ class TermQueryBuilderTest extends TestCase
             ->taxonomy('product_cat')
             ->hideEmpty()
             ->limit(20)
-            ->orderBy('name', 'ASC');
+            ->orderBy('name', SortDirection::ASC);
 
         $this->assertInstanceOf(TermQueryBuilder::class, $result);
         $args = $qb->getArgs();

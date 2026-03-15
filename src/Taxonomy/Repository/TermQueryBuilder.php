@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Taxonomy\Repository;
 
+use BackTo\Framework\PostType\Repository\MetaCompare;
+use BackTo\Framework\PostType\Repository\SortDirection;
 use BackTo\Framework\Taxonomy\Contracts\TermInterface;
 use BackTo\Framework\Taxonomy\Factory\TermFactory;
 
@@ -54,10 +56,10 @@ class TermQueryBuilder
         return $this;
     }
 
-    public function orderBy(string $field, string $direction = 'ASC'): self
+    public function orderBy(string $field, SortDirection $direction = SortDirection::ASC): self
     {
         $this->args['orderby'] = $field;
-        $this->args['order'] = $direction;
+        $this->args['order'] = $direction->value;
         return $this;
     }
 
@@ -103,7 +105,7 @@ class TermQueryBuilder
         return $this;
     }
 
-    public function whereMeta(string $key, mixed $value, string $compare = '='): self
+    public function whereMeta(string $key, mixed $value, MetaCompare $compare = MetaCompare::EQUAL): self
     {
         if (!isset($this->args['meta_query'])) {
             $this->args['meta_query'] = [];
@@ -112,7 +114,21 @@ class TermQueryBuilder
         $this->args['meta_query'][] = [
             'key' => $key,
             'value' => $value,
-            'compare' => $compare,
+            'compare' => $compare->value,
+        ];
+
+        return $this;
+    }
+
+    public function whereMetaExists(string $key): self
+    {
+        if (!isset($this->args['meta_query'])) {
+            $this->args['meta_query'] = [];
+        }
+
+        $this->args['meta_query'][] = [
+            'key' => $key,
+            'compare' => MetaCompare::EXISTS->value,
         ];
 
         return $this;
