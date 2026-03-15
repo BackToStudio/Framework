@@ -32,7 +32,7 @@ class LoadThemeTextDomain implements Hooks
         $this->textDomain = $themeTextDomain;
     }
 
-    public function hooks()
+    public function hooks(): void
     {
         add_action('after_setup_theme', [$this, 'loadTranslations']);
     }

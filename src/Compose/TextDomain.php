@@ -21,7 +21,7 @@ trait TextDomain
     /**
      * @param string $textDomain
      */
-	public function setTextDomain(string $textDomain)
+	public function setTextDomain(string $textDomain): self
 	{
 		$this->textDomain = $textDomain;
 

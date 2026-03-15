@@ -31,7 +31,7 @@ class RegisterPostType implements Hooks, ActivationHooks
         \flush_rewrite_rules();
     }
 
-    public function hooks()
+    public function hooks(): void
     {
         \add_action('init', [$this, 'registerCustomPostTypes']);
         \add_action('registered_post_type', 'flush_rewrite_rules');

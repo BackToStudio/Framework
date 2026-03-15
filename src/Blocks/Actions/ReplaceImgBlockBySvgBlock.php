@@ -17,7 +17,7 @@ class ReplaceImgBlockBySvgBlock implements Hooks
         $this->replaceImgTagBySvgTag = $replaceImgTagBySvgTag;
     }
 
-    public function hooks()
+    public function hooks(): void
     {
         add_action('render_block_core/image', [$this, 'replaceImgTag']);
     }

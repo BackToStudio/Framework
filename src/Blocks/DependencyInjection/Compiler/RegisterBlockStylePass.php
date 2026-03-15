@@ -9,7 +9,7 @@ use BackToVendor\Symfony\Component\DependencyInjection\Reference;
 
 class RegisterBlockStylePass implements CompilerPassInterface
 {
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         if (!$container->hasDefinition(BlockStyleRegistry::class)) {
             return;

@@ -15,7 +15,7 @@ class RegisterPostMetaStructure implements Hooks {
         $this->registry = $postMetaStructureRegistry;
     }
 
-    public function hooks()
+    public function hooks(): void
     {
         add_action('init', [$this, 'registerPostMeta']);
     }

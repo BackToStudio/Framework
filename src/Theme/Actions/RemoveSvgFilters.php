@@ -9,7 +9,7 @@ use function remove_action;
 class RemoveSvgFilters implements Hooks
 {
 
-    public function hooks()
+    public function hooks(): void
     {
         remove_action('wp_body_open', 'wp_global_styles_render_svg_filters');
         remove_action('wp_body_open', 'gutenberg_global_styles_render_svg_filters');

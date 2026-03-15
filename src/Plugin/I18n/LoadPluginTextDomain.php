@@ -29,7 +29,7 @@ class LoadPluginTextDomain implements Hooks
         $this->pluginTextDomain = $pluginTextDomain;
     }
 
-    public function hooks()
+    public function hooks(): void
     {
         \add_action('init', [$this, 'loadTranslations']);
     }

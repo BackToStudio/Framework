@@ -24,7 +24,7 @@ class RegisterTaxonomy implements Hooks
         $this->factory = $taxonomyFactory;
     }
 
-    public function hooks()
+    public function hooks(): void
     {
         \add_action('init', [$this, 'registerTaxonomy']);
         \add_action('registered_taxonomy', 'flush_rewrite_rules');

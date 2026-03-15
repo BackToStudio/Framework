@@ -37,14 +37,14 @@ class HookRegistry implements RegistryInterface
         return $this;
     }
 
-    public function addHook(HookInterface $hook)
+    public function addHook(HookInterface $hook): self
     {
         $this->hooks[] = $hook;
 
         return $this;
     }
 
-    public function runHooks()
+    public function runHooks(): void
     {
         foreach ($this->getHooks() as $action) {
             if ($action instanceof Hooks) {

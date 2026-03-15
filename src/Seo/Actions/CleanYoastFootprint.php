@@ -9,7 +9,7 @@ use BackTo\Framework\Contracts\Hooks;
  */
 class CleanYoastFootprint implements Hooks
 {
-    public function hooks()
+    public function hooks(): void
     {
         \add_filter('wpseo_debug_markers', '__return_false');
         \add_filter('wpseo_hide_version', '__return_true');

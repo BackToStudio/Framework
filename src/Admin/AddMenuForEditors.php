@@ -12,7 +12,7 @@ use function remove_submenu_page;
 
 class AddMenuForEditors implements AdminHooks {
 
-	public function hooks() {
+	public function hooks(): void {
 		add_action( 'admin_head', [ $this, 'displayAppearanceMenu'] );
 		add_action( 'admin_bar_menu', [ $this, 'removeCustomizer'], 999 );
 	}

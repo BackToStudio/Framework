@@ -17,11 +17,15 @@ class AddSocialLinksToTimberContext implements Hooks
         $this->seoManager = $seoManager;
     }
 
-    public function hooks()
+    public function hooks(): void
     {
         \add_filter('timber/context', [$this, 'addSocialLinks']);
     }
 
+    /**
+     * @param array<string, mixed> $context
+     * @return array<string, mixed>
+     */
     public function addSocialLinks(array $context): array
     {
         if (!$this->seoManager->hasProvider()) {

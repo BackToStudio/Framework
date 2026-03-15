@@ -9,7 +9,7 @@ use function add_menu_page;
 
 class AddReusableBlockMenu implements AdminHooks {
 
-	public function hooks() {
+	public function hooks(): void {
 		add_action( 'admin_menu', [ $this, 'addReusableBlockMenu'] );
 	}
 

@@ -10,7 +10,7 @@ use function add_filter;
 class RemoveWordPressVersion implements Hooks
 {
 
-    public function hooks()
+    public function hooks(): void
     {
         // Remove WordPress version.
         remove_action('wp_head', 'wp_generator');

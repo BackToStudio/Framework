@@ -284,7 +284,7 @@ trait WordPressContainer
      * @param ContainerBuilder $containerBuilder
      * @throws Exception
      */
-    protected function loadServices(ContainerBuilder $containerBuilder)
+    protected function loadServices(ContainerBuilder $containerBuilder): void
     {
         $configBuilderGenerator = ConfigBuilderGenerator::class ? new ConfigBuilderGenerator(
             $this->getBuildDir()

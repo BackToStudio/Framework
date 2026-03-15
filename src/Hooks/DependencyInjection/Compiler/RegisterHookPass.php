@@ -9,7 +9,7 @@ use BackToVendor\Symfony\Component\DependencyInjection\Reference;
 
 class RegisterHookPass implements CompilerPassInterface
 {
-	public function process(ContainerBuilder $container)
+	public function process(ContainerBuilder $container): void
 	{
 		if ( ! $container->hasDefinition( HookRegistry::class ) ) {
 			return;

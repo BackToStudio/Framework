@@ -9,7 +9,7 @@ use function add_filter;
 class RemoveNavigationFallback implements Hooks
 {
 
-    public function hooks()
+    public function hooks(): void
     {
         add_filter('block_core_navigation_render_fallback', '__return_false');
     }

@@ -9,7 +9,7 @@ use function remove_action;
 class CleanHead implements Hooks
 {
 
-    public function hooks()
+    public function hooks(): void
     {
         // Remove the links to the extra feeds such as category feeds
         remove_action('wp_head', 'feed_links_extra', 3);

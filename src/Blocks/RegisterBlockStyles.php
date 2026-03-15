@@ -14,7 +14,7 @@ class RegisterBlockStyles implements Hooks
         $this->registry = $registry;
     }
 
-    public function hooks()
+    public function hooks(): void
     {
         add_action('after_setup_theme', [$this, 'registerCustomBlockStyles']);
     }

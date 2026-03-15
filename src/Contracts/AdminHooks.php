@@ -7,5 +7,5 @@ interface AdminHooks extends HookInterface
     /**
      * Run admin hooks
      */
-    public function hooks();
+    public function hooks(): void;
 }
