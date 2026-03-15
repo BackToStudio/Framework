@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BackTo\Framework\Taxonomy;
 
 use BackTo\Framework\Contracts\RegistryInterface;
@@ -7,20 +9,12 @@ use BackTo\Framework\Taxonomy\Contracts\TaxonomyInterface;
 
 class TaxonomyRegistry implements RegistryInterface
 {
+    /** @var TaxonomyInterface[] */
+    private array $taxonomies = [];
 
-    /**
-     * @var TaxonomyInterface[]
-     */
-    private $taxonomies = [];
-
-    /**
-     * @param TaxonomyInterface $postType
-     *
-     * @return TaxonomyRegistry
-     */
-    public function add(TaxonomyInterface $postType): TaxonomyRegistry
+    public function add(TaxonomyInterface $taxonomy): self
     {
-        $this->taxonomies[] = $postType;
+        $this->taxonomies[] = $taxonomy;
 
         return $this;
     }

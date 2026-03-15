@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BackTo\Framework\PostMeta\Factory;
 
 use BackTo\Framework\PostMeta\Entity\PostMetaStructure;

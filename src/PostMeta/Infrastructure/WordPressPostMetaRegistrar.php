@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BackTo\Framework\PostMeta\Infrastructure;
 
 use BackTo\Framework\PostMeta\Contracts\PostMetaRegistrarInterface;

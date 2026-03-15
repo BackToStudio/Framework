@@ -1,19 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BackTo\Framework\PostType\Repository;
 
+use BackTo\Framework\Exception\PostNotFoundException;
 use BackTo\Framework\PostType\Contracts\PostInterface;
 use BackTo\Framework\PostType\Factory\PostFactory;
 
 use function get_post;
+use function get_posts;
 
 class PostRepository
 {
-
-    /**
-     * @var PostFactory
-     */
-    protected $factory;
+    protected PostFactory $factory;
 
     public function __construct(PostFactory $factory)
     {
@@ -23,27 +23,30 @@ class PostRepository
     /**
      * Retrieves post data given a post ID.
      *
-     * @param int $id
-     * @return PostInterface
+     * @throws PostNotFoundException
      */
     public function find(int $id): PostInterface
     {
         $wpPost = get_post($id);
+
+        if ($wpPost === null) {
+            throw PostNotFoundException::withId($id);
+        }
+
         return $this->factory->create($wpPost);
     }
 
     /**
-     * @param $args
-     *
+     * @param array<string, mixed> $args
      * @return PostInterface[]
      */
-    public function findAll($args = []): array
+    public function findAll(array $args = []): array
     {
         $defaultArgs = [
-            'numberposts' => -1
+            'numberposts' => -1,
         ];
         $wpPosts = get_posts(array_merge($defaultArgs, $args));
+
         return $this->factory->createFromPosts($wpPosts);
     }
-
 }

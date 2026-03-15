@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BackTo\Framework\Compose\DependencyInjection;
 
 use BackTo\Framework\Assets\Contracts\FileLocatorInterface;

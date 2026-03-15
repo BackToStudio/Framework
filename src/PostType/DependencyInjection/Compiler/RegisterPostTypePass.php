@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BackTo\Framework\PostType\DependencyInjection\Compiler;
 
 use BackTo\Framework\PostType\PostTypeRegistry;

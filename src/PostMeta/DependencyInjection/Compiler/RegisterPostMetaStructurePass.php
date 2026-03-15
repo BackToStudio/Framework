@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BackTo\Framework\PostMeta\DependencyInjection\Compiler;
 
 use BackTo\Framework\PostMeta\PostMetaStructureRegistry;

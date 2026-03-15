@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BackTo\Framework\Taxonomy\Entity;
 
 use BackTo\Framework\Compose\HasId;
@@ -9,25 +11,13 @@ use BackTo\Framework\Taxonomy\Contracts\TermInterface;
 
 class Term implements TermInterface
 {
-
     use HasId;
     use HasSlug;
     use HasParentId;
 
-    /**
-     * @var string
-     */
-    protected $name = '';
-
-    /**
-     * @var string
-     */
-    protected $description = '';
-
-    /**
-     * @var string
-     */
-    protected $taxonomy = '';
+    protected string $name = '';
+    protected string $description = '';
+    protected string $taxonomy = '';
 
     public function getName(): string
     {

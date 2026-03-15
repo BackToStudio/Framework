@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BackTo\Framework\Cache\Tests;
 
 use BackTo\Framework\Cache\Contracts\CacheInterface;

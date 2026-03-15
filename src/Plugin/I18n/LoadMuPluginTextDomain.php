@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BackTo\Framework\Plugin\I18n;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;

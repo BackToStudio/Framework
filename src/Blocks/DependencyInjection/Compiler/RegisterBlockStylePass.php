@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BackTo\Framework\Blocks\DependencyInjection\Compiler;
 
 use BackTo\Framework\Blocks\BlockStyleRegistry;

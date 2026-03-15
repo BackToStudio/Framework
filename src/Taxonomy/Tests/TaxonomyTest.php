@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BackTo\Framework\Taxonomy\Tests;
 
 use BackTo\Framework\Taxonomy\Entity\Taxonomy;
@@ -11,7 +13,7 @@ class TaxonomyTest extends TestCase
     public function testKey()
     {
         $taxonomy = new Taxonomy();
-        $this->assertNull($taxonomy->getKey());
+        $this->assertSame('', $taxonomy->getKey());
         $taxonomy->setKey('abcde');
         $this->assertSame('abcde', $taxonomy->getKey());
     }

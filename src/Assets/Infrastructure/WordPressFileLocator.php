@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BackTo\Framework\Assets\Infrastructure;
 
 use BackTo\Framework\Assets\Contracts\FileLocatorInterface;

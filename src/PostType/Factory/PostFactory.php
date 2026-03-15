@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BackTo\Framework\PostType\Factory;
 
 use BackTo\Framework\PostType\Contracts\PostInterface;

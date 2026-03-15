@@ -1,15 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BackTo\Framework\PostMeta\Entity;
 
 use BackTo\Framework\Compose\Type;
 
-abstract class PostMetaType
+/**
+ * @deprecated Use BackTo\Framework\Compose\Type enum directly.
+ */
+class PostMetaType
 {
-    const STRING = Type::STRING;
-    const BOOLEAN = Type::BOOLEAN;
-    const INTEGER = Type::INTEGER;
-    const NUMBER = Type::NUMBER;
-    const ARRAY = Type::ARRAY;
-    const OBJECT = Type::OBJECT;
+    public const STRING = 'string';
+    public const BOOLEAN = 'boolean';
+    public const INTEGER = 'integer';
+    public const NUMBER = 'number';
+    public const ARRAY = 'array';
+    public const OBJECT = 'object';
 }

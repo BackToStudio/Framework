@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BackTo\Framework\Blocks;
 
 use BackTo\Framework\Contracts\BlockInterface;
@@ -7,18 +9,10 @@ use BackTo\Framework\Contracts\RegistryInterface;
 
 class BlockRegistry implements RegistryInterface
 {
+    /** @var BlockInterface[] */
+    private array $blocks = [];
 
-    /**
-     * @var BlockInterface[]
-     */
-    private $blocks = [];
-
-    /**
-     * @param BlockInterface $block
-     *
-     * @return BlockRegistry
-     */
-    public function add(BlockInterface $block): BlockRegistry
+    public function add(BlockInterface $block): self
     {
         $this->blocks[] = $block;
 

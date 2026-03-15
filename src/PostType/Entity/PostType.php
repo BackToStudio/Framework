@@ -1,35 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BackTo\Framework\PostType\Entity;
 
 use BackTo\Framework\PostType\Contracts\PostTypeInterface;
 
 class PostType implements PostTypeInterface
 {
+    private string $key = '';
 
-    /**
-     * @var string
-     */
-    private $key;
+    /** @var array<string, mixed> */
+    private array $args = [];
 
-    /**
-     * @var array
-     */
-    private $args = [];
-
-    /**
-     * @return string
-     */
-    public function getKey(): ?string
+    public function getKey(): string
     {
         return $this->key;
     }
 
-    /**
-     * @param string $key
-     *
-     * @return PostType
-     */
     public function setKey(string $key): PostTypeInterface
     {
         $this->key = $key;
@@ -38,7 +26,7 @@ class PostType implements PostTypeInterface
     }
 
     /**
-     * @return array
+     * @return array<string, mixed>
      */
     public function getArgs(): array
     {
@@ -46,9 +34,7 @@ class PostType implements PostTypeInterface
     }
 
     /**
-     * @param array $args
-     *
-     * @return PostType
+     * @param array<string, mixed> $args
      */
     public function setArgs(array $args): PostTypeInterface
     {

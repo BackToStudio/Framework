@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BackTo\Framework\Blocks;
 
 use BackTo\Framework\Contracts\BlockStyleInterface;
@@ -7,18 +9,10 @@ use BackTo\Framework\Contracts\RegistryInterface;
 
 class BlockStyleRegistry implements RegistryInterface
 {
+    /** @var BlockStyleInterface[] */
+    private array $blockStyles = [];
 
-    /**
-     * @var BlockStyleInterface[]
-     */
-    private $blockStyles = [];
-
-    /**
-     * @param BlockStyleInterface $blockStyle
-     *
-     * @return BlockStyleRegistry
-     */
-    public function add(BlockStyleInterface $blockStyle): BlockStyleRegistry
+    public function add(BlockStyleInterface $blockStyle): self
     {
         $this->blockStyles[] = $blockStyle;
 

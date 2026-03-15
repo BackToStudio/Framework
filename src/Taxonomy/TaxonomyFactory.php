@@ -1,38 +1,36 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BackTo\Framework\Taxonomy;
 
-use Exception;
+use BackTo\Framework\Exception\InvalidTaxonomyException;
 use BackTo\Framework\Taxonomy\Contracts\TaxonomyInterface;
 use BackTo\Framework\Taxonomy\Entity\Taxonomy;
 
 class TaxonomyFactory
 {
     /**
-     * @param string $key
      * @param string[] $postTypes
-     * @param array $args
+     * @param array<string, mixed> $args
      *
-     * @return Taxonomy
-     * @throws Exception
+     * @throws InvalidTaxonomyException
      */
     public function createTaxonomy(string $key, array $postTypes, array $args): TaxonomyInterface
     {
         if (empty($key)) {
-            throw new Exception(
-                'WordPress required taxonomy name. (max. 20 characters, cannot contain capital letters, underscores or spaces)'
-            );
+            throw InvalidTaxonomyException::emptyKey();
         }
 
         $args = $this->prepareDefaultArgs($args);
 
-        // Add arbitrary labels if no exists.
+        // Add arbitrary labels if none exist.
         $args = $this->addArgIfNotExist(
             $args,
             'labels',
             [
-                'name' => $this->getPluralName($key),
-                'singular_name' => $this->getSingularName($key),
+                'name' => $key,
+                'singular_name' => $key,
             ]
         );
 
@@ -46,9 +44,8 @@ class TaxonomyFactory
     }
 
     /**
-     * @param array $args
-     *
-     * @return array
+     * @param array<string, mixed> $args
+     * @return array<string, mixed>
      */
     private function prepareDefaultArgs(array $args): array
     {
@@ -61,30 +58,15 @@ class TaxonomyFactory
     }
 
     /**
-     * @param array $args
-     * @param string $key
-     * @param $value
-     *
-     * @return array
+     * @param array<string, mixed> $args
+     * @return array<string, mixed>
      */
-    private function addArgIfNotExist(array $args, string $key, $value): array
+    private function addArgIfNotExist(array $args, string $key, mixed $value): array
     {
         if (!\array_key_exists($key, $args)) {
             $args[$key] = $value;
         }
 
         return $args;
-    }
-
-    public function getSingularName(string $key): string
-    {
-        $name = str_replace('-', ' ', $key);
-        $name = str_replace('_', ' ', $name);
-        return ucwords($name);
-    }
-
-    public function getPluralName(string $key): string
-    {
-        return $this->getSingularName($key) . 's';
     }
 }
