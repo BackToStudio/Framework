@@ -22,6 +22,7 @@ use BackTo\Framework\Security\Contracts\LoginLocationRepositoryInterface;
 use BackTo\Framework\Security\Contracts\LoginThrottleInterface;
 use BackTo\Framework\Security\Contracts\NonceManagerInterface;
 use BackTo\Framework\Security\Contracts\OutputEscaperInterface;
+use BackTo\Framework\Security\Contracts\RateLimiterRepositoryInterface;
 use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
 use BackTo\Framework\Security\Contracts\SubresourceIntegrityInterface;
 use BackTo\Framework\Security\ContentSecurityPolicyManager;
@@ -32,6 +33,7 @@ use BackTo\Framework\Security\SubresourceIntegrity;
 use BackTo\Framework\Security\Infrastructure\WordPressAuditLogRepository;
 use BackTo\Framework\Security\Infrastructure\WordPressFileIntegrityRepository;
 use BackTo\Framework\Security\Infrastructure\WordPressInputSanitizer;
+use BackTo\Framework\Security\Infrastructure\WordPressRateLimiterRepository;
 use BackTo\Framework\Security\Infrastructure\WordPressLoginLocationRepository;
 use BackTo\Framework\Security\Infrastructure\WordPressLoginThrottle;
 use BackTo\Framework\Security\Infrastructure\WordPressNonceManager;
@@ -233,6 +235,9 @@ class WordPressExtension
         $containerBuilder->register(IPAccessControlInterface::class, IPAccessControl::class)
             ->setAutowired(true);
         $containerBuilder->setAlias(IPAccessControl::class, IPAccessControlInterface::class);
+
+        $containerBuilder->register(RateLimiterRepositoryInterface::class, WordPressRateLimiterRepository::class);
+        $containerBuilder->setAlias(WordPressRateLimiterRepository::class, RateLimiterRepositoryInterface::class);
     }
 
     /**
