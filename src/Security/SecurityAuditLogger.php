@@ -18,6 +18,14 @@ use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
  * - Critical option updates
  * - Plugin/theme activations and deactivations
  * - User creation/deletion
+ *
+ * Hook priorities:
+ * - wp_login (10): Standard priority
+ * - wp_login_failed (10): Standard priority
+ * - set_user_role (10): After CapabilityHardening (5), before SecurityNotifier (15)
+ * - updated_option (10): Standard priority
+ * - activated_plugin / deactivated_plugin (10): Standard priority
+ * - switch_theme / user_register / delete_user (10): Standard priority
  */
 class SecurityAuditLogger implements Hooks, SecurityRuleInterface
 {

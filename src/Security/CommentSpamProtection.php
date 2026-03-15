@@ -20,6 +20,7 @@ use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
 class CommentSpamProtection implements Hooks, SecurityRuleInterface
 {
     use ClientIpTrait;
+    use HtmlEscapeTrait;
 
     private HookDispatcherInterface $hookDispatcher;
     private LoggerInterface $logger;
@@ -197,8 +198,4 @@ class CommentSpamProtection implements Hooks, SecurityRuleInterface
         wp_die($message, 'Comment Blocked', ['response' => 403, 'back_link' => true]);
     }
 
-    protected function escapeAttr(string $value): string
-    {
-        return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
-    }
 }

@@ -19,6 +19,11 @@ use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
  * - Malware detected in uploads
  * - Critical option changes (admin_email, siteurl, default_role)
  * - New administrator created
+ *
+ * Hook priorities:
+ * - backto_security_event (10): Standard priority for custom event hook
+ * - set_user_role (15): After CapabilityHardening (5) and SecurityAuditLogger (10)
+ * - wp_login_failed (10): Standard priority for login failure counting
  */
 class SecurityNotifier implements Hooks, SecurityRuleInterface, SecurityNotifierInterface
 {

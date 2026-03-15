@@ -12,9 +12,14 @@ use BackTo\Framework\Security\Contracts\AuditLogRepositoryInterface;
  */
 class AuditLogAdminPage implements AdminPageInterface
 {
+    use HtmlEscapeTrait;
+
+    private const DEFAULT_PER_PAGE = 50;
+    private const MENU_POSITION = 81;
+
     private AuditLogRepositoryInterface $repository;
 
-    private int $perPage = 50;
+    private int $perPage = self::DEFAULT_PER_PAGE;
 
     public function __construct(AuditLogRepositoryInterface $repository)
     {
@@ -48,7 +53,7 @@ class AuditLogAdminPage implements AdminPageInterface
 
     public function getPosition(): ?int
     {
-        return 81;
+        return self::MENU_POSITION;
     }
 
     public function render(): void
@@ -355,13 +360,4 @@ class AuditLogAdminPage implements AdminPageInterface
         }
     }
 
-    protected function escapeAttr(string $value): string
-    {
-        return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
-    }
-
-    protected function escapeHtml(string $value): string
-    {
-        return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
-    }
 }

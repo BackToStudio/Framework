@@ -22,8 +22,11 @@ class RestApiRateLimiter implements Hooks, SecurityRuleInterface
     private HookDispatcherInterface $hookDispatcher;
     private RateLimiterRepositoryInterface $repository;
 
-    private int $defaultLimit = 60;
-    private int $defaultWindow = 60;
+    private const DEFAULT_RATE_LIMIT = 60;
+    private const DEFAULT_RATE_WINDOW = 60;
+
+    private int $defaultLimit = self::DEFAULT_RATE_LIMIT;
+    private int $defaultWindow = self::DEFAULT_RATE_WINDOW;
 
     /** @var array<string, array{limit: int, window: int}> route pattern => config */
     private array $routeLimits = [];

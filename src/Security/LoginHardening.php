@@ -10,6 +10,15 @@ use BackTo\Framework\Observability\Contracts\LoggerInterface;
 use BackTo\Framework\Security\Contracts\LoginThrottleInterface;
 use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
 
+/**
+ * Hardens the WordPress login flow with throttling and generic error messages.
+ *
+ * Hook priorities:
+ * - authenticate (30): After WordPress core auth (20), before TwoFactorAuthentication (40)
+ * - login_errors (10): Standard priority for error message replacement
+ * - wp_login_failed (10): Standard priority for recording failures
+ * - wp_login (10): Standard priority for recording successes
+ */
 class LoginHardening implements Hooks, SecurityRuleInterface
 {
     use ClientIpTrait;

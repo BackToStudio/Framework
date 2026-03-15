@@ -17,6 +17,10 @@ use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
  * - Logins from previously unseen countries
  * - Logins from new IP addresses
  * - Rapid login location changes (impossible travel)
+ *
+ * Hook priorities:
+ * - wp_login (20): After SecurityAuditLogger (10) and LoginHardening (10),
+ *   ensures anomaly detection runs after login recording is complete
  */
 class LoginAnomalyDetector implements Hooks, SecurityRuleInterface
 {

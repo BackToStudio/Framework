@@ -105,7 +105,7 @@ class RestApiSecurity implements Hooks, SecurityRuleInterface
         }
 
         foreach ($this->getPublicRoutePatterns() as $pattern) {
-            if (preg_match($pattern, $restRoute)) {
+            if (preg_match($pattern, $restRoute) === 1) {
                 return true;
             }
         }

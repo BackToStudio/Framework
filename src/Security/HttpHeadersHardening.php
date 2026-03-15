@@ -8,6 +8,15 @@ use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
 use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
 
+/**
+ * Sends security hardening HTTP headers.
+ *
+ * Hook priorities:
+ * - send_headers (10): Standard priority for page requests
+ * - rest_api_init (10): Ensures headers are also sent for REST API requests
+ *
+ * Note: sendSecurityHeaders() guards against double-sending via headers_sent().
+ */
 class HttpHeadersHardening implements Hooks, SecurityRuleInterface
 {
     private HookDispatcherInterface $hookDispatcher;

@@ -41,15 +41,6 @@ class HideWordPressVersion implements Hooks, SecurityRuleInterface
             return $src;
         }
 
-        $parsed = parse_url($src);
-
-        if (!isset($parsed['query'])) {
-            return $src;
-        }
-
-        parse_str($parsed['query'], $params);
-        unset($params['ver']);
-
         $questionMarkPos = strpos($src, '?');
 
         if ($questionMarkPos === false) {
@@ -57,6 +48,10 @@ class HideWordPressVersion implements Hooks, SecurityRuleInterface
         }
 
         $base = substr($src, 0, $questionMarkPos);
+        $query = substr($src, $questionMarkPos + 1);
+
+        parse_str($query, $params);
+        unset($params['ver']);
 
         if ($params === []) {
             return $base;

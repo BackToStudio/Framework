@@ -122,11 +122,15 @@ class IPAccessControl implements Hooks, SecurityRuleInterface, IPAccessControlIn
         [$subnet, $bits] = explode('/', $cidr, 2);
         $bits = (int) $bits;
 
-        // Detect IPv6
         if (str_contains($ip, ':') || str_contains($subnet, ':')) {
             return $this->matchesIpv6Cidr($ip, $subnet, $bits);
         }
 
+        return $this->matchesIpv4Cidr($ip, $subnet, $bits);
+    }
+
+    private function matchesIpv4Cidr(string $ip, string $subnet, int $bits): bool
+    {
         if ($bits < 0 || $bits > 32) {
             return false;
         }

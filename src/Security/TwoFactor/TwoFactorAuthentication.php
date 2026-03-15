@@ -17,6 +17,9 @@ use BackTo\Framework\Security\TwoFactor\Contracts\TwoFactorRepositoryInterface;
  *
  * Intercepts the WordPress login flow to require a TOTP code
  * when 2FA is enabled for a user. Falls back to backup codes.
+ *
+ * Hook priorities:
+ * - authenticate (40): After WordPress core auth (20) and LoginHardening throttle (30)
  */
 class TwoFactorAuthentication implements Hooks, SecurityRuleInterface
 {

@@ -54,15 +54,15 @@ class PasswordPolicy implements Hooks, SecurityRuleInterface
             $errors[] = sprintf('Password must be at least %d characters long.', $this->minLength);
         }
 
-        if ($this->requireUppercase && !preg_match('/[A-Z]/', $password)) {
+        if ($this->requireUppercase && preg_match('/[A-Z]/', $password) !== 1) {
             $errors[] = 'Password must contain at least one uppercase letter.';
         }
 
-        if ($this->requireNumber && !preg_match('/[0-9]/', $password)) {
+        if ($this->requireNumber && preg_match('/[0-9]/', $password) !== 1) {
             $errors[] = 'Password must contain at least one number.';
         }
 
-        if ($this->requireSpecialChar && !preg_match('/[^a-zA-Z0-9]/', $password)) {
+        if ($this->requireSpecialChar && preg_match('/[^a-zA-Z0-9]/', $password) !== 1) {
             $errors[] = 'Password must contain at least one special character.';
         }
 
@@ -76,7 +76,11 @@ class PasswordPolicy implements Hooks, SecurityRuleInterface
      */
     public function validatePassword(mixed $errors, bool $update, mixed $user): void
     {
-        if (!isset($user->user_pass)) {
+        if (!is_object($user) || !isset($user->user_pass)) {
+            return;
+        }
+
+        if (!is_object($errors) || !method_exists($errors, 'add')) {
             return;
         }
 
@@ -93,9 +97,13 @@ class PasswordPolicy implements Hooks, SecurityRuleInterface
      */
     public function validateRegistrationPassword(mixed $errors, string $sanitizedLogin, string $userEmail): mixed
     {
+        if (!is_object($errors) || !method_exists($errors, 'add')) {
+            return $errors;
+        }
+
         $password = $_POST['pass1'] ?? '';
 
-        if ($password === '') {
+        if (!is_string($password) || $password === '') {
             return $errors;
         }
 

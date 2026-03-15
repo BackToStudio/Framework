@@ -14,6 +14,10 @@ use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
  *
  * WordPress is permissive by default on CORS. This rule provides explicit
  * control over Access-Control-Allow-Origin, Methods, Headers, Credentials, and Max-Age.
+ *
+ * Hook priorities:
+ * - rest_api_init (5): Early handling to intercept preflight before other REST hooks
+ * - rest_pre_serve_request (10): Standard priority for adding CORS headers to responses
  */
 class CorsManager implements Hooks, SecurityRuleInterface, CorsManagerInterface
 {
@@ -28,9 +32,11 @@ class CorsManager implements Hooks, SecurityRuleInterface, CorsManagerInterface
     /** @var string[] */
     private array $allowedHeaders = ['Content-Type', 'Authorization', 'X-WP-Nonce'];
 
+    private const DEFAULT_MAX_AGE = 86400;
+
     private bool $allowCredentials = false;
 
-    private int $maxAge = 86400;
+    private int $maxAge = self::DEFAULT_MAX_AGE;
 
     public function __construct(HookDispatcherInterface $hookDispatcher)
     {
