@@ -1,0 +1,321 @@
+<?php
+
+declare(strict_types=1);
+
+namespace BackTo\Framework\Security;
+
+use BackTo\Framework\Admin\Contracts\AdminPageInterface;
+use BackTo\Framework\Security\Contracts\AuditLogRepositoryInterface;
+
+/**
+ * Admin page for viewing, filtering, and exporting the security audit log.
+ */
+class AuditLogAdminPage implements AdminPageInterface
+{
+    private AuditLogRepositoryInterface $repository;
+
+    private int $perPage = 50;
+
+    public function __construct(AuditLogRepositoryInterface $repository)
+    {
+        $this->repository = $repository;
+    }
+
+    public function getPageTitle(): string
+    {
+        return 'Security Audit Log';
+    }
+
+    public function getMenuTitle(): string
+    {
+        return 'Audit Log';
+    }
+
+    public function getCapability(): string
+    {
+        return 'manage_options';
+    }
+
+    public function getMenuSlug(): string
+    {
+        return 'backto-audit-log';
+    }
+
+    public function getIconUrl(): string
+    {
+        return 'dashicons-shield';
+    }
+
+    public function getPosition(): ?int
+    {
+        return 81;
+    }
+
+    public function render(): void
+    {
+        $currentPage = $this->getCurrentPage();
+        $filters = $this->getFiltersFromRequest();
+        $offset = ($currentPage - 1) * $this->perPage;
+
+        if ($this->isExportRequest()) {
+            $this->exportCsv($filters);
+
+            return;
+        }
+
+        if ($this->isPurgeRequest()) {
+            $days = $this->getPurgeDays();
+            $purged = $this->repository->purge($days);
+            $this->renderNotice('Purged ' . $purged . ' events older than ' . $days . ' days.');
+        }
+
+        $events = $this->repository->getEvents($filters, $this->perPage, $offset);
+
+        $this->renderPage($events, $filters, $currentPage);
+    }
+
+    /**
+     * @param array<int, array<string, mixed>> $events
+     * @param array<string, mixed> $filters
+     */
+    public function renderPage(array $events, array $filters, int $currentPage): void
+    {
+        echo '<div class="wrap">';
+        echo '<h1>Security Audit Log</h1>';
+
+        $this->renderFilterForm($filters);
+        $this->renderTable($events);
+        $this->renderPagination($currentPage, count($events));
+        $this->renderActions();
+
+        echo '</div>';
+    }
+
+    /**
+     * @param array<string, mixed> $filters
+     */
+    public function renderFilterForm(array $filters): void
+    {
+        $eventValue = $this->escapeAttr((string) ($filters['event'] ?? ''));
+        $severityValue = $this->escapeAttr((string) ($filters['severity'] ?? ''));
+
+        echo '<form method="get" style="margin-bottom:15px;">';
+        echo '<input type="hidden" name="page" value="backto-audit-log" />';
+
+        echo '<label>Event: <select name="event">';
+        echo '<option value="">All</option>';
+
+        $eventTypes = [
+            'login_success', 'login_failed', 'user_role_changed',
+            'critical_option_changed', 'plugin_activated', 'plugin_deactivated',
+            'theme_switched', 'user_created', 'user_deleted',
+            'self_promotion_blocked', 'privileged_role_granted',
+        ];
+
+        foreach ($eventTypes as $type) {
+            $selected = $eventValue === $type ? ' selected' : '';
+            echo '<option value="' . $this->escapeAttr($type) . '"' . $selected . '>' . $this->escapeHtml($type) . '</option>';
+        }
+
+        echo '</select></label> ';
+
+        echo '<label>Severity: <select name="severity">';
+        echo '<option value="">All</option>';
+
+        foreach (['info', 'warning', 'critical'] as $sev) {
+            $selected = $severityValue === $sev ? ' selected' : '';
+            echo '<option value="' . $sev . '"' . $selected . '>' . ucfirst($sev) . '</option>';
+        }
+
+        echo '</select></label> ';
+        echo '<button type="submit" class="button">Filter</button>';
+        echo '</form>';
+    }
+
+    /**
+     * @param array<int, array<string, mixed>> $events
+     */
+    public function renderTable(array $events): void
+    {
+        echo '<table class="widefat striped">';
+        echo '<thead><tr>';
+        echo '<th>Time</th><th>Event</th><th>Severity</th><th>Details</th>';
+        echo '</tr></thead><tbody>';
+
+        if ($events === []) {
+            echo '<tr><td colspan="4">No events found.</td></tr>';
+        }
+
+        foreach ($events as $event) {
+            $timestamp = (int) ($event['timestamp'] ?? 0);
+            $date = $timestamp > 0 ? gmdate('Y-m-d H:i:s', $timestamp) : '-';
+            $eventName = $this->escapeHtml((string) ($event['event'] ?? ''));
+            $severity = (string) ($event['severity'] ?? 'info');
+            $context = $event['context'] ?? [];
+
+            $severityClass = match ($severity) {
+                'critical' => 'color:#dc3232;font-weight:bold',
+                'warning' => 'color:#dba617',
+                default => 'color:#72aee6',
+            };
+
+            $details = [];
+
+            /** @var mixed $value */
+            foreach ($context as $key => $value) {
+                $displayValue = is_array($value) ? implode(', ', array_map('strval', $value)) : (string) $value;
+                $details[] = $this->escapeHtml($key) . ': ' . $this->escapeHtml($displayValue);
+            }
+
+            echo '<tr>';
+            echo '<td>' . $this->escapeHtml($date) . '</td>';
+            echo '<td><code>' . $eventName . '</code></td>';
+            echo '<td style="' . $severityClass . '">' . $this->escapeHtml(strtoupper($severity)) . '</td>';
+            echo '<td><small>' . implode(' | ', $details) . '</small></td>';
+            echo '</tr>';
+        }
+
+        echo '</tbody></table>';
+    }
+
+    public function renderPagination(int $currentPage, int $eventCount): void
+    {
+        echo '<div style="margin-top:10px;">';
+
+        if ($currentPage > 1) {
+            echo '<a href="' . $this->escapeAttr($this->buildPageUrl($currentPage - 1)) . '" class="button">&laquo; Previous</a> ';
+        }
+
+        echo '<span>Page ' . $currentPage . '</span> ';
+
+        if ($eventCount >= $this->perPage) {
+            echo '<a href="' . $this->escapeAttr($this->buildPageUrl($currentPage + 1)) . '" class="button">Next &raquo;</a>';
+        }
+
+        echo '</div>';
+    }
+
+    public function renderActions(): void
+    {
+        echo '<div style="margin-top:20px;">';
+
+        echo '<form method="get" style="display:inline;">';
+        echo '<input type="hidden" name="page" value="backto-audit-log" />';
+        echo '<input type="hidden" name="action" value="export" />';
+        echo '<button type="submit" class="button">Export CSV</button>';
+        echo '</form> ';
+
+        echo '<form method="post" style="display:inline;">';
+        echo '<input type="hidden" name="action" value="purge" />';
+        echo '<label>Purge events older than <input type="number" name="days" value="90" min="1" max="365" style="width:60px;" /> days</label> ';
+        echo '<button type="submit" class="button" onclick="return confirm(\'Are you sure?\');">Purge</button>';
+        echo '</form>';
+
+        echo '</div>';
+    }
+
+    /**
+     * @param array<string, mixed> $filters
+     */
+    public function exportCsv(array $filters): void
+    {
+        $events = $this->repository->getEvents($filters, 10000, 0);
+
+        $this->sendCsvHeaders();
+
+        $output = $this->openOutputStream();
+
+        if ($output === false) {
+            return;
+        }
+
+        fputcsv($output, ['Timestamp', 'Event', 'Severity', 'Context']);
+
+        foreach ($events as $event) {
+            $timestamp = (int) ($event['timestamp'] ?? 0);
+            $context = $event['context'] ?? [];
+            $contextStr = is_array($context) ? (string) json_encode($context) : '';
+
+            fputcsv($output, [
+                gmdate('Y-m-d H:i:s', $timestamp),
+                (string) ($event['event'] ?? ''),
+                (string) ($event['severity'] ?? ''),
+                $contextStr,
+            ]);
+        }
+
+        fclose($output);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    protected function getFiltersFromRequest(): array
+    {
+        $filters = [];
+
+        if (isset($_GET['event']) && $_GET['event'] !== '') {
+            $filters['event'] = (string) $_GET['event'];
+        }
+
+        if (isset($_GET['severity']) && $_GET['severity'] !== '') {
+            $filters['severity'] = (string) $_GET['severity'];
+        }
+
+        return $filters;
+    }
+
+    protected function getCurrentPage(): int
+    {
+        return max(1, (int) ($_GET['paged'] ?? 1));
+    }
+
+    protected function isExportRequest(): bool
+    {
+        return ($_GET['action'] ?? '') === 'export';
+    }
+
+    protected function isPurgeRequest(): bool
+    {
+        return ($_POST['action'] ?? '') === 'purge';
+    }
+
+    protected function getPurgeDays(): int
+    {
+        return max(1, (int) ($_POST['days'] ?? 90));
+    }
+
+    protected function buildPageUrl(int $page): string
+    {
+        return '?page=backto-audit-log&paged=' . $page;
+    }
+
+    protected function renderNotice(string $message): void
+    {
+        echo '<div class="notice notice-success is-dismissible"><p>' . $this->escapeHtml($message) . '</p></div>';
+    }
+
+    protected function sendCsvHeaders(): void
+    {
+        header('Content-Type: text/csv; charset=utf-8');
+        header('Content-Disposition: attachment; filename="audit-log-' . gmdate('Y-m-d') . '.csv"');
+    }
+
+    /**
+     * @return resource|false
+     */
+    protected function openOutputStream()
+    {
+        return fopen('php://output', 'w');
+    }
+
+    protected function escapeAttr(string $value): string
+    {
+        return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
+    }
+
+    protected function escapeHtml(string $value): string
+    {
+        return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
+    }
+}

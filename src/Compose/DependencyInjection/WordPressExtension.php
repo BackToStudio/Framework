@@ -23,12 +23,14 @@ use BackTo\Framework\Security\Contracts\LoginThrottleInterface;
 use BackTo\Framework\Security\Contracts\NonceManagerInterface;
 use BackTo\Framework\Security\Contracts\OutputEscaperInterface;
 use BackTo\Framework\Security\Contracts\RateLimiterRepositoryInterface;
+use BackTo\Framework\Security\Contracts\SecurityNotifierInterface;
 use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
 use BackTo\Framework\Security\Contracts\SubresourceIntegrityInterface;
 use BackTo\Framework\Security\ContentSecurityPolicyManager;
 use BackTo\Framework\Security\CorsManager;
 use BackTo\Framework\Security\DependencyInjection\Compiler\RegisterSecurityRulePass;
 use BackTo\Framework\Security\IPAccessControl;
+use BackTo\Framework\Security\SecurityNotifier;
 use BackTo\Framework\Security\SubresourceIntegrity;
 use BackTo\Framework\Security\Infrastructure\WordPressAuditLogRepository;
 use BackTo\Framework\Security\Infrastructure\WordPressFileIntegrityRepository;
@@ -238,6 +240,10 @@ class WordPressExtension
 
         $containerBuilder->register(RateLimiterRepositoryInterface::class, WordPressRateLimiterRepository::class);
         $containerBuilder->setAlias(WordPressRateLimiterRepository::class, RateLimiterRepositoryInterface::class);
+
+        $containerBuilder->register(SecurityNotifierInterface::class, SecurityNotifier::class)
+            ->setAutowired(true);
+        $containerBuilder->setAlias(SecurityNotifier::class, SecurityNotifierInterface::class);
     }
 
     /**
