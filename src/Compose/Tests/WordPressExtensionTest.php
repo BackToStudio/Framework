@@ -34,6 +34,11 @@ use BackTo\Framework\RestApi\DependencyInjection\Compiler\RegisterRestRoutePass;
 use BackTo\Framework\RestApi\RestApiExtension;
 use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
 use BackTo\Framework\Security\DependencyInjection\Compiler\RegisterSecurityRulePass;
+use BackTo\Framework\Gdpr\Contracts\ConsentCategoryInterface;
+use BackTo\Framework\Gdpr\Contracts\TrackingScriptInterface;
+use BackTo\Framework\Gdpr\DependencyInjection\Compiler\RegisterConsentCategoryPass;
+use BackTo\Framework\Gdpr\DependencyInjection\Compiler\RegisterTrackingScriptPass;
+use BackTo\Framework\Gdpr\GdprExtension;
 use BackTo\Framework\Security\SecurityExtension;
 use BackTo\Framework\Seo\SeoExtension;
 use BackTo\Framework\Taxonomy\Contracts\TaxonomyInterface;
@@ -75,6 +80,7 @@ class WordPressExtensionTest extends TestCase
             'Options' => [new OptionsExtension()],
             'Cache' => [new CacheExtension()],
             'Seo' => [new SeoExtension()],
+            'Gdpr' => [new GdprExtension()],
         ];
     }
 
@@ -108,6 +114,8 @@ class WordPressExtensionTest extends TestCase
             'RestRoute' => [new RestApiExtension(), RestRouteInterface::class, 'wordpress.rest_route'],
             'HealthCheck' => [new ObservabilityExtension(), HealthCheckInterface::class, 'wordpress.health_check'],
             'SecurityRule' => [new SecurityExtension(), SecurityRuleInterface::class, 'wordpress.security_rule'],
+            'ConsentCategory' => [new GdprExtension(), ConsentCategoryInterface::class, 'wordpress.consent_category'],
+            'TrackingScript' => [new GdprExtension(), TrackingScriptInterface::class, 'wordpress.tracking_script'],
         ];
     }
 
@@ -137,6 +145,8 @@ class WordPressExtensionTest extends TestCase
             'RestRoute' => [new RestApiExtension(), RegisterRestRoutePass::class],
             'HealthCheck' => [new ObservabilityExtension(), RegisterHealthCheckPass::class],
             'SecurityRule' => [new SecurityExtension(), RegisterSecurityRulePass::class],
+            'ConsentCategory' => [new GdprExtension(), RegisterConsentCategoryPass::class],
+            'TrackingScript' => [new GdprExtension(), RegisterTrackingScriptPass::class],
         ];
     }
 
@@ -184,6 +194,7 @@ class WordPressExtensionTest extends TestCase
             new OptionsExtension(),
             new CacheExtension(),
             new SeoExtension(),
+            new GdprExtension(),
         ];
 
         foreach ($extensions as $extension) {

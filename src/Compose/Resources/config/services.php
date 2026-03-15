@@ -18,4 +18,6 @@ return function (ContainerConfigurator $configurator) {
              ->exclude('../../../PostType/{DependencyInjection,Entity,Tests,Contracts}');
     $services->load('BackTo\\Framework\\Taxonomy\\', '../../../Taxonomy/*')
              ->exclude('../../../Taxonomy/{DependencyInjection,Entity,Tests,Contracts}');
+    $services->load('BackTo\\Framework\\Gdpr\\', '../../../Gdpr/*')
+             ->exclude('../../../Gdpr/{DependencyInjection,Entity,Tests,Contracts}');
 };
