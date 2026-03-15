@@ -12,15 +12,21 @@ use BackTo\Framework\Observability\Contracts\HealthCheckInterface;
 use BackTo\Framework\Observability\Contracts\LoggerInterface;
 use BackTo\Framework\Observability\Contracts\PerformanceCollectorInterface;
 use BackTo\Framework\Observability\DependencyInjection\Compiler\RegisterHealthCheckPass;
+use BackTo\Framework\Security\Contracts\AuditLogRepositoryInterface;
 use BackTo\Framework\Security\Contracts\ContentSecurityPolicyInterface;
+use BackTo\Framework\Security\Contracts\FileIntegrityRepositoryInterface;
 use BackTo\Framework\Security\Contracts\InputSanitizerInterface;
+use BackTo\Framework\Security\Contracts\LoginLocationRepositoryInterface;
 use BackTo\Framework\Security\Contracts\LoginThrottleInterface;
 use BackTo\Framework\Security\Contracts\NonceManagerInterface;
 use BackTo\Framework\Security\Contracts\OutputEscaperInterface;
 use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
 use BackTo\Framework\Security\ContentSecurityPolicyManager;
 use BackTo\Framework\Security\DependencyInjection\Compiler\RegisterSecurityRulePass;
+use BackTo\Framework\Security\Infrastructure\WordPressAuditLogRepository;
+use BackTo\Framework\Security\Infrastructure\WordPressFileIntegrityRepository;
 use BackTo\Framework\Security\Infrastructure\WordPressInputSanitizer;
+use BackTo\Framework\Security\Infrastructure\WordPressLoginLocationRepository;
 use BackTo\Framework\Security\Infrastructure\WordPressLoginThrottle;
 use BackTo\Framework\Security\Infrastructure\WordPressNonceManager;
 use BackTo\Framework\Security\Infrastructure\WordPressOutputEscaper;
@@ -200,6 +206,15 @@ class WordPressExtension
 
         $containerBuilder->register(BackupCodeManagerInterface::class, BackupCodeManager::class);
         $containerBuilder->setAlias(BackupCodeManager::class, BackupCodeManagerInterface::class);
+
+        $containerBuilder->register(AuditLogRepositoryInterface::class, WordPressAuditLogRepository::class);
+        $containerBuilder->setAlias(WordPressAuditLogRepository::class, AuditLogRepositoryInterface::class);
+
+        $containerBuilder->register(FileIntegrityRepositoryInterface::class, WordPressFileIntegrityRepository::class);
+        $containerBuilder->setAlias(WordPressFileIntegrityRepository::class, FileIntegrityRepositoryInterface::class);
+
+        $containerBuilder->register(LoginLocationRepositoryInterface::class, WordPressLoginLocationRepository::class);
+        $containerBuilder->setAlias(WordPressLoginLocationRepository::class, LoginLocationRepositoryInterface::class);
     }
 
     /**
