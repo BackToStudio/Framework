@@ -14,15 +14,21 @@ use BackTo\Framework\Observability\Contracts\PerformanceCollectorInterface;
 use BackTo\Framework\Observability\DependencyInjection\Compiler\RegisterHealthCheckPass;
 use BackTo\Framework\Security\Contracts\AuditLogRepositoryInterface;
 use BackTo\Framework\Security\Contracts\ContentSecurityPolicyInterface;
+use BackTo\Framework\Security\Contracts\CorsManagerInterface;
 use BackTo\Framework\Security\Contracts\FileIntegrityRepositoryInterface;
 use BackTo\Framework\Security\Contracts\InputSanitizerInterface;
+use BackTo\Framework\Security\Contracts\IPAccessControlInterface;
 use BackTo\Framework\Security\Contracts\LoginLocationRepositoryInterface;
 use BackTo\Framework\Security\Contracts\LoginThrottleInterface;
 use BackTo\Framework\Security\Contracts\NonceManagerInterface;
 use BackTo\Framework\Security\Contracts\OutputEscaperInterface;
 use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
+use BackTo\Framework\Security\Contracts\SubresourceIntegrityInterface;
 use BackTo\Framework\Security\ContentSecurityPolicyManager;
+use BackTo\Framework\Security\CorsManager;
 use BackTo\Framework\Security\DependencyInjection\Compiler\RegisterSecurityRulePass;
+use BackTo\Framework\Security\IPAccessControl;
+use BackTo\Framework\Security\SubresourceIntegrity;
 use BackTo\Framework\Security\Infrastructure\WordPressAuditLogRepository;
 use BackTo\Framework\Security\Infrastructure\WordPressFileIntegrityRepository;
 use BackTo\Framework\Security\Infrastructure\WordPressInputSanitizer;
@@ -215,6 +221,18 @@ class WordPressExtension
 
         $containerBuilder->register(LoginLocationRepositoryInterface::class, WordPressLoginLocationRepository::class);
         $containerBuilder->setAlias(WordPressLoginLocationRepository::class, LoginLocationRepositoryInterface::class);
+
+        $containerBuilder->register(CorsManagerInterface::class, CorsManager::class)
+            ->setAutowired(true);
+        $containerBuilder->setAlias(CorsManager::class, CorsManagerInterface::class);
+
+        $containerBuilder->register(SubresourceIntegrityInterface::class, SubresourceIntegrity::class)
+            ->setAutowired(true);
+        $containerBuilder->setAlias(SubresourceIntegrity::class, SubresourceIntegrityInterface::class);
+
+        $containerBuilder->register(IPAccessControlInterface::class, IPAccessControl::class)
+            ->setAutowired(true);
+        $containerBuilder->setAlias(IPAccessControl::class, IPAccessControlInterface::class);
     }
 
     /**
