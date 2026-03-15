@@ -265,6 +265,11 @@ trait WordPressContainer
                 'namespace' => 'BackTo\\Framework\\PostMeta\\',
                 'exclude' => '{DependencyInjection,Entity,Tests,Contracts}',
             ],
+            [
+                'dir' => dirname(__DIR__) . '/Cache',
+                'namespace' => 'BackTo\\Framework\\Cache\\',
+                'exclude' => '{Tests,Contracts}',
+            ],
         ];
     }
 

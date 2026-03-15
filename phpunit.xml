@@ -35,6 +35,9 @@
         <testsuite name="compose">
             <directory>src/Compose/Tests</directory>
         </testsuite>
+        <testsuite name="cache">
+            <directory>src/Cache/Tests</directory>
+        </testsuite>
     </testsuites>
 
     <coverage cacheDirectory=".phpunit.cache/code-coverage">
