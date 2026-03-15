@@ -1,0 +1,121 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Parameter \#1 \$attachment_id of function get_attached_file expects int, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Assets/SvgFactory.php
+
+		-
+			message: '#^Action callback returns string but should not return anything\.$#'
+			identifier: return.void
+			count: 1
+			path: src/Blocks/Actions/ReplaceImgBlockBySvgBlock.php
+
+		-
+			message: '#^Call to function is_null\(\) with string will always evaluate to false\.$#'
+			identifier: function.impossibleType
+			count: 2
+			path: src/Compose/AbstractKernel.php
+
+		-
+			message: '#^Ternary operator condition is always true\.$#'
+			identifier: ternary.alwaysTrue
+			count: 1
+			path: src/Compose/AbstractKernel.php
+
+		-
+			message: '#^Instantiated class BackTo\\Framework\\Compose\\DependencyInjection\\Compiler\\InvalidArgumentException not found\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Compose/DependencyInjection/Compiler/ResolveInstanceOfConditionalPassWithVendorPrefix.php
+
+		-
+			message: '#^Instantiated class BackTo\\Framework\\Compose\\DependencyInjection\\Compiler\\RuntimeException not found\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Compose/DependencyInjection/Compiler/ResolveInstanceOfConditionalPassWithVendorPrefix.php
+
+		-
+			message: '#^Parameter \#2 \$replace of function substr_replace expects array\|string, int given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Compose/DependencyInjection/Compiler/ResolveInstanceOfConditionalPassWithVendorPrefix.php
+
+		-
+			message: '#^Throwing object of an unknown class BackTo\\Framework\\Compose\\DependencyInjection\\Compiler\\InvalidArgumentException\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Compose/DependencyInjection/Compiler/ResolveInstanceOfConditionalPassWithVendorPrefix.php
+
+		-
+			message: '#^Throwing object of an unknown class BackTo\\Framework\\Compose\\DependencyInjection\\Compiler\\RuntimeException\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Compose/DependencyInjection/Compiler/ResolveInstanceOfConditionalPassWithVendorPrefix.php
+
+		-
+			message: '#^Call to an undefined method BackTo\\Framework\\Options\\SocialLinksStrategyInterface\:\:getFacebookLink\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Options/SocialLinksInTimberContext.php
+
+		-
+			message: '#^Function load_muplugin_textdomain invoked with 3 parameters, 1\-2 required\.$#'
+			identifier: arguments.count
+			count: 1
+			path: src/Plugin/I18n/LoadMuPluginTextDomain.php
+
+		-
+			message: '#^Parameter \#2 \$mu_plugin_rel_path of function load_muplugin_textdomain expects string, false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Plugin/I18n/LoadMuPluginTextDomain.php
+
+		-
+			message: '#^Call to an undefined method BackTo\\Framework\\Contracts\\IdInterface\:\:setTitle\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/PostType/Factory/PostFactory.php
+
+		-
+			message: '#^Call to function array_key_exists\(\) with ''supports'' and non\-empty\-array will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: src/PostType/PostTypeFactory.php
+
+		-
+			message: '#^Function write_log not found\.$#'
+			identifier: function.notFound
+			count: 1
+			path: src/PostType/RegisterPostType.php
+
+		-
+			message: '#^Call to an undefined method BackTo\\Framework\\Contracts\\IdInterface\:\:setName\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Taxonomy/Factory/TermFactory.php
+
+		-
+			message: '#^PHPDoc tag @param references unknown parameter\: \$wpPosts$#'
+			identifier: parameter.notFound
+			count: 1
+			path: src/Taxonomy/Factory/TermFactory.php
+
+		-
+			message: '#^Function write_log not found\.$#'
+			identifier: function.notFound
+			count: 1
+			path: src/Taxonomy/RegisterTaxonomy.php
+
+		-
+			message: '#^Call to an undefined method BackTo\\Framework\\Taxonomy\\Contracts\\TaxonomyInterface\:\:setPostTypes\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Taxonomy/TaxonomyFactory.php
+
+		-
+			message: '#^Function remove_action invoked with 4 parameters, 2\-3 required\.$#'
+			identifier: arguments.count
+			count: 3
+			path: src/Theme/Actions/CleanHead.php

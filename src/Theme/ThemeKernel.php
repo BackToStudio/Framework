@@ -2,42 +2,17 @@
 
 namespace BackTo\Framework\Theme;
 
-use Exception;
-use BackTo\Framework\Compose\TextDomain;
-use BackTo\Framework\Compose\WordPressContainer;
-use BackToVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
+use BackTo\Framework\Compose\AbstractKernel;
 
-class ThemeKernel
+class ThemeKernel extends AbstractKernel
 {
-
-    use TextDomain;
-    use WordPressContainer;
-
-    /**
-     * @param string $environment
-     * @param bool $debug
-     */
-    public function __construct(string $environment, bool $debug)
+    protected function getDirectoryParameterName(): string
     {
-        $this->environment = $environment;
-        $this->debug = $debug;
+        return 'themeDirectory';
     }
-    
-    /**
-     * Prepare Container settings.
-     *
-     * @return ContainerBuilder
-     * @throws Exception
-     */
-    private function getContainerBuilder(): ContainerBuilder
+
+    protected function getTextDomainParameterName(): string
     {
-        $containerBuilder = new ContainerBuilder();
-
-        $containerBuilder->setParameter('themeDirectory', $this->getProjectDir() );
-        $containerBuilder->setParameter('themeTextDomain', $this->getTextDomain() );
-
-        $this->loadServices($containerBuilder);
-
-        return $this->wordPressContainerBuilder($containerBuilder);
+        return 'themeTextDomain';
     }
 }

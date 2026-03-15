@@ -1,82 +1,39 @@
-# Composer stores all downloaded packages in the vendor/ directory.
-# Do not use the following if the vendor/ directory is committed to
-# your git repository.
+stages:
+  - test
+
 cache:
   paths:
     - vendor/
 
 before_script:
-  # Install dependencies
   - bash ci/docker_install.sh > /dev/null
 
-# We test PHP 7.1
-#test:7.1:
-#  image: php:7.1
-#  script:
-#    - php composer.phar run test-post-type
-
-# We test PHP 7.2
-#test:7.2:
-#  image: php:7.2
-#  script:
-#    - php composer.phar run tests-post-type
-
-# We test PHP 7.3
-test:post-type:7.3:
-  image: php:7.3
+test:8.1:
+  image: php:8.1
+  stage: test
   script:
-    - vendor/bin/phpunit --testsuite "post-type" --log-junit .phpunit.cache/post-type.xml
+    - vendor/bin/phpunit --log-junit .phpunit.cache/results.xml
   artifacts:
     expire_in: 1 week
     reports:
-      junit: .phpunit.cache/post-type.xml
+      junit: .phpunit.cache/results.xml
 
-# We test PHP 7.4
-test:post-type:7.4:
-  image: php:7.4
+test:8.2:
+  image: php:8.2
+  stage: test
   script:
-    - vendor/bin/phpunit --testsuite "post-type" --log-junit .phpunit.cache/post-type.xml
+    - vendor/bin/phpunit --log-junit .phpunit.cache/results.xml
   artifacts:
     expire_in: 1 week
     reports:
-      junit: .phpunit.cache/post-type.xml
+      junit: .phpunit.cache/results.xml
 
-# We test PHP 7.3
-test:blocks:7.3:
-  image: php:7.3
+test:8.3:
+  image: php:8.3
+  stage: test
   script:
-    - vendor/bin/phpunit --testsuite "blocks" --log-junit .phpunit.cache/blocks.xml
+    - vendor/bin/phpunit --log-junit .phpunit.cache/results.xml
   artifacts:
     expire_in: 1 week
     reports:
-      junit: .phpunit.cache/blocks.xml
-
-# We test PHP 7.4
-test:blocks:7.4:
-  image: php:7.4
-  script:
-    - vendor/bin/phpunit --testsuite "blocks" --log-junit .phpunit.cache/blocks.xml
-  artifacts:
-    expire_in: 1 week
-    reports:
-      junit: .phpunit.cache/blocks.xml
-
-# We test PHP 7.3
-test:taxonomy:7.3:
-  image: php:7.3
-  script:
-    - vendor/bin/phpunit --testsuite "taxonomy" --log-junit .phpunit.cache/taxonomy.xml
-  artifacts:
-    expire_in: 1 week
-    reports:
-      junit: .phpunit.cache/taxonomy.xml
-
-# We test PHP 7.4
-test:taxonomy:7.4:
-  image: php:7.4
-  script:
-    - vendor/bin/phpunit --testsuite "taxonomy" --log-junit .phpunit.cache/taxonomy.xml
-  artifacts:
-    expire_in: 1 week
-    reports:
-      junit: .phpunit.cache/taxonomy.xml
+      junit: .phpunit.cache/results.xml

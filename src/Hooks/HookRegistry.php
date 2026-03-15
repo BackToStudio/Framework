@@ -2,6 +2,8 @@
 
 namespace BackTo\Framework\Hooks;
 
+use BackTo\Framework\Contracts\ActivationHooks;
+use BackTo\Framework\Contracts\DeactivationHooks;
 use BackTo\Framework\Contracts\HookInterface;
 use BackTo\Framework\Contracts\AdminHooks;
 use BackTo\Framework\Contracts\Hooks;
@@ -11,16 +13,28 @@ class HookRegistry implements RegistryInterface
 {
 
     /**
-     * @var array
+     * @var HookInterface[]
      */
     protected $hooks = [];
 
     /**
-     * @return array
+     * @var string|null
+     */
+    private $pluginFile;
+
+    /**
+     * @return HookInterface[]
      */
     public function getHooks(): array
     {
         return $this->hooks;
+    }
+
+    public function setPluginFile(string $pluginFile): self
+    {
+        $this->pluginFile = $pluginFile;
+
+        return $this;
     }
 
     public function addHook(HookInterface $hook)
@@ -41,13 +55,13 @@ class HookRegistry implements RegistryInterface
                 $action->hooks();
             }
 
-//            if ($action instanceof ActivationHooks) {
-//                register_activation_hook($this->pluginFile, [$action, 'activate']);
-//            }
-//
-//            if ($action instanceof DeactivationHooks) {
-//                register_deactivation_hook($this->pluginFile, [$action, 'deactivate']);
-//            }
+            if ($this->pluginFile !== null && $action instanceof ActivationHooks) {
+                \register_activation_hook($this->pluginFile, [$action, 'activate']);
+            }
+
+            if ($this->pluginFile !== null && $action instanceof DeactivationHooks) {
+                \register_deactivation_hook($this->pluginFile, [$action, 'deactivate']);
+            }
         }
     }
 

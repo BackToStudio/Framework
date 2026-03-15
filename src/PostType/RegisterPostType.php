@@ -10,7 +10,7 @@ class RegisterPostType implements Hooks, ActivationHooks
 {
 
     /**
-     * @var PostTypeRepository
+     * @var PostTypeRegistry
      */
     private $registry;
 

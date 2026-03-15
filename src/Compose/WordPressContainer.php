@@ -173,12 +173,13 @@ trait WordPressContainer
             $this->dumpContainer($cache, $containerBuilder);
         }
 
-        if (is_file($file)) {
-            require_once $file;
-            $container = new $classname();
+        if (!is_file($file)) {
+            return null;
         }
 
-        return $container;
+        require_once $file;
+
+        return new $classname();
     }
 
     /**
