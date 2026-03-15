@@ -261,7 +261,12 @@ trait WordPressContainer
             [
                 'dir' => dirname(__DIR__) . '/Security',
                 'namespace' => 'BackTo\\Framework\\Security\\',
-                'exclude' => '{DependencyInjection,Tests,Contracts,Infrastructure}',
+                'exclude' => '{DependencyInjection,Tests,Contracts,Infrastructure,HealthCheck,TwoFactor}',
+            ],
+            [
+                'dir' => dirname(__DIR__) . '/Security/TwoFactor',
+                'namespace' => 'BackTo\\Framework\\Security\\TwoFactor\\',
+                'exclude' => '{Contracts,Infrastructure,Tests}',
             ],
         ];
     }

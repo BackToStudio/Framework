@@ -24,6 +24,12 @@ use BackTo\Framework\Security\Infrastructure\WordPressInputSanitizer;
 use BackTo\Framework\Security\Infrastructure\WordPressLoginThrottle;
 use BackTo\Framework\Security\Infrastructure\WordPressNonceManager;
 use BackTo\Framework\Security\Infrastructure\WordPressOutputEscaper;
+use BackTo\Framework\Security\TwoFactor\BackupCodeManager;
+use BackTo\Framework\Security\TwoFactor\Contracts\BackupCodeManagerInterface;
+use BackTo\Framework\Security\TwoFactor\Contracts\TotpProviderInterface;
+use BackTo\Framework\Security\TwoFactor\Contracts\TwoFactorRepositoryInterface;
+use BackTo\Framework\Security\TwoFactor\Infrastructure\WordPressTwoFactorRepository;
+use BackTo\Framework\Security\TwoFactor\TotpProvider;
 use BackTo\Framework\Observability\ErrorHandler;
 use BackTo\Framework\Observability\Infrastructure\NullLogger;
 use BackTo\Framework\Observability\Infrastructure\WordPressLogger;
@@ -185,6 +191,15 @@ class WordPressExtension
 
         $containerBuilder->register(OutputEscaperInterface::class, WordPressOutputEscaper::class);
         $containerBuilder->setAlias(WordPressOutputEscaper::class, OutputEscaperInterface::class);
+
+        $containerBuilder->register(TotpProviderInterface::class, TotpProvider::class);
+        $containerBuilder->setAlias(TotpProvider::class, TotpProviderInterface::class);
+
+        $containerBuilder->register(TwoFactorRepositoryInterface::class, WordPressTwoFactorRepository::class);
+        $containerBuilder->setAlias(WordPressTwoFactorRepository::class, TwoFactorRepositoryInterface::class);
+
+        $containerBuilder->register(BackupCodeManagerInterface::class, BackupCodeManager::class);
+        $containerBuilder->setAlias(BackupCodeManager::class, BackupCodeManagerInterface::class);
     }
 
     /**

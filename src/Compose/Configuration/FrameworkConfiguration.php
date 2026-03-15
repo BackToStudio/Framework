@@ -49,6 +49,8 @@ class FrameworkConfiguration
             'framework.security.max_concurrent_sessions' => 1,
             'framework.security.rest_api_require_auth' => true,
             'framework.security.disable_file_editor' => true,
+            'framework.security.two_factor_enabled' => false,
+            'framework.security.two_factor_issuer' => 'WordPress',
         ];
     }
 
