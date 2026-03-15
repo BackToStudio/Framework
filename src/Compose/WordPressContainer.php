@@ -270,6 +270,11 @@ trait WordPressContainer
                 'namespace' => 'BackTo\\Framework\\Cache\\',
                 'exclude' => '{Tests,Contracts}',
             ],
+            [
+                'dir' => dirname(__DIR__) . '/Seo',
+                'namespace' => 'BackTo\\Framework\\Seo\\',
+                'exclude' => '{Tests,Contracts}',
+            ],
         ];
     }
 

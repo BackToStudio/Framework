@@ -38,6 +38,9 @@
         <testsuite name="cache">
             <directory>src/Cache/Tests</directory>
         </testsuite>
+        <testsuite name="seo">
+            <directory>src/Seo/Tests</directory>
+        </testsuite>
     </testsuites>
 
     <coverage cacheDirectory=".phpunit.cache/code-coverage">
