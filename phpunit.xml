@@ -32,6 +32,9 @@
         <testsuite name="post-meta">
             <directory>src/PostMeta/Tests</directory>
         </testsuite>
+        <testsuite name="compose">
+            <directory>src/Compose/Tests</directory>
+        </testsuite>
     </testsuites>
 
     <coverage cacheDirectory=".phpunit.cache/code-coverage">
