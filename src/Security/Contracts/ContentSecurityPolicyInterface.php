@@ -1,0 +1,27 @@
+<?php
+
+declare(strict_types=1);
+
+namespace BackTo\Framework\Security\Contracts;
+
+/**
+ * Port interface for Content Security Policy management.
+ */
+interface ContentSecurityPolicyInterface
+{
+    /**
+     * @param string|string[] $value
+     */
+    public function addDirective(string $directive, string|array $value): self;
+
+    /**
+     * @return array<string, string[]>
+     */
+    public function getDirectives(): array;
+
+    public function buildHeaderValue(): string;
+
+    public function generateNonce(): string;
+
+    public function getNonce(): string;
+}

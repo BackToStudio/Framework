@@ -12,10 +12,12 @@ use BackTo\Framework\Observability\Contracts\HealthCheckInterface;
 use BackTo\Framework\Observability\Contracts\LoggerInterface;
 use BackTo\Framework\Observability\Contracts\PerformanceCollectorInterface;
 use BackTo\Framework\Observability\DependencyInjection\Compiler\RegisterHealthCheckPass;
+use BackTo\Framework\Security\Contracts\ContentSecurityPolicyInterface;
 use BackTo\Framework\Security\Contracts\InputSanitizerInterface;
 use BackTo\Framework\Security\Contracts\LoginThrottleInterface;
 use BackTo\Framework\Security\Contracts\NonceManagerInterface;
 use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
+use BackTo\Framework\Security\ContentSecurityPolicyManager;
 use BackTo\Framework\Security\DependencyInjection\Compiler\RegisterSecurityRulePass;
 use BackTo\Framework\Security\Infrastructure\WordPressInputSanitizer;
 use BackTo\Framework\Security\Infrastructure\WordPressLoginThrottle;
@@ -174,6 +176,10 @@ class WordPressExtension
 
         $containerBuilder->register(LoginThrottleInterface::class, WordPressLoginThrottle::class);
         $containerBuilder->setAlias(WordPressLoginThrottle::class, LoginThrottleInterface::class);
+
+        $containerBuilder->register(ContentSecurityPolicyInterface::class, ContentSecurityPolicyManager::class)
+            ->setAutowired(true);
+        $containerBuilder->setAlias(ContentSecurityPolicyManager::class, ContentSecurityPolicyInterface::class);
     }
 
     /**
