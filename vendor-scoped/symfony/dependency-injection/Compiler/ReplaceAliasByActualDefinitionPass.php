@@ -29,7 +29,7 @@ class ReplaceAliasByActualDefinitionPass extends AbstractRecursivePass
      *
      * @return $this
      */
-    public function setAutoAliasServicePass(AutoAliasServicePass $autoAliasServicePass) : self
+    public function setAutoAliasServicePass(AutoAliasServicePass $autoAliasServicePass): self
     {
         $this->autoAliasServicePass = $autoAliasServicePass;
         return $this;
@@ -58,7 +58,7 @@ class ReplaceAliasByActualDefinitionPass extends AbstractRecursivePass
             if (isset($replacements[$targetId])) {
                 $container->setAlias($definitionId, $replacements[$targetId])->setPublic($target->isPublic());
                 if ($target->isDeprecated()) {
-                    $container->getAlias($definitionId)->setDeprecated(...\array_values($target->getDeprecation('%alias_id%')));
+                    $container->getAlias($definitionId)->setDeprecated(...array_values($target->getDeprecation('%alias_id%')));
                 }
             }
             // No need to process the same target twice
@@ -71,7 +71,7 @@ class ReplaceAliasByActualDefinitionPass extends AbstractRecursivePass
                 $definition = $container->getDefinition($targetId);
             } catch (ServiceNotFoundException $e) {
                 if ('' !== $e->getId() && '@' === $e->getId()[0]) {
-                    throw new ServiceNotFoundException($e->getId(), $e->getSourceId(), null, [\substr($e->getId(), 1)]);
+                    throw new ServiceNotFoundException($e->getId(), $e->getSourceId(), null, [substr($e->getId(), 1)]);
                 }
                 throw $e;
             }
@@ -100,7 +100,7 @@ class ReplaceAliasByActualDefinitionPass extends AbstractRecursivePass
             // Perform the replacement
             $newId = $this->replacements[$referenceId];
             $value = new Reference($newId, $value->getInvalidBehavior());
-            $this->container->log($this, \sprintf('Changed reference of service "%s" previously pointing to "%s" to "%s".', $this->currentId, $referenceId, $newId));
+            $this->container->log($this, sprintf('Changed reference of service "%s" previously pointing to "%s" to "%s".', $this->currentId, $referenceId, $newId));
         }
         return parent::processValue($value, $isRoot);
     }

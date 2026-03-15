@@ -113,7 +113,7 @@ class ExprBuilder
      */
     public function ifInArray(array $array)
     {
-        $this->ifPart = function ($v) use($array) {
+        $this->ifPart = function ($v) use ($array) {
             return \in_array($v, $array, \true);
         };
         return $this;
@@ -125,7 +125,7 @@ class ExprBuilder
      */
     public function ifNotInArray(array $array)
     {
-        $this->ifPart = function ($v) use($array) {
+        $this->ifPart = function ($v) use ($array) {
             return !\in_array($v, $array, \true);
         };
         return $this;
@@ -178,8 +178,8 @@ class ExprBuilder
      */
     public function thenInvalid(string $message)
     {
-        $this->thenPart = function ($v) use($message) {
-            throw new \InvalidArgumentException(\sprintf($message, \json_encode($v)));
+        $this->thenPart = function ($v) use ($message) {
+            throw new \InvalidArgumentException(sprintf($message, json_encode($v)));
         };
         return $this;
     }
@@ -227,7 +227,7 @@ class ExprBuilder
             if ($expr instanceof self) {
                 $if = $expr->ifPart;
                 $then = $expr->thenPart;
-                $expressions[$k] = function ($v) use($if, $then) {
+                $expressions[$k] = function ($v) use ($if, $then) {
                     return $if($v) ? $then($v) : $v;
                 };
             }

@@ -43,7 +43,7 @@ class YamlDumper extends Dumper
      */
     public function dump(array $options = [])
     {
-        if (!\class_exists(\BackToVendor\Symfony\Component\Yaml\Dumper::class)) {
+        if (!class_exists(\BackToVendor\Symfony\Component\Yaml\Dumper::class)) {
             throw new LogicException('Unable to dump the container as the Symfony Yaml Component is not installed.');
         }
         if (null === $this->dumper) {
@@ -51,34 +51,34 @@ class YamlDumper extends Dumper
         }
         return $this->container->resolveEnvPlaceholders($this->addParameters() . "\n" . $this->addServices());
     }
-    private function addService(string $id, Definition $definition) : string
+    private function addService(string $id, Definition $definition): string
     {
         $code = "    {$id}:\n";
         if ($class = $definition->getClass()) {
-            if ('\\' === \substr($class, 0, 1)) {
-                $class = \substr($class, 1);
+            if ('\\' === substr($class, 0, 1)) {
+                $class = substr($class, 1);
             }
-            $code .= \sprintf("        class: %s\n", $this->dumper->dump($class));
+            $code .= sprintf("        class: %s\n", $this->dumper->dump($class));
         }
         if (!$definition->isPrivate()) {
-            $code .= \sprintf("        public: %s\n", $definition->isPublic() ? 'true' : 'false');
+            $code .= sprintf("        public: %s\n", $definition->isPublic() ? 'true' : 'false');
         }
         $tagsCode = '';
         foreach ($definition->getTags() as $name => $tags) {
             foreach ($tags as $attributes) {
                 $att = [];
                 foreach ($attributes as $key => $value) {
-                    $att[] = \sprintf('%s: %s', $this->dumper->dump($key), $this->dumper->dump($value));
+                    $att[] = sprintf('%s: %s', $this->dumper->dump($key), $this->dumper->dump($value));
                 }
-                $att = $att ? ': { ' . \implode(', ', $att) . ' }' : '';
-                $tagsCode .= \sprintf("            - %s%s\n", $this->dumper->dump($name), $att);
+                $att = $att ? ': { ' . implode(', ', $att) . ' }' : '';
+                $tagsCode .= sprintf("            - %s%s\n", $this->dumper->dump($name), $att);
             }
         }
         if ($tagsCode) {
             $code .= "        tags:\n" . $tagsCode;
         }
         if ($definition->getFile()) {
-            $code .= \sprintf("        file: %s\n", $this->dumper->dump($definition->getFile()));
+            $code .= sprintf("        file: %s\n", $this->dumper->dump($definition->getFile()));
         }
         if ($definition->isSynthetic()) {
             $code .= "        synthetic: true\n";
@@ -87,7 +87,7 @@ class YamlDumper extends Dumper
             $code .= "        deprecated:\n";
             foreach ($definition->getDeprecation('%service_id%') as $key => $value) {
                 if ('' !== $value) {
-                    $code .= \sprintf("            %s: %s\n", $key, $this->dumper->dump($value));
+                    $code .= sprintf("            %s: %s\n", $key, $this->dumper->dump($value));
                 }
             }
         }
@@ -104,60 +104,60 @@ class YamlDumper extends Dumper
             $code .= "        lazy: true\n";
         }
         if ($definition->getArguments()) {
-            $code .= \sprintf("        arguments: %s\n", $this->dumper->dump($this->dumpValue($definition->getArguments()), 0));
+            $code .= sprintf("        arguments: %s\n", $this->dumper->dump($this->dumpValue($definition->getArguments()), 0));
         }
         if ($definition->getProperties()) {
-            $code .= \sprintf("        properties: %s\n", $this->dumper->dump($this->dumpValue($definition->getProperties()), 0));
+            $code .= sprintf("        properties: %s\n", $this->dumper->dump($this->dumpValue($definition->getProperties()), 0));
         }
         if ($definition->getMethodCalls()) {
-            $code .= \sprintf("        calls:\n%s\n", $this->dumper->dump($this->dumpValue($definition->getMethodCalls()), 1, 12));
+            $code .= sprintf("        calls:\n%s\n", $this->dumper->dump($this->dumpValue($definition->getMethodCalls()), 1, 12));
         }
         if (!$definition->isShared()) {
             $code .= "        shared: false\n";
         }
-        if (null !== ($decoratedService = $definition->getDecoratedService())) {
+        if (null !== $decoratedService = $definition->getDecoratedService()) {
             [$decorated, $renamedId, $priority] = $decoratedService;
-            $code .= \sprintf("        decorates: %s\n", $decorated);
+            $code .= sprintf("        decorates: %s\n", $decorated);
             if (null !== $renamedId) {
-                $code .= \sprintf("        decoration_inner_name: %s\n", $renamedId);
+                $code .= sprintf("        decoration_inner_name: %s\n", $renamedId);
             }
             if (0 !== $priority) {
-                $code .= \sprintf("        decoration_priority: %s\n", $priority);
+                $code .= sprintf("        decoration_priority: %s\n", $priority);
             }
             $decorationOnInvalid = $decoratedService[3] ?? ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE;
             if (\in_array($decorationOnInvalid, [ContainerInterface::IGNORE_ON_INVALID_REFERENCE, ContainerInterface::NULL_ON_INVALID_REFERENCE])) {
                 $invalidBehavior = ContainerInterface::NULL_ON_INVALID_REFERENCE === $decorationOnInvalid ? 'null' : 'ignore';
-                $code .= \sprintf("        decoration_on_invalid: %s\n", $invalidBehavior);
+                $code .= sprintf("        decoration_on_invalid: %s\n", $invalidBehavior);
             }
         }
         if ($callable = $definition->getFactory()) {
-            $code .= \sprintf("        factory: %s\n", $this->dumper->dump($this->dumpCallable($callable), 0));
+            $code .= sprintf("        factory: %s\n", $this->dumper->dump($this->dumpCallable($callable), 0));
         }
         if ($callable = $definition->getConfigurator()) {
-            $code .= \sprintf("        configurator: %s\n", $this->dumper->dump($this->dumpCallable($callable), 0));
+            $code .= sprintf("        configurator: %s\n", $this->dumper->dump($this->dumpCallable($callable), 0));
         }
         return $code;
     }
-    private function addServiceAlias(string $alias, Alias $id) : string
+    private function addServiceAlias(string $alias, Alias $id): string
     {
         $deprecated = '';
         if ($id->isDeprecated()) {
             $deprecated = "        deprecated:\n";
             foreach ($id->getDeprecation('%alias_id%') as $key => $value) {
                 if ('' !== $value) {
-                    $deprecated .= \sprintf("            %s: %s\n", $key, $value);
+                    $deprecated .= sprintf("            %s: %s\n", $key, $value);
                 }
             }
         }
         if (!$id->isDeprecated() && $id->isPrivate()) {
-            return \sprintf("    %s: '@%s'\n", $alias, $id);
+            return sprintf("    %s: '@%s'\n", $alias, $id);
         }
         if ($id->isPublic()) {
             $deprecated = "        public: true\n" . $deprecated;
         }
-        return \sprintf("    %s:\n        alias: %s\n%s", $alias, $id, $deprecated);
+        return sprintf("    %s:\n        alias: %s\n%s", $alias, $id, $deprecated);
     }
-    private function addServices() : string
+    private function addServices(): string
     {
         if (!$this->container->getDefinitions()) {
             return '';
@@ -175,7 +175,7 @@ class YamlDumper extends Dumper
         }
         return $code;
     }
-    private function addParameters() : string
+    private function addParameters(): string
     {
         if (!$this->container->getParameterBag()->all()) {
             return '';
@@ -216,7 +216,7 @@ class YamlDumper extends Dumper
         }
         if ($value instanceof ArgumentInterface) {
             $tag = $value;
-            if ($value instanceof TaggedIteratorArgument || $value instanceof ServiceLocatorArgument && ($tag = $value->getTaggedIteratorArgument())) {
+            if ($value instanceof TaggedIteratorArgument || $value instanceof ServiceLocatorArgument && $tag = $value->getTaggedIteratorArgument()) {
                 if (null === $tag->getIndexAttribute()) {
                     $content = $tag->getTag();
                 } else {
@@ -235,7 +235,7 @@ class YamlDumper extends Dumper
             } elseif ($value instanceof ServiceLocatorArgument) {
                 $tag = 'service_locator';
             } else {
-                throw new RuntimeException(\sprintf('Unspecified Yaml tag for type "%s".', \get_debug_type($value)));
+                throw new RuntimeException(sprintf('Unspecified Yaml tag for type "%s".', get_debug_type($value)));
             }
             return new TaggedValue($tag, $this->dumpValue($value->getValues()));
         }
@@ -254,7 +254,7 @@ class YamlDumper extends Dumper
         } elseif ($value instanceof Definition) {
             return new TaggedValue('service', (new Parser())->parse("_:\n" . $this->addService('_', $value), Yaml::PARSE_CUSTOM_TAGS)['_']['_']);
         } elseif ($value instanceof \UnitEnum) {
-            return new TaggedValue('php/const', \sprintf('%s::%s', \get_class($value), $value->name));
+            return new TaggedValue('php/const', sprintf('%s::%s', \get_class($value), $value->name));
         } elseif ($value instanceof AbstractArgument) {
             return new TaggedValue('abstract', $value->getText());
         } elseif (\is_object($value) || \is_resource($value)) {
@@ -262,7 +262,7 @@ class YamlDumper extends Dumper
         }
         return $value;
     }
-    private function getServiceCall(string $id, ?Reference $reference = null) : string
+    private function getServiceCall(string $id, ?Reference $reference = null): string
     {
         if (null !== $reference) {
             switch ($reference->getInvalidBehavior()) {
@@ -271,42 +271,42 @@ class YamlDumper extends Dumper
                 case ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE:
                     break;
                 case ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE:
-                    return \sprintf('@!%s', $id);
+                    return sprintf('@!%s', $id);
                 default:
-                    return \sprintf('@?%s', $id);
+                    return sprintf('@?%s', $id);
             }
         }
-        return \sprintf('@%s', $id);
+        return sprintf('@%s', $id);
     }
-    private function getParameterCall(string $id) : string
+    private function getParameterCall(string $id): string
     {
-        return \sprintf('%%%s%%', $id);
+        return sprintf('%%%s%%', $id);
     }
-    private function getExpressionCall(string $expression) : string
+    private function getExpressionCall(string $expression): string
     {
-        return \sprintf('@=%s', $expression);
+        return sprintf('@=%s', $expression);
     }
-    private function prepareParameters(array $parameters, bool $escape = \true) : array
+    private function prepareParameters(array $parameters, bool $escape = \true): array
     {
         $filtered = [];
         foreach ($parameters as $key => $value) {
             if (\is_array($value)) {
                 $value = $this->prepareParameters($value, $escape);
-            } elseif ($value instanceof Reference || \is_string($value) && \str_starts_with($value, '@')) {
+            } elseif ($value instanceof Reference || \is_string($value) && str_starts_with($value, '@')) {
                 $value = '@' . $value;
             }
             $filtered[$key] = $value;
         }
         return $escape ? $this->escape($filtered) : $filtered;
     }
-    private function escape(array $arguments) : array
+    private function escape(array $arguments): array
     {
         $args = [];
         foreach ($arguments as $k => $v) {
             if (\is_array($v)) {
                 $args[$k] = $this->escape($v);
             } elseif (\is_string($v)) {
-                $args[$k] = \str_replace('%', '%%', $v);
+                $args[$k] = str_replace('%', '%%', $v);
             } else {
                 $args[$k] = $v;
             }

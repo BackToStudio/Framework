@@ -36,14 +36,14 @@ class MergeExtensionConfigurationPass implements CompilerPassInterface
         $definitions = $container->getDefinitions();
         $aliases = $container->getAliases();
         $exprLangProviders = $container->getExpressionLanguageProviders();
-        $configAvailable = \class_exists(BaseNode::class);
+        $configAvailable = class_exists(BaseNode::class);
         foreach ($container->getExtensions() as $extension) {
             if ($extension instanceof PrependExtensionInterface) {
                 $extension->prepend($container);
             }
         }
         foreach ($container->getExtensions() as $name => $extension) {
-            if (!($config = $container->getExtensionConfig($name))) {
+            if (!$config = $container->getExtensionConfig($name)) {
                 // this extension was not called
                 continue;
             }
@@ -60,7 +60,7 @@ class MergeExtensionConfigurationPass implements CompilerPassInterface
                 $tmpContainer = new MergeExtensionConfigurationContainerBuilder($extension, $resolvingBag);
                 $tmpContainer->setResourceTracking($container->isTrackingResources());
                 $tmpContainer->addObjectResource($extension);
-                if ($extension instanceof ConfigurationExtensionInterface && null !== ($configuration = $extension->getConfiguration($config, $tmpContainer))) {
+                if ($extension instanceof ConfigurationExtensionInterface && null !== $configuration = $extension->getConfiguration($config, $tmpContainer)) {
                     $tmpContainer->addObjectResource($configuration);
                 }
                 foreach ($exprLangProviders as $provider) {
@@ -97,16 +97,16 @@ class MergeExtensionConfigurationParameterBag extends EnvPlaceholderParameterBag
     }
     public function freezeAfterProcessing(Extension $extension, ContainerBuilder $container)
     {
-        if (!($config = $extension->getProcessedConfigs())) {
+        if (!$config = $extension->getProcessedConfigs()) {
             // Extension::processConfiguration() wasn't called, we cannot know how configs were merged
             return;
         }
         $this->processedEnvPlaceholders = [];
         // serialize config and container to catch env vars nested in object graphs
-        $config = \serialize($config) . \serialize($container->getDefinitions()) . \serialize($container->getAliases()) . \serialize($container->getParameterBag()->all());
+        $config = serialize($config) . serialize($container->getDefinitions()) . serialize($container->getAliases()) . serialize($container->getParameterBag()->all());
         foreach (parent::getEnvPlaceholders() as $env => $placeholders) {
             foreach ($placeholders as $placeholder) {
-                if (\false !== \stripos($config, $placeholder)) {
+                if (\false !== stripos($config, $placeholder)) {
                     $this->processedEnvPlaceholders[$env] = $placeholders;
                     break;
                 }
@@ -116,13 +116,13 @@ class MergeExtensionConfigurationParameterBag extends EnvPlaceholderParameterBag
     /**
      * {@inheritdoc}
      */
-    public function getEnvPlaceholders() : array
+    public function getEnvPlaceholders(): array
     {
         return $this->processedEnvPlaceholders ?? parent::getEnvPlaceholders();
     }
-    public function getUnusedEnvPlaceholders() : array
+    public function getUnusedEnvPlaceholders(): array
     {
-        return null === $this->processedEnvPlaceholders ? [] : \array_diff_key(parent::getEnvPlaceholders(), $this->processedEnvPlaceholders);
+        return null === $this->processedEnvPlaceholders ? [] : array_diff_key(parent::getEnvPlaceholders(), $this->processedEnvPlaceholders);
     }
 }
 /**
@@ -141,23 +141,23 @@ class MergeExtensionConfigurationContainerBuilder extends ContainerBuilder
     /**
      * {@inheritdoc}
      */
-    public function addCompilerPass(CompilerPassInterface $pass, string $type = PassConfig::TYPE_BEFORE_OPTIMIZATION, int $priority = 0) : self
+    public function addCompilerPass(CompilerPassInterface $pass, string $type = PassConfig::TYPE_BEFORE_OPTIMIZATION, int $priority = 0): self
     {
-        throw new LogicException(\sprintf('You cannot add compiler pass "%s" from extension "%s". Compiler passes must be registered before the container is compiled.', \get_debug_type($pass), $this->extensionClass));
+        throw new LogicException(sprintf('You cannot add compiler pass "%s" from extension "%s". Compiler passes must be registered before the container is compiled.', get_debug_type($pass), $this->extensionClass));
     }
     /**
      * {@inheritdoc}
      */
     public function registerExtension(ExtensionInterface $extension)
     {
-        throw new LogicException(\sprintf('You cannot register extension "%s" from "%s". Extensions must be registered before the container is compiled.', \get_debug_type($extension), $this->extensionClass));
+        throw new LogicException(sprintf('You cannot register extension "%s" from "%s". Extensions must be registered before the container is compiled.', get_debug_type($extension), $this->extensionClass));
     }
     /**
      * {@inheritdoc}
      */
     public function compile(bool $resolveEnvPlaceholders = \false)
     {
-        throw new LogicException(\sprintf('Cannot compile the container in extension "%s".', $this->extensionClass));
+        throw new LogicException(sprintf('Cannot compile the container in extension "%s".', $this->extensionClass));
     }
     /**
      * {@inheritdoc}
@@ -173,12 +173,12 @@ class MergeExtensionConfigurationContainerBuilder extends ContainerBuilder
             return parent::resolveEnvPlaceholders($value, $format, $usedEnvs);
         }
         foreach ($bag->getEnvPlaceholders() as $env => $placeholders) {
-            if (!\str_contains($env, ':')) {
+            if (!str_contains($env, ':')) {
                 continue;
             }
             foreach ($placeholders as $placeholder) {
-                if (\false !== \stripos($value, $placeholder)) {
-                    throw new RuntimeException(\sprintf('Using a cast in "env(%s)" is incompatible with resolution at compile time in "%s". The logic in the extension should be moved to a compiler pass, or an env parameter with no cast should be used instead.', $env, $this->extensionClass));
+                if (\false !== stripos($value, $placeholder)) {
+                    throw new RuntimeException(sprintf('Using a cast in "env(%s)" is incompatible with resolution at compile time in "%s". The logic in the extension should be moved to a compiler pass, or an env parameter with no cast should be used instead.', $env, $this->extensionClass));
                 }
             }
         }

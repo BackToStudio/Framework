@@ -50,7 +50,7 @@ class PhpFileLoader extends FileLoader
         $this->setCurrentDir(\dirname($path));
         $this->container->fileExists($path);
         // the closure forbids access to the private scope in the included file
-        $load = \Closure::bind(function ($path, $env) use($container, $loader, $resource, $type) {
+        $load = \Closure::bind(function ($path, $env) use ($container, $loader, $resource, $type) {
             return include $path;
         }, $this, ProtectedPhpFileLoader::class);
         try {
@@ -72,7 +72,7 @@ class PhpFileLoader extends FileLoader
         if (!\is_string($resource)) {
             return \false;
         }
-        if (null === $type && 'php' === \pathinfo($resource, \PATHINFO_EXTENSION)) {
+        if (null === $type && 'php' === pathinfo($resource, \PATHINFO_EXTENSION)) {
             return \true;
         }
         return 'php' === $type;
@@ -103,7 +103,7 @@ class PhpFileLoader extends FileLoader
         foreach ($r->getParameters() as $parameter) {
             $reflectionType = $parameter->getType();
             if (!$reflectionType instanceof \ReflectionNamedType) {
-                throw new \InvalidArgumentException(\sprintf('Could not resolve argument "$%s" for "%s". You must typehint it (for example with "%s" or "%s").', $parameter->getName(), $path, ContainerConfigurator::class, ContainerBuilder::class));
+                throw new \InvalidArgumentException(sprintf('Could not resolve argument "$%s" for "%s". You must typehint it (for example with "%s" or "%s").', $parameter->getName(), $path, ContainerConfigurator::class, ContainerBuilder::class));
             }
             $type = $reflectionType->getName();
             switch ($type) {
@@ -121,14 +121,14 @@ class PhpFileLoader extends FileLoader
                     try {
                         $configBuilder = $this->configBuilder($type);
                     } catch (InvalidArgumentException|\LogicException $e) {
-                        throw new \InvalidArgumentException(\sprintf('Could not resolve argument "%s" for "%s".', $type . ' $' . $parameter->getName(), $path), 0, $e);
+                        throw new \InvalidArgumentException(sprintf('Could not resolve argument "%s" for "%s".', $type . ' $' . $parameter->getName(), $path), 0, $e);
                     }
                     $configBuilders[] = $configBuilder;
                     $arguments[] = $configBuilder;
             }
         }
         // Force load ContainerConfigurator to make env(), param() etc available.
-        \class_exists(ContainerConfigurator::class);
+        class_exists(ContainerConfigurator::class);
         $callback(...$arguments);
         /** @var ConfigBuilderInterface $configBuilder */
         foreach ($configBuilders as $configBuilder) {
@@ -138,36 +138,36 @@ class PhpFileLoader extends FileLoader
     /**
      * @param string $namespace FQCN string for a class implementing ConfigBuilderInterface
      */
-    private function configBuilder(string $namespace) : ConfigBuilderInterface
+    private function configBuilder(string $namespace): ConfigBuilderInterface
     {
-        if (!\class_exists(ConfigBuilderGenerator::class)) {
+        if (!class_exists(ConfigBuilderGenerator::class)) {
             throw new \LogicException('You cannot use the config builder as the Config component is not installed. Try running "composer require symfony/config".');
         }
         if (null === $this->generator) {
             throw new \LogicException('You cannot use the ConfigBuilders without providing a class implementing ConfigBuilderGeneratorInterface.');
         }
         // If class exists and implements ConfigBuilderInterface
-        if (\class_exists($namespace) && \is_subclass_of($namespace, ConfigBuilderInterface::class)) {
+        if (class_exists($namespace) && is_subclass_of($namespace, ConfigBuilderInterface::class)) {
             return new $namespace();
         }
         // If it does not start with Symfony\Config\ we dont know how to handle this
-        if ('Symfony\\Config\\' !== \substr($namespace, 0, 15)) {
-            throw new InvalidArgumentException(\sprintf('Could not find or generate class "%s".', $namespace));
+        if ('Symfony\Config\\' !== substr($namespace, 0, 15)) {
+            throw new InvalidArgumentException(sprintf('Could not find or generate class "%s".', $namespace));
         }
         // Try to get the extension alias
-        $alias = Container::underscore(\substr($namespace, 15, -6));
-        if (\false !== \strpos($alias, '\\')) {
-            throw new InvalidArgumentException('You can only use "root" ConfigBuilders from "Symfony\\Config\\" namespace. Nested classes like "Symfony\\Config\\Framework\\CacheConfig" cannot be used.');
+        $alias = Container::underscore(substr($namespace, 15, -6));
+        if (\false !== strpos($alias, '\\')) {
+            throw new InvalidArgumentException('You can only use "root" ConfigBuilders from "Symfony\Config\" namespace. Nested classes like "Symfony\Config\Framework\CacheConfig" cannot be used.');
         }
         if (!$this->container->hasExtension($alias)) {
-            $extensions = \array_filter(\array_map(function (ExtensionInterface $ext) {
+            $extensions = array_filter(array_map(function (ExtensionInterface $ext) {
                 return $ext->getAlias();
             }, $this->container->getExtensions()));
-            throw new InvalidArgumentException(\sprintf('There is no extension able to load the configuration for "%s". Looked for namespace "%s", found "%s".', $namespace, $alias, $extensions ? \implode('", "', $extensions) : 'none'));
+            throw new InvalidArgumentException(sprintf('There is no extension able to load the configuration for "%s". Looked for namespace "%s", found "%s".', $namespace, $alias, $extensions ? implode('", "', $extensions) : 'none'));
         }
         $extension = $this->container->getExtension($alias);
         if (!$extension instanceof ConfigurationExtensionInterface) {
-            throw new \LogicException(\sprintf('You cannot use the config builder for "%s" because the extension does not implement "%s".', $namespace, ConfigurationExtensionInterface::class));
+            throw new \LogicException(sprintf('You cannot use the config builder for "%s" because the extension does not implement "%s".', $namespace, ConfigurationExtensionInterface::class));
         }
         $configuration = $extension->getConfiguration([], $this->container);
         $loader = $this->generator->build($configuration);

@@ -28,7 +28,7 @@ class ServiceReferenceGraph
      * @var ServiceReferenceGraphNode[]
      */
     private $nodes = [];
-    public function hasNode(string $id) : bool
+    public function hasNode(string $id): bool
     {
         return isset($this->nodes[$id]);
     }
@@ -37,10 +37,10 @@ class ServiceReferenceGraph
      *
      * @throws InvalidArgumentException if no node matches the supplied identifier
      */
-    public function getNode(string $id) : ServiceReferenceGraphNode
+    public function getNode(string $id): ServiceReferenceGraphNode
     {
         if (!isset($this->nodes[$id])) {
-            throw new InvalidArgumentException(\sprintf('There is no node with id "%s".', $id));
+            throw new InvalidArgumentException(sprintf('There is no node with id "%s".', $id));
         }
         return $this->nodes[$id];
     }
@@ -49,7 +49,7 @@ class ServiceReferenceGraph
      *
      * @return ServiceReferenceGraphNode[]
      */
-    public function getNodes() : array
+    public function getNodes(): array
     {
         return $this->nodes;
     }
@@ -77,7 +77,7 @@ class ServiceReferenceGraph
         $sourceNode->addOutEdge($edge);
         $destNode->addInEdge($edge);
     }
-    private function createNode(string $id, $value) : ServiceReferenceGraphNode
+    private function createNode(string $id, $value): ServiceReferenceGraphNode
     {
         if (isset($this->nodes[$id]) && $this->nodes[$id]->getValue() === $value) {
             return $this->nodes[$id];

@@ -20,7 +20,7 @@ class ProxyHelper
     /**
      * @return string|null The FQCN or builtin name of the type hint, or null when the type hint references an invalid self|parent context
      */
-    public static function getTypeHint(\ReflectionFunctionAbstract $r, ?\ReflectionParameter $p = null, bool $noBuiltin = \false) : ?string
+    public static function getTypeHint(\ReflectionFunctionAbstract $r, ?\ReflectionParameter $p = null, bool $noBuiltin = \false): ?string
     {
         if ($p instanceof \ReflectionParameter) {
             $type = $p->getType();
@@ -32,7 +32,7 @@ class ProxyHelper
         }
         return self::getTypeHintForType($type, $r, $noBuiltin);
     }
-    private static function getTypeHintForType(\ReflectionType $type, \ReflectionFunctionAbstract $r, bool $noBuiltin) : ?string
+    private static function getTypeHintForType(\ReflectionType $type, \ReflectionFunctionAbstract $r, bool $noBuiltin): ?string
     {
         $types = [];
         $glue = '|';
@@ -52,7 +52,7 @@ class ProxyHelper
                 if (null === $typeHint) {
                     return null;
                 }
-                $types[] = \sprintf('(%s)', $typeHint);
+                $types[] = sprintf('(%s)', $typeHint);
                 continue;
             }
             if ($type->isBuiltin()) {
@@ -61,7 +61,7 @@ class ProxyHelper
                 }
                 continue;
             }
-            $lcName = \strtolower($type->getName());
+            $lcName = strtolower($type->getName());
             $prefix = $noBuiltin ? '' : '\\';
             if ('self' !== $lcName && 'parent' !== $lcName) {
                 $types[] = $prefix . $type->getName();
@@ -76,7 +76,7 @@ class ProxyHelper
                 $types[] = ($parent = $r->getDeclaringClass()->getParentClass()) ? $prefix . $parent->name : null;
             }
         }
-        \sort($types);
-        return $types ? \implode($glue, $types) : null;
+        sort($types);
+        return $types ? implode($glue, $types) : null;
     }
 }

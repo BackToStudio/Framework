@@ -32,7 +32,7 @@ class ValidateEnvPlaceholdersPass implements CompilerPassInterface
     public function process(ContainerBuilder $container)
     {
         $this->extensionConfig = [];
-        if (!\class_exists(BaseNode::class) || !($extensions = $container->getExtensions())) {
+        if (!class_exists(BaseNode::class) || !$extensions = $container->getExtensions()) {
             return;
         }
         $resolvingBag = $container->getParameterBag();
@@ -43,12 +43,12 @@ class ValidateEnvPlaceholdersPass implements CompilerPassInterface
         $envTypes = $resolvingBag->getProvidedTypes();
         foreach ($resolvingBag->getEnvPlaceholders() + $resolvingBag->getUnusedEnvPlaceholders() as $env => $placeholders) {
             $values = [];
-            if (\false === ($i = \strpos($env, ':'))) {
+            if (\false === $i = strpos($env, ':')) {
                 $default = $defaultBag->has("env({$env})") ? $defaultBag->get("env({$env})") : self::TYPE_FIXTURES['string'];
-                $defaultType = null !== $default ? \get_debug_type($default) : 'string';
+                $defaultType = null !== $default ? get_debug_type($default) : 'string';
                 $values[$defaultType] = $default;
             } else {
-                $prefix = \substr($env, 0, $i);
+                $prefix = substr($env, 0, $i);
                 foreach ($envTypes[$prefix] ?? ['string'] as $type) {
                     $values[$type] = self::TYPE_FIXTURES[$type] ?? null;
                 }
@@ -59,14 +59,14 @@ class ValidateEnvPlaceholdersPass implements CompilerPassInterface
         }
         $processor = new Processor();
         foreach ($extensions as $name => $extension) {
-            if (!($extension instanceof ConfigurationExtensionInterface || $extension instanceof ConfigurationInterface) || !($config = \array_filter($container->getExtensionConfig($name)))) {
+            if (!($extension instanceof ConfigurationExtensionInterface || $extension instanceof ConfigurationInterface) || !$config = array_filter($container->getExtensionConfig($name))) {
                 // this extension has no semantic configuration or was not called
                 continue;
             }
             $config = $resolvingBag->resolveValue($config);
             if ($extension instanceof ConfigurationInterface) {
                 $configuration = $extension;
-            } elseif (null === ($configuration = $extension->getConfiguration($config, $container))) {
+            } elseif (null === $configuration = $extension->getConfiguration($config, $container)) {
                 continue;
             }
             $this->extensionConfig[$name] = $processor->processConfiguration($configuration, $config);
@@ -76,7 +76,7 @@ class ValidateEnvPlaceholdersPass implements CompilerPassInterface
     /**
      * @internal
      */
-    public function getExtensionConfig() : array
+    public function getExtensionConfig(): array
     {
         try {
             return $this->extensionConfig;

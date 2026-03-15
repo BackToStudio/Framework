@@ -23,8 +23,8 @@ class ResolveFactoryClassPass extends AbstractRecursivePass
     protected function processValue($value, bool $isRoot = \false)
     {
         if ($value instanceof Definition && \is_array($factory = $value->getFactory()) && null === $factory[0]) {
-            if (null === ($class = $value->getClass())) {
-                throw new RuntimeException(\sprintf('The "%s" service is defined to be created by a factory, but is missing the factory class. Did you forget to define the factory or service class?', $this->currentId));
+            if (null === $class = $value->getClass()) {
+                throw new RuntimeException(sprintf('The "%s" service is defined to be created by a factory, but is missing the factory class. Did you forget to define the factory or service class?', $this->currentId));
             }
             $factory[0] = $class;
             $value->setFactory($factory);

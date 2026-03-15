@@ -92,24 +92,24 @@ class Alias
             $message = (string) $args[2];
         }
         if ('' !== $message) {
-            if (\preg_match('#[\\r\\n]|\\*/#', $message)) {
+            if (preg_match('#[\r\n]|\*/#', $message)) {
                 throw new InvalidArgumentException('Invalid characters found in deprecation template.');
             }
-            if (!\str_contains($message, '%alias_id%')) {
+            if (!str_contains($message, '%alias_id%')) {
                 throw new InvalidArgumentException('The deprecation template must contain the "%alias_id%" placeholder.');
             }
         }
         $this->deprecation = $status ? ['package' => $package, 'version' => $version, 'message' => $message ?: self::DEFAULT_DEPRECATION_TEMPLATE] : [];
         return $this;
     }
-    public function isDeprecated() : bool
+    public function isDeprecated(): bool
     {
         return (bool) $this->deprecation;
     }
     /**
      * @deprecated since Symfony 5.1, use "getDeprecation()" instead.
      */
-    public function getDeprecationMessage(string $id) : string
+    public function getDeprecationMessage(string $id): string
     {
         trigger_deprecation('symfony/dependency-injection', '5.1', 'The "%s()" method is deprecated, use "getDeprecation()" instead.', __METHOD__);
         return $this->getDeprecation($id)['message'];
@@ -117,9 +117,9 @@ class Alias
     /**
      * @param string $id Service id relying on this definition
      */
-    public function getDeprecation(string $id) : array
+    public function getDeprecation(string $id): array
     {
-        return ['package' => $this->deprecation['package'], 'version' => $this->deprecation['version'], 'message' => \str_replace('%alias_id%', $id, $this->deprecation['message'])];
+        return ['package' => $this->deprecation['package'], 'version' => $this->deprecation['version'], 'message' => str_replace('%alias_id%', $id, $this->deprecation['message'])];
     }
     /**
      * Returns the Id of this alias.

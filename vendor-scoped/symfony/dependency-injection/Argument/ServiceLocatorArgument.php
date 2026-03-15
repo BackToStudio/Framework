@@ -32,7 +32,7 @@ class ServiceLocatorArgument implements ArgumentInterface
             $this->setValues($values);
         }
     }
-    public function getTaggedIteratorArgument() : ?TaggedIteratorArgument
+    public function getTaggedIteratorArgument(): ?TaggedIteratorArgument
     {
         return $this->taggedIteratorArgument;
     }

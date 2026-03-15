@@ -62,10 +62,10 @@ abstract class Extension implements ExtensionInterface, ConfigurationExtensionIn
     public function getAlias()
     {
         $className = static::class;
-        if (!\str_ends_with($className, 'Extension')) {
+        if (!str_ends_with($className, 'Extension')) {
             throw new BadMethodCallException('This extension does not follow the naming convention; you must overwrite the getAlias() method.');
         }
-        $classBaseName = \substr(\strrchr($className, '\\'), 1, -9);
+        $classBaseName = substr(strrchr($className, '\\'), 1, -9);
         return Container::underscore($classBaseName);
     }
     /**
@@ -74,24 +74,24 @@ abstract class Extension implements ExtensionInterface, ConfigurationExtensionIn
     public function getConfiguration(array $config, ContainerBuilder $container)
     {
         $class = static::class;
-        if (\str_contains($class, "\x00")) {
+        if (str_contains($class, "\x00")) {
             return null;
             // ignore anonymous classes
         }
-        $class = \substr_replace($class, '\\Configuration', \strrpos($class, '\\'));
+        $class = substr_replace($class, '\Configuration', strrpos($class, '\\'));
         $class = $container->getReflectionClass($class);
         if (!$class) {
             return null;
         }
         if (!$class->implementsInterface(ConfigurationInterface::class)) {
-            throw new LogicException(\sprintf('The extension configuration class "%s" must implement "%s".', $class->getName(), ConfigurationInterface::class));
+            throw new LogicException(sprintf('The extension configuration class "%s" must implement "%s".', $class->getName(), ConfigurationInterface::class));
         }
         if (!($constructor = $class->getConstructor()) || !$constructor->getNumberOfRequiredParameters()) {
             return $class->newInstance();
         }
         return null;
     }
-    protected final function processConfiguration(ConfigurationInterface $configuration, array $configs) : array
+    final protected function processConfiguration(ConfigurationInterface $configuration, array $configs): array
     {
         $processor = new Processor();
         return $this->processedConfigs[] = $processor->processConfiguration($configuration, $configs);
@@ -99,7 +99,7 @@ abstract class Extension implements ExtensionInterface, ConfigurationExtensionIn
     /**
      * @internal
      */
-    public final function getProcessedConfigs() : array
+    final public function getProcessedConfigs(): array
     {
         try {
             return $this->processedConfigs;

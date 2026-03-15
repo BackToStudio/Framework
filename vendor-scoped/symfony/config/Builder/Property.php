@@ -30,44 +30,44 @@ class Property
         $this->name = $name;
         $this->originalName = $originalName;
     }
-    public function getName() : string
+    public function getName(): string
     {
         return $this->name;
     }
-    public function getOriginalName() : string
+    public function getOriginalName(): string
     {
         return $this->originalName;
     }
-    public function setType(string $type) : void
+    public function setType(string $type): void
     {
         $this->array = \false;
         $this->type = $type;
-        if ('|scalar' === \substr($type, -7)) {
+        if ('|scalar' === substr($type, -7)) {
             $this->scalarsAllowed = \true;
-            $this->type = $type = \substr($type, 0, -7);
+            $this->type = $type = substr($type, 0, -7);
         }
-        if ('[]' === \substr($type, -2)) {
+        if ('[]' === substr($type, -2)) {
             $this->array = \true;
-            $this->type = \substr($type, 0, -2);
+            $this->type = substr($type, 0, -2);
         }
     }
-    public function getType() : ?string
+    public function getType(): ?string
     {
         return $this->type;
     }
-    public function getContent() : ?string
+    public function getContent(): ?string
     {
         return $this->content;
     }
-    public function setContent(string $content) : void
+    public function setContent(string $content): void
     {
         $this->content = $content;
     }
-    public function isArray() : bool
+    public function isArray(): bool
     {
         return $this->array;
     }
-    public function areScalarsAllowed() : bool
+    public function areScalarsAllowed(): bool
     {
         return $this->scalarsAllowed;
     }

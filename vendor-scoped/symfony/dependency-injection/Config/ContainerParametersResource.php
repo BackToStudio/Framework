@@ -28,11 +28,11 @@ class ContainerParametersResource implements ResourceInterface
     {
         $this->parameters = $parameters;
     }
-    public function __toString() : string
+    public function __toString(): string
     {
-        return 'container_parameters_' . \md5(\serialize($this->parameters));
+        return 'container_parameters_' . md5(serialize($this->parameters));
     }
-    public function getParameters() : array
+    public function getParameters(): array
     {
         return $this->parameters;
     }

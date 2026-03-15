@@ -37,7 +37,7 @@ trait PriorityTaggedServiceTrait
      *
      * @return Reference[]
      */
-    private function findAndSortTaggedServices($tagName, ContainerBuilder $container) : array
+    private function findAndSortTaggedServices($tagName, ContainerBuilder $container): array
     {
         $indexAttribute = $defaultIndexMethod = $needsIndexes = $defaultPriorityMethod = null;
         if ($tagName instanceof TaggedIteratorArgument) {
@@ -63,7 +63,7 @@ trait PriorityTaggedServiceTrait
                 } elseif (null === $defaultPriority && $defaultPriorityMethod && $class) {
                     $defaultPriority = PriorityTaggedServiceUtil::getDefault($container, $serviceId, $class, $defaultPriorityMethod, $tagName, 'priority', $checkTaggedItem);
                 }
-                $priority = $priority ?? $defaultPriority ?? ($defaultPriority = 0);
+                $priority = $priority ?? $defaultPriority ?? $defaultPriority = 0;
                 if (null === $indexAttribute && !$defaultIndexMethod && !$needsIndexes) {
                     $services[] = [$priority, ++$i, null, $serviceId, null];
                     continue 2;
@@ -73,11 +73,11 @@ trait PriorityTaggedServiceTrait
                 } elseif (null === $defaultIndex && $defaultPriorityMethod && $class) {
                     $defaultIndex = PriorityTaggedServiceUtil::getDefault($container, $serviceId, $class, $defaultIndexMethod ?? 'getDefaultName', $tagName, $indexAttribute, $checkTaggedItem);
                 }
-                $index = $index ?? $defaultIndex ?? ($defaultIndex = $serviceId);
+                $index = $index ?? $defaultIndex ?? $defaultIndex = $serviceId;
                 $services[] = [$priority, ++$i, $index, $serviceId, $class];
             }
         }
-        \uasort($services, static function ($a, $b) {
+        uasort($services, static function ($a, $b) {
             return $b[0] <=> $a[0] ?: $a[1] <=> $b[1];
         });
         $refs = [];
@@ -118,21 +118,21 @@ class PriorityTaggedServiceUtil
             return null;
         }
         if (null !== $indexAttribute) {
-            $service = $class !== $serviceId ? \sprintf('service "%s"', $serviceId) : 'on the corresponding service';
-            $message = [\sprintf('Either method "%s::%s()" should ', $class, $defaultMethod), \sprintf(' or tag "%s" on %s is missing attribute "%s".', $tagName, $service, $indexAttribute)];
+            $service = $class !== $serviceId ? sprintf('service "%s"', $serviceId) : 'on the corresponding service';
+            $message = [sprintf('Either method "%s::%s()" should ', $class, $defaultMethod), sprintf(' or tag "%s" on %s is missing attribute "%s".', $tagName, $service, $indexAttribute)];
         } else {
-            $message = [\sprintf('Method "%s::%s()" should ', $class, $defaultMethod), '.'];
+            $message = [sprintf('Method "%s::%s()" should ', $class, $defaultMethod), '.'];
         }
         if (!($rm = $r->getMethod($defaultMethod))->isStatic()) {
-            throw new InvalidArgumentException(\implode('be static', $message));
+            throw new InvalidArgumentException(implode('be static', $message));
         }
         if (!$rm->isPublic()) {
-            throw new InvalidArgumentException(\implode('be public', $message));
+            throw new InvalidArgumentException(implode('be public', $message));
         }
         $default = $rm->invoke(null);
         if ('priority' === $indexAttribute) {
             if (!\is_int($default)) {
-                throw new InvalidArgumentException(\implode(\sprintf('return int (got "%s")', \get_debug_type($default)), $message));
+                throw new InvalidArgumentException(implode(sprintf('return int (got "%s")', get_debug_type($default)), $message));
             }
             return $default;
         }
@@ -140,7 +140,7 @@ class PriorityTaggedServiceUtil
             $default = (string) $default;
         }
         if (!\is_string($default)) {
-            throw new InvalidArgumentException(\implode(\sprintf('return string|int (got "%s")', \get_debug_type($default)), $message));
+            throw new InvalidArgumentException(implode(sprintf('return string|int (got "%s")', get_debug_type($default)), $message));
         }
         return $default;
     }

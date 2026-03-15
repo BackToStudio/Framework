@@ -35,7 +35,7 @@ class InstanceofConfigurator extends AbstractServiceConfigurator
     /**
      * Defines an instanceof-conditional to be applied to following service definitions.
      */
-    public final function instanceof(string $fqcn) : self
+    final public function instanceof(string $fqcn): self
     {
         return $this->parent->instanceof($fqcn);
     }

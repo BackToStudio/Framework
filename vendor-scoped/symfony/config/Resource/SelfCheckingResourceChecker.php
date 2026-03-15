@@ -36,6 +36,6 @@ class SelfCheckingResourceChecker implements ResourceCheckerInterface
     public function isFresh(ResourceInterface $resource, int $timestamp)
     {
         $key = "{$resource}:{$timestamp}";
-        return self::$cache[$key] ?? (self::$cache[$key] = $resource->isFresh($timestamp));
+        return self::$cache[$key] ?? self::$cache[$key] = $resource->isFresh($timestamp);
     }
 }

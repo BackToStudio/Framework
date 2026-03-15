@@ -46,7 +46,7 @@ class PrototypeConfigurator extends AbstractServiceConfigurator
         $definition->setAutowired($defaults->isAutowired());
         $definition->setAutoconfigured($defaults->isAutoconfigured());
         // deep clone, to avoid multiple process of the same instance in the passes
-        $definition->setBindings(\unserialize(\serialize($defaults->getBindings())));
+        $definition->setBindings(unserialize(serialize($defaults->getBindings())));
         $definition->setChanges([]);
         $this->loader = $loader;
         $this->resource = $resource;
@@ -68,7 +68,7 @@ class PrototypeConfigurator extends AbstractServiceConfigurator
      *
      * @return $this
      */
-    public final function exclude($excludes) : self
+    final public function exclude($excludes): self
     {
         $this->excludes = (array) $excludes;
         return $this;

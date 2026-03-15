@@ -41,7 +41,7 @@ abstract class BaseNode implements NodeInterface
      */
     public function __construct(?string $name, ?NodeInterface $parent = null, string $pathSeparator = self::DEFAULT_PATH_SEPARATOR)
     {
-        if (\str_contains($name = (string) $name, $pathSeparator)) {
+        if (str_contains($name = (string) $name, $pathSeparator)) {
             throw new \InvalidArgumentException('The name must not contain ".' . $pathSeparator . '".');
         }
         $this->name = $name;
@@ -56,7 +56,7 @@ abstract class BaseNode implements NodeInterface
      *
      * @internal
      */
-    public static function setPlaceholder(string $placeholder, array $values) : void
+    public static function setPlaceholder(string $placeholder, array $values): void
     {
         if (!$values) {
             throw new \InvalidArgumentException('At least one value must be provided.');
@@ -71,7 +71,7 @@ abstract class BaseNode implements NodeInterface
      *
      * @internal
      */
-    public static function setPlaceholderUniquePrefix(string $prefix) : void
+    public static function setPlaceholderUniquePrefix(string $prefix): void
     {
         self::$placeholderUniquePrefixes[] = $prefix;
     }
@@ -80,7 +80,7 @@ abstract class BaseNode implements NodeInterface
      *
      * @internal
      */
-    public static function resetPlaceholders() : void
+    public static function resetPlaceholders(): void
     {
         self::$placeholderUniquePrefixes = [];
         self::$placeholders = [];
@@ -258,9 +258,9 @@ abstract class BaseNode implements NodeInterface
      * @param string $node The configuration node name
      * @param string $path The path of the node
      */
-    public function getDeprecation(string $node, string $path) : array
+    public function getDeprecation(string $node, string $path): array
     {
-        return ['package' => $this->deprecation['package'] ?? '', 'version' => $this->deprecation['version'] ?? '', 'message' => \strtr($this->deprecation['message'] ?? '', ['%node%' => $node, '%path%' => $path])];
+        return ['package' => $this->deprecation['package'] ?? '', 'version' => $this->deprecation['version'] ?? '', 'message' => strtr($this->deprecation['message'] ?? '', ['%node%' => $node, '%path%' => $path])];
     }
     /**
      * {@inheritdoc}
@@ -282,12 +282,12 @@ abstract class BaseNode implements NodeInterface
     /**
      * {@inheritdoc}
      */
-    public final function merge($leftSide, $rightSide)
+    final public function merge($leftSide, $rightSide)
     {
         if (!$this->allowOverwrite) {
-            throw new ForbiddenOverwriteException(\sprintf('Configuration path "%s" cannot be overwritten. You have to define all options for this path, and any of its sub-paths in one configuration section.', $this->getPath()));
+            throw new ForbiddenOverwriteException(sprintf('Configuration path "%s" cannot be overwritten. You have to define all options for this path, and any of its sub-paths in one configuration section.', $this->getPath()));
         }
-        if ($leftSide !== ($leftPlaceholders = self::resolvePlaceholderValue($leftSide))) {
+        if ($leftSide !== $leftPlaceholders = self::resolvePlaceholderValue($leftSide)) {
             foreach ($leftPlaceholders as $leftPlaceholder) {
                 $this->handlingPlaceholder = $leftSide;
                 try {
@@ -298,7 +298,7 @@ abstract class BaseNode implements NodeInterface
             }
             return $rightSide;
         }
-        if ($rightSide !== ($rightPlaceholders = self::resolvePlaceholderValue($rightSide))) {
+        if ($rightSide !== $rightPlaceholders = self::resolvePlaceholderValue($rightSide)) {
             foreach ($rightPlaceholders as $rightPlaceholder) {
                 $this->handlingPlaceholder = $rightSide;
                 try {
@@ -316,7 +316,7 @@ abstract class BaseNode implements NodeInterface
     /**
      * {@inheritdoc}
      */
-    public final function normalize($value)
+    final public function normalize($value)
     {
         $value = $this->preNormalize($value);
         // run custom normalization closures
@@ -324,7 +324,7 @@ abstract class BaseNode implements NodeInterface
             $value = $closure($value);
         }
         // resolve placeholder value
-        if ($value !== ($placeholders = self::resolvePlaceholderValue($value))) {
+        if ($value !== $placeholders = self::resolvePlaceholderValue($value)) {
             foreach ($placeholders as $placeholder) {
                 $this->handlingPlaceholder = $value;
                 try {
@@ -369,9 +369,9 @@ abstract class BaseNode implements NodeInterface
     /**
      * {@inheritdoc}
      */
-    public final function finalize($value)
+    final public function finalize($value)
     {
-        if ($value !== ($placeholders = self::resolvePlaceholderValue($value))) {
+        if ($value !== $placeholders = self::resolvePlaceholderValue($value)) {
             foreach ($placeholders as $placeholder) {
                 $this->handlingPlaceholder = $value;
                 try {
@@ -395,7 +395,7 @@ abstract class BaseNode implements NodeInterface
                 }
                 throw $e;
             } catch (\Exception $e) {
-                throw new InvalidConfigurationException(\sprintf('Invalid configuration for path "%s": ', $this->getPath()) . $e->getMessage(), $e->getCode(), $e);
+                throw new InvalidConfigurationException(sprintf('Invalid configuration for path "%s": ', $this->getPath()) . $e->getMessage(), $e->getCode(), $e);
             }
         }
         return $value;
@@ -407,7 +407,7 @@ abstract class BaseNode implements NodeInterface
      *
      * @throws InvalidTypeException when the value is invalid
      */
-    protected abstract function validateType($value);
+    abstract protected function validateType($value);
     /**
      * Normalizes the value.
      *
@@ -415,7 +415,7 @@ abstract class BaseNode implements NodeInterface
      *
      * @return mixed
      */
-    protected abstract function normalizeValue($value);
+    abstract protected function normalizeValue($value);
     /**
      * Merges two values together.
      *
@@ -424,7 +424,7 @@ abstract class BaseNode implements NodeInterface
      *
      * @return mixed
      */
-    protected abstract function mergeValues($leftSide, $rightSide);
+    abstract protected function mergeValues($leftSide, $rightSide);
     /**
      * Finalizes a value.
      *
@@ -432,25 +432,25 @@ abstract class BaseNode implements NodeInterface
      *
      * @return mixed
      */
-    protected abstract function finalizeValue($value);
+    abstract protected function finalizeValue($value);
     /**
      * Tests if placeholder values are allowed for this node.
      */
-    protected function allowPlaceholders() : bool
+    protected function allowPlaceholders(): bool
     {
         return \true;
     }
     /**
      * Tests if a placeholder is being handled currently.
      */
-    protected function isHandlingPlaceholder() : bool
+    protected function isHandlingPlaceholder(): bool
     {
         return null !== $this->handlingPlaceholder;
     }
     /**
      * Gets allowed dynamic types for this node.
      */
-    protected function getValidPlaceholderTypes() : array
+    protected function getValidPlaceholderTypes(): array
     {
         return [];
     }
@@ -461,17 +461,17 @@ abstract class BaseNode implements NodeInterface
                 return self::$placeholders[$value];
             }
             foreach (self::$placeholderUniquePrefixes as $placeholderUniquePrefix) {
-                if (\str_starts_with($value, $placeholderUniquePrefix)) {
+                if (str_starts_with($value, $placeholderUniquePrefix)) {
                     return [];
                 }
             }
         }
         return $value;
     }
-    private function doValidateType($value) : void
+    private function doValidateType($value): void
     {
         if (null !== $this->handlingPlaceholder && !$this->allowPlaceholders()) {
-            $e = new InvalidTypeException(\sprintf('A dynamic value is not compatible with a "%s" node type at path "%s".', static::class, $this->getPath()));
+            $e = new InvalidTypeException(sprintf('A dynamic value is not compatible with a "%s" node type at path "%s".', static::class, $this->getPath()));
             $e->setPath($this->getPath());
             throw $e;
         }
@@ -479,10 +479,10 @@ abstract class BaseNode implements NodeInterface
             $this->validateType($value);
             return;
         }
-        $knownTypes = \array_keys(self::$placeholders[$this->handlingPlaceholder]);
+        $knownTypes = array_keys(self::$placeholders[$this->handlingPlaceholder]);
         $validTypes = $this->getValidPlaceholderTypes();
-        if ($validTypes && \array_diff($knownTypes, $validTypes)) {
-            $e = new InvalidTypeException(\sprintf('Invalid type for path "%s". Expected %s, but got %s.', $this->getPath(), 1 === \count($validTypes) ? '"' . \reset($validTypes) . '"' : 'one of "' . \implode('", "', $validTypes) . '"', 1 === \count($knownTypes) ? '"' . \reset($knownTypes) . '"' : 'one of "' . \implode('", "', $knownTypes) . '"'));
+        if ($validTypes && array_diff($knownTypes, $validTypes)) {
+            $e = new InvalidTypeException(sprintf('Invalid type for path "%s". Expected %s, but got %s.', $this->getPath(), 1 === \count($validTypes) ? '"' . reset($validTypes) . '"' : 'one of "' . implode('", "', $validTypes) . '"', 1 === \count($knownTypes) ? '"' . reset($knownTypes) . '"' : 'one of "' . implode('", "', $knownTypes) . '"'));
             if ($hint = $this->getInfo()) {
                 $e->addHint($hint);
             }

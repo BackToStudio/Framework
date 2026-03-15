@@ -34,7 +34,7 @@ class AutowireRequiredPropertiesPass extends AbstractRecursivePass
         if (!$value instanceof Definition || !$value->isAutowired() || $value->isAbstract() || !$value->getClass()) {
             return $value;
         }
-        if (!($reflectionClass = $this->container->getReflectionClass($value->getClass(), \false))) {
+        if (!$reflectionClass = $this->container->getReflectionClass($value->getClass(), \false)) {
             return $value;
         }
         $properties = $value->getProperties();
@@ -42,7 +42,7 @@ class AutowireRequiredPropertiesPass extends AbstractRecursivePass
             if (!($type = $reflectionProperty->getType()) instanceof \ReflectionNamedType) {
                 continue;
             }
-            if ((\PHP_VERSION_ID < 80000 || !$reflectionProperty->getAttributes(Required::class)) && (\false === ($doc = $reflectionProperty->getDocComment()) || \false === \stripos($doc, '@required') || !\preg_match('#(?:^/\\*\\*|\\n\\s*+\\*)\\s*+@required(?:\\s|\\*/$)#i', $doc))) {
+            if ((\PHP_VERSION_ID < 80000 || !$reflectionProperty->getAttributes(Required::class)) && (\false === ($doc = $reflectionProperty->getDocComment()) || \false === stripos($doc, '@required') || !preg_match('#(?:^/\*\*|\n\s*+\*)\s*+@required(?:\s|\*/$)#i', $doc))) {
                 continue;
             }
             if (\array_key_exists($name = $reflectionProperty->getName(), $properties)) {

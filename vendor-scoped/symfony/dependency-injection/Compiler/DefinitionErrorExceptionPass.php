@@ -39,7 +39,7 @@ class DefinitionErrorExceptionPass extends AbstractRecursivePass
                 }
                 // only show the first error so the user can focus on it
                 $errors = $definition->getErrors();
-                throw new RuntimeException(\reset($errors));
+                throw new RuntimeException(reset($errors));
             }
         } finally {
             $this->erroredDefinitions = [];
@@ -55,9 +55,9 @@ class DefinitionErrorExceptionPass extends AbstractRecursivePass
             parent::processValue($value->getValues());
             return $value;
         }
-        if ($value instanceof Reference && $this->currentId !== ($targetId = (string) $value)) {
+        if ($value instanceof Reference && $this->currentId !== $targetId = (string) $value) {
             if (ContainerInterface::RUNTIME_EXCEPTION_ON_INVALID_REFERENCE === $value->getInvalidBehavior()) {
-                $this->sourceReferences[$targetId][$this->currentId] ?? ($this->sourceReferences[$targetId][$this->currentId] = \true);
+                $this->sourceReferences[$targetId][$this->currentId] ?? $this->sourceReferences[$targetId][$this->currentId] = \true;
             } else {
                 $this->sourceReferences[$targetId][$this->currentId] = \false;
             }
@@ -69,7 +69,7 @@ class DefinitionErrorExceptionPass extends AbstractRecursivePass
         $this->erroredDefinitions[$this->currentId] = $value;
         return parent::processValue($value);
     }
-    private function isErrorForRuntime(string $id, array &$visitedIds) : bool
+    private function isErrorForRuntime(string $id, array &$visitedIds): bool
     {
         if (!isset($this->sourceReferences[$id])) {
             return \false;
@@ -79,7 +79,7 @@ class DefinitionErrorExceptionPass extends AbstractRecursivePass
         }
         $visitedIds[$id] = \true;
         foreach ($this->sourceReferences[$id] as $sourceId => $isRuntime) {
-            if ($visitedIds[$sourceId] ?? ($visitedIds[$sourceId] = $this->isErrorForRuntime($sourceId, $visitedIds))) {
+            if ($visitedIds[$sourceId] ?? $visitedIds[$sourceId] = $this->isErrorForRuntime($sourceId, $visitedIds)) {
                 continue;
             }
             if (!$isRuntime) {

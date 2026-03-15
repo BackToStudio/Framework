@@ -20,9 +20,9 @@ interface ConfigBuilderInterface
     /**
      * Gets all configuration represented as an array.
      */
-    public function toArray() : array;
+    public function toArray(): array;
     /**
      * Gets the alias for the extension which config we are building.
      */
-    public function getExtensionAlias() : string;
+    public function getExtensionAlias(): string;
 }

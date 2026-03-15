@@ -87,8 +87,8 @@ class XmlDumper extends Dumper
             $service->setAttribute('id', $id);
         }
         if ($class = $definition->getClass()) {
-            if ('\\' === \substr($class, 0, 1)) {
-                $class = \substr($class, 1);
+            if ('\\' === substr($class, 0, 1)) {
+                $class = substr($class, 1);
             }
             $service->setAttribute('class', $class);
         }
@@ -104,7 +104,7 @@ class XmlDumper extends Dumper
         if ($definition->isLazy()) {
             $service->setAttribute('lazy', 'true');
         }
-        if (null !== ($decoratedService = $definition->getDecoratedService())) {
+        if (null !== $decoratedService = $definition->getDecoratedService()) {
             [$decorated, $renamedId, $priority] = $decoratedService;
             $service->setAttribute('decorates', $decorated);
             $decorationOnInvalid = $decoratedService[3] ?? ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE;
@@ -231,7 +231,7 @@ class XmlDumper extends Dumper
     }
     private function convertParameters(array $parameters, string $type, \DOMElement $parent, string $keyAttribute = 'key')
     {
-        $withKeys = !\array_is_list($parameters);
+        $withKeys = !array_is_list($parameters);
         foreach ($parameters as $key => $value) {
             $element = $this->document->createElement($type);
             if ($withKeys) {
@@ -240,7 +240,7 @@ class XmlDumper extends Dumper
             if (\is_array($tag = $value)) {
                 $element->setAttribute('type', 'collection');
                 $this->convertParameters($value, $type, $element, 'key');
-            } elseif ($value instanceof TaggedIteratorArgument || $value instanceof ServiceLocatorArgument && ($tag = $value->getTaggedIteratorArgument())) {
+            } elseif ($value instanceof TaggedIteratorArgument || $value instanceof ServiceLocatorArgument && $tag = $value->getTaggedIteratorArgument()) {
                 $element->setAttribute('type', $value instanceof TaggedIteratorArgument ? 'tagged_iterator' : 'tagged_locator');
                 $element->setAttribute('tag', $tag->getTag());
                 if (null !== $tag->getIndexAttribute()) {
@@ -280,9 +280,9 @@ class XmlDumper extends Dumper
                 $element->setAttribute('type', 'expression');
                 $text = $this->document->createTextNode(self::phpToXml((string) $value));
                 $element->appendChild($text);
-            } elseif (\is_string($value) && !\preg_match('/^[^\\x00-\\x08\\x0B\\x0C\\x0E-\\x1F\\x7F]*+$/u', $value)) {
+            } elseif (\is_string($value) && !preg_match('/^[^\x00-\x08\x0B\x0C\x0E-\x1F\x7F]*+$/u', $value)) {
                 $element->setAttribute('type', 'binary');
-                $text = $this->document->createTextNode(self::phpToXml(\base64_encode($value)));
+                $text = $this->document->createTextNode(self::phpToXml(base64_encode($value)));
                 $element->appendChild($text);
             } elseif ($value instanceof \UnitEnum) {
                 $element->setAttribute('type', 'constant');
@@ -295,7 +295,7 @@ class XmlDumper extends Dumper
                 if (\in_array($value, ['null', 'true', 'false'], \true)) {
                     $element->setAttribute('type', 'string');
                 }
-                if (\is_string($value) && (\is_numeric($value) || \preg_match('/^0b[01]*$/', $value) || \preg_match('/^0x[0-9a-f]++$/i', $value))) {
+                if (\is_string($value) && (is_numeric($value) || preg_match('/^0b[01]*$/', $value) || preg_match('/^0x[0-9a-f]++$/i', $value))) {
                     $element->setAttribute('type', 'string');
                 }
                 $text = $this->document->createTextNode(self::phpToXml($value));
@@ -307,14 +307,14 @@ class XmlDumper extends Dumper
     /**
      * Escapes arguments.
      */
-    private function escape(array $arguments) : array
+    private function escape(array $arguments): array
     {
         $args = [];
         foreach ($arguments as $k => $v) {
             if (\is_array($v)) {
                 $args[$k] = $this->escape($v);
             } elseif (\is_string($v)) {
-                $args[$k] = \str_replace('%', '%%', $v);
+                $args[$k] = str_replace('%', '%%', $v);
             } else {
                 $args[$k] = $v;
             }
@@ -328,7 +328,7 @@ class XmlDumper extends Dumper
      *
      * @throws RuntimeException When trying to dump object or resource
      */
-    public static function phpToXml($value) : string
+    public static function phpToXml($value): string
     {
         switch (\true) {
             case null === $value:
@@ -340,7 +340,7 @@ class XmlDumper extends Dumper
             case $value instanceof Parameter:
                 return '%' . $value . '%';
             case $value instanceof \UnitEnum:
-                return \sprintf('%s::%s', \get_class($value), $value->name);
+                return sprintf('%s::%s', \get_class($value), $value->name);
             case \is_object($value) || \is_resource($value):
                 throw new RuntimeException('Unable to dump a service container if a parameter is an object or a resource.');
             default:

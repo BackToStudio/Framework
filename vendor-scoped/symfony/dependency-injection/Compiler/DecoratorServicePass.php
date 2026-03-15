@@ -38,7 +38,7 @@ class DecoratorServicePass extends AbstractRecursivePass
         $definitions = new \SplPriorityQueue();
         $order = \PHP_INT_MAX;
         foreach ($container->getDefinitions() as $id => $definition) {
-            if (!($decorated = $definition->getDecoratedService())) {
+            if (!$decorated = $definition->getDecoratedService()) {
                 continue;
             }
             $definitions->insert([$id, $definition], [$decorated[2], --$order]);
@@ -80,7 +80,7 @@ class DecoratorServicePass extends AbstractRecursivePass
                 throw new ServiceNotFoundException($inner, $id);
             }
             if ($decoratedDefinition && $decoratedDefinition->isSynthetic()) {
-                throw new InvalidArgumentException(\sprintf('A synthetic service cannot be decorated: service "%s" cannot decorate "%s".', $id, $inner));
+                throw new InvalidArgumentException(sprintf('A synthetic service cannot be decorated: service "%s" cannot decorate "%s".', $id, $inner));
             }
             if (isset($decoratingDefinitions[$inner])) {
                 $decoratingDefinition = $decoratingDefinitions[$inner];
@@ -93,7 +93,7 @@ class DecoratorServicePass extends AbstractRecursivePass
                         unset($decoratingTags[$containerTag]);
                     }
                 }
-                $definition->setTags(\array_merge($decoratingTags, $definition->getTags()));
+                $definition->setTags(array_merge($decoratingTags, $definition->getTags()));
                 $decoratingDefinition->setTags($resetTags);
                 $decoratingDefinitions[$inner] = $definition;
             }

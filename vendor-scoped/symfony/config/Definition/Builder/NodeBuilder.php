@@ -159,7 +159,7 @@ class NodeBuilder implements NodeParentInterface
      */
     public function setNodeClass(string $type, string $class)
     {
-        $this->nodeMapping[\strtolower($type)] = $class;
+        $this->nodeMapping[strtolower($type)] = $class;
         return $this;
     }
     /**
@@ -172,13 +172,13 @@ class NodeBuilder implements NodeParentInterface
      */
     protected function getNodeClass(string $type)
     {
-        $type = \strtolower($type);
+        $type = strtolower($type);
         if (!isset($this->nodeMapping[$type])) {
-            throw new \RuntimeException(\sprintf('The node type "%s" is not registered.', $type));
+            throw new \RuntimeException(sprintf('The node type "%s" is not registered.', $type));
         }
         $class = $this->nodeMapping[$type];
-        if (!\class_exists($class)) {
-            throw new \RuntimeException(\sprintf('The node class "%s" does not exist.', $class));
+        if (!class_exists($class)) {
+            throw new \RuntimeException(sprintf('The node class "%s" does not exist.', $class));
         }
         return $class;
     }

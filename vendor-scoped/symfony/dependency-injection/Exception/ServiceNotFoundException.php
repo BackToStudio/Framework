@@ -26,9 +26,9 @@ class ServiceNotFoundException extends InvalidArgumentException implements NotFo
         if (null !== $msg) {
             // no-op
         } elseif (null === $sourceId) {
-            $msg = \sprintf('You have requested a non-existent service "%s".', $id);
+            $msg = sprintf('You have requested a non-existent service "%s".', $id);
         } else {
-            $msg = \sprintf('The service "%s" has a dependency on a non-existent service "%s".', $sourceId, $id);
+            $msg = sprintf('The service "%s" has a dependency on a non-existent service "%s".', $sourceId, $id);
         }
         if ($alternatives) {
             if (1 == \count($alternatives)) {
@@ -36,7 +36,7 @@ class ServiceNotFoundException extends InvalidArgumentException implements NotFo
             } else {
                 $msg .= ' Did you mean one of these: "';
             }
-            $msg .= \implode('", "', $alternatives) . '"?';
+            $msg .= implode('", "', $alternatives) . '"?';
         }
         parent::__construct($msg, 0, $previous);
         $this->id = $id;

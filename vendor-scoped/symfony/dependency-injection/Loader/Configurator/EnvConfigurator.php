@@ -19,163 +19,163 @@ class EnvConfigurator extends ParamConfigurator
     private $stack;
     public function __construct(string $name)
     {
-        $this->stack = \explode(':', $name);
+        $this->stack = explode(':', $name);
     }
-    public function __toString() : string
+    public function __toString(): string
     {
-        return '%env(' . \implode(':', $this->stack) . ')%';
+        return '%env(' . implode(':', $this->stack) . ')%';
     }
     /**
      * @return $this
      */
-    public function __call(string $name, array $arguments) : self
+    public function __call(string $name, array $arguments): self
     {
-        $processor = \strtolower(\preg_replace(['/([A-Z]+)([A-Z][a-z])/', '/([a-z\\d])([A-Z])/'], 'BackToVendor\\1_\\2', $name));
+        $processor = strtolower(preg_replace(['/([A-Z]+)([A-Z][a-z])/', '/([a-z\d])([A-Z])/'], '\1_\2', $name));
         $this->custom($processor, ...$arguments);
         return $this;
     }
     /**
      * @return $this
      */
-    public function custom(string $processor, ...$args) : self
+    public function custom(string $processor, ...$args): self
     {
-        \array_unshift($this->stack, $processor, ...$args);
+        array_unshift($this->stack, $processor, ...$args);
         return $this;
     }
     /**
      * @return $this
      */
-    public function base64() : self
+    public function base64(): self
     {
-        \array_unshift($this->stack, 'base64');
+        array_unshift($this->stack, 'base64');
         return $this;
     }
     /**
      * @return $this
      */
-    public function bool() : self
+    public function bool(): self
     {
-        \array_unshift($this->stack, 'bool');
+        array_unshift($this->stack, 'bool');
         return $this;
     }
     /**
      * @return $this
      */
-    public function not() : self
+    public function not(): self
     {
-        \array_unshift($this->stack, 'not');
+        array_unshift($this->stack, 'not');
         return $this;
     }
     /**
      * @return $this
      */
-    public function const() : self
+    public function const(): self
     {
-        \array_unshift($this->stack, 'const');
+        array_unshift($this->stack, 'const');
         return $this;
     }
     /**
      * @return $this
      */
-    public function csv() : self
+    public function csv(): self
     {
-        \array_unshift($this->stack, 'csv');
+        array_unshift($this->stack, 'csv');
         return $this;
     }
     /**
      * @return $this
      */
-    public function file() : self
+    public function file(): self
     {
-        \array_unshift($this->stack, 'file');
+        array_unshift($this->stack, 'file');
         return $this;
     }
     /**
      * @return $this
      */
-    public function float() : self
+    public function float(): self
     {
-        \array_unshift($this->stack, 'float');
+        array_unshift($this->stack, 'float');
         return $this;
     }
     /**
      * @return $this
      */
-    public function int() : self
+    public function int(): self
     {
-        \array_unshift($this->stack, 'int');
+        array_unshift($this->stack, 'int');
         return $this;
     }
     /**
      * @return $this
      */
-    public function json() : self
+    public function json(): self
     {
-        \array_unshift($this->stack, 'json');
+        array_unshift($this->stack, 'json');
         return $this;
     }
     /**
      * @return $this
      */
-    public function key(string $key) : self
+    public function key(string $key): self
     {
-        \array_unshift($this->stack, 'key', $key);
+        array_unshift($this->stack, 'key', $key);
         return $this;
     }
     /**
      * @return $this
      */
-    public function url() : self
+    public function url(): self
     {
-        \array_unshift($this->stack, 'url');
+        array_unshift($this->stack, 'url');
         return $this;
     }
     /**
      * @return $this
      */
-    public function queryString() : self
+    public function queryString(): self
     {
-        \array_unshift($this->stack, 'query_string');
+        array_unshift($this->stack, 'query_string');
         return $this;
     }
     /**
      * @return $this
      */
-    public function resolve() : self
+    public function resolve(): self
     {
-        \array_unshift($this->stack, 'resolve');
+        array_unshift($this->stack, 'resolve');
         return $this;
     }
     /**
      * @return $this
      */
-    public function default(string $fallbackParam) : self
+    public function default(string $fallbackParam): self
     {
-        \array_unshift($this->stack, 'default', $fallbackParam);
+        array_unshift($this->stack, 'default', $fallbackParam);
         return $this;
     }
     /**
      * @return $this
      */
-    public function string() : self
+    public function string(): self
     {
-        \array_unshift($this->stack, 'string');
+        array_unshift($this->stack, 'string');
         return $this;
     }
     /**
      * @return $this
      */
-    public function trim() : self
+    public function trim(): self
     {
-        \array_unshift($this->stack, 'trim');
+        array_unshift($this->stack, 'trim');
         return $this;
     }
     /**
      * @return $this
      */
-    public function require() : self
+    public function require(): self
     {
-        \array_unshift($this->stack, 'require');
+        array_unshift($this->stack, 'require');
         return $this;
     }
 }

@@ -21,5 +21,5 @@ interface ConfigBuilderGeneratorInterface
     /**
      * @return \Closure that will return the root config class
      */
-    public function build(ConfigurationInterface $configuration) : \Closure;
+    public function build(ConfigurationInterface $configuration): \Closure;
 }

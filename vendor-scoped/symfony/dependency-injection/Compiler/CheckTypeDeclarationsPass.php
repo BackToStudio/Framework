@@ -66,10 +66,10 @@ final class CheckTypeDeclarationsPass extends AbstractRecursivePass
             return parent::processValue($value, $isRoot);
         }
         if (!$this->autoload) {
-            if (!($class = $value->getClass())) {
+            if (!$class = $value->getClass()) {
                 return parent::processValue($value, $isRoot);
             }
-            if (!\class_exists($class, \false) && !\interface_exists($class, \false)) {
+            if (!class_exists($class, \false) && !interface_exists($class, \false)) {
                 return parent::processValue($value, $isRoot);
             }
         }
@@ -95,14 +95,14 @@ final class CheckTypeDeclarationsPass extends AbstractRecursivePass
     /**
      * @throws InvalidArgumentException When not enough parameters are defined for the method
      */
-    private function checkTypeDeclarations(Definition $checkedDefinition, \ReflectionFunctionAbstract $reflectionFunction, array $values) : void
+    private function checkTypeDeclarations(Definition $checkedDefinition, \ReflectionFunctionAbstract $reflectionFunction, array $values): void
     {
         $numberOfRequiredParameters = $reflectionFunction->getNumberOfRequiredParameters();
         if (\count($values) < $numberOfRequiredParameters) {
-            throw new InvalidArgumentException(\sprintf('Invalid definition for service "%s": "%s::%s()" requires %d arguments, %d passed.', $this->currentId, $reflectionFunction->class, $reflectionFunction->name, $numberOfRequiredParameters, \count($values)));
+            throw new InvalidArgumentException(sprintf('Invalid definition for service "%s": "%s::%s()" requires %d arguments, %d passed.', $this->currentId, $reflectionFunction->class, $reflectionFunction->name, $numberOfRequiredParameters, \count($values)));
         }
         $reflectionParameters = $reflectionFunction->getParameters();
-        $checksCount = \min($reflectionFunction->getNumberOfParameters(), \count($values));
+        $checksCount = min($reflectionFunction->getNumberOfParameters(), \count($values));
         $envPlaceholderUniquePrefix = $this->container->getParameterBag() instanceof EnvPlaceholderParameterBag ? $this->container->getParameterBag()->getEnvPlaceholderUniquePrefix() : null;
         for ($i = 0; $i < $checksCount; ++$i) {
             $p = $reflectionParameters[$i];
@@ -116,7 +116,7 @@ final class CheckTypeDeclarationsPass extends AbstractRecursivePass
             }
             $this->checkType($checkedDefinition, $values[$i], $p, $envPlaceholderUniquePrefix);
         }
-        if ($reflectionFunction->isVariadic() && ($lastParameter = \end($reflectionParameters))->hasType()) {
+        if ($reflectionFunction->isVariadic() && ($lastParameter = end($reflectionParameters))->hasType()) {
             $variadicParameters = \array_slice($values, $lastParameter->getPosition());
             foreach ($variadicParameters as $variadicParameter) {
                 $this->checkType($checkedDefinition, $variadicParameter, $lastParameter, $envPlaceholderUniquePrefix);
@@ -126,7 +126,7 @@ final class CheckTypeDeclarationsPass extends AbstractRecursivePass
     /**
      * @throws InvalidParameterTypeException When a parameter is not compatible with the declared type
      */
-    private function checkType(Definition $checkedDefinition, $value, \ReflectionParameter $parameter, ?string $envPlaceholderUniquePrefix, ?\ReflectionType $reflectionType = null) : void
+    private function checkType(Definition $checkedDefinition, $value, \ReflectionParameter $parameter, ?string $envPlaceholderUniquePrefix, ?\ReflectionType $reflectionType = null): void
     {
         $reflectionType = $reflectionType ?? $parameter->getType();
         if ($reflectionType instanceof \ReflectionUnionType) {
@@ -153,7 +153,7 @@ final class CheckTypeDeclarationsPass extends AbstractRecursivePass
             if (!$this->container->has($value = (string) $value)) {
                 return;
             }
-            if ('service_container' === $value && \is_a($type, Container::class, \true)) {
+            if ('service_container' === $value && is_a($type, Container::class, \true)) {
                 return;
             }
             $value = $this->container->findDefinition($value);
@@ -170,9 +170,9 @@ final class CheckTypeDeclarationsPass extends AbstractRecursivePass
                 return;
             }
             $class = $value->getClass();
-            if ($class && isset(self::BUILTIN_TYPES[\strtolower($class)])) {
-                $class = \strtolower($class);
-            } elseif (!$class || !$this->autoload && !\class_exists($class, \false) && !\interface_exists($class, \false)) {
+            if ($class && isset(self::BUILTIN_TYPES[strtolower($class)])) {
+                $class = strtolower($class);
+            } elseif (!$class || !$this->autoload && !class_exists($class, \false) && !interface_exists($class, \false)) {
                 return;
             }
         } elseif ($value instanceof Parameter) {
@@ -185,13 +185,13 @@ final class CheckTypeDeclarationsPass extends AbstractRecursivePass
                 return;
             }
         } elseif (\is_string($value)) {
-            if ('%' === ($value[0] ?? '') && \preg_match('/^%([^%]+)%$/', $value, $match)) {
-                $value = $this->container->getParameter(\substr($value, 1, -1));
+            if ('%' === ($value[0] ?? '') && preg_match('/^%([^%]+)%$/', $value, $match)) {
+                $value = $this->container->getParameter(substr($value, 1, -1));
             }
-            if ($envPlaceholderUniquePrefix && \is_string($value) && \str_contains($value, 'env_')) {
+            if ($envPlaceholderUniquePrefix && \is_string($value) && str_contains($value, 'env_')) {
                 // If the value is an env placeholder that is either mixed with a string or with another env placeholder, then its resolved value will always be a string, so we don't need to resolve it.
                 // We don't need to change the value because it is already a string.
-                if ('' === \preg_replace('/' . $envPlaceholderUniquePrefix . '_\\w+_[a-f0-9]{32}/U', '', $value, -1, $c) && 1 === $c) {
+                if ('' === preg_replace('/' . $envPlaceholderUniquePrefix . '_\w+_[a-f0-9]{32}/U', '', $value, -1, $c) && 1 === $c) {
                     try {
                         $value = $this->container->resolveEnvPlaceholders($value, \true);
                     } catch (\Exception $e) {
@@ -221,16 +221,16 @@ final class CheckTypeDeclarationsPass extends AbstractRecursivePass
         if (isset(self::SCALAR_TYPES[$type]) && isset(self::SCALAR_TYPES[$class])) {
             return;
         }
-        if ('string' === $type && \method_exists($class, '__toString')) {
+        if ('string' === $type && method_exists($class, '__toString')) {
             return;
         }
-        if ('callable' === $type && (\Closure::class === $class || \method_exists($class, '__invoke'))) {
+        if ('callable' === $type && (\Closure::class === $class || method_exists($class, '__invoke'))) {
             return;
         }
         if ('callable' === $type && \is_array($value) && isset($value[0]) && ($value[0] instanceof Reference || $value[0] instanceof Definition || \is_string($value[0]))) {
             return;
         }
-        if ('iterable' === $type && (\is_array($value) || 'array' === $class || \is_subclass_of($class, \Traversable::class))) {
+        if ('iterable' === $type && (\is_array($value) || 'array' === $class || is_subclass_of($class, \Traversable::class))) {
             return;
         }
         if ($type === $class) {
@@ -242,7 +242,7 @@ final class CheckTypeDeclarationsPass extends AbstractRecursivePass
         if ('mixed' === $type) {
             return;
         }
-        if (\is_a($class, $type, \true)) {
+        if (is_a($class, $type, \true)) {
             return;
         }
         if ('false' === $type) {
@@ -254,14 +254,14 @@ final class CheckTypeDeclarationsPass extends AbstractRecursivePass
                 return;
             }
         } elseif ($reflectionType->isBuiltin()) {
-            $checkFunction = \sprintf('is_%s', $type);
+            $checkFunction = sprintf('is_%s', $type);
             if ($checkFunction($value)) {
                 return;
             }
         }
-        throw new InvalidParameterTypeException($this->currentId, \is_object($value) ? $class : \get_debug_type($value), $parameter);
+        throw new InvalidParameterTypeException($this->currentId, \is_object($value) ? $class : get_debug_type($value), $parameter);
     }
-    private function getExpressionLanguage() : ExpressionLanguage
+    private function getExpressionLanguage(): ExpressionLanguage
     {
         if (null === $this->expressionLanguage) {
             $this->expressionLanguage = new ExpressionLanguage(null, $this->container->getExpressionLanguageProviders());

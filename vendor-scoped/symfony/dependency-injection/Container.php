@@ -23,8 +23,8 @@ use BackToVendor\Symfony\Component\DependencyInjection\ParameterBag\FrozenParame
 use BackToVendor\Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use BackToVendor\Symfony\Contracts\Service\ResetInterface;
 // Help opcache.preload discover always-needed symbols
-\class_exists(RewindableGenerator::class);
-\class_exists(ArgumentServiceLocator::class);
+class_exists(RewindableGenerator::class);
+class_exists(ArgumentServiceLocator::class);
 /**
  * Container is a dependency injection container.
  *
@@ -143,12 +143,12 @@ class Container implements ContainerInterface, ResetInterface
             if (isset($this->syntheticIds[$id]) || !isset($this->getRemovedIds()[$id])) {
                 // no-op
             } elseif (null === $service) {
-                throw new InvalidArgumentException(\sprintf('The "%s" service is private, you cannot unset it.', $id));
+                throw new InvalidArgumentException(sprintf('The "%s" service is private, you cannot unset it.', $id));
             } else {
-                throw new InvalidArgumentException(\sprintf('The "%s" service is private, you cannot replace it.', $id));
+                throw new InvalidArgumentException(sprintf('The "%s" service is private, you cannot replace it.', $id));
             }
         } elseif (isset($this->services[$id])) {
-            throw new InvalidArgumentException(\sprintf('The "%s" service is already initialized, you cannot replace it.', $id));
+            throw new InvalidArgumentException(sprintf('The "%s" service is already initialized, you cannot replace it.', $id));
         }
         if (isset($this->aliases[$id])) {
             unset($this->aliases[$id]);
@@ -202,7 +202,7 @@ class Container implements ContainerInterface, ResetInterface
     private function make(string $id, int $invalidBehavior)
     {
         if (isset($this->loading[$id])) {
-            throw new ServiceCircularReferenceException($id, \array_merge(\array_keys($this->loading), [$id]));
+            throw new ServiceCircularReferenceException($id, array_merge(array_keys($this->loading), [$id]));
         }
         $this->loading[$id] = \true;
         try {
@@ -222,18 +222,18 @@ class Container implements ContainerInterface, ResetInterface
                 throw new ServiceNotFoundException($id);
             }
             if (isset($this->syntheticIds[$id])) {
-                throw new ServiceNotFoundException($id, null, null, [], \sprintf('The "%s" service is synthetic, it needs to be set at boot time before it can be used.', $id));
+                throw new ServiceNotFoundException($id, null, null, [], sprintf('The "%s" service is synthetic, it needs to be set at boot time before it can be used.', $id));
             }
             if (isset($this->getRemovedIds()[$id])) {
-                throw new ServiceNotFoundException($id, null, null, [], \sprintf('The "%s" service or alias has been removed or inlined when the container was compiled. You should either make it public, or stop using the container directly and use dependency injection instead.', $id));
+                throw new ServiceNotFoundException($id, null, null, [], sprintf('The "%s" service or alias has been removed or inlined when the container was compiled. You should either make it public, or stop using the container directly and use dependency injection instead.', $id));
             }
             $alternatives = [];
             foreach ($this->getServiceIds() as $knownId) {
                 if ('' === $knownId || '.' === $knownId[0]) {
                     continue;
                 }
-                $lev = \levenshtein($id, $knownId);
-                if ($lev <= \strlen($id) / 3 || \str_contains($knownId, $id)) {
+                $lev = levenshtein($id, $knownId);
+                if ($lev <= \strlen($id) / 3 || str_contains($knownId, $id)) {
                     $alternatives[] = $knownId;
                 }
             }
@@ -280,7 +280,7 @@ class Container implements ContainerInterface, ResetInterface
      */
     public function getServiceIds()
     {
-        return \array_map('strval', \array_unique(\array_merge(['service_container'], \array_keys($this->fileMap), \array_keys($this->methodMap), \array_keys($this->aliases), \array_keys($this->services))));
+        return array_map('strval', array_unique(array_merge(['service_container'], array_keys($this->fileMap), array_keys($this->methodMap), array_keys($this->aliases), array_keys($this->services))));
     }
     /**
      * Gets service ids that existed at compile time.
@@ -298,7 +298,7 @@ class Container implements ContainerInterface, ResetInterface
      */
     public static function camelize(string $id)
     {
-        return \strtr(\ucwords(\strtr($id, ['_' => ' ', '.' => '_ ', '\\' => '_ '])), [' ' => '']);
+        return strtr(ucwords(strtr($id, ['_' => ' ', '.' => '_ ', '\\' => '_ '])), [' ' => '']);
     }
     /**
      * A string to underscore.
@@ -307,7 +307,7 @@ class Container implements ContainerInterface, ResetInterface
      */
     public static function underscore(string $id)
     {
-        return \strtolower(\preg_replace(['/([A-Z]+)([A-Z][a-z])/', '/([a-z\\d])([A-Z])/'], ['\\1_\\2', '\\1_\\2'], \str_replace('_', '.', $id)));
+        return strtolower(preg_replace(['/([A-Z]+)([A-Z][a-z])/', '/([a-z\d])([A-Z])/'], ['\1_\2', '\1_\2'], str_replace('_', '.', $id)));
     }
     /**
      * Creates a service by requiring its factory file.
@@ -326,7 +326,7 @@ class Container implements ContainerInterface, ResetInterface
     protected function getEnv(string $name)
     {
         if (isset($this->resolving[$envName = "env({$name})"])) {
-            throw new ParameterCircularReferenceException(\array_keys($this->resolving));
+            throw new ParameterCircularReferenceException(array_keys($this->resolving));
         }
         if (isset($this->envCache[$name]) || \array_key_exists($name, $this->envCache)) {
             return $this->envCache[$name];
@@ -338,9 +338,9 @@ class Container implements ContainerInterface, ResetInterface
             $this->getEnv = \Closure::fromCallable([$this, 'getEnv']);
         }
         $processors = $this->get($id);
-        if (\false !== ($i = \strpos($name, ':'))) {
-            $prefix = \substr($name, 0, $i);
-            $localName = \substr($name, 1 + $i);
+        if (\false !== $i = strpos($name, ':')) {
+            $prefix = substr($name, 0, $i);
+            $localName = substr($name, 1 + $i);
         } else {
             $prefix = 'string';
             $localName = $name;
@@ -364,7 +364,7 @@ class Container implements ContainerInterface, ResetInterface
      *
      * @internal
      */
-    protected final function getService($registry, string $id, ?string $method, $load)
+    final protected function getService($registry, string $id, ?string $method, $load)
     {
         if ('service_container' === $id) {
             return $this;
@@ -376,7 +376,7 @@ class Container implements ContainerInterface, ResetInterface
             return \false !== $registry ? $this->{$registry}[$id] ?? null : null;
         }
         if (\false !== $registry) {
-            return $this->{$registry}[$id] ?? ($this->{$registry}[$id] = $load ? $this->load($method) : $this->{$method}());
+            return $this->{$registry}[$id] ?? $this->{$registry}[$id] = $load ? $this->load($method) : $this->{$method}();
         }
         if (!$load) {
             return $this->{$method}();

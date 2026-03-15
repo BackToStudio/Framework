@@ -44,11 +44,11 @@ class ParameterNotFoundException extends InvalidArgumentException implements Not
     public function updateRepr()
     {
         if (null !== $this->sourceId) {
-            $this->message = \sprintf('The service "%s" has a dependency on a non-existent parameter "%s".', $this->sourceId, $this->key);
+            $this->message = sprintf('The service "%s" has a dependency on a non-existent parameter "%s".', $this->sourceId, $this->key);
         } elseif (null !== $this->sourceKey) {
-            $this->message = \sprintf('The parameter "%s" has a dependency on a non-existent parameter "%s".', $this->sourceKey, $this->key);
+            $this->message = sprintf('The parameter "%s" has a dependency on a non-existent parameter "%s".', $this->sourceKey, $this->key);
         } else {
-            $this->message = \sprintf('You have requested a non-existent parameter "%s".', $this->key);
+            $this->message = sprintf('You have requested a non-existent parameter "%s".', $this->key);
         }
         if ($this->alternatives) {
             if (1 == \count($this->alternatives)) {
@@ -56,7 +56,7 @@ class ParameterNotFoundException extends InvalidArgumentException implements Not
             } else {
                 $this->message .= ' Did you mean one of these: "';
             }
-            $this->message .= \implode('", "', $this->alternatives) . '"?';
+            $this->message .= implode('", "', $this->alternatives) . '"?';
         } elseif (null !== $this->nonNestedAlternative) {
             $this->message .= ' You cannot access nested array items, do you want to inject "' . $this->nonNestedAlternative . '" instead?';
         }

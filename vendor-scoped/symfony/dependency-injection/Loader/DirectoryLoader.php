@@ -22,12 +22,12 @@ class DirectoryLoader extends FileLoader
      */
     public function load($file, ?string $type = null)
     {
-        $file = \rtrim($file, '/');
+        $file = rtrim($file, '/');
         $path = $this->locator->locate($file);
         $this->container->fileExists($path, \false);
-        foreach (\scandir($path) as $dir) {
+        foreach (scandir($path) as $dir) {
             if ('.' !== $dir[0]) {
-                if (\is_dir($path . '/' . $dir)) {
+                if (is_dir($path . '/' . $dir)) {
                     $dir .= '/';
                     // append / to allow recursion
                 }
@@ -45,6 +45,6 @@ class DirectoryLoader extends FileLoader
         if ('directory' === $type) {
             return \true;
         }
-        return null === $type && \is_string($resource) && \str_ends_with($resource, '/');
+        return null === $type && \is_string($resource) && str_ends_with($resource, '/');
     }
 }
