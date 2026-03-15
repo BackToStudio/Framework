@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace BackTo\Framework\Compose\DependencyInjection;
 
 use BackTo\Framework\Admin\Contracts\AdminPageInterface;
+use BackTo\Framework\Compose\Configuration\FrameworkConfiguration;
 use BackTo\Framework\Admin\Contracts\AdminPageRegistrarInterface;
 use BackTo\Framework\Admin\DependencyInjection\Compiler\RegisterAdminPagePass;
 use BackTo\Framework\Admin\Infrastructure\WordPressAdminPageRegistrar;
@@ -136,6 +137,7 @@ class WordPressExtension
      */
     public function configure(ContainerBuilder $containerBuilder): void
     {
+        FrameworkConfiguration::apply($containerBuilder);
         $this->registerPortBindings($containerBuilder);
         $this->registerAutoconfiguration($containerBuilder);
         $this->registerCompilerPasses($containerBuilder);
