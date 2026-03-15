@@ -4,27 +4,18 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\PostMeta\DependencyInjection\Compiler;
 
+use BackTo\Framework\Compose\DependencyInjection\Compiler\AbstractTaggedServiceCompilerPass;
 use BackTo\Framework\PostMeta\PostMetaStructureRegistry;
-use BackToVendor\Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
-use BackToVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
-use BackToVendor\Symfony\Component\DependencyInjection\Reference;
 
-/**
- * Register all Custom Post Meta that have the "wordpress.post_meta" tag into the container.
- */
-class RegisterPostMetaStructurePass implements CompilerPassInterface
+class RegisterPostMetaStructurePass extends AbstractTaggedServiceCompilerPass
 {
-
-    public function process(ContainerBuilder $container): void
+    protected function getRegistryClass(): string
     {
-        if (!$container->hasDefinition(PostMetaStructureRegistry::class)) {
-            return;
-        }
+        return PostMetaStructureRegistry::class;
+    }
 
-        $registryDefinition = $container->findDefinition(PostMetaStructureRegistry::class);
-
-        foreach ($container->findTaggedServiceIds('wordpress.post_meta') as $id => $tags) {
-            $registryDefinition->addMethodCall('add', [new Reference($id)]);
-        }
+    protected function getTag(): string
+    {
+        return 'wordpress.post_meta';
     }
 }

@@ -4,27 +4,18 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Taxonomy\DependencyInjection\Compiler;
 
+use BackTo\Framework\Compose\DependencyInjection\Compiler\AbstractTaggedServiceCompilerPass;
 use BackTo\Framework\Taxonomy\TaxonomyRegistry;
-use BackToVendor\Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
-use BackToVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
-use BackToVendor\Symfony\Component\DependencyInjection\Reference;
 
-/**
- * Register all Custom Taxonomies that have the "wordpress.taxonomy" tag into the container.
- */
-class RegisterTaxonomyPass implements CompilerPassInterface
+class RegisterTaxonomyPass extends AbstractTaggedServiceCompilerPass
 {
-
-    public function process(ContainerBuilder $container): void
+    protected function getRegistryClass(): string
     {
-        if (!$container->hasDefinition(TaxonomyRegistry::class)) {
-            return;
-        }
+        return TaxonomyRegistry::class;
+    }
 
-        $registryDefinition = $container->findDefinition(TaxonomyRegistry::class);
-
-        foreach ($container->findTaggedServiceIds('wordpress.taxonomy') as $id => $tags) {
-            $registryDefinition->addMethodCall('add', [new Reference($id)]);
-        }
+    protected function getTag(): string
+    {
+        return 'wordpress.taxonomy';
     }
 }

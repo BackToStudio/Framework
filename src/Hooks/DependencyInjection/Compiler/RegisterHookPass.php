@@ -4,23 +4,23 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Hooks\DependencyInjection\Compiler;
 
+use BackTo\Framework\Compose\DependencyInjection\Compiler\AbstractTaggedServiceCompilerPass;
 use BackTo\Framework\Hooks\HookRegistry;
-use BackToVendor\Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
-use BackToVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
-use BackToVendor\Symfony\Component\DependencyInjection\Reference;
 
-class RegisterHookPass implements CompilerPassInterface
+class RegisterHookPass extends AbstractTaggedServiceCompilerPass
 {
-	public function process(ContainerBuilder $container): void
-	{
-		if ( ! $container->hasDefinition( HookRegistry::class ) ) {
-			return;
-		}
+    protected function getRegistryClass(): string
+    {
+        return HookRegistry::class;
+    }
 
-		$registryDefinition = $container->findDefinition( HookRegistry::class );
+    protected function getTag(): string
+    {
+        return 'wordpress.hook';
+    }
 
-		foreach ($container->findTaggedServiceIds('wordpress.hook') as $id => $tags) {
-			$registryDefinition->addMethodCall( 'addHook', [new Reference($id)] );
-		}
-	}
+    protected function getRegistryMethod(): string
+    {
+        return 'addHook';
+    }
 }

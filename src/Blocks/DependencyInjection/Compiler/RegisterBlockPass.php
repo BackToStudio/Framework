@@ -5,22 +5,17 @@ declare(strict_types=1);
 namespace BackTo\Framework\Blocks\DependencyInjection\Compiler;
 
 use BackTo\Framework\Blocks\BlockRegistry;
-use BackToVendor\Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
-use BackToVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
-use BackToVendor\Symfony\Component\DependencyInjection\Reference;
+use BackTo\Framework\Compose\DependencyInjection\Compiler\AbstractTaggedServiceCompilerPass;
 
-class RegisterBlockPass implements CompilerPassInterface
+class RegisterBlockPass extends AbstractTaggedServiceCompilerPass
 {
-    public function process(ContainerBuilder $container): void
+    protected function getRegistryClass(): string
     {
-        if (!$container->hasDefinition(BlockRegistry::class)) {
-            return;
-        }
+        return BlockRegistry::class;
+    }
 
-        $registryDefinition = $container->findDefinition(BlockRegistry::class);
-
-        foreach ($container->findTaggedServiceIds('wordpress.block') as $id => $tags) {
-            $registryDefinition->addMethodCall('add', [new Reference($id)]);
-        }
+    protected function getTag(): string
+    {
+        return 'wordpress.block';
     }
 }

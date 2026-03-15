@@ -49,4 +49,33 @@ class PostRepository
 
         return $this->factory->createFromPosts($wpPosts);
     }
+
+    /**
+     * @param array<string, mixed> $criteria
+     * @return PostInterface[]
+     */
+    public function findBy(array $criteria, ?string $orderBy = null, string $order = 'DESC', ?int $limit = null): array
+    {
+        return $this->query()
+            ->postType($criteria['post_type'] ?? 'post')
+            ->status($criteria['post_status'] ?? 'publish')
+            ->orderBy($orderBy ?? 'date', $order)
+            ->limit($limit ?? -1)
+            ->get();
+    }
+
+    /**
+     * @param array<string, mixed> $criteria
+     */
+    public function findOneBy(array $criteria): ?PostInterface
+    {
+        $results = $this->findBy($criteria, null, 'DESC', 1);
+
+        return $results[0] ?? null;
+    }
+
+    public function query(): PostQueryBuilder
+    {
+        return new PostQueryBuilder($this->factory);
+    }
 }

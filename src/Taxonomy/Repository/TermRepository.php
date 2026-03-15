@@ -57,4 +57,29 @@ class TermRepository
 
         return $this->factory->createFromTerms($wpTerms);
     }
+
+    /**
+     * @return TermInterface[]
+     */
+    public function findBy(string $taxonomy, ?string $orderBy = null, string $order = 'ASC', ?int $limit = null): array
+    {
+        return $this->query()
+            ->taxonomy($taxonomy)
+            ->orderBy($orderBy ?? 'name', $order)
+            ->limit($limit ?? 0)
+            ->get();
+    }
+
+    public function findOneBySlug(string $slug, string $taxonomy): ?TermInterface
+    {
+        return $this->query()
+            ->taxonomy($taxonomy)
+            ->slug($slug)
+            ->first();
+    }
+
+    public function query(): TermQueryBuilder
+    {
+        return new TermQueryBuilder($this->factory);
+    }
 }

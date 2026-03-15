@@ -1,0 +1,164 @@
+<?php
+
+declare(strict_types=1);
+
+namespace BackTo\Framework\PostType\Tests;
+
+use BackTo\Framework\PostType\Factory\PostFactory;
+use BackTo\Framework\PostType\Repository\PostQueryBuilder;
+use PHPUnit\Framework\TestCase;
+
+class PostQueryBuilderTest extends TestCase
+{
+    private function createQueryBuilder(): PostQueryBuilder
+    {
+        $factory = $this->createMock(PostFactory::class);
+        return new PostQueryBuilder($factory);
+    }
+
+    public function testPostType(): void
+    {
+        $qb = $this->createQueryBuilder();
+        $qb->postType('page');
+        $this->assertSame('page', $qb->getArgs()['post_type']);
+    }
+
+    public function testStatus(): void
+    {
+        $qb = $this->createQueryBuilder();
+        $qb->status('draft');
+        $this->assertSame('draft', $qb->getArgs()['post_status']);
+    }
+
+    public function testStatuses(): void
+    {
+        $qb = $this->createQueryBuilder();
+        $qb->statuses(['publish', 'draft']);
+        $this->assertSame(['publish', 'draft'], $qb->getArgs()['post_status']);
+    }
+
+    public function testLimit(): void
+    {
+        $qb = $this->createQueryBuilder();
+        $qb->limit(10);
+        $this->assertSame(10, $qb->getArgs()['numberposts']);
+    }
+
+    public function testOffset(): void
+    {
+        $qb = $this->createQueryBuilder();
+        $qb->offset(5);
+        $this->assertSame(5, $qb->getArgs()['offset']);
+    }
+
+    public function testPage(): void
+    {
+        $qb = $this->createQueryBuilder();
+        $qb->page(3, 20);
+        $this->assertSame(20, $qb->getArgs()['posts_per_page']);
+        $this->assertSame(3, $qb->getArgs()['paged']);
+    }
+
+    public function testOrderBy(): void
+    {
+        $qb = $this->createQueryBuilder();
+        $qb->orderBy('title', 'ASC');
+        $this->assertSame('title', $qb->getArgs()['orderby']);
+        $this->assertSame('ASC', $qb->getArgs()['order']);
+    }
+
+    public function testAuthor(): void
+    {
+        $qb = $this->createQueryBuilder();
+        $qb->author(42);
+        $this->assertSame(42, $qb->getArgs()['author']);
+    }
+
+    public function testParent(): void
+    {
+        $qb = $this->createQueryBuilder();
+        $qb->parent(10);
+        $this->assertSame(10, $qb->getArgs()['post_parent']);
+    }
+
+    public function testSearch(): void
+    {
+        $qb = $this->createQueryBuilder();
+        $qb->search('hello');
+        $this->assertSame('hello', $qb->getArgs()['s']);
+    }
+
+    public function testWhereIn(): void
+    {
+        $qb = $this->createQueryBuilder();
+        $qb->whereIn([1, 2, 3]);
+        $this->assertSame([1, 2, 3], $qb->getArgs()['post__in']);
+    }
+
+    public function testWhereNotIn(): void
+    {
+        $qb = $this->createQueryBuilder();
+        $qb->whereNotIn([4, 5]);
+        $this->assertSame([4, 5], $qb->getArgs()['post__not_in']);
+    }
+
+    public function testWhereMeta(): void
+    {
+        $qb = $this->createQueryBuilder();
+        $qb->whereMeta('color', 'red');
+        $this->assertCount(1, $qb->getArgs()['meta_query']);
+        $this->assertSame('color', $qb->getArgs()['meta_query'][0]['key']);
+        $this->assertSame('red', $qb->getArgs()['meta_query'][0]['value']);
+        $this->assertSame('=', $qb->getArgs()['meta_query'][0]['compare']);
+    }
+
+    public function testWhereMetaExists(): void
+    {
+        $qb = $this->createQueryBuilder();
+        $qb->whereMetaExists('featured');
+        $this->assertSame('EXISTS', $qb->getArgs()['meta_query'][0]['compare']);
+    }
+
+    public function testInTaxonomy(): void
+    {
+        $qb = $this->createQueryBuilder();
+        $qb->inTaxonomy('category', [1, 2]);
+        $this->assertCount(1, $qb->getArgs()['tax_query']);
+        $this->assertSame('category', $qb->getArgs()['tax_query'][0]['taxonomy']);
+        $this->assertSame([1, 2], $qb->getArgs()['tax_query'][0]['terms']);
+    }
+
+    public function testFluentChaining(): void
+    {
+        $qb = $this->createQueryBuilder();
+        $result = $qb
+            ->postType('product')
+            ->status('publish')
+            ->limit(10)
+            ->orderBy('date', 'DESC')
+            ->whereMeta('price', '100', '>');
+
+        $this->assertInstanceOf(PostQueryBuilder::class, $result);
+        $args = $qb->getArgs();
+        $this->assertSame('product', $args['post_type']);
+        $this->assertSame('publish', $args['post_status']);
+        $this->assertSame(10, $args['numberposts']);
+        $this->assertSame('date', $args['orderby']);
+    }
+
+    public function testMultipleMetaQueries(): void
+    {
+        $qb = $this->createQueryBuilder();
+        $qb->whereMeta('color', 'red')
+           ->whereMeta('size', 'large')
+           ->whereMetaExists('featured');
+
+        $this->assertCount(3, $qb->getArgs()['meta_query']);
+    }
+
+    public function testEmptyArgsInitially(): void
+    {
+        $qb = $this->createQueryBuilder();
+        $this->assertEmpty($qb->getArgs());
+    }
+}
