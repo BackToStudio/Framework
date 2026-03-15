@@ -4,6 +4,7 @@ namespace BackTo\Framework\Hooks;
 
 use BackTo\Framework\Contracts\ActivationHooks;
 use BackTo\Framework\Contracts\DeactivationHooks;
+use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\HookInterface;
 use BackTo\Framework\Contracts\AdminHooks;
 use BackTo\Framework\Contracts\Hooks;
@@ -21,6 +22,16 @@ class HookRegistry implements RegistryInterface
      * @var string|null
      */
     private $pluginFile;
+
+    /**
+     * @var HookDispatcherInterface
+     */
+    private $hookDispatcher;
+
+    public function __construct(HookDispatcherInterface $hookDispatcher)
+    {
+        $this->hookDispatcher = $hookDispatcher;
+    }
 
     /**
      * @return HookInterface[]
@@ -51,16 +62,16 @@ class HookRegistry implements RegistryInterface
                 $action->hooks();
             }
 
-            if ($action instanceof AdminHooks && \is_admin()) {
+            if ($action instanceof AdminHooks && $this->hookDispatcher->isAdmin()) {
                 $action->hooks();
             }
 
             if ($this->pluginFile !== null && $action instanceof ActivationHooks) {
-                \register_activation_hook($this->pluginFile, [$action, 'activate']);
+                $this->hookDispatcher->registerActivationHook($this->pluginFile, [$action, 'activate']);
             }
 
             if ($this->pluginFile !== null && $action instanceof DeactivationHooks) {
-                \register_deactivation_hook($this->pluginFile, [$action, 'deactivate']);
+                $this->hookDispatcher->registerDeactivationHook($this->pluginFile, [$action, 'deactivate']);
             }
         }
     }

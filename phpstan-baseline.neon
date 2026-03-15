@@ -1,26 +1,8 @@
 parameters:
 	ignoreErrors:
 		-
-			message: '#^Method BackTo\\Framework\\Admin\\AddMenuForEditors\:\:displayAppearanceMenu\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: src/Admin/AddMenuForEditors.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Admin\\AddMenuForEditors\:\:removeCustomizer\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: src/Admin/AddMenuForEditors.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Admin\\AddReusableBlockMenu\:\:addReusableBlockMenu\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: src/Admin/AddReusableBlockMenu.php
-
-		-
-			message: '#^Parameter \#1 \$attachment_id of function get_attached_file expects int, string given\.$#'
-			identifier: argument.type
+			message: '#^PHPDoc tag @param for parameter \$image_id with type string is incompatible with native type int\.$#'
+			identifier: parameter.phpDocType
 			count: 1
 			path: src/Assets/SvgFactory.php
 
@@ -67,12 +49,6 @@ parameters:
 			path: src/Assets/WordPressScriptsAssets.php
 
 		-
-			message: '#^Action callback returns string but should not return anything\.$#'
-			identifier: return.void
-			count: 1
-			path: src/Blocks/Actions/ReplaceImgBlockBySvgBlock.php
-
-		-
 			message: '#^Method BackTo\\Framework\\Blocks\\CustomBlockStyle\:\:getProperties\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -83,12 +59,6 @@ parameters:
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/Blocks/CustomBlockStyle.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Blocks\\RegisterBlockStyles\:\:registerCustomBlockStyles\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: src/Blocks/RegisterBlockStyles.php
 
 		-
 			message: '#^Call to function is_null\(\) with string will always evaluate to false\.$#'
@@ -211,22 +181,10 @@ parameters:
 			path: src/Plugin/I18n/LoadMuPluginTextDomain.php
 
 		-
-			message: '#^Method BackTo\\Framework\\Plugin\\I18n\\LoadMuPluginTextDomain\:\:loadTranslations\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: src/Plugin/I18n/LoadMuPluginTextDomain.php
-
-		-
 			message: '#^Parameter \#2 \$mu_plugin_rel_path of function load_muplugin_textdomain expects string, false given\.$#'
 			identifier: argument.type
 			count: 1
 			path: src/Plugin/I18n/LoadMuPluginTextDomain.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Plugin\\I18n\\LoadPluginTextDomain\:\:loadTranslations\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: src/Plugin/I18n/LoadPluginTextDomain.php
 
 		-
 			message: '#^Method BackTo\\Framework\\PostMeta\\Contracts\\PostMetaStructureInterface\:\:getArgs\(\) return type has no value type specified in iterable type array\.$#'
@@ -397,12 +355,6 @@ parameters:
 			path: src/PostType/PostTypeFactory.php
 
 		-
-			message: '#^Function write_log not found\.$#'
-			identifier: function.notFound
-			count: 1
-			path: src/PostType/RegisterPostType.php
-
-		-
 			message: '#^Method BackTo\\Framework\\PostType\\RegisterPostType\:\:activate\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
@@ -411,12 +363,6 @@ parameters:
 		-
 			message: '#^Method BackTo\\Framework\\PostType\\RegisterPostType\:\:add\(\) has parameter \$args with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
-			count: 1
-			path: src/PostType/RegisterPostType.php
-
-		-
-			message: '#^Method BackTo\\Framework\\PostType\\RegisterPostType\:\:registerCustomPostTypes\(\) has no return type specified\.$#'
-			identifier: missingType.return
 			count: 1
 			path: src/PostType/RegisterPostType.php
 
@@ -481,12 +427,6 @@ parameters:
 			path: src/Taxonomy/Factory/TermFactory.php
 
 		-
-			message: '#^Function write_log not found\.$#'
-			identifier: function.notFound
-			count: 1
-			path: src/Taxonomy/RegisterTaxonomy.php
-
-		-
 			message: '#^Method BackTo\\Framework\\Taxonomy\\RegisterTaxonomy\:\:add\(\) has parameter \$args with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -495,12 +435,6 @@ parameters:
 		-
 			message: '#^Method BackTo\\Framework\\Taxonomy\\RegisterTaxonomy\:\:add\(\) has parameter \$relatedPostTypes with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
-			count: 1
-			path: src/Taxonomy/RegisterTaxonomy.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Taxonomy\\RegisterTaxonomy\:\:registerTaxonomy\(\) has no return type specified\.$#'
-			identifier: missingType.return
 			count: 1
 			path: src/Taxonomy/RegisterTaxonomy.php
 
@@ -557,9 +491,3 @@ parameters:
 			identifier: arguments.count
 			count: 3
 			path: src/Theme/Actions/CleanHead.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Theme\\I18n\\LoadThemeTextDomain\:\:loadTranslations\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: src/Theme/I18n/LoadThemeTextDomain.php

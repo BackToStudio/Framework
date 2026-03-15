@@ -2,6 +2,7 @@
 
 namespace BackTo\Framework\Plugin\I18n;
 
+use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
 
 class LoadPluginTextDomain implements Hooks
@@ -18,26 +19,32 @@ class LoadPluginTextDomain implements Hooks
     protected $pluginTextDomain;
 
     /**
+     * @var HookDispatcherInterface
+     */
+    private $hookDispatcher;
+
+    /**
      * Params are auto-injected by Dependency Injection.
      *
      * @param string $pluginDirectory
      * @param string $pluginTextDomain
      */
-    public function __construct(string $pluginDirectory, string $pluginTextDomain)
+    public function __construct(string $pluginDirectory, string $pluginTextDomain, HookDispatcherInterface $hookDispatcher)
     {
         $this->pluginDirectory = $pluginDirectory;
         $this->pluginTextDomain = $pluginTextDomain;
+        $this->hookDispatcher = $hookDispatcher;
     }
 
     public function hooks(): void
     {
-        \add_action('init', [$this, 'loadTranslations']);
+        $this->hookDispatcher->addAction('init', [$this, 'loadTranslations']);
     }
 
     /**
      * Load plugin translations.
      */
-    public function loadTranslations()
+    public function loadTranslations(): void
     {
         \load_plugin_textdomain(
             $this->pluginTextDomain,

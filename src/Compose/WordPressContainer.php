@@ -238,32 +238,32 @@ trait WordPressContainer
             [
                 'dir' => dirname(__DIR__) . '/Assets',
                 'namespace' => 'BackTo\\Framework\\Assets\\',
-                'exclude' => '{DependencyInjection,Entity,Tests,Contracts}',
+                'exclude' => '{DependencyInjection,Entity,Tests,Contracts,Infrastructure}',
             ],
             [
                 'dir' => dirname(__DIR__) . '/Hooks',
                 'namespace' => 'BackTo\\Framework\\Hooks\\',
-                'exclude' => '{DependencyInjection,Entity,Tests,Contracts}',
+                'exclude' => '{DependencyInjection,Entity,Tests,Contracts,Infrastructure}',
             ],
             [
                 'dir' => dirname(__DIR__) . '/Blocks',
                 'namespace' => 'BackTo\\Framework\\Blocks\\',
-                'exclude' => '{DependencyInjection,Entity,Tests,Contracts}',
+                'exclude' => '{DependencyInjection,Entity,Tests,Contracts,Infrastructure}',
             ],
             [
                 'dir' => dirname(__DIR__) . '/PostType',
                 'namespace' => 'BackTo\\Framework\\PostType\\',
-                'exclude' => '{DependencyInjection,Entity,Tests,Contracts}',
+                'exclude' => '{DependencyInjection,Entity,Tests,Contracts,Infrastructure}',
             ],
             [
                 'dir' => dirname(__DIR__) . '/Taxonomy',
                 'namespace' => 'BackTo\\Framework\\Taxonomy\\',
-                'exclude' => '{DependencyInjection,Entity,Tests,Contracts}',
+                'exclude' => '{DependencyInjection,Entity,Tests,Contracts,Infrastructure}',
             ],
             [
                 'dir' => dirname(__DIR__) . '/PostMeta',
                 'namespace' => 'BackTo\\Framework\\PostMeta\\',
-                'exclude' => '{DependencyInjection,Entity,Tests,Contracts}',
+                'exclude' => '{DependencyInjection,Entity,Tests,Contracts,Infrastructure}',
             ],
             [
                 'dir' => dirname(__DIR__) . '/Cache',

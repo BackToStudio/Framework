@@ -2,19 +2,24 @@
 
 namespace BackTo\Framework\Theme\Actions;
 
+use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
-
-use function remove_action;
-use function add_filter;
 
 class RemoveWordPressVersion implements Hooks
 {
 
+    private HookDispatcherInterface $hookDispatcher;
+
+    public function __construct(HookDispatcherInterface $hookDispatcher)
+    {
+        $this->hookDispatcher = $hookDispatcher;
+    }
+
     public function hooks(): void
     {
         // Remove WordPress version.
-        remove_action('wp_head', 'wp_generator');
+        $this->hookDispatcher->removeAction('wp_head', 'wp_generator');
         // Remove the WordPress version from RSS feeds.
-        add_filter('the_generator', '__return_false');
+        $this->hookDispatcher->addFilter('the_generator', '__return_false');
     }
 }

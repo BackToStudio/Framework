@@ -2,6 +2,7 @@
 
 namespace BackTo\Framework\Seo\Hooks;
 
+use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
 use BackTo\Framework\Seo\SeoManager;
 
@@ -12,14 +13,17 @@ class AddSocialLinksToTimberContext implements Hooks
 {
     private SeoManager $seoManager;
 
-    public function __construct(SeoManager $seoManager)
+    private HookDispatcherInterface $hookDispatcher;
+
+    public function __construct(SeoManager $seoManager, HookDispatcherInterface $hookDispatcher)
     {
         $this->seoManager = $seoManager;
+        $this->hookDispatcher = $hookDispatcher;
     }
 
     public function hooks(): void
     {
-        \add_filter('timber/context', [$this, 'addSocialLinks']);
+        $this->hookDispatcher->addFilter('timber/context', [$this, 'addSocialLinks']);
     }
 
     /**

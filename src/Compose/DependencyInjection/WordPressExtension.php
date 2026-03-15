@@ -2,20 +2,32 @@
 
 namespace BackTo\Framework\Compose\DependencyInjection;
 
+use BackTo\Framework\Assets\Contracts\FileLocatorInterface;
+use BackTo\Framework\Assets\Infrastructure\WordPressFileLocator;
+use BackTo\Framework\Blocks\Contracts\BlockStyleRegistrarInterface;
 use BackTo\Framework\Blocks\DependencyInjection\Compiler\RegisterBlockPass;
 use BackTo\Framework\Blocks\DependencyInjection\Compiler\RegisterBlockStylePass;
+use BackTo\Framework\Blocks\Infrastructure\WordPressBlockStyleRegistrar;
 use BackTo\Framework\Compose\DependencyInjection\Compiler\ResolveInstanceOfConditionalPassWithVendorPrefix;
 use BackTo\Framework\Contracts\BlockInterface;
 use BackTo\Framework\Contracts\BlockStyleInterface;
+use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\HookInterface;
 use BackTo\Framework\Contracts\RegistryInterface;
 use BackTo\Framework\Hooks\DependencyInjection\Compiler\RegisterHookPass;
+use BackTo\Framework\Hooks\Infrastructure\WordPressHookDispatcher;
+use BackTo\Framework\PostMeta\Contracts\PostMetaRegistrarInterface;
 use BackTo\Framework\PostMeta\Contracts\PostMetaStructureInterface;
 use BackTo\Framework\PostMeta\DependencyInjection\Compiler\RegisterPostMetaStructurePass;
+use BackTo\Framework\PostMeta\Infrastructure\WordPressPostMetaRegistrar;
 use BackTo\Framework\PostType\Contracts\PostTypeInterface;
+use BackTo\Framework\PostType\Contracts\PostTypeRegistrarInterface;
 use BackTo\Framework\PostType\DependencyInjection\Compiler\RegisterPostTypePass;
+use BackTo\Framework\PostType\Infrastructure\WordPressPostTypeRegistrar;
 use BackTo\Framework\Taxonomy\Contracts\TaxonomyInterface;
+use BackTo\Framework\Taxonomy\Contracts\TaxonomyRegistrarInterface;
 use BackTo\Framework\Taxonomy\DependencyInjection\Compiler\RegisterTaxonomyPass;
+use BackTo\Framework\Taxonomy\Infrastructure\WordPressTaxonomyRegistrar;
 use BackToVendor\Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use BackToVendor\Symfony\Component\DependencyInjection\Compiler\ResolveInstanceofConditionalsPass;
 use BackToVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -65,10 +77,37 @@ class WordPressExtension
     }
 
     /**
+     * Register port → adapter bindings (Clean Architecture).
+     *
+     * Maps domain port interfaces to their WordPress infrastructure adapters.
+     */
+    public function registerPortBindings(ContainerBuilder $containerBuilder): void
+    {
+        $containerBuilder->register(HookDispatcherInterface::class, WordPressHookDispatcher::class);
+        $containerBuilder->setAlias(WordPressHookDispatcher::class, HookDispatcherInterface::class);
+
+        $containerBuilder->register(PostTypeRegistrarInterface::class, WordPressPostTypeRegistrar::class);
+        $containerBuilder->setAlias(WordPressPostTypeRegistrar::class, PostTypeRegistrarInterface::class);
+
+        $containerBuilder->register(TaxonomyRegistrarInterface::class, WordPressTaxonomyRegistrar::class);
+        $containerBuilder->setAlias(WordPressTaxonomyRegistrar::class, TaxonomyRegistrarInterface::class);
+
+        $containerBuilder->register(BlockStyleRegistrarInterface::class, WordPressBlockStyleRegistrar::class);
+        $containerBuilder->setAlias(WordPressBlockStyleRegistrar::class, BlockStyleRegistrarInterface::class);
+
+        $containerBuilder->register(PostMetaRegistrarInterface::class, WordPressPostMetaRegistrar::class);
+        $containerBuilder->setAlias(WordPressPostMetaRegistrar::class, PostMetaRegistrarInterface::class);
+
+        $containerBuilder->register(FileLocatorInterface::class, WordPressFileLocator::class);
+        $containerBuilder->setAlias(WordPressFileLocator::class, FileLocatorInterface::class);
+    }
+
+    /**
      * Apply all WordPress DI configuration to the container.
      */
     public function configure(ContainerBuilder $containerBuilder): void
     {
+        $this->registerPortBindings($containerBuilder);
         $this->registerAutoconfiguration($containerBuilder);
         $this->registerCompilerPasses($containerBuilder);
     }
