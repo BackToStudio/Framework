@@ -55,6 +55,10 @@ class TermRepository
             )
         );
 
+        if ($wpTerms instanceof \WP_Error) {
+            return [];
+        }
+
         return $this->factory->createFromTerms($wpTerms);
     }
 

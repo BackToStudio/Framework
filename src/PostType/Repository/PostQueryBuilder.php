@@ -133,6 +133,9 @@ class PostQueryBuilder
         return $this;
     }
 
+    /**
+     * @param int|string|array<int, int|string> $terms
+     */
     public function inTaxonomy(string $taxonomy, int|string|array $terms, string $field = 'term_id'): self
     {
         if (!isset($this->args['tax_query'])) {

@@ -129,6 +129,10 @@ class TermQueryBuilder
 
         $wpTerms = get_terms(array_merge($defaults, $this->args));
 
+        if ($wpTerms instanceof \WP_Error) {
+            return [];
+        }
+
         return $this->factory->createFromTerms($wpTerms);
     }
 
