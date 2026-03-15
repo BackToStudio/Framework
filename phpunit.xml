@@ -53,6 +53,9 @@
         <testsuite name="theme">
             <directory>src/Theme/Tests</directory>
         </testsuite>
+        <testsuite name="rest-api">
+            <directory>src/RestApi/Tests</directory>
+        </testsuite>
     </testsuites>
 
     <coverage cacheDirectory=".phpunit.cache/code-coverage">

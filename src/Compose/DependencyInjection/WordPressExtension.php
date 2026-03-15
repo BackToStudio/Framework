@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Compose\DependencyInjection;
 
+use BackTo\Framework\Admin\Contracts\AdminPageInterface;
+use BackTo\Framework\Admin\Contracts\AdminPageRegistrarInterface;
+use BackTo\Framework\Admin\DependencyInjection\Compiler\RegisterAdminPagePass;
+use BackTo\Framework\Admin\Infrastructure\WordPressAdminPageRegistrar;
 use BackTo\Framework\Assets\Contracts\FileLocatorInterface;
 use BackTo\Framework\Assets\Infrastructure\WordPressFileLocator;
 use BackTo\Framework\Blocks\Contracts\BlockStyleRegistrarInterface;
@@ -18,6 +22,8 @@ use BackTo\Framework\Contracts\HookInterface;
 use BackTo\Framework\Contracts\RegistryInterface;
 use BackTo\Framework\Hooks\DependencyInjection\Compiler\RegisterHookPass;
 use BackTo\Framework\Hooks\Infrastructure\WordPressHookDispatcher;
+use BackTo\Framework\Options\Contracts\OptionsRepositoryInterface;
+use BackTo\Framework\Options\Infrastructure\WordPressOptionsRepository;
 use BackTo\Framework\PostMeta\Contracts\PostMetaRegistrarInterface;
 use BackTo\Framework\PostMeta\Contracts\PostMetaStructureInterface;
 use BackTo\Framework\PostMeta\DependencyInjection\Compiler\RegisterPostMetaStructurePass;
@@ -26,6 +32,10 @@ use BackTo\Framework\PostType\Contracts\PostTypeInterface;
 use BackTo\Framework\PostType\Contracts\PostTypeRegistrarInterface;
 use BackTo\Framework\PostType\DependencyInjection\Compiler\RegisterPostTypePass;
 use BackTo\Framework\PostType\Infrastructure\WordPressPostTypeRegistrar;
+use BackTo\Framework\RestApi\Contracts\RestRouteInterface;
+use BackTo\Framework\RestApi\Contracts\RestRouteRegistrarInterface;
+use BackTo\Framework\RestApi\DependencyInjection\Compiler\RegisterRestRoutePass;
+use BackTo\Framework\RestApi\Infrastructure\WordPressRestRouteRegistrar;
 use BackTo\Framework\Taxonomy\Contracts\TaxonomyInterface;
 use BackTo\Framework\Taxonomy\Contracts\TaxonomyRegistrarInterface;
 use BackTo\Framework\Taxonomy\DependencyInjection\Compiler\RegisterTaxonomyPass;
@@ -61,6 +71,12 @@ class WordPressExtension
 
         $containerBuilder->registerForAutoconfiguration(HookInterface::class)
             ->addTag('wordpress.hook');
+
+        $containerBuilder->registerForAutoconfiguration(AdminPageInterface::class)
+            ->addTag('wordpress.admin_page');
+
+        $containerBuilder->registerForAutoconfiguration(RestRouteInterface::class)
+            ->addTag('wordpress.rest_route');
     }
 
     /**
@@ -76,6 +92,8 @@ class WordPressExtension
         $containerBuilder->addCompilerPass(new RegisterBlockPass());
         $containerBuilder->addCompilerPass(new RegisterBlockStylePass());
         $containerBuilder->addCompilerPass(new RegisterHookPass());
+        $containerBuilder->addCompilerPass(new RegisterAdminPagePass());
+        $containerBuilder->addCompilerPass(new RegisterRestRoutePass());
     }
 
     /**
@@ -102,6 +120,15 @@ class WordPressExtension
 
         $containerBuilder->register(FileLocatorInterface::class, WordPressFileLocator::class);
         $containerBuilder->setAlias(WordPressFileLocator::class, FileLocatorInterface::class);
+
+        $containerBuilder->register(OptionsRepositoryInterface::class, WordPressOptionsRepository::class);
+        $containerBuilder->setAlias(WordPressOptionsRepository::class, OptionsRepositoryInterface::class);
+
+        $containerBuilder->register(AdminPageRegistrarInterface::class, WordPressAdminPageRegistrar::class);
+        $containerBuilder->setAlias(WordPressAdminPageRegistrar::class, AdminPageRegistrarInterface::class);
+
+        $containerBuilder->register(RestRouteRegistrarInterface::class, WordPressRestRouteRegistrar::class);
+        $containerBuilder->setAlias(WordPressRestRouteRegistrar::class, RestRouteRegistrarInterface::class);
     }
 
     /**

@@ -238,6 +238,21 @@ trait WordPressContainer
                 'namespace' => 'BackTo\\Framework\\Seo\\',
                 'exclude' => '{Tests,Contracts}',
             ],
+            [
+                'dir' => dirname(__DIR__) . '/Admin',
+                'namespace' => 'BackTo\\Framework\\Admin\\',
+                'exclude' => '{DependencyInjection,Tests,Contracts,Infrastructure}',
+            ],
+            [
+                'dir' => dirname(__DIR__) . '/Options',
+                'namespace' => 'BackTo\\Framework\\Options\\',
+                'exclude' => '{Tests,Contracts,Infrastructure}',
+            ],
+            [
+                'dir' => dirname(__DIR__) . '/RestApi',
+                'namespace' => 'BackTo\\Framework\\RestApi\\',
+                'exclude' => '{DependencyInjection,Tests,Contracts,Infrastructure}',
+            ],
         ];
     }
 
