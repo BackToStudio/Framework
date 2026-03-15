@@ -16,12 +16,14 @@ use BackTo\Framework\Security\Contracts\ContentSecurityPolicyInterface;
 use BackTo\Framework\Security\Contracts\InputSanitizerInterface;
 use BackTo\Framework\Security\Contracts\LoginThrottleInterface;
 use BackTo\Framework\Security\Contracts\NonceManagerInterface;
+use BackTo\Framework\Security\Contracts\OutputEscaperInterface;
 use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
 use BackTo\Framework\Security\ContentSecurityPolicyManager;
 use BackTo\Framework\Security\DependencyInjection\Compiler\RegisterSecurityRulePass;
 use BackTo\Framework\Security\Infrastructure\WordPressInputSanitizer;
 use BackTo\Framework\Security\Infrastructure\WordPressLoginThrottle;
 use BackTo\Framework\Security\Infrastructure\WordPressNonceManager;
+use BackTo\Framework\Security\Infrastructure\WordPressOutputEscaper;
 use BackTo\Framework\Observability\ErrorHandler;
 use BackTo\Framework\Observability\Infrastructure\NullLogger;
 use BackTo\Framework\Observability\Infrastructure\WordPressLogger;
@@ -180,6 +182,9 @@ class WordPressExtension
         $containerBuilder->register(ContentSecurityPolicyInterface::class, ContentSecurityPolicyManager::class)
             ->setAutowired(true);
         $containerBuilder->setAlias(ContentSecurityPolicyManager::class, ContentSecurityPolicyInterface::class);
+
+        $containerBuilder->register(OutputEscaperInterface::class, WordPressOutputEscaper::class);
+        $containerBuilder->setAlias(WordPressOutputEscaper::class, OutputEscaperInterface::class);
     }
 
     /**
