@@ -12,8 +12,14 @@ use BackTo\Framework\Observability\Contracts\HealthCheckInterface;
 use BackTo\Framework\Observability\Contracts\LoggerInterface;
 use BackTo\Framework\Observability\Contracts\PerformanceCollectorInterface;
 use BackTo\Framework\Observability\DependencyInjection\Compiler\RegisterHealthCheckPass;
+use BackTo\Framework\Security\Contracts\InputSanitizerInterface;
+use BackTo\Framework\Security\Contracts\LoginThrottleInterface;
+use BackTo\Framework\Security\Contracts\NonceManagerInterface;
 use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
 use BackTo\Framework\Security\DependencyInjection\Compiler\RegisterSecurityRulePass;
+use BackTo\Framework\Security\Infrastructure\WordPressInputSanitizer;
+use BackTo\Framework\Security\Infrastructure\WordPressLoginThrottle;
+use BackTo\Framework\Security\Infrastructure\WordPressNonceManager;
 use BackTo\Framework\Observability\ErrorHandler;
 use BackTo\Framework\Observability\Infrastructure\NullLogger;
 use BackTo\Framework\Observability\Infrastructure\WordPressLogger;
@@ -159,6 +165,15 @@ class WordPressExtension
 
         $containerBuilder->register(PerformanceCollectorInterface::class, PerformanceCollector::class);
         $containerBuilder->setAlias(PerformanceCollector::class, PerformanceCollectorInterface::class);
+
+        $containerBuilder->register(NonceManagerInterface::class, WordPressNonceManager::class);
+        $containerBuilder->setAlias(WordPressNonceManager::class, NonceManagerInterface::class);
+
+        $containerBuilder->register(InputSanitizerInterface::class, WordPressInputSanitizer::class);
+        $containerBuilder->setAlias(WordPressInputSanitizer::class, InputSanitizerInterface::class);
+
+        $containerBuilder->register(LoginThrottleInterface::class, WordPressLoginThrottle::class);
+        $containerBuilder->setAlias(WordPressLoginThrottle::class, LoginThrottleInterface::class);
     }
 
     /**
