@@ -1,35 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BackTo\Framework\PostType;
 
-use Exception;
 use BackTo\Framework\Contracts\ActivationHooks;
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
+use BackTo\Framework\Exception\FrameworkException;
 use BackTo\Framework\PostType\Contracts\PostTypeRegistrarInterface;
 
 class RegisterPostType implements Hooks, ActivationHooks
 {
-
-    /**
-     * @var PostTypeRegistry
-     */
-    private $registry;
-
-    /**
-     * @var PostTypeFactory
-     */
-    private $factory;
-
-    /**
-     * @var PostTypeRegistrarInterface
-     */
-    private $registrar;
-
-    /**
-     * @var HookDispatcherInterface
-     */
-    private $hookDispatcher;
+    private PostTypeRegistry $registry;
+    private PostTypeFactory $factory;
+    private PostTypeRegistrarInterface $registrar;
+    private HookDispatcherInterface $hookDispatcher;
 
     public function __construct(
         PostTypeRegistry $postTypeRegistry,
@@ -43,7 +29,7 @@ class RegisterPostType implements Hooks, ActivationHooks
         $this->hookDispatcher = $hookDispatcher;
     }
 
-    public function activate()
+    public function activate(): void
     {
         $this->registerCustomPostTypes();
         $this->registrar->flushRewriteRules();
@@ -65,27 +51,22 @@ class RegisterPostType implements Hooks, ActivationHooks
             try {
                 $newPostType = $this->factory->createPostType($postType->getKey(), $postType->getArgs());
                 $this->registrar->register($newPostType->getKey(), $newPostType->getArgs());
-            } catch (Exception $exception) {
-                error_log($exception->getMessage());
+            } catch (FrameworkException $exception) {
+                \error_log($exception->getMessage());
             }
         }
     }
 
     /**
-     * Register new Custom Post Type on the fly.
-     *
-     * @param string $name
-     * @param array $args
-     *
-     * @return $this
+     * @param array<string, mixed> $args
      */
-    public function add(string $name, array $args = []): RegisterPostType
+    public function add(string $name, array $args = []): self
     {
         try {
             $newPostType = $this->factory->createPostType($name, $args);
             $this->registry->add($newPostType);
-        } catch (Exception $e) {
-            error_log($e->getMessage());
+        } catch (FrameworkException $e) {
+            \error_log($e->getMessage());
         }
 
         return $this;

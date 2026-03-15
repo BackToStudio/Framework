@@ -1,39 +1,26 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BackTo\Framework\Taxonomy\Entity;
 
 use BackTo\Framework\Taxonomy\Contracts\TaxonomyInterface;
 
 class Taxonomy implements TaxonomyInterface
 {
+    private string $key = '';
 
-    /**
-     * @var string
-     */
-    private $key;
+    /** @var array<string, mixed> */
+    private array $args = [];
 
-    /**
-     * @var array
-     */
-    private $args = [];
+    /** @var string[] */
+    private array $postTypes = [];
 
-    /**
-     * @var string[]
-     */
-    private $postTypes = [];
-
-    /**
-     * @return string
-     */
-    public function getKey(): ?string
+    public function getKey(): string
     {
         return $this->key;
     }
 
-    /**
-     * @param string $key
-     * @return TaxonomyInterface
-     */
     public function setKey(string $key): TaxonomyInterface
     {
         $this->key = $key;
@@ -42,7 +29,7 @@ class Taxonomy implements TaxonomyInterface
     }
 
     /**
-     * @return array
+     * @return array<string, mixed>
      */
     public function getArgs(): array
     {
@@ -50,8 +37,7 @@ class Taxonomy implements TaxonomyInterface
     }
 
     /**
-     * @param array $args
-     * @return TaxonomyInterface
+     * @param array<string, mixed> $args
      */
     public function setArgs(array $args): TaxonomyInterface
     {
@@ -69,8 +55,7 @@ class Taxonomy implements TaxonomyInterface
     }
 
     /**
-     * @param array $postTypes
-     * @return Taxonomy
+     * @param string[] $postTypes
      */
     public function setPostTypes(array $postTypes): TaxonomyInterface
     {
@@ -79,11 +64,6 @@ class Taxonomy implements TaxonomyInterface
         return $this;
     }
 
-    /**
-     * @param string $postType
-     *
-     * @return Taxonomy
-     */
     public function addPostType(string $postType): TaxonomyInterface
     {
         $this->postTypes[] = $postType;

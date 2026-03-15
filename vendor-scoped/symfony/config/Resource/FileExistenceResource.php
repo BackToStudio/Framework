@@ -30,21 +30,21 @@ class FileExistenceResource implements SelfCheckingResourceInterface
     public function __construct(string $resource)
     {
         $this->resource = $resource;
-        $this->exists = \file_exists($resource);
+        $this->exists = file_exists($resource);
     }
-    public function __toString() : string
+    public function __toString(): string
     {
         return 'existence.' . $this->resource;
     }
-    public function getResource() : string
+    public function getResource(): string
     {
         return $this->resource;
     }
     /**
      * {@inheritdoc}
      */
-    public function isFresh(int $timestamp) : bool
+    public function isFresh(int $timestamp): bool
     {
-        return \file_exists($this->resource) === $this->exists;
+        return file_exists($this->resource) === $this->exists;
     }
 }

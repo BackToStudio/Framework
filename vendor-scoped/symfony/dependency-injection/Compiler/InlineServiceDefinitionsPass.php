@@ -51,7 +51,7 @@ class InlineServiceDefinitionsPass extends AbstractRecursivePass
             $this->connectedIds = $this->notInlinedIds = $container->getDefinitions();
             do {
                 if ($this->analyzingPass) {
-                    $analyzedContainer->setDefinitions(\array_intersect_key($analyzedContainer->getDefinitions(), $this->connectedIds));
+                    $analyzedContainer->setDefinitions(array_intersect_key($analyzedContainer->getDefinitions(), $this->connectedIds));
                     $this->analyzingPass->process($analyzedContainer);
                 }
                 $this->graph = $analyzedContainer->getCompiler()->getServiceReferenceGraph();
@@ -119,16 +119,16 @@ class InlineServiceDefinitionsPass extends AbstractRecursivePass
             $this->notInlinableIds[$id] = \true;
             return $value;
         }
-        $this->container->log($this, \sprintf('Inlined service "%s" to "%s".', $id, $this->currentId));
+        $this->container->log($this, sprintf('Inlined service "%s" to "%s".', $id, $this->currentId));
         $this->inlinedIds[$id] = $definition->isPublic() || !$definition->isShared();
         $this->notInlinedIds[$this->currentId] = \true;
         if ($definition->isShared()) {
             return $definition;
         }
         if (isset($this->cloningIds[$id])) {
-            $ids = \array_keys($this->cloningIds);
+            $ids = array_keys($this->cloningIds);
             $ids[] = $id;
-            throw new ServiceCircularReferenceException($id, \array_slice($ids, \array_search($id, $ids)));
+            throw new ServiceCircularReferenceException($id, \array_slice($ids, array_search($id, $ids)));
         }
         $this->cloningIds[$id] = \true;
         try {
@@ -140,7 +140,7 @@ class InlineServiceDefinitionsPass extends AbstractRecursivePass
     /**
      * Checks if the definition is inlineable.
      */
-    private function isInlineableDefinition(string $id, Definition $definition) : bool
+    private function isInlineableDefinition(string $id, Definition $definition): bool
     {
         if ($definition->hasErrors() || $definition->isDeprecated() || $definition->isLazy() || $definition->isSynthetic() || $definition->hasTag('container.do_not_inline')) {
             return \false;
@@ -153,7 +153,7 @@ class InlineServiceDefinitionsPass extends AbstractRecursivePass
                 $srcId = $edge->getSourceNode()->getId();
                 $this->connectedIds[$srcId] = \true;
                 if ($edge->isWeak() || $edge->isLazy()) {
-                    return !($this->connectedIds[$id] = \true);
+                    return !$this->connectedIds[$id] = \true;
                 }
             }
             return \true;

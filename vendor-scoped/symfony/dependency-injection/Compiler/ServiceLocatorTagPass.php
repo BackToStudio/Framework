@@ -49,7 +49,7 @@ final class ServiceLocatorTagPass extends AbstractRecursivePass
             $services = $this->findAndSortTaggedServices($services, $this->container);
         }
         if (!\is_array($services)) {
-            throw new InvalidArgumentException(\sprintf('Invalid definition for service "%s": an array of references is expected as first argument when the "container.service_locator" tag is set.', $this->currentId));
+            throw new InvalidArgumentException(sprintf('Invalid definition for service "%s": an array of references is expected as first argument when the "container.service_locator" tag is set.', $this->currentId));
         }
         $i = 0;
         foreach ($services as $k => $v) {
@@ -57,7 +57,7 @@ final class ServiceLocatorTagPass extends AbstractRecursivePass
                 continue;
             }
             if (!$v instanceof Reference) {
-                throw new InvalidArgumentException(\sprintf('Invalid definition for service "%s": an array of references is expected as first argument when the "container.service_locator" tag is set, "%s" found for key "%s".', $this->currentId, \get_debug_type($v), $k));
+                throw new InvalidArgumentException(sprintf('Invalid definition for service "%s": an array of references is expected as first argument when the "container.service_locator" tag is set, "%s" found for key "%s".', $this->currentId, get_debug_type($v), $k));
             }
             if ($i === $k) {
                 unset($services[$k]);
@@ -68,7 +68,7 @@ final class ServiceLocatorTagPass extends AbstractRecursivePass
             }
             $services[$k] = new ServiceClosureArgument($v);
         }
-        \ksort($services);
+        ksort($services);
         $value->setArgument(0, $services);
         $id = '.service_locator.' . ContainerBuilder::hash($value);
         if ($isRoot) {
@@ -83,11 +83,11 @@ final class ServiceLocatorTagPass extends AbstractRecursivePass
     /**
      * @param Reference[] $refMap
      */
-    public static function register(ContainerBuilder $container, array $refMap, ?string $callerId = null) : Reference
+    public static function register(ContainerBuilder $container, array $refMap, ?string $callerId = null): Reference
     {
         foreach ($refMap as $id => $ref) {
             if (!$ref instanceof Reference) {
-                throw new InvalidArgumentException(\sprintf('Invalid service locator definition: only services can be referenced, "%s" found for key "%s". Inject parameter values using constructors instead.', \get_debug_type($ref), $id));
+                throw new InvalidArgumentException(sprintf('Invalid service locator definition: only services can be referenced, "%s" found for key "%s". Inject parameter values using constructors instead.', get_debug_type($ref), $id));
             }
             $refMap[$id] = new ServiceClosureArgument($ref);
         }

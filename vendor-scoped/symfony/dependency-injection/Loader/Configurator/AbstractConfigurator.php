@@ -30,10 +30,10 @@ abstract class AbstractConfigurator
     protected $definition;
     public function __call(string $method, array $args)
     {
-        if (\method_exists($this, 'set' . $method)) {
+        if (method_exists($this, 'set' . $method)) {
             return $this->{'set' . $method}(...$args);
         }
-        throw new \BadMethodCallException(\sprintf('Call to undefined method "%s::%s()".', static::class, $method));
+        throw new \BadMethodCallException(sprintf('Call to undefined method "%s::%s()".', static::class, $method));
     }
     /**
      * @return array
@@ -78,7 +78,7 @@ abstract class AbstractConfigurator
             return (string) $value;
         }
         if ($value instanceof self) {
-            throw new InvalidArgumentException(\sprintf('"%s()" can be used only at the root of service configuration files.', $value::FACTORY));
+            throw new InvalidArgumentException(sprintf('"%s()" can be used only at the root of service configuration files.', $value::FACTORY));
         }
         switch (\true) {
             case null === $value:
@@ -94,6 +94,6 @@ abstract class AbstractConfigurator
                     return $value;
                 }
         }
-        throw new InvalidArgumentException(\sprintf('Cannot use values of type "%s" in service configuration files.', \get_debug_type($value)));
+        throw new InvalidArgumentException(sprintf('Cannot use values of type "%s" in service configuration files.', get_debug_type($value)));
     }
 }

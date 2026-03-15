@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BackTo\Framework\Taxonomy\Tests;
 
-use Exception;
+use BackTo\Framework\Exception\InvalidTaxonomyException;
 use BackTo\Framework\Taxonomy\Entity\Taxonomy;
 use BackTo\Framework\Taxonomy\TaxonomyFactory;
 use PHPUnit\Framework\TestCase;
@@ -24,29 +26,23 @@ class TaxonomyFactoryTest extends TestCase
         return [];
     }
 
-    private function givenThereAreSpecificArgs()
+    private function givenThereAreSpecificArgs(): array
     {
         return [
             'show_ui' => false,
             'show_in_rest' => false,
             'publicly_queryable' => false,
-            'hierarchical' => false
+            'hierarchical' => false,
         ];
     }
 
-    /**
-     * @throws Exception
-     */
     public function whenImCreatingTaxonomy(string $key, array $postTypes, array $args): Taxonomy
     {
         $factory = new TaxonomyFactory();
         return $factory->createTaxonomy($key, $postTypes, $args);
     }
 
-    /**
-     * @throws Exception
-     */
-    public function thenIShouldHaveDefaultArgs(array $args)
+    public function thenIShouldHaveDefaultArgs(array $args): void
     {
         $this->assertArrayHasKey('show_ui', $args);
         $this->assertArrayHasKey('show_in_rest', $args);
@@ -58,7 +54,7 @@ class TaxonomyFactoryTest extends TestCase
         $this->assertTrue($args['hierarchical']);
     }
 
-    private function thenIShouldHaveSameArgs(array $args, array $givenArgs)
+    private function thenIShouldHaveSameArgs(array $args, array $givenArgs): void
     {
         $this->assertSame($args['show_ui'], $givenArgs['show_ui']);
         $this->assertSame($args['show_in_rest'], $givenArgs['show_in_rest']);
@@ -66,22 +62,15 @@ class TaxonomyFactoryTest extends TestCase
         $this->assertSame($args['hierarchical'], $givenArgs['hierarchical']);
     }
 
-
-    /**
-     * @throws Exception
-     */
-    public function testNotAllowEmptyTaxonomyKey()
+    public function testNotAllowEmptyTaxonomyKey(): void
     {
-        $this->expectException(Exception::class);
+        $this->expectException(InvalidTaxonomyException::class);
         $key = $this->givenThereIsEmptyKey();
         $args = $this->givenThereAreEmptyArgs();
         $this->whenImCreatingTaxonomy($key, ['abcdef'], $args);
     }
 
-    /**
-     * @throws Exception
-     */
-    public function testDefaultTaxonomyArgs()
+    public function testDefaultTaxonomyArgs(): void
     {
         $key = $this->givenThereIsKey();
         $args = $this->givenThereAreEmptyArgs();
@@ -89,10 +78,7 @@ class TaxonomyFactoryTest extends TestCase
         $this->thenIShouldHaveDefaultArgs($postType->getArgs());
     }
 
-    /**
-     * @throws Exception
-     */
-    public function testGivenTaxonomyArgs()
+    public function testGivenTaxonomyArgs(): void
     {
         $key = $this->givenThereIsKey();
         $args = $this->givenThereAreSpecificArgs();
@@ -100,15 +86,14 @@ class TaxonomyFactoryTest extends TestCase
         $this->thenIShouldHaveSameArgs($postType->getArgs(), $args);
     }
 
-    /**
-     * @throws Exception
-     */
-    public function testTaxonomyNames()
+    public function testDefaultLabelsUseKey(): void
     {
-        $key = 'abc-def';
+        $key = 'category';
         $factory = new TaxonomyFactory();
-        $this->assertSame('Abc Def', $factory->getSingularName($key));
-        $this->assertSame('Abc Defs', $factory->getPluralName($key));
+        $taxonomy = $factory->createTaxonomy($key, ['post'], []);
+        $args = $taxonomy->getArgs();
+        $this->assertArrayHasKey('labels', $args);
+        $this->assertSame($key, $args['labels']['name']);
+        $this->assertSame($key, $args['labels']['singular_name']);
     }
-
 }

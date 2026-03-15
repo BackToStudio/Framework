@@ -311,7 +311,7 @@ abstract class NodeDefinition implements NodeParentInterface
      *
      * @throws InvalidDefinitionException When the definition is invalid
      */
-    protected abstract function createNode();
+    abstract protected function createNode();
     /**
      * Set PathSeparator to use.
      *

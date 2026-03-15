@@ -72,7 +72,7 @@ class ResolveInvalidReferencesPass implements CompilerPassInterface
                     if (\false !== $i && $k !== $i++) {
                         $i = \false;
                     }
-                    if ($v !== ($processedValue = $this->processValue($v, $rootLevel, 1 + $level))) {
+                    if ($v !== $processedValue = $this->processValue($v, $rootLevel, 1 + $level)) {
                         $value[$k] = $processedValue;
                     }
                 } catch (RuntimeException $e) {
@@ -87,7 +87,7 @@ class ResolveInvalidReferencesPass implements CompilerPassInterface
             }
             // Ensure numerically indexed arguments have sequential numeric keys.
             if (\false !== $i) {
-                $value = \array_values($value);
+                $value = array_values($value);
             }
         } elseif ($value instanceof Reference) {
             if ($this->container->has($id = (string) $value)) {
@@ -102,7 +102,7 @@ class ResolveInvalidReferencesPass implements CompilerPassInterface
             if (ContainerInterface::RUNTIME_EXCEPTION_ON_INVALID_REFERENCE === $invalidBehavior && $value instanceof TypedReference && !$this->container->has($id)) {
                 $e = new ServiceNotFoundException($id, $this->currentId);
                 // since the error message varies by $id and $this->currentId, so should the id of the dummy errored definition
-                $this->container->register($id = \sprintf('.errored.%s.%s', $this->currentId, $id), $value->getType())->addError($e->getMessage());
+                $this->container->register($id = sprintf('.errored.%s.%s', $this->currentId, $id), $value->getType())->addError($e->getMessage());
                 return new TypedReference($id, $value->getType(), $value->getInvalidBehavior());
             }
             // resolve invalid behavior

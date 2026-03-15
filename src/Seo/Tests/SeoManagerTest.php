@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BackTo\Framework\Seo\Tests;
 
 use BackTo\Framework\Seo\Contracts\SeoProviderInterface;

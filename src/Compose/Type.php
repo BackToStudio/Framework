@@ -1,12 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BackTo\Framework\Compose;
 
-abstract class Type {
-    const STRING = 'string';
-    const BOOLEAN = 'boolean';
-    const INTEGER = 'integer';
-    const NUMBER = 'number';
-    const ARRAY = 'array';
-    const OBJECT = 'object';
+enum Type: string
+{
+    case STRING = 'string';
+    case BOOLEAN = 'boolean';
+    case INTEGER = 'integer';
+    case NUMBER = 'number';
+    case ARRAY = 'array';
+    case OBJECT = 'object';
 }

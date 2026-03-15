@@ -34,14 +34,14 @@ class ReflectionClassResource implements SelfCheckingResourceInterface
     /**
      * {@inheritdoc}
      */
-    public function isFresh(int $timestamp) : bool
+    public function isFresh(int $timestamp): bool
     {
         if (null === $this->hash) {
             $this->hash = $this->computeHash();
             $this->loadFiles($this->classReflector);
         }
         foreach ($this->files as $file => $v) {
-            if (\false === ($filemtime = @\filemtime($file))) {
+            if (\false === $filemtime = @filemtime($file)) {
                 return \false;
             }
             if ($filemtime > $timestamp) {
@@ -50,14 +50,14 @@ class ReflectionClassResource implements SelfCheckingResourceInterface
         }
         return \true;
     }
-    public function __toString() : string
+    public function __toString(): string
     {
         return 'reflection.' . $this->className;
     }
     /**
      * @internal
      */
-    public function __sleep() : array
+    public function __sleep(): array
     {
         if (null === $this->hash) {
             $this->hash = $this->computeHash();
@@ -72,9 +72,9 @@ class ReflectionClassResource implements SelfCheckingResourceInterface
         }
         do {
             $file = $class->getFileName();
-            if (\false !== $file && \is_file($file)) {
+            if (\false !== $file && is_file($file)) {
                 foreach ($this->excludedVendors as $vendor) {
-                    if (\str_starts_with($file, $vendor) && \false !== \strpbrk(\substr($file, \strlen($vendor), 1), '/' . \DIRECTORY_SEPARATOR)) {
+                    if (str_starts_with($file, $vendor) && \false !== strpbrk(substr($file, \strlen($vendor), 1), '/' . \DIRECTORY_SEPARATOR)) {
                         $file = \false;
                         break;
                     }
@@ -88,7 +88,7 @@ class ReflectionClassResource implements SelfCheckingResourceInterface
             }
         } while ($class = $class->getParentClass());
     }
-    private function computeHash() : string
+    private function computeHash(): string
     {
         if (null === $this->classReflector) {
             try {
@@ -98,31 +98,31 @@ class ReflectionClassResource implements SelfCheckingResourceInterface
                 return \false;
             }
         }
-        $hash = \hash_init('md5');
+        $hash = hash_init('md5');
         foreach ($this->generateSignature($this->classReflector) as $info) {
-            \hash_update($hash, $info);
+            hash_update($hash, $info);
         }
-        return \hash_final($hash);
+        return hash_final($hash);
     }
-    private function generateSignature(\ReflectionClass $class) : iterable
+    private function generateSignature(\ReflectionClass $class): iterable
     {
         if (\PHP_VERSION_ID >= 80000) {
             $attributes = [];
             foreach ($class->getAttributes() as $a) {
                 $attributes[] = [$a->getName(), \PHP_VERSION_ID >= 80100 ? (string) $a : $a->getArguments()];
             }
-            (yield \print_r($attributes, \true));
+            yield print_r($attributes, \true);
             $attributes = [];
         }
-        (yield $class->getDocComment());
-        (yield (int) $class->isFinal());
-        (yield (int) $class->isAbstract());
+        yield $class->getDocComment();
+        yield (int) $class->isFinal();
+        yield (int) $class->isAbstract();
         if ($class->isTrait()) {
-            (yield \print_r(\class_uses($class->name), \true));
+            yield print_r(class_uses($class->name), \true);
         } else {
-            (yield \print_r(\class_parents($class->name), \true));
-            (yield \print_r(\class_implements($class->name), \true));
-            (yield \print_r($class->getConstants(), \true));
+            yield print_r(class_parents($class->name), \true);
+            yield print_r(class_implements($class->name), \true);
+            yield print_r($class->getConstants(), \true);
         }
         if (!$class->isInterface()) {
             $defaults = $class->getDefaultProperties();
@@ -131,15 +131,15 @@ class ReflectionClassResource implements SelfCheckingResourceInterface
                     foreach ($p->getAttributes() as $a) {
                         $attributes[] = [$a->getName(), \PHP_VERSION_ID >= 80100 ? (string) $a : $a->getArguments()];
                     }
-                    (yield \print_r($attributes, \true));
+                    yield print_r($attributes, \true);
                     $attributes = [];
                 }
-                (yield $p->getDocComment());
-                (yield $p->isDefault() ? '<default>' : '');
-                (yield $p->isPublic() ? 'public' : 'protected');
-                (yield $p->isStatic() ? 'static' : '');
-                (yield '$' . $p->name);
-                (yield \print_r(isset($defaults[$p->name]) && !\is_object($defaults[$p->name]) ? $defaults[$p->name] : null, \true));
+                yield $p->getDocComment();
+                yield $p->isDefault() ? '<default>' : '';
+                yield $p->isPublic() ? 'public' : 'protected';
+                yield $p->isStatic() ? 'static' : '';
+                yield '$' . $p->name;
+                yield print_r(isset($defaults[$p->name]) && !\is_object($defaults[$p->name]) ? $defaults[$p->name] : null, \true);
             }
         }
         $defined = \Closure::bind(static function ($c) {
@@ -150,7 +150,7 @@ class ReflectionClassResource implements SelfCheckingResourceInterface
                 foreach ($m->getAttributes() as $a) {
                     $attributes[] = [$a->getName(), \PHP_VERSION_ID >= 80100 ? (string) $a : $a->getArguments()];
                 }
-                (yield \print_r($attributes, \true));
+                yield print_r($attributes, \true);
                 $attributes = [];
             }
             $defaults = [];
@@ -160,7 +160,7 @@ class ReflectionClassResource implements SelfCheckingResourceInterface
                     foreach ($p->getAttributes() as $a) {
                         $attributes[] = [$a->getName(), \PHP_VERSION_ID >= 80100 ? (string) $a : $a->getArguments()];
                     }
-                    (yield \print_r($attributes, \true));
+                    yield print_r($attributes, \true);
                     $attributes = [];
                 }
                 if (!$p->isDefaultValueAvailable()) {
@@ -179,7 +179,7 @@ class ReflectionClassResource implements SelfCheckingResourceInterface
                 $parametersWithUndefinedConstants[$p->name] = \true;
             }
             if (!$parametersWithUndefinedConstants) {
-                (yield \preg_replace('/^  @@.*/m', '', $m));
+                yield preg_replace('/^  @@.*/m', '', $m);
             } else {
                 $t = $m->getReturnType();
                 $stack = [$m->getDocComment(), $m->getName(), $m->isAbstract(), $m->isFinal(), $m->isStatic(), $m->isPublic(), $m->isPrivate(), $m->isProtected(), $m->returnsReference(), $t instanceof \ReflectionNamedType ? (string) $t->allowsNull() . $t->getName() : (string) $t];
@@ -195,26 +195,26 @@ class ReflectionClassResource implements SelfCheckingResourceInterface
                         $stack[] = $p->getName();
                     }
                 }
-                (yield \implode(',', $stack));
+                yield implode(',', $stack);
             }
-            (yield \print_r($defaults, \true));
+            yield print_r($defaults, \true);
         }
         if ($class->isAbstract() || $class->isInterface() || $class->isTrait()) {
             return;
         }
-        if (\interface_exists(EventSubscriberInterface::class, \false) && $class->isSubclassOf(EventSubscriberInterface::class)) {
-            (yield EventSubscriberInterface::class);
-            (yield \print_r($class->name::getSubscribedEvents(), \true));
+        if (interface_exists(EventSubscriberInterface::class, \false) && $class->isSubclassOf(EventSubscriberInterface::class)) {
+            yield EventSubscriberInterface::class;
+            yield print_r($class->name::getSubscribedEvents(), \true);
         }
-        if (\interface_exists(MessageSubscriberInterface::class, \false) && $class->isSubclassOf(MessageSubscriberInterface::class)) {
-            (yield MessageSubscriberInterface::class);
+        if (interface_exists(MessageSubscriberInterface::class, \false) && $class->isSubclassOf(MessageSubscriberInterface::class)) {
+            yield MessageSubscriberInterface::class;
             foreach ($class->name::getHandledMessages() as $key => $value) {
-                (yield $key . \print_r($value, \true));
+                yield $key . print_r($value, \true);
             }
         }
-        if (\interface_exists(ServiceSubscriberInterface::class, \false) && $class->isSubclassOf(ServiceSubscriberInterface::class)) {
-            (yield ServiceSubscriberInterface::class);
-            (yield \print_r($class->name::getSubscribedServices(), \true));
+        if (interface_exists(ServiceSubscriberInterface::class, \false) && $class->isSubclassOf(ServiceSubscriberInterface::class)) {
+            yield ServiceSubscriberInterface::class;
+            yield print_r($class->name::getSubscribedServices(), \true);
         }
     }
 }

@@ -1,24 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BackTo\Framework\Blocks\DependencyInjection\Compiler;
 
 use BackTo\Framework\Blocks\BlockStyleRegistry;
-use BackToVendor\Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
-use BackToVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
-use BackToVendor\Symfony\Component\DependencyInjection\Reference;
+use BackTo\Framework\Compose\DependencyInjection\Compiler\AbstractTaggedServiceCompilerPass;
 
-class RegisterBlockStylePass implements CompilerPassInterface
+class RegisterBlockStylePass extends AbstractTaggedServiceCompilerPass
 {
-    public function process(ContainerBuilder $container): void
+    protected function getRegistryClass(): string
     {
-        if (!$container->hasDefinition(BlockStyleRegistry::class)) {
-            return;
-        }
+        return BlockStyleRegistry::class;
+    }
 
-        $registryDefinition = $container->findDefinition(BlockStyleRegistry::class);
-
-        foreach ($container->findTaggedServiceIds('wordpress.block_style') as $id => $tags) {
-            $registryDefinition->addMethodCall('add', [new Reference($id)]);
-        }
+    protected function getTag(): string
+    {
+        return 'wordpress.block_style';
     }
 }

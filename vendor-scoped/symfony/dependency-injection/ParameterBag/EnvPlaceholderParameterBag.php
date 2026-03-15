@@ -27,8 +27,8 @@ class EnvPlaceholderParameterBag extends ParameterBag
      */
     public function get(string $name)
     {
-        if (\str_starts_with($name, 'env(') && \str_ends_with($name, ')') && 'env()' !== $name) {
-            $env = \substr($name, 4, -1);
+        if (str_starts_with($name, 'env(') && str_ends_with($name, ')') && 'env()' !== $name) {
+            $env = substr($name, 4, -1);
             if (isset($this->envPlaceholders[$env])) {
                 foreach ($this->envPlaceholders[$env] as $placeholder) {
                     return $placeholder;
@@ -41,14 +41,14 @@ class EnvPlaceholderParameterBag extends ParameterBag
                     // return first result
                 }
             }
-            if (!\preg_match('/^(?:[-.\\w]*+:)*+\\w++$/', $env)) {
-                throw new InvalidArgumentException(\sprintf('Invalid %s name: only "word" characters are allowed.', $name));
+            if (!preg_match('/^(?:[-.\w]*+:)*+\w++$/', $env)) {
+                throw new InvalidArgumentException(sprintf('Invalid %s name: only "word" characters are allowed.', $name));
             }
             if ($this->has($name) && null !== ($defaultValue = parent::get($name)) && !\is_string($defaultValue)) {
-                throw new RuntimeException(\sprintf('The default value of an env() parameter must be a string or null, but "%s" given to "%s".', \get_debug_type($defaultValue), $name));
+                throw new RuntimeException(sprintf('The default value of an env() parameter must be a string or null, but "%s" given to "%s".', get_debug_type($defaultValue), $name));
             }
-            $uniqueName = \md5($name . '_' . self::$counter++);
-            $placeholder = \sprintf('%s_%s_%s', $this->getEnvPlaceholderUniquePrefix(), \strtr($env, ':-.', '___'), $uniqueName);
+            $uniqueName = md5($name . '_' . self::$counter++);
+            $placeholder = sprintf('%s_%s_%s', $this->getEnvPlaceholderUniquePrefix(), strtr($env, ':-.', '___'), $uniqueName);
             $this->envPlaceholders[$env][$placeholder] = $placeholder;
             return $placeholder;
         }
@@ -57,14 +57,14 @@ class EnvPlaceholderParameterBag extends ParameterBag
     /**
      * Gets the common env placeholder prefix for env vars created by this bag.
      */
-    public function getEnvPlaceholderUniquePrefix() : string
+    public function getEnvPlaceholderUniquePrefix(): string
     {
         if (null === $this->envPlaceholderUniquePrefix) {
-            $reproducibleEntropy = \unserialize(\serialize($this->parameters));
-            \array_walk_recursive($reproducibleEntropy, function (&$v) {
+            $reproducibleEntropy = unserialize(serialize($this->parameters));
+            array_walk_recursive($reproducibleEntropy, function (&$v) {
                 $v = null;
             });
-            $this->envPlaceholderUniquePrefix = 'env_' . \substr(\md5(\serialize($reproducibleEntropy)), -16);
+            $this->envPlaceholderUniquePrefix = 'env_' . substr(md5(serialize($reproducibleEntropy)), -16);
         }
         return $this->envPlaceholderUniquePrefix;
     }
@@ -77,7 +77,7 @@ class EnvPlaceholderParameterBag extends ParameterBag
     {
         return $this->envPlaceholders;
     }
-    public function getUnusedEnvPlaceholders() : array
+    public function getUnusedEnvPlaceholders(): array
     {
         return $this->unusedEnvPlaceholders;
     }
@@ -130,7 +130,7 @@ class EnvPlaceholderParameterBag extends ParameterBag
         parent::resolve();
         foreach ($this->envPlaceholders as $env => $placeholders) {
             if ($this->has($name = "env({$env})") && null !== ($default = $this->parameters[$name]) && !\is_string($default)) {
-                throw new RuntimeException(\sprintf('The default value of env parameter "%s" must be a string or null, "%s" given.', $env, \get_debug_type($default)));
+                throw new RuntimeException(sprintf('The default value of env parameter "%s" must be a string or null, "%s" given.', $env, get_debug_type($default)));
             }
         }
     }

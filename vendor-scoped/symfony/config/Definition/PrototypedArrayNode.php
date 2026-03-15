@@ -101,7 +101,7 @@ class PrototypedArrayNode extends ArrayNode
         if (null === $children) {
             $this->defaultChildren = ['defaults'];
         } else {
-            $this->defaultChildren = \is_int($children) && $children > 0 ? \range(1, $children) : (array) $children;
+            $this->defaultChildren = \is_int($children) && $children > 0 ? range(1, $children) : (array) $children;
         }
     }
     /**
@@ -115,7 +115,7 @@ class PrototypedArrayNode extends ArrayNode
         if (null !== $this->defaultChildren) {
             $default = $this->prototype->hasDefaultValue() ? $this->prototype->getDefaultValue() : [];
             $defaults = [];
-            foreach (\array_values($this->defaultChildren) as $i => $name) {
+            foreach (array_values($this->defaultChildren) as $i => $name) {
                 $defaults[null === $this->keyAttribute ? $i : $name] = $default;
             }
             return $defaults;
@@ -153,7 +153,7 @@ class PrototypedArrayNode extends ArrayNode
     protected function finalizeValue($value)
     {
         if (\false === $value) {
-            throw new UnsetKeyException(\sprintf('Unsetting key for path "%s", value: %s.', $this->getPath(), \json_encode($value)));
+            throw new UnsetKeyException(sprintf('Unsetting key for path "%s", value: %s.', $this->getPath(), json_encode($value)));
         }
         foreach ($value as $k => $v) {
             $prototype = $this->getPrototypeForChild($k);
@@ -164,7 +164,7 @@ class PrototypedArrayNode extends ArrayNode
             }
         }
         if (\count($value) < $this->minNumberOfElements) {
-            $ex = new InvalidConfigurationException(\sprintf('The path "%s" should have at least %d element(s) defined.', $this->getPath(), $this->minNumberOfElements));
+            $ex = new InvalidConfigurationException(sprintf('The path "%s" should have at least %d element(s) defined.', $this->getPath(), $this->minNumberOfElements));
             $ex->setPath($this->getPath());
             throw $ex;
         }
@@ -181,40 +181,40 @@ class PrototypedArrayNode extends ArrayNode
             return $value;
         }
         $value = $this->remapXml($value);
-        $isList = \array_is_list($value);
+        $isList = array_is_list($value);
         $normalized = [];
         foreach ($value as $k => $v) {
             if (null !== $this->keyAttribute && \is_array($v)) {
                 if (!isset($v[$this->keyAttribute]) && \is_int($k) && $isList) {
-                    $ex = new InvalidConfigurationException(\sprintf('The attribute "%s" must be set for path "%s".', $this->keyAttribute, $this->getPath()));
+                    $ex = new InvalidConfigurationException(sprintf('The attribute "%s" must be set for path "%s".', $this->keyAttribute, $this->getPath()));
                     $ex->setPath($this->getPath());
                     throw $ex;
                 } elseif (isset($v[$this->keyAttribute])) {
                     $k = $v[$this->keyAttribute];
                     if (\is_float($k)) {
-                        $k = \var_export($k, \true);
+                        $k = var_export($k, \true);
                     }
                     // remove the key attribute when required
                     if ($this->removeKeyAttribute) {
                         unset($v[$this->keyAttribute]);
                     }
                     // if only "value" is left
-                    if (\array_keys($v) === ['value']) {
+                    if (array_keys($v) === ['value']) {
                         $v = $v['value'];
                         if ($this->prototype instanceof ArrayNode && ($children = $this->prototype->getChildren()) && \array_key_exists('value', $children)) {
-                            $valuePrototype = \current($this->valuePrototypes) ?: clone $children['value'];
+                            $valuePrototype = current($this->valuePrototypes) ?: clone $children['value'];
                             $valuePrototype->parent = $this;
                             $originalClosures = $this->prototype->normalizationClosures;
                             if (\is_array($originalClosures)) {
                                 $valuePrototypeClosures = $valuePrototype->normalizationClosures;
-                                $valuePrototype->normalizationClosures = \is_array($valuePrototypeClosures) ? \array_merge($originalClosures, $valuePrototypeClosures) : $originalClosures;
+                                $valuePrototype->normalizationClosures = \is_array($valuePrototypeClosures) ? array_merge($originalClosures, $valuePrototypeClosures) : $originalClosures;
                             }
                             $this->valuePrototypes[$k] = $valuePrototype;
                         }
                     }
                 }
                 if (\array_key_exists($k, $normalized)) {
-                    $ex = new DuplicateKeyException(\sprintf('Duplicate key "%s" for path "%s".', $k, $this->getPath()));
+                    $ex = new DuplicateKeyException(sprintf('Duplicate key "%s" for path "%s".', $k, $this->getPath()));
                     $ex->setPath($this->getPath());
                     throw $ex;
                 }
@@ -241,7 +241,7 @@ class PrototypedArrayNode extends ArrayNode
         if (\false === $leftSide || !$this->performDeepMerging) {
             return $rightSide;
         }
-        $isList = \array_is_list($rightSide);
+        $isList = array_is_list($rightSide);
         foreach ($rightSide as $k => $v) {
             // prototype, and key is irrelevant there are no named keys, append the element
             if (null === $this->keyAttribute && $isList) {
@@ -251,7 +251,7 @@ class PrototypedArrayNode extends ArrayNode
             // no conflict
             if (!\array_key_exists($k, $leftSide)) {
                 if (!$this->allowNewKeys) {
-                    $ex = new InvalidConfigurationException(\sprintf('You are not allowed to define new elements for path "%s". Please define all elements for this path in one config file.', $this->getPath()));
+                    $ex = new InvalidConfigurationException(sprintf('You are not allowed to define new elements for path "%s". Please define all elements for this path in one config file.', $this->getPath()));
                     $ex->setPath($this->getPath());
                     throw $ex;
                 }

@@ -50,8 +50,8 @@ class Compiler
      */
     public function log(CompilerPassInterface $pass, string $message)
     {
-        if (\str_contains($message, "\n")) {
-            $message = \str_replace("\n", "\n" . \get_class($pass) . ': ', \trim($message));
+        if (str_contains($message, "\n")) {
+            $message = str_replace("\n", "\n" . \get_class($pass) . ': ', trim($message));
         }
         $this->log[] = \get_class($pass) . ': ' . $message;
     }
@@ -76,7 +76,7 @@ class Compiler
             $prev = $e;
             do {
                 $msg = $prev->getMessage();
-                if ($msg !== ($resolvedMsg = $container->resolveEnvPlaceholders($msg, null, $usedEnvs))) {
+                if ($msg !== $resolvedMsg = $container->resolveEnvPlaceholders($msg, null, $usedEnvs)) {
                     $r = new \ReflectionProperty($prev, 'message');
                     $r->setAccessible(\true);
                     $r->setValue($prev, $resolvedMsg);

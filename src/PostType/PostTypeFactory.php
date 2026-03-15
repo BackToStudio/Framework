@@ -1,39 +1,37 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BackTo\Framework\PostType;
 
-use Exception;
+use BackTo\Framework\Exception\InvalidPostTypeException;
 use BackTo\Framework\PostType\Contracts\PostTypeInterface;
 use BackTo\Framework\PostType\Entity\PostType;
 
 class PostTypeFactory
 {
     /**
-     * @param string $key
-     * @param array $args
+     * @param array<string, mixed> $args
      *
-     * @return PostType
-     * @throws Exception
+     * @throws InvalidPostTypeException
      */
     public function createPostType(string $key, array $args): PostTypeInterface
     {
         if (empty($key)) {
-            throw new Exception(
-                'WordPress required post type name. (max. 20 characters, cannot contain capital letters, underscores or spaces)'
-            );
+            throw InvalidPostTypeException::emptyKey();
         }
 
         $args = $this->prepareDefaultArgs($args);
         $args = $this->prepareHierarchicalArgs($args);
         $args = $this->prepareEditorArgs($args);
 
-        // Add arbitrary labels if no exists.
+        // Add arbitrary labels if none exist.
         $args = $this->addArgIfNotExist(
             $args,
             'labels',
             [
-                'name' => $this->getPluralName($key),
-                'singular_name' => $this->getSingularName($key),
+                'name' => $key,
+                'singular_name' => $key,
             ]
         );
 
@@ -46,15 +44,12 @@ class PostTypeFactory
     }
 
     /**
-     * Add right supports when post type is hierarchical.
-     *
-     * @param array $args
-     *
-     * @return array
+     * @param array<string, mixed> $args
+     * @return array<string, mixed>
      */
     private function prepareHierarchicalArgs(array $args): array
     {
-        if (\array_key_exists('hierarchical', $args) && boolval($args['hierarchical']) === true) {
+        if (\array_key_exists('hierarchical', $args) && (bool) $args['hierarchical'] === true) {
             $supports = ['page-attributes', 'editor', 'title'];
             if (\array_key_exists('supports', $args)) {
                 $supports = array_merge($supports, $args['supports']);
@@ -66,15 +61,12 @@ class PostTypeFactory
     }
 
     /**
-     * Add right supports when post type supports editor.
-     *
-     * @param array $args
-     *
-     * @return array
+     * @param array<string, mixed> $args
+     * @return array<string, mixed>
      */
     private function prepareEditorArgs(array $args): array
     {
-        if (\array_key_exists('supports', $args) && \in_array('editor', $args['supports'])) {
+        if (\array_key_exists('supports', $args) && \in_array('editor', $args['supports'], true)) {
             $supports = ['custom-fields', 'revisions', 'title'];
             if (\array_key_exists('supports', $args)) {
                 $supports = array_merge($supports, $args['supports']);
@@ -86,9 +78,8 @@ class PostTypeFactory
     }
 
     /**
-     * @param array $args
-     *
-     * @return array
+     * @param array<string, mixed> $args
+     * @return array<string, mixed>
      */
     private function prepareDefaultArgs(array $args): array
     {
@@ -100,30 +91,15 @@ class PostTypeFactory
     }
 
     /**
-     * @param array $args
-     * @param string $key
-     * @param $value
-     *
-     * @return array
+     * @param array<string, mixed> $args
+     * @return array<string, mixed>
      */
-    private function addArgIfNotExist(array $args, string $key, $value): array
+    private function addArgIfNotExist(array $args, string $key, mixed $value): array
     {
         if (!\array_key_exists($key, $args)) {
             $args[$key] = $value;
         }
 
         return $args;
-    }
-
-    public function getSingularName(string $key): string
-    {
-        $name = str_replace('-', ' ', $key);
-        $name = str_replace('_', ' ', $name);
-        return ucwords($name);
-    }
-
-    public function getPluralName(string $key): string
-    {
-        return $this->getSingularName($key) . 's';
     }
 }

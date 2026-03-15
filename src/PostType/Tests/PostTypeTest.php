@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BackTo\Framework\PostType\Tests;
 
 use BackTo\Framework\PostType\Entity\PostType;
@@ -11,7 +13,7 @@ class PostTypeTest extends TestCase
     public function testKey()
     {
         $postType = new PostType();
-        $this->assertNull($postType->getKey());
+        $this->assertSame('', $postType->getKey());
         $postType->setKey('abcde');
         $this->assertSame('abcde', $postType->getKey());
     }

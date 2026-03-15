@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BackTo\Framework\Blocks\Infrastructure;
 
 use BackTo\Framework\Blocks\Contracts\BlockStyleRegistrarInterface;

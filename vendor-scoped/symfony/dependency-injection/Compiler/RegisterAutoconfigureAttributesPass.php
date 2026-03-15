@@ -32,12 +32,12 @@ final class RegisterAutoconfigureAttributesPass implements CompilerPassInterface
             return;
         }
         foreach ($container->getDefinitions() as $id => $definition) {
-            if ($this->accept($definition) && ($class = $container->getReflectionClass($definition->getClass(), \false))) {
+            if ($this->accept($definition) && $class = $container->getReflectionClass($definition->getClass(), \false)) {
                 $this->processClass($container, $class);
             }
         }
     }
-    public function accept(Definition $definition) : bool
+    public function accept(Definition $definition): bool
     {
         return 80000 <= \PHP_VERSION_ID && $definition->isAutoconfigured() && !$definition->hasTag('container.ignore_attributes');
     }
@@ -55,10 +55,10 @@ final class RegisterAutoconfigureAttributesPass implements CompilerPassInterface
         $parseDefinitions = new \ReflectionMethod(YamlFileLoader::class, 'parseDefinitions');
         $parseDefinitions->setAccessible(\true);
         $yamlLoader = $parseDefinitions->getDeclaringClass()->newInstanceWithoutConstructor();
-        self::$registerForAutoconfiguration = static function (ContainerBuilder $container, \ReflectionClass $class, \ReflectionAttribute $attribute) use($parseDefinitions, $yamlLoader) {
+        self::$registerForAutoconfiguration = static function (ContainerBuilder $container, \ReflectionClass $class, \ReflectionAttribute $attribute) use ($parseDefinitions, $yamlLoader) {
             $attribute = (array) $attribute->newInstance();
             foreach ($attribute['tags'] ?? [] as $i => $tag) {
-                if (\is_array($tag) && [0] === \array_keys($tag)) {
+                if (\is_array($tag) && [0] === array_keys($tag)) {
                     $attribute['tags'][$i] = [$class->name => $tag[0]];
                 }
             }

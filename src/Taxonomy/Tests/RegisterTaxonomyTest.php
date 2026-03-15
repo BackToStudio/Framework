@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BackTo\Framework\Taxonomy\Tests;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;

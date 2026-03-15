@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BackTo\Framework\PostType\Tests;
 
-use Exception;
+use BackTo\Framework\Exception\InvalidPostTypeException;
 use BackTo\Framework\PostType\Entity\PostType;
 use BackTo\Framework\PostType\PostTypeFactory;
 use PHPUnit\Framework\TestCase;
@@ -24,44 +26,36 @@ class PostTypeFactoryTest extends TestCase
         return [];
     }
 
-    private function givenThereAreSpecificArgs()
+    private function givenThereAreSpecificArgs(): array
     {
         return [
             'show_ui' => false,
             'show_in_rest' => false,
-            'publicly_queryable' => false
+            'publicly_queryable' => false,
         ];
     }
 
-
-    private function givenThereIsHierarchicalPostTypeArgs()
+    private function givenThereIsHierarchicalPostTypeArgs(): array
     {
         return [
             'hierarchical' => true,
         ];
     }
 
-
-    private function givenThereAreEditorSupports()
+    private function givenThereAreEditorSupports(): array
     {
         return [
             'supports' => ['editor'],
         ];
     }
 
-    /**
-     * @throws Exception
-     */
     public function whenImCreatingPostType(string $key, array $args): PostType
     {
         $factory = new PostTypeFactory();
         return $factory->createPostType($key, $args);
     }
 
-    /**
-     * @throws Exception
-     */
-    public function thenIShouldHaveDefaultArgs(array $args)
+    public function thenIShouldHaveDefaultArgs(array $args): void
     {
         $this->assertArrayHasKey('show_ui', $args);
         $this->assertArrayHasKey('show_in_rest', $args);
@@ -71,56 +65,46 @@ class PostTypeFactoryTest extends TestCase
         $this->assertTrue($args['publicly_queryable']);
     }
 
-    /**
-     * @throws Exception
-     */
-    public function thenIShouldHaveHierarchicalPostTypeSupportsExist(array $args)
+    public function thenIShouldHaveHierarchicalPostTypeSupportsExist(array $args): void
     {
         $this->assertArrayHasKey('hierarchical', $args);
         $this->assertTrue($args['hierarchical']);
     }
 
-    private function thenIShouldHaveSameArgs(array $args, array $givenArgs)
+    private function thenIShouldHaveSameArgs(array $args, array $givenArgs): void
     {
         $this->assertSame($args['show_ui'], $givenArgs['show_ui']);
         $this->assertSame($args['show_in_rest'], $givenArgs['show_in_rest']);
         $this->assertSame($args['publicly_queryable'], $givenArgs['publicly_queryable']);
     }
 
-    private function thenIShouldHaveCustomFieldSupports(array $args)
+    private function thenIShouldHaveCustomFieldSupports(array $args): void
     {
         $this->assertArrayHasKey('supports', $args);
         $this->assertContains('custom-fields', $args['supports']);
     }
 
-    private function thenIShouldHaveRevisionsSupports(array $args)
+    private function thenIShouldHaveRevisionsSupports(array $args): void
     {
         $this->assertArrayHasKey('supports', $args);
         $this->assertContains('revisions', $args['supports']);
     }
 
-    private function thenIShouldHaveTitleSupports(array $args)
+    private function thenIShouldHaveTitleSupports(array $args): void
     {
         $this->assertArrayHasKey('supports', $args);
         $this->assertContains('title', $args['supports']);
     }
 
-
-    /**
-     * @throws Exception
-     */
-    public function testNotAllowEmptyPostTypeKey()
+    public function testNotAllowEmptyPostTypeKey(): void
     {
-        $this->expectException(Exception::class);
+        $this->expectException(InvalidPostTypeException::class);
         $key = $this->givenThereIsEmptyKey();
         $args = $this->givenThereAreEmptyArgs();
         $this->whenImCreatingPostType($key, $args);
     }
 
-    /**
-     * @throws Exception
-     */
-    public function testDefaultPostTypeArgs()
+    public function testDefaultPostTypeArgs(): void
     {
         $key = $this->givenThereIsKey();
         $args = $this->givenThereAreEmptyArgs();
@@ -128,10 +112,7 @@ class PostTypeFactoryTest extends TestCase
         $this->thenIShouldHaveDefaultArgs($postType->getArgs());
     }
 
-    /**
-     * @throws Exception
-     */
-    public function testHierarchicalPostType()
+    public function testHierarchicalPostType(): void
     {
         $key = $this->givenThereIsKey();
         $args = $this->givenThereIsHierarchicalPostTypeArgs();
@@ -139,10 +120,7 @@ class PostTypeFactoryTest extends TestCase
         $this->thenIShouldHaveHierarchicalPostTypeSupportsExist($postType->getArgs());
     }
 
-    /**
-     * @throws Exception
-     */
-    public function testGivenPostTypeArgs()
+    public function testGivenPostTypeArgs(): void
     {
         $key = $this->givenThereIsKey();
         $args = $this->givenThereAreSpecificArgs();
@@ -150,10 +128,7 @@ class PostTypeFactoryTest extends TestCase
         $this->thenIShouldHaveSameArgs($postType->getArgs(), $args);
     }
 
-    /**
-     * @throws Exception
-     */
-    public function testPostTypeEditorSupports()
+    public function testPostTypeEditorSupports(): void
     {
         $key = $this->givenThereIsKey();
         $args = $this->givenThereAreEditorSupports();
@@ -163,15 +138,14 @@ class PostTypeFactoryTest extends TestCase
         $this->thenIShouldHaveTitleSupports($postType->getArgs());
     }
 
-    /**
-     * @throws Exception
-     */
-    public function testPostTypeNames()
+    public function testDefaultLabelsUseKey(): void
     {
-        $key = 'abc-def';
+        $key = 'product';
         $factory = new PostTypeFactory();
-        $this->assertSame('Abc Def', $factory->getSingularName($key));
-        $this->assertSame('Abc Defs', $factory->getPluralName($key));
+        $postType = $factory->createPostType($key, []);
+        $args = $postType->getArgs();
+        $this->assertArrayHasKey('labels', $args);
+        $this->assertSame($key, $args['labels']['name']);
+        $this->assertSame($key, $args['labels']['singular_name']);
     }
-
 }

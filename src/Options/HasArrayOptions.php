@@ -1,57 +1,42 @@
 <?php
 
-namespace BackTo\Framework\Options;
+declare(strict_types=1);
 
-use BackTo\Framework\Contracts\Hooks;
+namespace BackTo\Framework\Options;
 
 trait HasArrayOptions
 {
+    /** @var array<string, mixed> */
+    protected array $options = [];
 
     /**
-     * @var array
+     * @param array<string, mixed> $options
      */
-    protected $options = [];
-
-    public function setOptions(array $options)
+    public function setOptions(array $options): void
     {
         $this->options = $options;
     }
 
-
-    /**
-     * @param string $key
-     * @return bool
-     */
     public function isInOptions(string $key): bool
     {
-        return in_array($key, $this->options);
+        return in_array($key, $this->options, true);
     }
 
-    /**
-     * @param string $key
-     * @return mixed|null
-     */
-    protected function getValue(string $key)
+    protected function getValue(string $key): mixed
     {
         return array_key_exists($key, $this->options) ? $this->options[$key] : null;
     }
 
-    /**
-     * @param string $key
-     * @return string|null
-     */
     public function getString(string $key): ?string
     {
         return $this->getValue($key);
     }
 
     /**
-     * @param string $key
-     * @return array|null
+     * @return array<mixed>|null
      */
     public function getArray(string $key): ?array
     {
         return $this->getValue($key);
     }
 }
-

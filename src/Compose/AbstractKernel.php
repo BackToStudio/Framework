@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BackTo\Framework\Compose;
 
 use Exception;
@@ -19,25 +21,13 @@ abstract class AbstractKernel
         $this->debug = $debug;
     }
 
-    /**
-     * Return the parameter name for the project directory (e.g. 'themeDirectory', 'pluginDirectory').
-     */
     abstract protected function getDirectoryParameterName(): string;
 
-    /**
-     * Return the parameter name for the text domain (e.g. 'themeTextDomain', 'pluginTextDomain').
-     */
     abstract protected function getTextDomainParameterName(): string;
 
-    /**
-     * Return the path to this kernel's Resources/config directory.
-     */
     abstract protected function getKernelConfigDir(): string;
 
     /**
-     * Prepare Container settings.
-     *
-     * @return ContainerBuilder
      * @throws Exception
      */
     private function getContainerBuilder(): ContainerBuilder
@@ -52,10 +42,7 @@ abstract class AbstractKernel
         return $this->configureWordPressContainer($containerBuilder);
     }
 
-    /**
-     * Load kernel-specific services (I18n, bindings, etc.).
-     */
-    protected function loadKernelServices(ContainerBuilder $containerBuilder, ?ConfigBuilderGenerator $configBuilderGenerator): void
+    protected function loadKernelServices(ContainerBuilder $containerBuilder, ConfigBuilderGenerator $configBuilderGenerator): void
     {
         $configDir = $this->getKernelConfigDir();
         $fileLocator = new FileLocator($configDir);

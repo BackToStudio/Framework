@@ -1,16 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BackTo\Framework\Compose;
 
 use BackTo\Framework\Contracts\IdInterface;
 
 trait HasId
 {
-
-    /**
-     * @var int
-     */
-    protected $id = null;
+    protected ?int $id = null;
 
     public function getId(): ?int
     {
@@ -22,5 +20,4 @@ trait HasId
         $this->id = $id;
         return $this;
     }
-
 }

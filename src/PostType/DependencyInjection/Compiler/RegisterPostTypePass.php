@@ -1,29 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BackTo\Framework\PostType\DependencyInjection\Compiler;
 
+use BackTo\Framework\Compose\DependencyInjection\Compiler\AbstractTaggedServiceCompilerPass;
 use BackTo\Framework\PostType\PostTypeRegistry;
-use BackToVendor\Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
-use BackToVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
-use BackToVendor\Symfony\Component\DependencyInjection\Reference;
 
-/**
- * Register all Custom Post Types that have the "wordpress.post_type" tag into the container.
- */
-class RegisterPostTypePass implements CompilerPassInterface
+class RegisterPostTypePass extends AbstractTaggedServiceCompilerPass
 {
-
-    public function process(ContainerBuilder $container): void
+    protected function getRegistryClass(): string
     {
+        return PostTypeRegistry::class;
+    }
 
-        if ( ! $container->hasDefinition(PostTypeRegistry::class)) {
-            return;
-        }
-
-        $registryDefinition = $container->findDefinition(PostTypeRegistry::class);
-
-        foreach ($container->findTaggedServiceIds('wordpress.post_type') as $id => $tags) {
-            $registryDefinition->addMethodCall('add', [new Reference($id)]);
-        }
+    protected function getTag(): string
+    {
+        return 'wordpress.post_type';
     }
 }

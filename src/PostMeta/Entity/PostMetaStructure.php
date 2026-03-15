@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BackTo\Framework\PostMeta\Entity;
 
 use BackTo\Framework\PostMeta\Contracts\PostMetaStructureInterface;
@@ -8,18 +10,18 @@ class PostMetaStructure implements PostMetaStructureInterface
 {
     private string $objectType = 'post';
     private string $metaKey = '';
+    /** @var array<string, mixed> */
     private array $args = [];
     private string $objectSubtype = '';
-    /** @see PostMetaType::class */
     private string $type = '';
     private string $label = '';
     private string $description = '';
     private bool $single = true;
     private mixed $default = null;
-    /** @var callable|null $sanitizeCallback */
-    private $sanitizeCallback = null;
-    /** @var callable|null $authCallback */
-    private $authCallback = null;
+    /** @var callable|null */
+    private mixed $sanitizeCallback = null;
+    /** @var callable|null */
+    private mixed $authCallback = null;
     private bool $showInRest = false;
     private bool $revisionsEnabled = false;
 
@@ -45,11 +47,17 @@ class PostMetaStructure implements PostMetaStructureInterface
         return $this;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getArgs(): array
     {
         return $this->args;
     }
 
+    /**
+     * @param array<string, mixed> $args
+     */
     public function setArgs(array $args): PostMetaStructureInterface
     {
         $this->args = $args;
@@ -111,12 +119,12 @@ class PostMetaStructure implements PostMetaStructureInterface
         return $this;
     }
 
-    public function getDefault()
+    public function getDefault(): mixed
     {
         return $this->default;
     }
 
-    public function setDefault($default): PostMetaStructureInterface
+    public function setDefault(mixed $default): PostMetaStructureInterface
     {
         $this->default = $default;
         return $this;

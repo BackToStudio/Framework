@@ -50,7 +50,7 @@ class ResolveChildDefinitionsPass extends AbstractRecursivePass
      *
      * @throws RuntimeException When the definition is invalid
      */
-    private function resolveDefinition(ChildDefinition $definition) : Definition
+    private function resolveDefinition(ChildDefinition $definition): Definition
     {
         try {
             return $this->doResolveDefinition($definition);
@@ -59,16 +59,16 @@ class ResolveChildDefinitionsPass extends AbstractRecursivePass
         } catch (ExceptionInterface $e) {
             $r = new \ReflectionProperty($e, 'message');
             $r->setAccessible(\true);
-            $r->setValue($e, \sprintf('Service "%s": %s', $this->currentId, $e->getMessage()));
+            $r->setValue($e, sprintf('Service "%s": %s', $this->currentId, $e->getMessage()));
             throw $e;
         }
     }
-    private function doResolveDefinition(ChildDefinition $definition) : Definition
+    private function doResolveDefinition(ChildDefinition $definition): Definition
     {
         if (!$this->container->has($parent = $definition->getParent())) {
-            throw new RuntimeException(\sprintf('Parent definition "%s" does not exist.', $parent));
+            throw new RuntimeException(sprintf('Parent definition "%s" does not exist.', $parent));
         }
-        $searchKey = \array_search($parent, $this->currentPath);
+        $searchKey = array_search($parent, $this->currentPath);
         $this->currentPath[] = $parent;
         if (\false !== $searchKey) {
             throw new ServiceCircularReferenceException($parent, \array_slice($this->currentPath, $searchKey));
@@ -81,7 +81,7 @@ class ResolveChildDefinitionsPass extends AbstractRecursivePass
             $this->container->setDefinition($parent, $parentDef);
             $this->currentId = $id;
         }
-        $this->container->log($this, \sprintf('Resolving inheritance for "%s" (parent: %s).', $this->currentId, $parent));
+        $this->container->log($this, sprintf('Resolving inheritance for "%s" (parent: %s).', $this->currentId, $parent));
         $def = new Definition();
         // merge in parent definition
         // purposely ignored attributes: abstract, shared, tags, autoconfigured
@@ -148,10 +148,10 @@ class ResolveChildDefinitionsPass extends AbstractRecursivePass
         }
         // merge arguments
         foreach ($definition->getArguments() as $k => $v) {
-            if (\is_numeric($k)) {
+            if (is_numeric($k)) {
                 $def->addArgument($v);
-            } elseif (\str_starts_with($k, 'index_')) {
-                $def->replaceArgument((int) \substr($k, \strlen('index_')), $v);
+            } elseif (str_starts_with($k, 'index_')) {
+                $def->replaceArgument((int) substr($k, \strlen('index_')), $v);
             } else {
                 $def->setArgument($k, $v);
             }
@@ -162,7 +162,7 @@ class ResolveChildDefinitionsPass extends AbstractRecursivePass
         }
         // append method calls
         if ($calls = $definition->getMethodCalls()) {
-            $def->setMethodCalls(\array_merge($def->getMethodCalls(), $calls));
+            $def->setMethodCalls(array_merge($def->getMethodCalls(), $calls));
         }
         $def->addError($parentDef);
         $def->addError($definition);

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BackTo\Framework\Blocks\Actions;
 
 use BackTo\Framework\Assets\ReplaceImgTagBySvgTag;

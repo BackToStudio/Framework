@@ -1,22 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BackTo\Framework\Taxonomy\Contracts;
 
 interface TaxonomyInterface
 {
+    public function getKey(): string;
 
     /**
-     * @return string
-     */
-    public function getKey(): ?string;
-
-    /**
-     * @return array
+     * @return array<string, mixed>
      */
     public function getArgs(): array;
 
     /**
-     * @return array
+     * @return string[]
      */
     public function getPostTypes(): array;
 }

@@ -21,19 +21,19 @@ trait ParentTrait
      *
      * @throws InvalidArgumentException when parent cannot be set
      */
-    public final function parent(string $parent) : self
+    final public function parent(string $parent): self
     {
         if (!$this->allowParent) {
-            throw new InvalidArgumentException(\sprintf('A parent cannot be defined when either "_instanceof" or "_defaults" are also defined for service prototype "%s".', $this->id));
+            throw new InvalidArgumentException(sprintf('A parent cannot be defined when either "_instanceof" or "_defaults" are also defined for service prototype "%s".', $this->id));
         }
         if ($this->definition instanceof ChildDefinition) {
             $this->definition->setParent($parent);
         } else {
             // cast Definition to ChildDefinition
-            $definition = \serialize($this->definition);
-            $definition = \substr_replace($definition, '53', 2, 2);
-            $definition = \substr_replace($definition, 'Child', 44, 0);
-            $definition = \unserialize($definition);
+            $definition = serialize($this->definition);
+            $definition = substr_replace($definition, '66', 2, 2);
+            $definition = substr_replace($definition, 'Child', 57, 0);
+            $definition = unserialize($definition);
             $this->definition = $definition->setParent($parent);
         }
         return $this;

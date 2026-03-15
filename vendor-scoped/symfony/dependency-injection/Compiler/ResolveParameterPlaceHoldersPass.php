@@ -82,7 +82,7 @@ class ResolveParameterPlaceHoldersPass extends AbstractRecursivePass
         }
         $value = parent::processValue($value, $isRoot);
         if ($value && \is_array($value)) {
-            $value = \array_combine($this->bag->resolveValue(\array_keys($value)), $value);
+            $value = array_combine($this->bag->resolveValue(array_keys($value)), $value);
         }
         return $value;
     }

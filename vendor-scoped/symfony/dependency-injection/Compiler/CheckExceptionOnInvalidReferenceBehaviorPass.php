@@ -69,7 +69,7 @@ class CheckExceptionOnInvalidReferenceBehaviorPass extends AbstractRecursivePass
         }
         $this->throwServiceNotFoundException($value, $currentId, $value);
     }
-    private function throwServiceNotFoundException(Reference $ref, string $sourceId, $value) : void
+    private function throwServiceNotFoundException(Reference $ref, string $sourceId, $value): void
     {
         $id = (string) $ref;
         $alternatives = [];
@@ -77,8 +77,8 @@ class CheckExceptionOnInvalidReferenceBehaviorPass extends AbstractRecursivePass
             if ('' === $knownId || '.' === $knownId[0]) {
                 continue;
             }
-            $lev = \levenshtein($id, $knownId);
-            if ($lev <= \strlen($id) / 3 || \false !== \strpos($knownId, $id)) {
+            $lev = levenshtein($id, $knownId);
+            if ($lev <= \strlen($id) / 3 || \false !== strpos($knownId, $id)) {
                 $alternatives[] = $knownId;
             }
         }

@@ -29,10 +29,10 @@ class ParametersConfigurator extends AbstractConfigurator
      *
      * @return $this
      */
-    public final function set(string $name, $value) : self
+    final public function set(string $name, $value): self
     {
         if ($value instanceof Expression) {
-            throw new InvalidArgumentException(\sprintf('Using an expression in parameter "%s" is not allowed.', $name));
+            throw new InvalidArgumentException(sprintf('Using an expression in parameter "%s" is not allowed.', $name));
         }
         $this->container->setParameter($name, static::processValue($value, \true));
         return $this;
@@ -42,7 +42,7 @@ class ParametersConfigurator extends AbstractConfigurator
      *
      * @return $this
      */
-    public final function __invoke(string $name, $value) : self
+    final public function __invoke(string $name, $value): self
     {
         return $this->set($name, $value);
     }

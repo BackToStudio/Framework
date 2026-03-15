@@ -28,17 +28,17 @@ class AutowireRequiredMethodsPass extends AbstractRecursivePass
         if (!$value instanceof Definition || !$value->isAutowired() || $value->isAbstract() || !$value->getClass()) {
             return $value;
         }
-        if (!($reflectionClass = $this->container->getReflectionClass($value->getClass(), \false))) {
+        if (!$reflectionClass = $this->container->getReflectionClass($value->getClass(), \false)) {
             return $value;
         }
         $alreadyCalledMethods = [];
         $withers = [];
         foreach ($value->getMethodCalls() as [$method]) {
-            $alreadyCalledMethods[\strtolower($method)] = \true;
+            $alreadyCalledMethods[strtolower($method)] = \true;
         }
         foreach ($reflectionClass->getMethods() as $reflectionMethod) {
             $r = $reflectionMethod;
-            if ($r->isConstructor() || isset($alreadyCalledMethods[\strtolower($r->name)])) {
+            if ($r->isConstructor() || isset($alreadyCalledMethods[strtolower($r->name)])) {
                 continue;
             }
             while (\true) {
@@ -50,8 +50,8 @@ class AutowireRequiredMethodsPass extends AbstractRecursivePass
                     }
                     break;
                 }
-                if (\false !== ($doc = $r->getDocComment())) {
-                    if (\false !== \stripos($doc, '@required') && \preg_match('#(?:^/\\*\\*|\\n\\s*+\\*)\\s*+@required(?:\\s|\\*/$)#i', $doc)) {
+                if (\false !== $doc = $r->getDocComment()) {
+                    if (\false !== stripos($doc, '@required') && preg_match('#(?:^/\*\*|\n\s*+\*)\s*+@required(?:\s|\*/$)#i', $doc)) {
                         if ($this->isWither($reflectionMethod, $doc)) {
                             $withers[] = [$reflectionMethod->name, [], \true];
                         } else {
@@ -59,7 +59,7 @@ class AutowireRequiredMethodsPass extends AbstractRecursivePass
                         }
                         break;
                     }
-                    if (\false === \stripos($doc, '@inheritdoc') || !\preg_match('#(?:^/\\*\\*|\\n\\s*+\\*)\\s*+(?:\\{@inheritdoc\\}|@inheritdoc)(?:\\s|\\*/$)#i', $doc)) {
+                    if (\false === stripos($doc, '@inheritdoc') || !preg_match('#(?:^/\*\*|\n\s*+\*)\s*+(?:\{@inheritdoc\}|@inheritdoc)(?:\s|\*/$)#i', $doc)) {
                         break;
                     }
                 }
@@ -81,9 +81,9 @@ class AutowireRequiredMethodsPass extends AbstractRecursivePass
         }
         return $value;
     }
-    private function isWither(\ReflectionMethod $reflectionMethod, string $doc) : bool
+    private function isWither(\ReflectionMethod $reflectionMethod, string $doc): bool
     {
-        $match = \preg_match('#(?:^/\\*\\*|\\n\\s*+\\*)\\s*+@return\\s++(static|\\$this)[\\s\\*]#i', $doc, $matches);
+        $match = preg_match('#(?:^/\*\*|\n\s*+\*)\s*+@return\s++(static|\$this)[\s\*]#i', $doc, $matches);
         if ($match && 'static' === $matches[1]) {
             return \true;
         }

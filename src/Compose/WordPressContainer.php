@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BackTo\Framework\Compose;
 
 use BackTo\Framework\Compose\DependencyInjection\WordPressExtension;
@@ -18,77 +20,50 @@ use BackToVendor\Symfony\Component\Config\FileLocator;
 
 use function dirname;
 use function is_file;
-use function is_null;
 
 trait WordPressContainer
 {
+    protected bool $debug = false;
+    protected string $environment = '';
+    protected ?string $kernelFile = null;
+    protected ?string $kernelDir = null;
 
-    /**
-     * @var bool
-     */
-    protected $debug;
-
-    /**
-     * @var string
-     */
-    protected $environment;
-
-    /**
-     * @var string
-     */
-    protected $kernelFile;
-
-    /**
-     * @var string
-     */
-    protected $kernelDir;
-
-    /**
-     * @return bool
-     */
     public function isDebug(): bool
     {
         return $this->debug;
     }
 
-    /**
-     * @return string
-     */
     public function getEnvironment(): string
     {
         return $this->environment;
     }
 
     /**
-     * Get Kernel file from root Kernel instanciation.
-     *
-     * @return string
+     * Get Kernel file from root Kernel instantiation.
      */
     public function getKernelFile(): string
     {
-        if (is_null($this->kernelFile)) {
+        if ($this->kernelFile === null) {
             $reflected = new ReflectionObject($this);
 
-            if (!is_file($reflected->getFileName())) {
+            if (!is_file((string) $reflected->getFileName())) {
                 throw new LogicException(
                     sprintf('Cannot auto-detect project dir for kernel of class "%s".', $reflected->name)
                 );
             }
 
-            $this->kernelFile = $reflected->getFileName();
+            $this->kernelFile = (string) $reflected->getFileName();
         }
 
         return $this->kernelFile;
     }
 
     /**
-     * Get Kernel directory from root Kernel instanciation.
-     *
-     * @return string
+     * Get Kernel directory from root Kernel instantiation.
      */
     public function getProjectDir(): string
     {
-        if (is_null($this->kernelDir)) {
+        if ($this->kernelDir === null) {
             $kernelFile = $this->getKernelFile();
             $dir = $rootDir = dirname($kernelFile);
             while (!is_file($dir . '/composer.json')) {
@@ -103,16 +78,12 @@ trait WordPressContainer
         return $this->kernelDir;
     }
 
-    /**
-     * @return string
-     */
     public function getBuildDir(): string
     {
         return $this->getProjectDir() . '/var/';
     }
 
     /**
-     * @return ContainerInterface|null
      * @throws Exception
      */
     public function getContainer(): ?ContainerInterface
@@ -132,18 +103,12 @@ trait WordPressContainer
         return 'Container';
     }
 
-    /**
-     * @return string
-     */
     protected function getContainerHash(): string
     {
         return \str_replace('.', '_', ContainerBuilder::hash($this->getKernelFile()));
     }
 
     /**
-     * @param string $file
-     *
-     * @return ContainerInterface|null
      * @throws Exception
      */
     public function generateContainer(string $file): ?ContainerInterface
@@ -166,16 +131,10 @@ trait WordPressContainer
         return new $classname();
     }
 
-    /**
-     * Store Container in PHP version.
-     *
-     * @param ConfigCacheInterface $cache
-     * @param ContainerBuilder $container
-     */
     protected function dumpContainer(
         ConfigCacheInterface $cache,
         ContainerBuilder $container
-    ) {
+    ): void {
         $containerBaseClass = $this->getContainerBaseClass();
         $classname = $containerBaseClass . $this->getContainerHash();
         $dumper = new PhpDumper($container);
@@ -198,10 +157,15 @@ trait WordPressContainer
      *
      * @throws Exception
      */
-    public function load()
+    public function load(): void
     {
         try {
             $container = $this->getContainer();
+
+            if ($container === null) {
+                return;
+            }
+
             /** @var HookRegistry $hooksRegistry */
             $hooksRegistry = $container->get(HookRegistry::class);
             $hooksRegistry->runHooks();
@@ -209,13 +173,10 @@ trait WordPressContainer
             if ($this->isDebug()) {
                 throw $e;
             }
-            // Don't crash the entire site, simply don't load.
+            \error_log(sprintf('[BackTo Framework] %s', $e->getMessage()));
         }
     }
 
-    /**
-     * Apply WordPress DI configuration (autoconfiguration + compiler passes).
-     */
     protected function configureWordPressContainer(ContainerBuilder $containerBuilder): ContainerBuilder
     {
         $extension = new WordPressExtension();
@@ -226,9 +187,6 @@ trait WordPressContainer
 
     /**
      * Return the service bundle directories to load.
-     *
-     * Each entry is a [directory, namespace] pair that will be loaded as services.
-     * Override in subclasses to register additional bundles.
      *
      * @return array<array{dir: string, namespace: string, exclude: string}>
      */
@@ -279,33 +237,21 @@ trait WordPressContainer
     }
 
     /**
-     * Load framework bundles and the project's own services.
-     *
-     * @param ContainerBuilder $containerBuilder
      * @throws Exception
      */
     protected function loadServices(ContainerBuilder $containerBuilder): void
     {
-        $configBuilderGenerator = ConfigBuilderGenerator::class ? new ConfigBuilderGenerator(
-            $this->getBuildDir()
-        ) : null;
+        $configBuilderGenerator = new ConfigBuilderGenerator($this->getBuildDir());
 
-        // Load framework bundles.
         $this->loadBundles($containerBuilder, $configBuilderGenerator);
-
-        // Load the kernel-specific services (Theme or Plugin I18n, etc.).
         $this->loadKernelServices($containerBuilder, $configBuilderGenerator);
 
-        // Load the project's own services.
         $fileLocator = new FileLocator($this->getProjectDir());
         $loader = new PhpFileLoader($containerBuilder, $fileLocator, $this->getEnvironment(), $configBuilderGenerator);
         $loader->load('config/services.php');
     }
 
-    /**
-     * Load all registered framework bundles into the container.
-     */
-    private function loadBundles(ContainerBuilder $containerBuilder, ?ConfigBuilderGenerator $configBuilderGenerator): void
+    private function loadBundles(ContainerBuilder $containerBuilder, ConfigBuilderGenerator $configBuilderGenerator): void
     {
         $bundles = $this->getBundles();
 
@@ -323,11 +269,7 @@ trait WordPressContainer
         }
     }
 
-    /**
-     * Load kernel-specific services (I18n, etc.).
-     * Override in subclasses if the kernel has its own Resources/config/services.php.
-     */
-    protected function loadKernelServices(ContainerBuilder $containerBuilder, ?ConfigBuilderGenerator $configBuilderGenerator): void
+    protected function loadKernelServices(ContainerBuilder $containerBuilder, ConfigBuilderGenerator $configBuilderGenerator): void
     {
         // Default: no kernel-specific services. Override in AbstractKernel subclasses.
     }

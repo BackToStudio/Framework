@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BackTo\Framework\Hooks;
 
 use BackTo\Framework\Contracts\ActivationHooks;
@@ -12,21 +14,10 @@ use BackTo\Framework\Contracts\RegistryInterface;
 
 class HookRegistry implements RegistryInterface
 {
-
-    /**
-     * @var HookInterface[]
-     */
-    protected $hooks = [];
-
-    /**
-     * @var string|null
-     */
-    private $pluginFile;
-
-    /**
-     * @var HookDispatcherInterface
-     */
-    private $hookDispatcher;
+    /** @var HookInterface[] */
+    protected array $hooks = [];
+    private ?string $pluginFile = null;
+    private HookDispatcherInterface $hookDispatcher;
 
     public function __construct(HookDispatcherInterface $hookDispatcher)
     {
@@ -60,9 +51,7 @@ class HookRegistry implements RegistryInterface
         foreach ($this->getHooks() as $action) {
             if ($action instanceof Hooks) {
                 $action->hooks();
-            }
-
-            if ($action instanceof AdminHooks && $this->hookDispatcher->isAdmin()) {
+            } elseif ($action instanceof AdminHooks && $this->hookDispatcher->isAdmin()) {
                 $action->hooks();
             }
 
@@ -75,5 +64,4 @@ class HookRegistry implements RegistryInterface
             }
         }
     }
-
 }

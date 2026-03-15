@@ -1,34 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BackTo\Framework\Taxonomy;
 
-use Exception;
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
+use BackTo\Framework\Exception\FrameworkException;
+use BackTo\Framework\Exception\InvalidTaxonomyException;
 use BackTo\Framework\Taxonomy\Contracts\TaxonomyRegistrarInterface;
 
 class RegisterTaxonomy implements Hooks
 {
-
-    /**
-     * @var TaxonomyRegistry
-     */
-    private $registry;
-
-    /**
-     * @var TaxonomyFactory
-     */
-    private $factory;
-
-    /**
-     * @var TaxonomyRegistrarInterface
-     */
-    private $registrar;
-
-    /**
-     * @var HookDispatcherInterface
-     */
-    private $hookDispatcher;
+    private TaxonomyRegistry $registry;
+    private TaxonomyFactory $factory;
+    private TaxonomyRegistrarInterface $registrar;
+    private HookDispatcherInterface $hookDispatcher;
 
     public function __construct(
         TaxonomyRegistry $taxonomyRegistry,
@@ -59,23 +46,19 @@ class RegisterTaxonomy implements Hooks
             try {
                 $newTaxonomy = $this->factory->createTaxonomy($taxonomy->getKey(), $taxonomy->getPostTypes(), $taxonomy->getArgs());
                 $this->registrar->register($newTaxonomy->getKey(), $newTaxonomy->getPostTypes(), $newTaxonomy->getArgs());
-            } catch (Exception $exception) {
-                error_log($exception->getMessage());
+            } catch (FrameworkException $exception) {
+                \error_log($exception->getMessage());
             }
         }
     }
 
     /**
-     * Register new Taxonomy on the fly.
+     * @param string[] $relatedPostTypes
+     * @param array<string, mixed> $args
      *
-     * @param string $name
-     * @param array $relatedPostTypes
-     * @param array $args
-     *
-     * @return RegisterTaxonomy
-     * @throws Exception
+     * @throws InvalidTaxonomyException
      */
-    public function add(string $name, array $relatedPostTypes, array $args = []): RegisterTaxonomy
+    public function add(string $name, array $relatedPostTypes, array $args = []): self
     {
         $newTaxonomy = $this->factory->createTaxonomy($name, $relatedPostTypes, $args);
         $this->registry->add($newTaxonomy);

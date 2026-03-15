@@ -64,18 +64,18 @@ abstract class FileLoader extends Loader
      */
     public function import($resource, ?string $type = null, bool $ignoreErrors = \false, ?string $sourceResource = null, $exclude = null)
     {
-        if (\is_string($resource) && \strlen($resource) !== ($i = \strcspn($resource, '*?{[')) && !\str_contains($resource, "\n")) {
+        if (\is_string($resource) && \strlen($resource) !== ($i = strcspn($resource, '*?{[')) && !str_contains($resource, "\n")) {
             $excluded = [];
             foreach ((array) $exclude as $pattern) {
                 foreach ($this->glob($pattern, \true, $_, \false, \true) as $path => $info) {
                     // normalize Windows slashes and remove trailing slashes
-                    $excluded[\rtrim(\str_replace('\\', '/', $path), '/')] = \true;
+                    $excluded[rtrim(str_replace('\\', '/', $path), '/')] = \true;
                 }
             }
             $ret = [];
-            $isSubpath = 0 !== $i && \str_contains(\substr($resource, 0, $i), '/');
+            $isSubpath = 0 !== $i && str_contains(substr($resource, 0, $i), '/');
             foreach ($this->glob($resource, \false, $_, $ignoreErrors || !$isSubpath, \false, $excluded) as $path => $info) {
-                if (null !== ($res = $this->doImport($path, 'glob' === $type ? null : $type, $ignoreErrors, $sourceResource))) {
+                if (null !== $res = $this->doImport($path, 'glob' === $type ? null : $type, $ignoreErrors, $sourceResource)) {
                     $ret[] = $res;
                 }
                 $isSubpath = \true;
@@ -91,15 +91,15 @@ abstract class FileLoader extends Loader
      */
     protected function glob(string $pattern, bool $recursive, &$resource = null, bool $ignoreErrors = \false, bool $forExclusion = \false, array $excluded = [])
     {
-        if (\strlen($pattern) === ($i = \strcspn($pattern, '*?{['))) {
+        if (\strlen($pattern) === $i = strcspn($pattern, '*?{[')) {
             $prefix = $pattern;
             $pattern = '';
-        } elseif (0 === $i || !\str_contains(\substr($pattern, 0, $i), '/')) {
+        } elseif (0 === $i || !str_contains(substr($pattern, 0, $i), '/')) {
             $prefix = '.';
             $pattern = '/' . $pattern;
         } else {
-            $prefix = \dirname(\substr($pattern, 0, 1 + $i));
-            $pattern = \substr($pattern, \strlen($prefix));
+            $prefix = \dirname(substr($pattern, 0, 1 + $i));
+            $pattern = substr($pattern, \strlen($prefix));
         }
         try {
             $prefix = $this->locator->locate($prefix, $this->currentDir, \true);
@@ -124,10 +124,10 @@ abstract class FileLoader extends Loader
                 $resource = $loader->getLocator()->locate($resource, $this->currentDir, \false);
             }
             $resources = \is_array($resource) ? $resource : [$resource];
-            for ($i = 0; $i < ($resourcesCount = \count($resources)); ++$i) {
+            for ($i = 0; $i < $resourcesCount = \count($resources); ++$i) {
                 if (isset(self::$loading[$resources[$i]])) {
                     if ($i == $resourcesCount - 1) {
-                        throw new FileLoaderImportCircularReferenceException(\array_keys(self::$loading));
+                        throw new FileLoaderImportCircularReferenceException(array_keys(self::$loading));
                     }
                 } else {
                     $resource = $resources[$i];

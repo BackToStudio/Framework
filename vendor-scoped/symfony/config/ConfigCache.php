@@ -47,7 +47,7 @@ class ConfigCache extends ResourceCheckerConfigCache
      */
     public function isFresh()
     {
-        if (!$this->debug && \is_file($this->getPath())) {
+        if (!$this->debug && is_file($this->getPath())) {
             return \true;
         }
         return parent::isFresh();

@@ -46,7 +46,7 @@ class PassConfig
      */
     public function getPasses()
     {
-        return \array_merge([$this->mergePass], $this->getBeforeOptimizationPasses(), $this->getOptimizationPasses(), $this->getBeforeRemovingPasses(), $this->getRemovingPasses(), $this->getAfterRemovingPasses());
+        return array_merge([$this->mergePass], $this->getBeforeOptimizationPasses(), $this->getOptimizationPasses(), $this->getBeforeRemovingPasses(), $this->getRemovingPasses(), $this->getAfterRemovingPasses());
     }
     /**
      * Adds a pass.
@@ -57,7 +57,7 @@ class PassConfig
     {
         $property = $type . 'Passes';
         if (!isset($this->{$property})) {
-            throw new InvalidArgumentException(\sprintf('Invalid type "%s".', $type));
+            throw new InvalidArgumentException(sprintf('Invalid type "%s".', $type));
         }
         $passes =& $this->{$property};
         if (!isset($passes[$priority])) {
@@ -175,13 +175,13 @@ class PassConfig
      *
      * @return CompilerPassInterface[]
      */
-    private function sortPasses(array $passes) : array
+    private function sortPasses(array $passes): array
     {
         if (0 === \count($passes)) {
             return [];
         }
-        \krsort($passes);
+        krsort($passes);
         // Flatten the array
-        return \array_merge(...$passes);
+        return array_merge(...$passes);
     }
 }

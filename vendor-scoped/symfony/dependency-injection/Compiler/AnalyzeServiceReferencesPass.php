@@ -139,7 +139,7 @@ class AnalyzeServiceReferencesPass extends AbstractRecursivePass
         $this->lazy = $lazy;
         return $value;
     }
-    private function getDefinitionId(string $id) : ?string
+    private function getDefinitionId(string $id): ?string
     {
         while (isset($this->aliases[$id])) {
             $id = (string) $this->aliases[$id];

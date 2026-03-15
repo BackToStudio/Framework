@@ -20,7 +20,7 @@ class AutowiringFailedException extends RuntimeException
     public function __construct(string $serviceId, $message = '', int $code = 0, ?\Throwable $previous = null)
     {
         $this->serviceId = $serviceId;
-        if ($message instanceof \Closure && \function_exists('xdebug_is_enabled') && \xdebug_is_enabled()) {
+        if ($message instanceof \Closure && \function_exists('xdebug_is_enabled') && xdebug_is_enabled()) {
             $message = $message();
         }
         if (!$message instanceof \Closure) {
@@ -38,7 +38,7 @@ class AutowiringFailedException extends RuntimeException
                 $this->message =& $message;
                 $this->messageCallback =& $messageCallback;
             }
-            public function __toString() : string
+            public function __toString(): string
             {
                 $messageCallback = $this->messageCallback;
                 $this->messageCallback = null;
@@ -50,7 +50,7 @@ class AutowiringFailedException extends RuntimeException
             }
         };
     }
-    public function getMessageCallback() : ?\Closure
+    public function getMessageCallback(): ?\Closure
     {
         return $this->messageCallback;
     }

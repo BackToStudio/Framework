@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BackTo\Framework\Seo\Hooks;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;

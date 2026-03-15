@@ -43,40 +43,40 @@ class ContainerConfigurator extends AbstractConfigurator
         $this->file = $file;
         $this->env = $env;
     }
-    public final function extension(string $namespace, array $config)
+    final public function extension(string $namespace, array $config)
     {
         if (!$this->container->hasExtension($namespace)) {
-            $extensions = \array_filter(\array_map(function (ExtensionInterface $ext) {
+            $extensions = array_filter(array_map(function (ExtensionInterface $ext) {
                 return $ext->getAlias();
             }, $this->container->getExtensions()));
-            throw new InvalidArgumentException(\sprintf('There is no extension able to load the configuration for "%s" (in "%s"). Looked for namespace "%s", found "%s".', $namespace, $this->file, $namespace, $extensions ? \implode('", "', $extensions) : 'none'));
+            throw new InvalidArgumentException(sprintf('There is no extension able to load the configuration for "%s" (in "%s"). Looked for namespace "%s", found "%s".', $namespace, $this->file, $namespace, $extensions ? implode('", "', $extensions) : 'none'));
         }
         $this->container->loadFromExtension($namespace, static::processValue($config));
     }
-    public final function import(string $resource, ?string $type = null, $ignoreErrors = \false)
+    final public function import(string $resource, ?string $type = null, $ignoreErrors = \false)
     {
         $this->loader->setCurrentDir(\dirname($this->path));
         $this->loader->import($resource, $type, $ignoreErrors, $this->file);
     }
-    public final function parameters() : ParametersConfigurator
+    final public function parameters(): ParametersConfigurator
     {
         return new ParametersConfigurator($this->container);
     }
-    public final function services() : ServicesConfigurator
+    final public function services(): ServicesConfigurator
     {
         return new ServicesConfigurator($this->container, $this->loader, $this->instanceof, $this->path, $this->anonymousCount);
     }
     /**
      * Get the current environment to be able to write conditional configuration.
      */
-    public final function env() : ?string
+    final public function env(): ?string
     {
         return $this->env;
     }
     /**
      * @return static
      */
-    public final function withPath(string $path) : self
+    final public function withPath(string $path): self
     {
         $clone = clone $this;
         $clone->path = $clone->file = $path;
@@ -87,7 +87,7 @@ class ContainerConfigurator extends AbstractConfigurator
 /**
  * Creates a parameter.
  */
-function param(string $name) : ParamConfigurator
+function param(string $name): ParamConfigurator
 {
     return new ParamConfigurator($name);
 }
@@ -96,7 +96,7 @@ function param(string $name) : ParamConfigurator
  *
  * @deprecated since Symfony 5.1, use service() instead.
  */
-function ref(string $id) : ReferenceConfigurator
+function ref(string $id): ReferenceConfigurator
 {
     trigger_deprecation('symfony/dependency-injection', '5.1', '"%s()" is deprecated, use "service()" instead.', __FUNCTION__);
     return new ReferenceConfigurator($id);
@@ -104,7 +104,7 @@ function ref(string $id) : ReferenceConfigurator
 /**
  * Creates a reference to a service.
  */
-function service(string $serviceId) : ReferenceConfigurator
+function service(string $serviceId): ReferenceConfigurator
 {
     return new ReferenceConfigurator($serviceId);
 }
@@ -113,7 +113,7 @@ function service(string $serviceId) : ReferenceConfigurator
  *
  * @deprecated since Symfony 5.1, use inline_service() instead.
  */
-function inline(?string $class = null) : InlineServiceConfigurator
+function inline(?string $class = null): InlineServiceConfigurator
 {
     trigger_deprecation('symfony/dependency-injection', '5.1', '"%s()" is deprecated, use "inline_service()" instead.', __FUNCTION__);
     return new InlineServiceConfigurator(new Definition($class));
@@ -121,7 +121,7 @@ function inline(?string $class = null) : InlineServiceConfigurator
 /**
  * Creates an inline service.
  */
-function inline_service(?string $class = null) : InlineServiceConfigurator
+function inline_service(?string $class = null): InlineServiceConfigurator
 {
     return new InlineServiceConfigurator(new Definition($class));
 }
@@ -130,7 +130,7 @@ function inline_service(?string $class = null) : InlineServiceConfigurator
  *
  * @param ReferenceConfigurator[] $values
  */
-function service_locator(array $values) : ServiceLocatorArgument
+function service_locator(array $values): ServiceLocatorArgument
 {
     return new ServiceLocatorArgument(AbstractConfigurator::processValue($values, \true));
 }
@@ -139,49 +139,49 @@ function service_locator(array $values) : ServiceLocatorArgument
  *
  * @param ReferenceConfigurator[] $values
  */
-function iterator(array $values) : IteratorArgument
+function iterator(array $values): IteratorArgument
 {
     return new IteratorArgument(AbstractConfigurator::processValue($values, \true));
 }
 /**
  * Creates a lazy iterator by tag name.
  */
-function tagged_iterator(string $tag, ?string $indexAttribute = null, ?string $defaultIndexMethod = null, ?string $defaultPriorityMethod = null) : TaggedIteratorArgument
+function tagged_iterator(string $tag, ?string $indexAttribute = null, ?string $defaultIndexMethod = null, ?string $defaultPriorityMethod = null): TaggedIteratorArgument
 {
     return new TaggedIteratorArgument($tag, $indexAttribute, $defaultIndexMethod, \false, $defaultPriorityMethod);
 }
 /**
  * Creates a service locator by tag name.
  */
-function tagged_locator(string $tag, ?string $indexAttribute = null, ?string $defaultIndexMethod = null, ?string $defaultPriorityMethod = null) : ServiceLocatorArgument
+function tagged_locator(string $tag, ?string $indexAttribute = null, ?string $defaultIndexMethod = null, ?string $defaultPriorityMethod = null): ServiceLocatorArgument
 {
     return new ServiceLocatorArgument(new TaggedIteratorArgument($tag, $indexAttribute, $defaultIndexMethod, \true, $defaultPriorityMethod));
 }
 /**
  * Creates an expression.
  */
-function expr(string $expression) : Expression
+function expr(string $expression): Expression
 {
     return new Expression($expression);
 }
 /**
  * Creates an abstract argument.
  */
-function abstract_arg(string $description) : AbstractArgument
+function abstract_arg(string $description): AbstractArgument
 {
     return new AbstractArgument($description);
 }
 /**
  * Creates an environment variable reference.
  */
-function env(string $name) : EnvConfigurator
+function env(string $name): EnvConfigurator
 {
     return new EnvConfigurator($name);
 }
 /**
  * Creates a closure service reference.
  */
-function service_closure(string $serviceId) : ClosureReferenceConfigurator
+function service_closure(string $serviceId): ClosureReferenceConfigurator
 {
     return new ClosureReferenceConfigurator($serviceId);
 }

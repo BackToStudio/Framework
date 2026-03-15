@@ -40,10 +40,10 @@ class ServiceLocator extends BaseServiceLocator
     /**
      * {@inheritdoc}
      */
-    public function getProvidedServices() : array
+    public function getProvidedServices(): array
     {
-        return $this->serviceTypes ?? ($this->serviceTypes = \array_map(function () {
+        return $this->serviceTypes ?? $this->serviceTypes = array_map(function () {
             return '?';
-        }, $this->serviceMap));
+        }, $this->serviceMap);
     }
 }

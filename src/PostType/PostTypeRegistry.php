@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BackTo\Framework\PostType;
 
 use BackTo\Framework\Contracts\RegistryInterface;
@@ -8,17 +10,9 @@ use BackTo\Framework\PostType\Contracts\PostTypeRegistryInterface;
 
 class PostTypeRegistry implements RegistryInterface, PostTypeRegistryInterface
 {
+    /** @var PostTypeInterface[] */
+    private array $postTypes = [];
 
-    /**
-     * @var PostTypeInterface[]
-     */
-    private $postTypes = [];
-
-    /**
-     * @param PostTypeInterface $postType
-     *
-     * @return PostTypeRegistry
-     */
     public function add(PostTypeInterface $postType): PostTypeRegistryInterface
     {
         $this->postTypes[] = $postType;

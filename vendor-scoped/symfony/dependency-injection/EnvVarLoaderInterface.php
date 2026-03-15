@@ -20,5 +20,5 @@ interface EnvVarLoaderInterface
     /**
      * @return string[] Key/value pairs that can be accessed using the regular "%env()%" syntax
      */
-    public function loadEnvVars() : array;
+    public function loadEnvVars(): array;
 }

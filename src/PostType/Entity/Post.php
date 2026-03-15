@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BackTo\Framework\PostType\Entity;
 
 use DateTimeInterface;
@@ -23,11 +25,6 @@ class Post implements PostInterface
 
     protected string $content = '';
     protected string $excerpt = '';
-
-    /**
-     * @var int
-     */
-    protected $parentId = null;
 
     protected string $postType = '';
 
