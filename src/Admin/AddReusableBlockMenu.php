@@ -3,17 +3,24 @@
 namespace BackTo\Framework\Admin;
 
 use BackTo\Framework\Contracts\AdminHooks;
+use BackTo\Framework\Contracts\HookDispatcherInterface;
 
-use function add_action;
 use function add_menu_page;
 
 class AddReusableBlockMenu implements AdminHooks {
 
-	public function hooks() {
-		add_action( 'admin_menu', [ $this, 'addReusableBlockMenu'] );
+	private HookDispatcherInterface $hookDispatcher;
+
+	public function __construct(HookDispatcherInterface $hookDispatcher)
+	{
+		$this->hookDispatcher = $hookDispatcher;
 	}
 
-	function addReusableBlockMenu() {
+	public function hooks(): void {
+		$this->hookDispatcher->addAction( 'admin_menu', [ $this, 'addReusableBlockMenu'] );
+	}
+
+	function addReusableBlockMenu(): void {
 		add_menu_page(
 			__( 'Reusable Blocks', 'gutenberg' ),
 			__( 'Reusable Blocks', 'gutenberg' ),

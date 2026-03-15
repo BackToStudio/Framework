@@ -2,24 +2,30 @@
 
 namespace BackTo\Framework\Assets;
 
+use BackTo\Framework\Assets\Contracts\FileLocatorInterface;
 
 use function file_get_contents;
-use function get_attached_file;
 use function html_entity_decode;
 use function str_contains;
 use function str_replace;
-use function wp_upload_dir;
 
 class SvgFactory
 {
+    private FileLocatorInterface $fileLocator;
+
+    public function __construct(FileLocatorInterface $fileLocator)
+    {
+        $this->fileLocator = $fileLocator;
+    }
+
     /**
      * @param string $image_id
      *
      * @return string
      */
-    function getFromId(string $image_id): string
+    function getFromId(int $image_id): string
     {
-        $path = get_attached_file($image_id);
+        $path = $this->fileLocator->getAttachedFile($image_id);
 
         return $this->getFromPath($path);
     }
@@ -33,9 +39,9 @@ class SvgFactory
     {
         $path = $src;
 
-        $upload_dir = wp_upload_dir();
-        if (str_contains($src, $upload_dir['baseurl'])) {
-            $path = str_replace($upload_dir['baseurl'], $upload_dir['basedir'], $src);
+        $uploadDir = $this->fileLocator->getUploadDir();
+        if (str_contains($src, $uploadDir['baseurl'])) {
+            $path = str_replace($uploadDir['baseurl'], $uploadDir['basedir'], $src);
         }
 
         // Use path instead of url to prevent .htpasswd security.

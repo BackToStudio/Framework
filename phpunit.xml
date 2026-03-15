@@ -26,6 +26,21 @@
         <testsuite name="blocks">
             <directory>src/Blocks/Tests</directory>
         </testsuite>
+        <testsuite name="hooks">
+            <directory>src/Hooks/Tests</directory>
+        </testsuite>
+        <testsuite name="post-meta">
+            <directory>src/PostMeta/Tests</directory>
+        </testsuite>
+        <testsuite name="compose">
+            <directory>src/Compose/Tests</directory>
+        </testsuite>
+        <testsuite name="cache">
+            <directory>src/Cache/Tests</directory>
+        </testsuite>
+        <testsuite name="seo">
+            <directory>src/Seo/Tests</directory>
+        </testsuite>
     </testsuites>
 
     <coverage cacheDirectory=".phpunit.cache/code-coverage">

@@ -1,0 +1,493 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^PHPDoc tag @param for parameter \$image_id with type string is incompatible with native type int\.$#'
+			identifier: parameter.phpDocType
+			count: 1
+			path: src/Assets/SvgFactory.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Assets\\WordPressScriptsAssets\:\:enqueueScript\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: src/Assets/WordPressScriptsAssets.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Assets\\WordPressScriptsAssets\:\:enqueueStyle\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: src/Assets/WordPressScriptsAssets.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Assets\\WordPressScriptsAssets\:\:getAsset\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: src/Assets/WordPressScriptsAssets.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Assets\\WordPressScriptsAssets\:\:localizeScript\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: src/Assets/WordPressScriptsAssets.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Assets\\WordPressScriptsAssets\:\:localizeScript\(\) has parameter \$data with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Assets/WordPressScriptsAssets.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Assets\\WordPressScriptsAssets\:\:registerScript\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: src/Assets/WordPressScriptsAssets.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Assets\\WordPressScriptsAssets\:\:registerStyle\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: src/Assets/WordPressScriptsAssets.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Blocks\\CustomBlockStyle\:\:getProperties\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Blocks/CustomBlockStyle.php
+
+		-
+			message: '#^Property BackTo\\Framework\\Blocks\\CustomBlockStyle\:\:\$blocks type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Blocks/CustomBlockStyle.php
+
+		-
+			message: '#^Call to function is_null\(\) with string will always evaluate to false\.$#'
+			identifier: function.impossibleType
+			count: 2
+			path: src/Compose/AbstractKernel.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Compose\\AbstractKernel\:\:dumpContainer\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: src/Compose/AbstractKernel.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Compose\\AbstractKernel\:\:load\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: src/Compose/AbstractKernel.php
+
+		-
+			message: '#^Ternary operator condition is always true\.$#'
+			identifier: ternary.alwaysTrue
+			count: 1
+			path: src/Compose/AbstractKernel.php
+
+		-
+			message: '#^Instantiated class BackTo\\Framework\\Compose\\DependencyInjection\\Compiler\\InvalidArgumentException not found\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Compose/DependencyInjection/Compiler/ResolveInstanceOfConditionalPassWithVendorPrefix.php
+
+		-
+			message: '#^Instantiated class BackTo\\Framework\\Compose\\DependencyInjection\\Compiler\\RuntimeException not found\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Compose/DependencyInjection/Compiler/ResolveInstanceOfConditionalPassWithVendorPrefix.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Compose\\DependencyInjection\\Compiler\\ResolveInstanceOfConditionalPassWithVendorPrefix\:\:mergeConditionals\(\) has parameter \$autoconfiguredInstanceof with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Compose/DependencyInjection/Compiler/ResolveInstanceOfConditionalPassWithVendorPrefix.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Compose\\DependencyInjection\\Compiler\\ResolveInstanceOfConditionalPassWithVendorPrefix\:\:mergeConditionals\(\) has parameter \$instanceofConditionals with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Compose/DependencyInjection/Compiler/ResolveInstanceOfConditionalPassWithVendorPrefix.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Compose\\DependencyInjection\\Compiler\\ResolveInstanceOfConditionalPassWithVendorPrefix\:\:mergeConditionals\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Compose/DependencyInjection/Compiler/ResolveInstanceOfConditionalPassWithVendorPrefix.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Compose\\DependencyInjection\\Compiler\\ResolveInstanceOfConditionalPassWithVendorPrefix\:\:processDefinition\(\) has parameter \$tagsToKeep with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Compose/DependencyInjection/Compiler/ResolveInstanceOfConditionalPassWithVendorPrefix.php
+
+		-
+			message: '#^Parameter \#2 \$replace of function substr_replace expects array\|string, int given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Compose/DependencyInjection/Compiler/ResolveInstanceOfConditionalPassWithVendorPrefix.php
+
+		-
+			message: '#^Throwing object of an unknown class BackTo\\Framework\\Compose\\DependencyInjection\\Compiler\\InvalidArgumentException\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Compose/DependencyInjection/Compiler/ResolveInstanceOfConditionalPassWithVendorPrefix.php
+
+		-
+			message: '#^Throwing object of an unknown class BackTo\\Framework\\Compose\\DependencyInjection\\Compiler\\RuntimeException\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Compose/DependencyInjection/Compiler/ResolveInstanceOfConditionalPassWithVendorPrefix.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Contracts\\ActivationHooks\:\:activate\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: src/Contracts/ActivationHooks.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Contracts\\BlockStyleInterface\:\:getProperties\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Contracts/BlockStyleInterface.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Contracts\\DeactivationHooks\:\:deactivate\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: src/Contracts/DeactivationHooks.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Contracts\\DynamicBlock\:\:renderBlock\(\) has parameter \$attributes with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Contracts/DynamicBlock.php
+
+		-
+			message: '#^Trait BackTo\\Framework\\Options\\HasArrayOptions is used zero times and is not analysed\.$#'
+			identifier: trait.unused
+			count: 1
+			path: src/Options/HasArrayOptions.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Options\\OptionsRepository\:\:find\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Options/OptionsRepository.php
+
+		-
+			message: '#^Function load_muplugin_textdomain invoked with 3 parameters, 1\-2 required\.$#'
+			identifier: arguments.count
+			count: 1
+			path: src/Plugin/I18n/LoadMuPluginTextDomain.php
+
+		-
+			message: '#^Parameter \#2 \$mu_plugin_rel_path of function load_muplugin_textdomain expects string, false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Plugin/I18n/LoadMuPluginTextDomain.php
+
+		-
+			message: '#^Method BackTo\\Framework\\PostMeta\\Contracts\\PostMetaStructureInterface\:\:getArgs\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/PostMeta/Contracts/PostMetaStructureInterface.php
+
+		-
+			message: '#^Method BackTo\\Framework\\PostMeta\\Contracts\\PostMetaStructureInterface\:\:getDefault\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: src/PostMeta/Contracts/PostMetaStructureInterface.php
+
+		-
+			message: '#^Method BackTo\\Framework\\PostMeta\\Contracts\\PostMetaStructureInterface\:\:setArgs\(\) has parameter \$args with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/PostMeta/Contracts/PostMetaStructureInterface.php
+
+		-
+			message: '#^Method BackTo\\Framework\\PostMeta\\Contracts\\PostMetaStructureInterface\:\:setDefault\(\) has parameter \$default with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: src/PostMeta/Contracts/PostMetaStructureInterface.php
+
+		-
+			message: '#^Method BackTo\\Framework\\PostMeta\\Entity\\PostMetaStructure\:\:getArgs\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/PostMeta/Entity/PostMetaStructure.php
+
+		-
+			message: '#^Method BackTo\\Framework\\PostMeta\\Entity\\PostMetaStructure\:\:getDefault\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: src/PostMeta/Entity/PostMetaStructure.php
+
+		-
+			message: '#^Method BackTo\\Framework\\PostMeta\\Entity\\PostMetaStructure\:\:setArgs\(\) has parameter \$args with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/PostMeta/Entity/PostMetaStructure.php
+
+		-
+			message: '#^Method BackTo\\Framework\\PostMeta\\Entity\\PostMetaStructure\:\:setDefault\(\) has parameter \$default with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: src/PostMeta/Entity/PostMetaStructure.php
+
+		-
+			message: '#^Property BackTo\\Framework\\PostMeta\\Entity\\PostMetaStructure\:\:\$args type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/PostMeta/Entity/PostMetaStructure.php
+
+		-
+			message: '#^Method BackTo\\Framework\\PostMeta\\Factory\\PostMetaStructureFactory\:\:create\(\) has parameter \$args with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/PostMeta/Factory/PostMetaStructureFactory.php
+
+		-
+			message: '#^Method BackTo\\Framework\\PostMeta\\PostMetaStructureRegistry\:\:getPostMetaStructures\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/PostMeta/PostMetaStructureRegistry.php
+
+		-
+			message: '#^Method BackTo\\Framework\\PostMeta\\Repository\\PostMetaRepository\:\:update\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: src/PostMeta/Repository/PostMetaRepository.php
+
+		-
+			message: '#^Method BackTo\\Framework\\PostType\\Contracts\\PostTypeInterface\:\:getArgs\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/PostType/Contracts/PostTypeInterface.php
+
+		-
+			message: '#^Method BackTo\\Framework\\PostType\\Entity\\PostType\:\:getArgs\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/PostType/Entity/PostType.php
+
+		-
+			message: '#^Method BackTo\\Framework\\PostType\\Entity\\PostType\:\:setArgs\(\) has parameter \$args with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/PostType/Entity/PostType.php
+
+		-
+			message: '#^Property BackTo\\Framework\\PostType\\Entity\\PostType\:\:\$args type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/PostType/Entity/PostType.php
+
+		-
+			message: '#^Call to an undefined method BackTo\\Framework\\Contracts\\IdInterface\:\:setTitle\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/PostType/Factory/PostFactory.php
+
+		-
+			message: '#^Call to function array_key_exists\(\) with ''supports'' and non\-empty\-array will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: src/PostType/PostTypeFactory.php
+
+		-
+			message: '#^Method BackTo\\Framework\\PostType\\PostTypeFactory\:\:addArgIfNotExist\(\) has parameter \$args with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/PostType/PostTypeFactory.php
+
+		-
+			message: '#^Method BackTo\\Framework\\PostType\\PostTypeFactory\:\:addArgIfNotExist\(\) has parameter \$value with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: src/PostType/PostTypeFactory.php
+
+		-
+			message: '#^Method BackTo\\Framework\\PostType\\PostTypeFactory\:\:addArgIfNotExist\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/PostType/PostTypeFactory.php
+
+		-
+			message: '#^Method BackTo\\Framework\\PostType\\PostTypeFactory\:\:createPostType\(\) has parameter \$args with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/PostType/PostTypeFactory.php
+
+		-
+			message: '#^Method BackTo\\Framework\\PostType\\PostTypeFactory\:\:prepareDefaultArgs\(\) has parameter \$args with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/PostType/PostTypeFactory.php
+
+		-
+			message: '#^Method BackTo\\Framework\\PostType\\PostTypeFactory\:\:prepareDefaultArgs\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/PostType/PostTypeFactory.php
+
+		-
+			message: '#^Method BackTo\\Framework\\PostType\\PostTypeFactory\:\:prepareEditorArgs\(\) has parameter \$args with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/PostType/PostTypeFactory.php
+
+		-
+			message: '#^Method BackTo\\Framework\\PostType\\PostTypeFactory\:\:prepareEditorArgs\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/PostType/PostTypeFactory.php
+
+		-
+			message: '#^Method BackTo\\Framework\\PostType\\PostTypeFactory\:\:prepareHierarchicalArgs\(\) has parameter \$args with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/PostType/PostTypeFactory.php
+
+		-
+			message: '#^Method BackTo\\Framework\\PostType\\PostTypeFactory\:\:prepareHierarchicalArgs\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/PostType/PostTypeFactory.php
+
+		-
+			message: '#^Method BackTo\\Framework\\PostType\\RegisterPostType\:\:activate\(\) has no return type specified\.$#'
+			identifier: missingType.return
+			count: 1
+			path: src/PostType/RegisterPostType.php
+
+		-
+			message: '#^Method BackTo\\Framework\\PostType\\RegisterPostType\:\:add\(\) has parameter \$args with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/PostType/RegisterPostType.php
+
+		-
+			message: '#^Method BackTo\\Framework\\PostType\\Repository\\PostRepository\:\:findAll\(\) has parameter \$args with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: src/PostType/Repository/PostRepository.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Taxonomy\\Contracts\\TaxonomyInterface\:\:getArgs\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Taxonomy/Contracts/TaxonomyInterface.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Taxonomy\\Contracts\\TaxonomyInterface\:\:getPostTypes\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Taxonomy/Contracts/TaxonomyInterface.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Taxonomy\\Entity\\Taxonomy\:\:getArgs\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Taxonomy/Entity/Taxonomy.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Taxonomy\\Entity\\Taxonomy\:\:setArgs\(\) has parameter \$args with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Taxonomy/Entity/Taxonomy.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Taxonomy\\Entity\\Taxonomy\:\:setPostTypes\(\) has parameter \$postTypes with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Taxonomy/Entity/Taxonomy.php
+
+		-
+			message: '#^Property BackTo\\Framework\\Taxonomy\\Entity\\Taxonomy\:\:\$args type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Taxonomy/Entity/Taxonomy.php
+
+		-
+			message: '#^Call to an undefined method BackTo\\Framework\\Contracts\\IdInterface\:\:setName\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Taxonomy/Factory/TermFactory.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Taxonomy\\Factory\\TermFactory\:\:createFromTerms\(\) has parameter \$wpTerms with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Taxonomy/Factory/TermFactory.php
+
+		-
+			message: '#^PHPDoc tag @param references unknown parameter\: \$wpPosts$#'
+			identifier: parameter.notFound
+			count: 1
+			path: src/Taxonomy/Factory/TermFactory.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Taxonomy\\RegisterTaxonomy\:\:add\(\) has parameter \$args with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Taxonomy/RegisterTaxonomy.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Taxonomy\\RegisterTaxonomy\:\:add\(\) has parameter \$relatedPostTypes with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Taxonomy/RegisterTaxonomy.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Taxonomy\\Repository\\TermRepository\:\:findAll\(\) has parameter \$options with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Taxonomy/Repository/TermRepository.php
+
+		-
+			message: '#^Call to an undefined method BackTo\\Framework\\Taxonomy\\Contracts\\TaxonomyInterface\:\:setPostTypes\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Taxonomy/TaxonomyFactory.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Taxonomy\\TaxonomyFactory\:\:addArgIfNotExist\(\) has parameter \$args with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Taxonomy/TaxonomyFactory.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Taxonomy\\TaxonomyFactory\:\:addArgIfNotExist\(\) has parameter \$value with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: src/Taxonomy/TaxonomyFactory.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Taxonomy\\TaxonomyFactory\:\:addArgIfNotExist\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Taxonomy/TaxonomyFactory.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Taxonomy\\TaxonomyFactory\:\:createTaxonomy\(\) has parameter \$args with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Taxonomy/TaxonomyFactory.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Taxonomy\\TaxonomyFactory\:\:prepareDefaultArgs\(\) has parameter \$args with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Taxonomy/TaxonomyFactory.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Taxonomy\\TaxonomyFactory\:\:prepareDefaultArgs\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Taxonomy/TaxonomyFactory.php
+
+		-
+			message: '#^Function remove_action invoked with 4 parameters, 2\-3 required\.$#'
+			identifier: arguments.count
+			count: 3
+			path: src/Theme/Actions/CleanHead.php

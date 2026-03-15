@@ -29,21 +29,6 @@ trait HasArrayOptions
 
     /**
      * @param string $key
-     * @return string|null
-     * @deprecated
-     */
-    public function getKey(string $key): ?string
-    {
-        trigger_error(
-            'getKey($key) method is deprecated, you can use getString($key) or getArray($key) instead',
-            E_USER_DEPRECATED
-        );
-
-        return $this->getValue($key);
-    }
-
-    /**
-     * @param string $key
      * @return mixed|null
      */
     protected function getValue(string $key)

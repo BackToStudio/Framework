@@ -3,7 +3,9 @@
 namespace BackTo\Framework\Taxonomy;
 
 use Exception;
+use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
+use BackTo\Framework\Taxonomy\Contracts\TaxonomyRegistrarInterface;
 
 class RegisterTaxonomy implements Hooks
 {
@@ -18,33 +20,48 @@ class RegisterTaxonomy implements Hooks
      */
     private $factory;
 
-    public function __construct(TaxonomyRegistry $taxonomyRegistry, TaxonomyFactory $taxonomyFactory)
-    {
+    /**
+     * @var TaxonomyRegistrarInterface
+     */
+    private $registrar;
+
+    /**
+     * @var HookDispatcherInterface
+     */
+    private $hookDispatcher;
+
+    public function __construct(
+        TaxonomyRegistry $taxonomyRegistry,
+        TaxonomyFactory $taxonomyFactory,
+        TaxonomyRegistrarInterface $registrar,
+        HookDispatcherInterface $hookDispatcher
+    ) {
         $this->registry = $taxonomyRegistry;
         $this->factory = $taxonomyFactory;
+        $this->registrar = $registrar;
+        $this->hookDispatcher = $hookDispatcher;
     }
 
-    public function hooks()
+    public function hooks(): void
     {
-        \add_action('init', [$this, 'registerTaxonomy']);
-        \add_action('registered_taxonomy', 'flush_rewrite_rules');
-        \add_action('unregistered_taxonomy', 'flush_rewrite_rules');
+        $this->hookDispatcher->addAction('init', [$this, 'registerTaxonomy']);
+        $this->hookDispatcher->addAction('registered_taxonomy', [$this->registrar, 'flushRewriteRules']);
+        $this->hookDispatcher->addAction('unregistered_taxonomy', [$this->registrar, 'flushRewriteRules']);
     }
 
-    public function registerTaxonomy()
+    public function registerTaxonomy(): void
     {
         foreach ($this->registry->getTaxonomies() as $taxonomy) {
-            if (\taxonomy_exists($taxonomy->getKey())) {
+            if ($this->registrar->exists($taxonomy->getKey())) {
                 return;
             }
 
             try {
                 $newTaxonomy = $this->factory->createTaxonomy($taxonomy->getKey(), $taxonomy->getPostTypes(), $taxonomy->getArgs());
-                \register_taxonomy($newTaxonomy->getKey(), $newTaxonomy->getPostTypes(), $newTaxonomy->getArgs());
+                $this->registrar->register($newTaxonomy->getKey(), $newTaxonomy->getPostTypes(), $newTaxonomy->getArgs());
             } catch (Exception $exception) {
-                write_log($exception->getMessage());
+                error_log($exception->getMessage());
             }
-
         }
     }
 

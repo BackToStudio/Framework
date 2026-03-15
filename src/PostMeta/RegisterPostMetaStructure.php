@@ -2,22 +2,32 @@
 
 namespace BackTo\Framework\PostMeta;
 
+use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
-use function add_action;
-use function register_post_meta;
+use BackTo\Framework\PostMeta\Contracts\PostMetaRegistrarInterface;
 
-class RegisterPostMetaStructure implements Hooks {
+class RegisterPostMetaStructure implements Hooks
+{
 
     private PostMetaStructureRegistry $registry;
 
-    public function __construct(PostMetaStructureRegistry $postMetaStructureRegistry)
-    {
+    private PostMetaRegistrarInterface $registrar;
+
+    private HookDispatcherInterface $hookDispatcher;
+
+    public function __construct(
+        PostMetaStructureRegistry $postMetaStructureRegistry,
+        PostMetaRegistrarInterface $registrar,
+        HookDispatcherInterface $hookDispatcher
+    ) {
         $this->registry = $postMetaStructureRegistry;
+        $this->registrar = $registrar;
+        $this->hookDispatcher = $hookDispatcher;
     }
 
-    public function hooks()
+    public function hooks(): void
     {
-        add_action('init', [$this, 'registerPostMeta']);
+        $this->hookDispatcher->addAction('init', [$this, 'registerPostMeta']);
     }
 
     public function registerPostMeta(): void
@@ -32,20 +42,24 @@ class RegisterPostMetaStructure implements Hooks {
                 'show_in_rest' => $postMetaStructure->isShowInRest(),
                 'revisions_enabled' => $postMetaStructure->isRevisionsEnabled(),
             ];
-    
+
             if (!is_null($postMetaStructure->getDefault())) {
                 $args['default'] = $postMetaStructure->getDefault();
             }
-    
+
             if (is_callable($postMetaStructure->getSanitizeCallback())) {
                 $args['sanitize_callback'] = $postMetaStructure->getSanitizeCallback();
             }
-    
+
             if (is_callable($postMetaStructure->getAuthCallback())) {
                 $args['auth_callback'] = $postMetaStructure->getAuthCallback();
-            }   
+            }
 
-            register_post_meta($postMetaStructure->getObjectType(), $postMetaStructure->getMetaKey(), $args);
+            $this->registrar->register(
+                $postMetaStructure->getObjectType(),
+                $postMetaStructure->getMetaKey(),
+                $args
+            );
         }
     }
 }

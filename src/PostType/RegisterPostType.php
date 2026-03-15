@@ -4,13 +4,15 @@ namespace BackTo\Framework\PostType;
 
 use Exception;
 use BackTo\Framework\Contracts\ActivationHooks;
+use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
+use BackTo\Framework\PostType\Contracts\PostTypeRegistrarInterface;
 
 class RegisterPostType implements Hooks, ActivationHooks
 {
 
     /**
-     * @var PostTypeRepository
+     * @var PostTypeRegistry
      */
     private $registry;
 
@@ -19,36 +21,52 @@ class RegisterPostType implements Hooks, ActivationHooks
      */
     private $factory;
 
-    public function __construct(PostTypeRegistry $postTypeRegistry, PostTypeFactory $postTypeFactory)
-    {
+    /**
+     * @var PostTypeRegistrarInterface
+     */
+    private $registrar;
+
+    /**
+     * @var HookDispatcherInterface
+     */
+    private $hookDispatcher;
+
+    public function __construct(
+        PostTypeRegistry $postTypeRegistry,
+        PostTypeFactory $postTypeFactory,
+        PostTypeRegistrarInterface $registrar,
+        HookDispatcherInterface $hookDispatcher
+    ) {
         $this->registry = $postTypeRegistry;
         $this->factory = $postTypeFactory;
+        $this->registrar = $registrar;
+        $this->hookDispatcher = $hookDispatcher;
     }
 
     public function activate()
     {
         $this->registerCustomPostTypes();
-        \flush_rewrite_rules();
+        $this->registrar->flushRewriteRules();
     }
 
-    public function hooks()
+    public function hooks(): void
     {
-        \add_action('init', [$this, 'registerCustomPostTypes']);
-        \add_action('registered_post_type', 'flush_rewrite_rules');
-        \add_action('unregistered_post_type', 'flush_rewrite_rules');
+        $this->hookDispatcher->addAction('init', [$this, 'registerCustomPostTypes']);
+        $this->hookDispatcher->addAction('registered_post_type', [$this->registrar, 'flushRewriteRules']);
+        $this->hookDispatcher->addAction('unregistered_post_type', [$this->registrar, 'flushRewriteRules']);
     }
 
-    public function registerCustomPostTypes()
+    public function registerCustomPostTypes(): void
     {
         foreach ($this->registry->getPostTypes() as $postType) {
-            if (\post_type_exists($postType->getKey())) {
+            if ($this->registrar->exists($postType->getKey())) {
                 return;
             }
             try {
                 $newPostType = $this->factory->createPostType($postType->getKey(), $postType->getArgs());
-                \register_post_type($newPostType->getKey(), $newPostType->getArgs());
+                $this->registrar->register($newPostType->getKey(), $newPostType->getArgs());
             } catch (Exception $exception) {
-                \write_log($exception->getMessage());
+                error_log($exception->getMessage());
             }
         }
     }

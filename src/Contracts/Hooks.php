@@ -8,6 +8,6 @@ interface Hooks extends HookInterface
     /**
      * Run front hooks
      */
-    public function hooks();
+    public function hooks(): void;
 
 }

@@ -3,23 +3,25 @@
 namespace BackTo\Framework\Blocks\Actions;
 
 use BackTo\Framework\Assets\ReplaceImgTagBySvgTag;
+use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
-
-use function add_action;
 
 class ReplaceImgBlockBySvgBlock implements Hooks
 {
 
     private ReplaceImgTagBySvgTag $replaceImgTagBySvgTag;
 
-    public function __construct(ReplaceImgTagBySvgTag $replaceImgTagBySvgTag)
+    private HookDispatcherInterface $hookDispatcher;
+
+    public function __construct(ReplaceImgTagBySvgTag $replaceImgTagBySvgTag, HookDispatcherInterface $hookDispatcher)
     {
         $this->replaceImgTagBySvgTag = $replaceImgTagBySvgTag;
+        $this->hookDispatcher = $hookDispatcher;
     }
 
-    public function hooks()
+    public function hooks(): void
     {
-        add_action('render_block_core/image', [$this, 'replaceImgTag']);
+        $this->hookDispatcher->addAction('render_block_core/image', [$this, 'replaceImgTag']);
     }
 
     function replaceImgTag(string $blockContent): string

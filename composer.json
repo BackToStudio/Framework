@@ -17,7 +17,10 @@
     "symfony/service-contracts": "^2.4",
     "symfony/filesystem": "^5.3",
     "symfony/config": "^5.3",
-    "symfony/dependency-injection": "^5.3"
+    "symfony/dependency-injection": "^5.3",
+    "phpstan/phpstan": "^2.1",
+    "php-stubs/wordpress-stubs": "^6.9",
+    "szepeviktor/phpstan-wordpress": "^2.0"
   },
   "autoload": {
     "psr-4": {
@@ -56,5 +59,10 @@
     "prefix-symfony-filesystem": "php ./vendor/bin/php-scoper add-prefix --prefix=BackToVendor --output-dir=./vendor-scoped/symfony/filesystem --config=config/php-scoper/symfony-filesystem.inc.php --quiet",
     "prefix-symfony-service-contracts": "php ./vendor/bin/php-scoper add-prefix --prefix=BackToVendor --output-dir=./vendor-scoped/symfony/service-contracts --config=config/php-scoper/symfony-service-contracts.inc.php --quiet",
     "prefix-psr-container": "php ./vendor/bin/php-scoper add-prefix --prefix=BackToVendor --output-dir=./vendor-scoped/psr/container --config=config/php-scoper/psr-container.inc.php --quiet"
+  },
+  "config": {
+    "allow-plugins": {
+      "bamarni/composer-bin-plugin": true
+    }
   }
 }

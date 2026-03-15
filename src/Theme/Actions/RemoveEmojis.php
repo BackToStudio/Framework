@@ -10,7 +10,7 @@ use function remove_filter;
 class RemoveEmojis implements Hooks
 {
 
-    public function hooks()
+    public function hooks(): void
     {
         remove_action('admin_enqueue_scripts', 'wp_enqueue_emoji_styles');
         remove_action('enqueue_embed_scripts', 'wp_enqueue_emoji_styles');
