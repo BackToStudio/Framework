@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Compose\DependencyInjection\Compiler;
 
+use InvalidArgumentException;
+use RuntimeException;
 use BackToVendor\Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use BackToVendor\Symfony\Component\DependencyInjection\ChildDefinition;
 use BackToVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -26,8 +28,10 @@ class ResolveInstanceOfConditionalPassWithVendorPrefix implements CompilerPassIn
                 throw new InvalidArgumentException(\sprintf('Autoconfigured instanceof for type "%s" defines arguments but these are not supported and should be removed.', $interface));
             }
         }
+        /** @var array<int|string, mixed> $tagsToKeep */
         $tagsToKeep = [];
         if ($container->hasParameter('container.behavior_describing_tags')) {
+            /** @var array<int|string, mixed> $tagsToKeep */
             $tagsToKeep = $container->getParameter('container.behavior_describing_tags');
         }
         foreach ($container->getDefinitions() as $id => $definition) {
@@ -38,6 +42,11 @@ class ResolveInstanceOfConditionalPassWithVendorPrefix implements CompilerPassIn
         }
     }
 
+    /**
+     * @param array<string, ChildDefinition> $autoconfiguredInstanceof
+     * @param array<string, ChildDefinition> $instanceofConditionals
+     * @return array<string, list<ChildDefinition>>
+     */
     private function mergeConditionals(array $autoconfiguredInstanceof, array $instanceofConditionals, ContainerBuilder $container) : array
     {
         // make each value an array of ChildDefinition
@@ -57,6 +66,9 @@ class ResolveInstanceOfConditionalPassWithVendorPrefix implements CompilerPassIn
         return $conditionals;
     }
 
+	/**
+	 * @param array<int|string, mixed> $tagsToKeep
+	 */
 	private function processDefinition(ContainerBuilder $container, string $id, Definition $definition, array $tagsToKeep) : Definition
 	{
 		$instanceofConditionals = $definition->getInstanceofConditionals();
@@ -111,7 +123,7 @@ class ResolveInstanceOfConditionalPassWithVendorPrefix implements CompilerPassIn
 			if (Definition::class === \get_class($abstract)) {
 				// cast Definition to ChildDefinition
 				// Modify to correspond to vendor prefixes.
-				$definition = \substr_replace($definition, 53 + 13, 2, 2);
+				$definition = \substr_replace($definition, (string) (53 + 13), 2, 2);
                 // Modify to correspond to vendor prefixes.
 				$definition = \substr_replace($definition, 'Child', 44 + 13, 0);
 			}

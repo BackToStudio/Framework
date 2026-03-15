@@ -50,7 +50,6 @@ class LoadMuPluginTextDomain implements Hooks
     {
         \load_muplugin_textdomain(
             $this->pluginTextDomain,
-            false,
             basename($this->pluginDirectory) . DIRECTORY_SEPARATOR . 'languages'
         );
     }

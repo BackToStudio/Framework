@@ -36,14 +36,14 @@ class AdminHookStub implements HookInterface, AdminHooks
 
 class ActivationHookStub implements HookInterface, ActivationHooks
 {
-    public function activate()
+    public function activate(): void
     {
     }
 }
 
 class DeactivationHookStub implements HookInterface, DeactivationHooks
 {
-    public function deactivate()
+    public function deactivate(): void
     {
     }
 }

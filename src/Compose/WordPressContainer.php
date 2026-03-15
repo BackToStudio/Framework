@@ -128,7 +128,10 @@ trait WordPressContainer
 
         require_once $file;
 
-        return new $classname();
+        /** @var ContainerInterface $container */
+        $container = new $classname();
+
+        return $container;
     }
 
     protected function dumpContainer(
@@ -146,8 +149,10 @@ trait WordPressContainer
             'build_time' => time(),
         ];
 
+        /** @var string $dump */
+        $dump = $dumper->dump($options);
         $cache->write(
-            $dumper->dump($options),
+            $dump,
             $container->getResources()
         );
     }

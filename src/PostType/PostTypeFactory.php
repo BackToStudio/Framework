@@ -67,10 +67,7 @@ class PostTypeFactory
     private function prepareEditorArgs(array $args): array
     {
         if (\array_key_exists('supports', $args) && \in_array('editor', $args['supports'], true)) {
-            $supports = ['custom-fields', 'revisions', 'title'];
-            if (\array_key_exists('supports', $args)) {
-                $supports = array_merge($supports, $args['supports']);
-            }
+            $supports = array_merge(['custom-fields', 'revisions', 'title'], $args['supports']);
             $args['supports'] = $supports;
         }
 

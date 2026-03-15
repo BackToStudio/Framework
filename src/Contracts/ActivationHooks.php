@@ -9,5 +9,5 @@ interface ActivationHooks extends HookInterface
     /**
      * Run activation hook
      */
-    public function activate();
+    public function activate(): void;
 }

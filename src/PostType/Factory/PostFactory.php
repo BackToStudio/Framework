@@ -15,16 +15,16 @@ class PostFactory
 
     public function create(WP_Post $wpPost): PostInterface
     {
-        $post = (new Post())
-            ->setId($wpPost->ID)
-            ->setTitle($wpPost->post_title)
-            ->setContent($wpPost->post_content)
-            ->setStatus($wpPost->post_status)
-            ->setSlug($wpPost->post_name)
-            ->setExcerpt($wpPost->post_excerpt)
-            ->setParentId($wpPost->post_parent)
-            ->setPostType($wpPost->post_type)
-            ->setAuthor($wpPost->post_author);
+        $post = new Post();
+        $post->setId($wpPost->ID);
+        $post->setTitle($wpPost->post_title);
+        $post->setContent($wpPost->post_content);
+        $post->setStatus($wpPost->post_status);
+        $post->setSlug($wpPost->post_name);
+        $post->setExcerpt($wpPost->post_excerpt);
+        $post->setParentId($wpPost->post_parent);
+        $post->setPostType($wpPost->post_type);
+        $post->setAuthor($wpPost->post_author);
 
         try {
             $modifiedAt = new DateTimeImmutable($wpPost->post_modified);

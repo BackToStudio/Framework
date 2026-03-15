@@ -7,7 +7,7 @@ namespace BackTo\Framework\Contracts;
 interface BlockStyleInterface
 {
     /**
-     * @return array
+     * @return array{name: string, label: string}
      */
     public function getProperties(): array;
 

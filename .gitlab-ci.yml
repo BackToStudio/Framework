@@ -1,4 +1,5 @@
 stages:
+  - lint
   - test
 
 cache:
@@ -8,15 +9,29 @@ cache:
 before_script:
   - bash ci/docker_install.sh > /dev/null
 
-test:8.1:
-  image: php:8.1
-  stage: test
+# ── Lint stage ──────────────────────────────────────────────
+
+phpstan:
+  image: php:8.3
+  stage: lint
   script:
-    - vendor/bin/phpunit --log-junit .phpunit.cache/results.xml
+    - vendor/bin/phpstan analyse --no-progress --error-format=gitlab > phpstan-report.json
   artifacts:
     expire_in: 1 week
     reports:
-      junit: .phpunit.cache/results.xml
+      codequality: phpstan-report.json
+
+cs-fixer:
+  image: php:8.3
+  stage: lint
+  script:
+    - vendor/bin/php-cs-fixer fix --dry-run --diff --format=gitlab > cs-fixer-report.json
+  artifacts:
+    expire_in: 1 week
+    reports:
+      codequality: cs-fixer-report.json
+
+# ── Test stage ──────────────────────────────────────────────
 
 test:8.2:
   image: php:8.2
@@ -30,6 +45,16 @@ test:8.2:
 
 test:8.3:
   image: php:8.3
+  stage: test
+  script:
+    - vendor/bin/phpunit --log-junit .phpunit.cache/results.xml
+  artifacts:
+    expire_in: 1 week
+    reports:
+      junit: .phpunit.cache/results.xml
+
+test:8.4:
+  image: php:8.4
   stage: test
   script:
     - vendor/bin/phpunit --log-junit .phpunit.cache/results.xml

@@ -21,6 +21,7 @@ class WordPressPostTypeRegistrar implements PostTypeRegistrarInterface
      */
     public function register(string $key, array $args): void
     {
+        /** @var lowercase-string&non-empty-string $key */
         register_post_type($key, $args);
     }
 

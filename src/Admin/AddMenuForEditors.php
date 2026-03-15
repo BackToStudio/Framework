@@ -29,7 +29,9 @@ class AddMenuForEditors implements AdminHooks {
 	public function displayAppearanceMenu(): void {
 		// Do this only once. Can go anywhere inside your functions.php file
 		$role_object = get_role( 'editor' );
-		$role_object->add_cap( 'edit_theme_options' );
+		if ($role_object !== null) {
+			$role_object->add_cap( 'edit_theme_options' );
+		}
 
 		if ( current_user_can( 'editor' ) ) {
 			/**

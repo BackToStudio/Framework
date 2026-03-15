@@ -18,17 +18,17 @@ use function remove_action;
  */
 class WordPressHookDispatcher implements HookDispatcherInterface
 {
-    public function addAction(string $hookName, callable $callback, int $priority = 10, int $acceptedArgs = 1): void
+    public function addAction(string $hookName, callable|string $callback, int $priority = 10, int $acceptedArgs = 1): void
     {
         add_action($hookName, $callback, $priority, $acceptedArgs);
     }
 
-    public function addFilter(string $hookName, callable $callback, int $priority = 10, int $acceptedArgs = 1): void
+    public function addFilter(string $hookName, callable|string $callback, int $priority = 10, int $acceptedArgs = 1): void
     {
         add_filter($hookName, $callback, $priority, $acceptedArgs);
     }
 
-    public function removeAction(string $hookName, callable $callback, int $priority = 10): void
+    public function removeAction(string $hookName, callable|string $callback, int $priority = 10): void
     {
         remove_action($hookName, $callback, $priority);
     }

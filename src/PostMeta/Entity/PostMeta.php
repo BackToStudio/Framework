@@ -34,7 +34,7 @@ class PostMeta implements PostMetaInterface
     public function setPost(PostInterface $post): PostMetaInterface
     {
         $this->post = $post;
-        $this->postId = $post->getId();
+        $this->postId = $post->getId() ?? 0;
         return $this;
     }
 

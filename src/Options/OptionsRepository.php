@@ -7,9 +7,9 @@ namespace BackTo\Framework\Options;
 class OptionsRepository
 {
     /**
-     * @return array<string, mixed>
+     * @return mixed
      */
-    public function find(string $key): array
+    public function find(string $key): mixed
     {
         return \get_option($key, []);
     }
