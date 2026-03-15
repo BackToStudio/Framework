@@ -112,12 +112,71 @@ Media and SVG utilities.
 
 ## Admin
 
-WordPress admin customizations.
+WordPress admin page management.
 
 | Class | Role |
 |-------|------|
+| `AdminPageRegistry` | Collects registered admin pages |
+| `RegisterAdminPage` | Application orchestrator (hooks into `admin_menu`) |
+| `Contracts\AdminPageInterface` | Interface for admin page definitions |
+| `Contracts\AdminPageRegistrarInterface` | Port for WP registration |
+| `Infrastructure\WordPressAdminPageRegistrar` | WP adapter (`add_menu_page`/`add_submenu_page`) |
 | `AddReusableBlockMenu` | Adds reusable blocks menu page |
 | `AddMenuForEditors` | Grants editor role theme options access |
+
+## Options
+
+WordPress `wp_options` abstraction.
+
+| Class | Role |
+|-------|------|
+| `Contracts\OptionsRepositoryInterface` | Port interface (get, update, delete, exists) |
+| `Infrastructure\WordPressOptionsRepository` | WP adapter |
+
+## RestApi
+
+REST API route management with autoconfiguration.
+
+| Class | Role |
+|-------|------|
+| `RestRouteRegistry` | Collects registered REST routes |
+| `RegisterRestRoute` | Application orchestrator (hooks into `rest_api_init`) |
+| `Contracts\RestRouteInterface` | Interface for route definitions |
+| `Contracts\RestRouteRegistrarInterface` | Port for WP registration |
+| `Infrastructure\WordPressRestRouteRegistrar` | WP adapter (`register_rest_route`) |
+
+## Observability
+
+Logging, error handling, health checks, and performance monitoring.
+
+| Class | Role |
+|-------|------|
+| `Contracts\LoggerInterface` | PSR-3 compatible logger port |
+| `Infrastructure\WordPressLogger` | WP adapter (error_log with structured formatting) |
+| `Infrastructure\NullLogger` | No-op logger for testing |
+| `ErrorHandler` | Error boundary with `capture()` pattern |
+| `Contracts\ErrorHandlerInterface` | Port for error handling |
+| `HealthCheckRegistry` | Collects and runs health checks |
+| `Contracts\HealthCheckInterface` | Port for health check definitions |
+| `Contracts\HealthCheckResult` | Value object (healthy/degraded/unhealthy) |
+| `HealthCheck\ContainerHealthCheck` | Verifies DI container state |
+| `HealthCheck\CacheHealthCheck` | Verifies cache operations |
+| `PerformanceCollector` | In-memory timing and counters |
+| `ObservableHookDispatcher` | Decorator adding instrumentation to hook dispatch |
+
+## Cli
+
+WP-CLI scaffolding commands.
+
+| Class | Role |
+|-------|------|
+| `Command\AbstractMakeCommand` | Base class for make commands |
+| `Command\MakePostTypeCommand` | `wp make:post-type` |
+| `Command\MakeTaxonomyCommand` | `wp make:taxonomy` |
+| `Command\MakeBlockCommand` | `wp make:block` |
+| `Command\MakeHookCommand` | `wp make:hook` |
+| `Command\MakeRestRouteCommand` | `wp make:rest-route` |
+| `Generator\ClassGenerator` | Template engine for code generation |
 
 ## Compose
 
@@ -129,3 +188,4 @@ Framework kernel and container management.
 | `WordPressContainer` | Trait — container lifecycle (build, cache, dump, load) |
 | `TextDomain` | Trait — text domain management |
 | `DependencyInjection\WordPressExtension` | Autoconfiguration + compiler passes + port bindings |
+| `Configuration\FrameworkConfiguration` | Default framework parameters |

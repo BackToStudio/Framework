@@ -22,6 +22,11 @@ class PostTypeA implements PostTypeInterface
     {
         return [];
     }
+
+    public function setArgs(array $args): PostTypeInterface
+    {
+        return $this;
+    }
 }
 
 class PostTypeB implements PostTypeInterface
@@ -35,6 +40,11 @@ class PostTypeB implements PostTypeInterface
     public function getArgs(): array
     {
         return [];
+    }
+
+    public function setArgs(array $args): PostTypeInterface
+    {
+        return $this;
     }
 }
 

@@ -9,6 +9,9 @@ use BackTo\Framework\PostMeta\Contracts\PostMetaStructureInterface;
 
 class PostMetaStructureFactory
 {
+    /**
+     * @param array<string, mixed> $args
+     */
     public function create(string $key, array $args = []): PostMetaStructureInterface
     {
         $defaultArgs = [

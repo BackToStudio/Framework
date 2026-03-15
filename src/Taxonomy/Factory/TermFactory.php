@@ -15,19 +15,19 @@ class TermFactory
 
     public function create(WP_Term $wpTerm): TermInterface
     {
-        $term = (new Term())
-            ->setId($wpTerm->term_id)
-            ->setName($wpTerm->name)
-            ->setDescription($wpTerm->description)
-            ->setTaxonomy($wpTerm->taxonomy)
-            ->setSlug($wpTerm->slug)
-            ->setParentId($wpTerm->parent);
+        $term = new Term();
+        $term->setId($wpTerm->term_id);
+        $term->setName($wpTerm->name);
+        $term->setDescription($wpTerm->description);
+        $term->setTaxonomy($wpTerm->taxonomy);
+        $term->setSlug($wpTerm->slug);
+        $term->setParentId($wpTerm->parent);
 
         return $term;
     }
 
     /**
-     * @param WP_Term[] $wpPosts
+     * @param WP_Term[] $wpTerms
      *
      * @return TermInterface[]
      */

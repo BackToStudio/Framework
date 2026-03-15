@@ -32,7 +32,7 @@ class TransientCache extends AbstractCache
             return $default;
         }
 
-        return unserialize($value);
+        return \unserialize($value, ['allowed_classes' => false]);
     }
 
     public function set(string $key, mixed $value, null|int|DateInterval $ttl = null): bool

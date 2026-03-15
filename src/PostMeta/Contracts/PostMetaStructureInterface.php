@@ -6,6 +6,10 @@ namespace BackTo\Framework\PostMeta\Contracts;
 
 interface PostMetaStructureInterface
 {
+    public function getType(): string;
+
+    public function setType(string $type): PostMetaStructureInterface;
+
     public function getObjectType(): string;
 
     public function setObjectType(string $objectType): PostMetaStructureInterface;

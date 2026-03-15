@@ -22,9 +22,19 @@ class TaxonomyA implements TaxonomyInterface
         return [];
     }
 
+    public function setArgs(array $args): TaxonomyInterface
+    {
+        return $this;
+    }
+
     public function getPostTypes(): array
     {
         return [];
+    }
+
+    public function setPostTypes(array $postTypes): TaxonomyInterface
+    {
+        return $this;
     }
 }
 
@@ -41,9 +51,19 @@ class TaxonomyB implements TaxonomyInterface
         return [];
     }
 
+    public function setArgs(array $args): TaxonomyInterface
+    {
+        return $this;
+    }
+
     public function getPostTypes(): array
     {
         return [ 'abcde' ];
+    }
+
+    public function setPostTypes(array $postTypes): TaxonomyInterface
+    {
+        return $this;
     }
 }
 

@@ -24,10 +24,10 @@ class CleanHead implements Hooks
         // Remove index link
         remove_action('wp_head', 'index_rel_link');
         // Remove prev link
-        remove_action('wp_head', 'parent_post_rel_link', 10, 0);
+        remove_action('wp_head', 'parent_post_rel_link', 10);
         // Remove start link
-        remove_action('wp_head', 'start_post_rel_link', 10, 0);
+        remove_action('wp_head', 'start_post_rel_link', 10);
         // Remove relational links for the posts adjacent to the current post.
-        remove_action('wp_head', 'adjacent_posts_rel_link', 10, 0);
+        remove_action('wp_head', 'adjacent_posts_rel_link', 10);
     }
 }

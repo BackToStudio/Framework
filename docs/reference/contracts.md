@@ -184,6 +184,138 @@ interface FileLocatorInterface
 }
 ```
 
+## Admin contracts
+
+### `AdminPageInterface` extends `HookInterface`
+
+Represents an admin menu page to be registered.
+
+```php
+interface AdminPageInterface extends HookInterface
+{
+    public function getPageTitle(): string;
+    public function getMenuTitle(): string;
+    public function getCapability(): string;
+    public function getMenuSlug(): string;
+    public function getIconUrl(): string;
+    public function getPosition(): ?int;
+    public function render(): void;
+}
+```
+
+## Options contracts
+
+### `OptionsRepositoryInterface`
+
+Port interface for WordPress options (`wp_options`).
+
+```php
+interface OptionsRepositoryInterface
+{
+    public function get(string $key, mixed $default = null): mixed;
+    public function update(string $key, mixed $value): bool;
+    public function delete(string $key): bool;
+    public function exists(string $key): bool;
+}
+```
+
+## REST API contracts
+
+### `RestRouteInterface` extends `HookInterface`
+
+Represents a REST API route to be registered.
+
+```php
+interface RestRouteInterface extends HookInterface
+{
+    public function getNamespace(): string;
+    public function getRoute(): string;
+    /** @return string[] */
+    public function getMethods(): array;
+    public function handle(WP_REST_Request $request): WP_REST_Response;
+    public function getPermissionCallback(): ?callable;
+}
+```
+
+## Observability contracts
+
+### `LoggerInterface`
+
+PSR-3 compatible logger port interface.
+
+```php
+interface LoggerInterface
+{
+    public function emergency(string $message, array $context = []): void;
+    public function alert(string $message, array $context = []): void;
+    public function critical(string $message, array $context = []): void;
+    public function error(string $message, array $context = []): void;
+    public function warning(string $message, array $context = []): void;
+    public function notice(string $message, array $context = []): void;
+    public function info(string $message, array $context = []): void;
+    public function debug(string $message, array $context = []): void;
+    public function log(mixed $level, string $message, array $context = []): void;
+}
+```
+
+### `ErrorHandlerInterface`
+
+Error boundary pattern — catches exceptions and delegates to logger.
+
+```php
+interface ErrorHandlerInterface
+{
+    public function handle(\Throwable $exception, array $context = []): void;
+
+    /**
+     * @template T
+     * @param callable(): T $callback
+     * @param T $fallback
+     * @return T
+     */
+    public function capture(callable $callback, mixed $fallback = null): mixed;
+}
+```
+
+### `HealthCheckInterface`
+
+Verifies that a service or subsystem is operational.
+
+```php
+interface HealthCheckInterface
+{
+    public function getName(): string;
+    public function check(): HealthCheckResult;
+}
+```
+
+### `HealthCheckResult`
+
+Value object with named constructors:
+
+```php
+HealthCheckResult::healthy(string $message, array $metadata = []);
+HealthCheckResult::degraded(string $message, array $metadata = []);
+HealthCheckResult::unhealthy(string $message, array $metadata = []);
+```
+
+Methods: `getStatus()`, `getMessage()`, `getMetadata()`, `isHealthy()`, `toArray()`.
+
+### `PerformanceCollectorInterface`
+
+Collects performance metrics with nanosecond-precision timing.
+
+```php
+interface PerformanceCollectorInterface
+{
+    public function startTimer(string $name): void;
+    public function stopTimer(string $name): float; // ms
+    public function increment(string $name): void;
+    /** @return array<string, array{count: int, total_ms: float, avg_ms: float}> */
+    public function getMetrics(): array;
+}
+```
+
 ## Cache contracts
 
 ### `CacheInterface`

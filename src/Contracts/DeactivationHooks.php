@@ -7,7 +7,7 @@ namespace BackTo\Framework\Contracts;
 interface DeactivationHooks extends HookInterface
 {
     /**
-     * Run activation hook
+     * Run deactivation hook
      */
-    public function deactivate();
+    public function deactivate(): void;
 }

@@ -4,13 +4,22 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Options;
 
+use BackTo\Framework\Options\Contracts\OptionsRepositoryInterface;
+
+/**
+ * @deprecated Use OptionsRepositoryInterface with WordPressOptionsRepository instead.
+ */
 class OptionsRepository
 {
-    /**
-     * @return array<string, mixed>
-     */
-    public function find(string $key): array
+    private OptionsRepositoryInterface $repository;
+
+    public function __construct(OptionsRepositoryInterface $repository)
     {
-        return \get_option($key, []);
+        $this->repository = $repository;
+    }
+
+    public function find(string $key): mixed
+    {
+        return $this->repository->get($key, []);
     }
 }

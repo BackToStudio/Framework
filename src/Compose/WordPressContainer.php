@@ -128,7 +128,10 @@ trait WordPressContainer
 
         require_once $file;
 
-        return new $classname();
+        /** @var ContainerInterface $container */
+        $container = new $classname();
+
+        return $container;
     }
 
     protected function dumpContainer(
@@ -146,8 +149,10 @@ trait WordPressContainer
             'build_time' => time(),
         ];
 
+        /** @var string $dump */
+        $dump = $dumper->dump($options);
         $cache->write(
-            $dumper->dump($options),
+            $dump,
             $container->getResources()
         );
     }
@@ -173,7 +178,7 @@ trait WordPressContainer
             if ($this->isDebug()) {
                 throw $e;
             }
-            \error_log(sprintf('[BackTo Framework] %s', $e->getMessage()));
+            \error_log(\sprintf('[BackTo Framework] %s in %s:%d', $e->getMessage(), $e->getFile(), $e->getLine()));
         }
     }
 
@@ -232,6 +237,26 @@ trait WordPressContainer
                 'dir' => dirname(__DIR__) . '/Seo',
                 'namespace' => 'BackTo\\Framework\\Seo\\',
                 'exclude' => '{Tests,Contracts}',
+            ],
+            [
+                'dir' => dirname(__DIR__) . '/Admin',
+                'namespace' => 'BackTo\\Framework\\Admin\\',
+                'exclude' => '{DependencyInjection,Tests,Contracts,Infrastructure}',
+            ],
+            [
+                'dir' => dirname(__DIR__) . '/Options',
+                'namespace' => 'BackTo\\Framework\\Options\\',
+                'exclude' => '{Tests,Contracts,Infrastructure}',
+            ],
+            [
+                'dir' => dirname(__DIR__) . '/RestApi',
+                'namespace' => 'BackTo\\Framework\\RestApi\\',
+                'exclude' => '{DependencyInjection,Tests,Contracts,Infrastructure}',
+            ],
+            [
+                'dir' => dirname(__DIR__) . '/Observability',
+                'namespace' => 'BackTo\\Framework\\Observability\\',
+                'exclude' => '{DependencyInjection,Tests,Contracts,Infrastructure,HealthCheck}',
             ],
         ];
     }

@@ -12,4 +12,9 @@ interface PostTypeInterface
      * @return array<string, mixed>
      */
     public function getArgs(): array;
+
+    /**
+     * @param array<string, mixed> $args
+     */
+    public function setArgs(array $args): PostTypeInterface;
 }

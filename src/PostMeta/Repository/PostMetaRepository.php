@@ -21,7 +21,9 @@ class PostMetaRepository
 
     public function create(PostMetaInterface $postMeta): PostMetaInterface
     {
-        return $this->update($postMeta);
+        $this->update($postMeta);
+
+        return $postMeta;
     }
 
     public function get(int $postId, string $metaKey, bool $single = true): PostMetaInterface
@@ -30,7 +32,10 @@ class PostMetaRepository
         return $this->factory->create($postId, $metaKey, $postMetaValue);
     }
 
-    public function update(PostMetaInterface $postMeta)
+    /**
+     * @return int|bool
+     */
+    public function update(PostMetaInterface $postMeta): int|bool
     {
         return update_post_meta($postMeta->getPostId(), $postMeta->getMetaKey(), $postMeta->getMetaValue());
     }

@@ -21,6 +21,11 @@ Practical guides for accomplishing specific tasks.
 - [How to register post meta fields](how-to/register-post-meta.md)
 - [How to use the cache system](how-to/use-cache.md)
 - [How to integrate SEO plugins](how-to/integrate-seo.md)
+- [How to register REST API routes](how-to/use-rest-api.md)
+- [How to work with options](how-to/work-with-options.md)
+- [How to use WP-CLI scaffolding](how-to/use-cli-scaffolding.md)
+- [How to use the observability module](how-to/use-observability.md)
+- [How to debug with Query Monitor](how-to/debug-with-query-monitor.md)
 
 ## Reference
 
@@ -30,6 +35,7 @@ Technical descriptions of the framework's modules, contracts, and architecture.
 - [Modules reference](reference/modules.md)
 - [Contracts and interfaces](reference/contracts.md)
 - [Configuration reference](reference/configuration.md)
+- [Compatibility matrix](reference/compatibility.md)
 
 ## Explanation
 

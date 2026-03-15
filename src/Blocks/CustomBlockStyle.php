@@ -9,6 +9,7 @@ use BackTo\Framework\Contracts\BlockStyleInterface;
 abstract class CustomBlockStyle implements BlockStyleInterface
 {
 
+    /** @var string[] */
     protected array $blocks = [];
 
     protected string $styleName = '';
@@ -39,6 +40,9 @@ abstract class CustomBlockStyle implements BlockStyleInterface
         return $this->blocks;
     }
 
+    /**
+     * @return array{name: string, label: string}
+     */
     public function getProperties(): array
     {
         return [

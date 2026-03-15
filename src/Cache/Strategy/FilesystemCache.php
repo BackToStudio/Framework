@@ -138,7 +138,7 @@ class FilesystemCache extends AbstractCache
             return null;
         }
 
-        $data = @unserialize($content);
+        $data = @\unserialize($content, ['allowed_classes' => false]);
 
         if (!is_array($data) || !array_key_exists('value', $data) || !array_key_exists('expiry', $data)) {
             return null;

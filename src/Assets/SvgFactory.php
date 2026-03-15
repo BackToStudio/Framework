@@ -21,11 +21,11 @@ class SvgFactory
     }
 
     /**
-     * @param string $image_id
+     * @param int $image_id
      *
      * @return string
      */
-    function getFromId(int $image_id): string
+    public function getFromId(int $image_id): string
     {
         $path = $this->fileLocator->getAttachedFile($image_id);
 
@@ -37,7 +37,7 @@ class SvgFactory
      *
      * @return string
      */
-    function getFromSrc(string $src): string
+    public function getFromSrc(string $src): string
     {
         $path = $src;
 
@@ -55,9 +55,13 @@ class SvgFactory
      *
      * @return string
      */
-    function getFromPath(string $path): string
+    public function getFromPath(string $path): string
     {
         $res = file_get_contents($path);
+
+        if ($res === false) {
+            return '';
+        }
 
         return html_entity_decode($res);
     }

@@ -12,28 +12,11 @@ namespace BackTo\Framework\Contracts;
  */
 interface HookDispatcherInterface
 {
-    /**
-     * @param string $hookName
-     * @param callable $callback
-     * @param int $priority
-     * @param int $acceptedArgs
-     */
-    public function addAction(string $hookName, callable $callback, int $priority = 10, int $acceptedArgs = 1): void;
+    public function addAction(string $hookName, callable|string $callback, int $priority = 10, int $acceptedArgs = 1): void;
 
-    /**
-     * @param string $hookName
-     * @param callable $callback
-     * @param int $priority
-     * @param int $acceptedArgs
-     */
-    public function addFilter(string $hookName, callable $callback, int $priority = 10, int $acceptedArgs = 1): void;
+    public function addFilter(string $hookName, callable|string $callback, int $priority = 10, int $acceptedArgs = 1): void;
 
-    /**
-     * @param string $hookName
-     * @param callable $callback
-     * @param int $priority
-     */
-    public function removeAction(string $hookName, callable $callback, int $priority = 10): void;
+    public function removeAction(string $hookName, callable|string $callback, int $priority = 10): void;
 
     /**
      * Check if the current request is for an admin page.

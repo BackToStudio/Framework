@@ -16,7 +16,9 @@ class WordPressFileLocator implements FileLocatorInterface
 {
     public function getAttachedFile(int $attachmentId): string
     {
-        return get_attached_file($attachmentId);
+        $file = get_attached_file($attachmentId);
+
+        return $file !== false ? $file : '';
     }
 
     /**

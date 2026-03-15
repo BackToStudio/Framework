@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Compose\Tests;
 
+use BackTo\Framework\Admin\Contracts\AdminPageInterface;
+use BackTo\Framework\Admin\DependencyInjection\Compiler\RegisterAdminPagePass;
 use BackTo\Framework\Blocks\DependencyInjection\Compiler\RegisterBlockPass;
 use BackTo\Framework\Blocks\DependencyInjection\Compiler\RegisterBlockStylePass;
 use BackTo\Framework\Compose\DependencyInjection\Compiler\ResolveInstanceOfConditionalPassWithVendorPrefix;
@@ -12,11 +14,15 @@ use BackTo\Framework\Contracts\BlockInterface;
 use BackTo\Framework\Contracts\BlockStyleInterface;
 use BackTo\Framework\Contracts\HookInterface;
 use BackTo\Framework\Contracts\RegistryInterface;
+use BackTo\Framework\Observability\Contracts\HealthCheckInterface;
+use BackTo\Framework\Observability\DependencyInjection\Compiler\RegisterHealthCheckPass;
 use BackTo\Framework\Hooks\DependencyInjection\Compiler\RegisterHookPass;
 use BackTo\Framework\PostMeta\Contracts\PostMetaStructureInterface;
 use BackTo\Framework\PostMeta\DependencyInjection\Compiler\RegisterPostMetaStructurePass;
 use BackTo\Framework\PostType\Contracts\PostTypeInterface;
 use BackTo\Framework\PostType\DependencyInjection\Compiler\RegisterPostTypePass;
+use BackTo\Framework\RestApi\Contracts\RestRouteInterface;
+use BackTo\Framework\RestApi\DependencyInjection\Compiler\RegisterRestRoutePass;
 use BackTo\Framework\Taxonomy\Contracts\TaxonomyInterface;
 use BackTo\Framework\Taxonomy\DependencyInjection\Compiler\RegisterTaxonomyPass;
 use BackToVendor\Symfony\Component\DependencyInjection\Compiler\ResolveInstanceofConditionalsPass;
@@ -66,6 +72,9 @@ class WordPressExtensionTest extends TestCase
             'Block' => [BlockInterface::class, 'wordpress.block'],
             'BlockStyle' => [BlockStyleInterface::class, 'wordpress.block_style'],
             'Hook' => [HookInterface::class, 'wordpress.hook'],
+            'AdminPage' => [AdminPageInterface::class, 'wordpress.admin_page'],
+            'RestRoute' => [RestRouteInterface::class, 'wordpress.rest_route'],
+            'HealthCheck' => [HealthCheckInterface::class, 'wordpress.health_check'],
         ];
     }
 
@@ -82,6 +91,9 @@ class WordPressExtensionTest extends TestCase
         $this->assertContains(RegisterBlockPass::class, $passClasses);
         $this->assertContains(RegisterBlockStylePass::class, $passClasses);
         $this->assertContains(RegisterHookPass::class, $passClasses);
+        $this->assertContains(RegisterAdminPagePass::class, $passClasses);
+        $this->assertContains(RegisterRestRoutePass::class, $passClasses);
+        $this->assertContains(RegisterHealthCheckPass::class, $passClasses);
     }
 
     public function testReplacesResolveInstanceofConditionalsPass(): void
@@ -101,7 +113,7 @@ class WordPressExtensionTest extends TestCase
 
         // Autoconfiguration registered
         $autoconfigured = $this->containerBuilder->getAutoconfiguredInstanceof();
-        $this->assertCount(7, $autoconfigured);
+        $this->assertCount(10, $autoconfigured);
 
         // Compiler passes registered
         $passes = $this->containerBuilder->getCompilerPassConfig()->getBeforeOptimizationPasses();

@@ -41,6 +41,21 @@
         <testsuite name="seo">
             <directory>src/Seo/Tests</directory>
         </testsuite>
+        <testsuite name="admin">
+            <directory>src/Admin/Tests</directory>
+        </testsuite>
+        <testsuite name="assets">
+            <directory>src/Assets/Tests</directory>
+        </testsuite>
+        <testsuite name="options">
+            <directory>src/Options/Tests</directory>
+        </testsuite>
+        <testsuite name="theme">
+            <directory>src/Theme/Tests</directory>
+        </testsuite>
+        <testsuite name="rest-api">
+            <directory>src/RestApi/Tests</directory>
+        </testsuite>
     </testsuites>
 
     <coverage cacheDirectory=".phpunit.cache/code-coverage">
