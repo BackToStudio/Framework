@@ -128,7 +128,7 @@ class ResolveInstanceOfConditionalPassWithVendorPrefix implements CompilerPassIn
 				$definition = \substr_replace($definition, 'Child', 44 + 13, 0);
 			}
 			/** @var ChildDefinition $definition */
-			$definition = \unserialize($definition);
+			$definition = \unserialize($definition, ['allowed_classes' => [Definition::class, ChildDefinition::class]]);
 			$definition->setParent($parent);
 			if (null !== $shared && !isset($definition->getChanges()['shared'])) {
 				$definition->setShared($shared);

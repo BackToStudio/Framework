@@ -33,6 +33,7 @@ class PostFactory
             $publishedAt = new DateTimeImmutable($wpPost->post_date);
             $post->setPublishedAt($publishedAt);
         } catch (Exception $e) {
+            \error_log(\sprintf('[BackTo Framework] Invalid post dates for post %d: %s', $wpPost->ID, $e->getMessage()));
         }
 
         return $post;

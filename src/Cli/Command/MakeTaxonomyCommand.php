@@ -30,6 +30,7 @@ class MakeTaxonomyCommand extends AbstractMakeCommand
         $postTypes = '';
         if (isset($assocArgs['post-types'])) {
             $types = \array_map('trim', \explode(',', (string) $assocArgs['post-types']));
+            $types = \array_filter($types, static fn (string $type): bool => \preg_match('/^[a-z0-9_-]{1,20}$/', $type) === 1);
             $postTypes = \implode(', ', \array_map(static fn (string $type): string => "'{$type}'", $types));
         }
 
