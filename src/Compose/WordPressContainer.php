@@ -258,6 +258,11 @@ trait WordPressContainer
                 'namespace' => 'BackTo\\Framework\\Observability\\',
                 'exclude' => '{DependencyInjection,Tests,Contracts,Infrastructure,HealthCheck}',
             ],
+            [
+                'dir' => dirname(__DIR__) . '/Security',
+                'namespace' => 'BackTo\\Framework\\Security\\',
+                'exclude' => '{DependencyInjection,Tests,Contracts,Infrastructure}',
+            ],
         ];
     }
 

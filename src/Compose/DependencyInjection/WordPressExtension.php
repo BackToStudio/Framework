@@ -12,6 +12,8 @@ use BackTo\Framework\Observability\Contracts\HealthCheckInterface;
 use BackTo\Framework\Observability\Contracts\LoggerInterface;
 use BackTo\Framework\Observability\Contracts\PerformanceCollectorInterface;
 use BackTo\Framework\Observability\DependencyInjection\Compiler\RegisterHealthCheckPass;
+use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
+use BackTo\Framework\Security\DependencyInjection\Compiler\RegisterSecurityRulePass;
 use BackTo\Framework\Observability\ErrorHandler;
 use BackTo\Framework\Observability\Infrastructure\NullLogger;
 use BackTo\Framework\Observability\Infrastructure\WordPressLogger;
@@ -90,6 +92,9 @@ class WordPressExtension
 
         $containerBuilder->registerForAutoconfiguration(HealthCheckInterface::class)
             ->addTag('wordpress.health_check');
+
+        $containerBuilder->registerForAutoconfiguration(SecurityRuleInterface::class)
+            ->addTag('wordpress.security_rule');
     }
 
     /**
@@ -108,6 +113,7 @@ class WordPressExtension
         $containerBuilder->addCompilerPass(new RegisterAdminPagePass());
         $containerBuilder->addCompilerPass(new RegisterRestRoutePass());
         $containerBuilder->addCompilerPass(new RegisterHealthCheckPass());
+        $containerBuilder->addCompilerPass(new RegisterSecurityRulePass());
     }
 
     /**

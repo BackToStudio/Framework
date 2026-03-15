@@ -39,6 +39,11 @@ class FrameworkConfiguration
             // Observability
             'framework.observability.log_level' => 'error',
             'framework.observability.performance_tracking' => false,
+
+            // Security
+            'framework.security.headers_enabled' => true,
+            'framework.security.xmlrpc_disabled' => true,
+            'framework.security.hide_version' => true,
         ];
     }
 
