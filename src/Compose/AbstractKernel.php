@@ -3,7 +3,10 @@
 namespace BackTo\Framework\Compose;
 
 use Exception;
+use BackToVendor\Symfony\Component\Config\Builder\ConfigBuilderGenerator;
+use BackToVendor\Symfony\Component\Config\FileLocator;
 use BackToVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
+use BackToVendor\Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 
 abstract class AbstractKernel
 {
@@ -27,6 +30,11 @@ abstract class AbstractKernel
     abstract protected function getTextDomainParameterName(): string;
 
     /**
+     * Return the path to this kernel's Resources/config directory.
+     */
+    abstract protected function getKernelConfigDir(): string;
+
+    /**
      * Prepare Container settings.
      *
      * @return ContainerBuilder
@@ -41,6 +49,17 @@ abstract class AbstractKernel
 
         $this->loadServices($containerBuilder);
 
-        return $this->wordPressContainerBuilder($containerBuilder);
+        return $this->configureWordPressContainer($containerBuilder);
+    }
+
+    /**
+     * Load kernel-specific services (I18n, bindings, etc.).
+     */
+    protected function loadKernelServices(ContainerBuilder $containerBuilder, ?ConfigBuilderGenerator $configBuilderGenerator): void
+    {
+        $configDir = $this->getKernelConfigDir();
+        $fileLocator = new FileLocator($configDir);
+        $loader = new PhpFileLoader($containerBuilder, $fileLocator, $this->getEnvironment(), $configBuilderGenerator);
+        $loader->load('services.php');
     }
 }

@@ -15,4 +15,9 @@ class ThemeKernel extends AbstractKernel
     {
         return 'themeTextDomain';
     }
+
+    protected function getKernelConfigDir(): string
+    {
+        return __DIR__ . '/Resources/config';
+    }
 }

@@ -15,4 +15,9 @@ class PluginKernel extends AbstractKernel
     {
         return 'pluginTextDomain';
     }
+
+    protected function getKernelConfigDir(): string
+    {
+        return __DIR__ . '/Resources/config';
+    }
 }

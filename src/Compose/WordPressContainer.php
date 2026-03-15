@@ -2,27 +2,12 @@
 
 namespace BackTo\Framework\Compose;
 
-use BackTo\Framework\PostMeta\Contracts\PostMetaStructureInterface;
+use BackTo\Framework\Compose\DependencyInjection\WordPressExtension;
 use Exception;
 use LogicException;
 use ReflectionObject;
-use BackTo\Framework\PostType\Contracts\PostTypeInterface;
-use BackTo\Framework\Taxonomy\Contracts\TaxonomyInterface;
-use BackTo\Framework\Blocks\DependencyInjection\Compiler\RegisterBlockPass;
-use BackTo\Framework\Blocks\DependencyInjection\Compiler\RegisterBlockStylePass;
-use BackTo\Framework\Compose\DependencyInjection\Compiler\ResolveInstanceOfConditionalPassWithVendorPrefix;
-use BackTo\Framework\Contracts\BlockInterface;
-use BackTo\Framework\Contracts\BlockStyleInterface;
-use BackTo\Framework\Contracts\HookInterface;
-use BackTo\Framework\Contracts\RegistryInterface;
-use BackTo\Framework\Hooks\DependencyInjection\Compiler\RegisterHookPass;
 use BackTo\Framework\Hooks\HookRegistry;
-use BackTo\Framework\PostMeta\DependencyInjection\Compiler\RegisterPostMetaStructurePass;
-use BackTo\Framework\PostType\DependencyInjection\Compiler\RegisterPostTypePass;
-use BackTo\Framework\Taxonomy\DependencyInjection\Compiler\RegisterTaxonomyPass;
 use BackToVendor\Symfony\Component\Config\Builder\ConfigBuilderGenerator;
-use BackToVendor\Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
-use BackToVendor\Symfony\Component\DependencyInjection\Compiler\ResolveInstanceofConditionalsPass;
 use BackToVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
 use BackToVendor\Symfony\Component\DependencyInjection\ContainerInterface;
 use BackToVendor\Symfony\Component\DependencyInjection\Dumper\PhpDumper;
@@ -34,7 +19,6 @@ use BackToVendor\Symfony\Component\Config\FileLocator;
 use function dirname;
 use function is_file;
 use function is_null;
-use function get_class;
 
 trait WordPressContainer
 {
@@ -230,47 +214,64 @@ trait WordPressContainer
     }
 
     /**
-     * TODO: To move in DependencyInjection/Extension
+     * Apply WordPress DI configuration (autoconfiguration + compiler passes).
      */
-    public function wordPressContainerBuilder(ContainerBuilder $containerBuilder): ContainerBuilder
+    protected function configureWordPressContainer(ContainerBuilder $containerBuilder): ContainerBuilder
     {
-        $containerBuilder->registerForAutoconfiguration(RegistryInterface::class)
-            ->setPublic(true);
-
-        $containerBuilder->registerForAutoconfiguration(PostTypeInterface::class)
-            ->addTag('wordpress.post_type');
-
-        $containerBuilder->registerForAutoconfiguration(PostMetaStructureInterface::class)
-            ->addTag('wordpress.post_meta');
-
-        $containerBuilder->registerForAutoconfiguration(TaxonomyInterface::class)
-            ->addTag('wordpress.taxonomy');
-
-        $containerBuilder->registerForAutoconfiguration(BlockInterface::class)
-            ->addTag('wordpress.block');
-
-        $containerBuilder->registerForAutoconfiguration(BlockStyleInterface::class)
-            ->addTag('wordpress.block_style');
-
-        $containerBuilder->registerForAutoconfiguration(HookInterface::class)
-            ->addTag('wordpress.hook');
-
-        $containerBuilder = $this->replaceResolveInstanceofConditionalsPass($containerBuilder);
-
-        $containerBuilder->addCompilerPass(new RegisterPostTypePass());
-        $containerBuilder->addCompilerPass(new RegisterPostMetaStructurePass());
-        $containerBuilder->addCompilerPass(new RegisterTaxonomyPass());
-        $containerBuilder->addCompilerPass(new RegisterBlockPass());
-        $containerBuilder->addCompilerPass(new RegisterBlockStylePass());
-        $containerBuilder->addCompilerPass(new RegisterHookPass());
+        $extension = new WordPressExtension();
+        $extension->configure($containerBuilder);
 
         return $containerBuilder;
     }
 
+    /**
+     * Return the service bundle directories to load.
+     *
+     * Each entry is a [directory, namespace] pair that will be loaded as services.
+     * Override in subclasses to register additional bundles.
+     *
+     * @return array<array{dir: string, namespace: string, exclude: string}>
+     */
+    protected function getBundles(): array
+    {
+        return [
+            [
+                'dir' => dirname(__DIR__) . '/Assets',
+                'namespace' => 'BackTo\\Framework\\Assets\\',
+                'exclude' => '{DependencyInjection,Entity,Tests,Contracts}',
+            ],
+            [
+                'dir' => dirname(__DIR__) . '/Hooks',
+                'namespace' => 'BackTo\\Framework\\Hooks\\',
+                'exclude' => '{DependencyInjection,Entity,Tests,Contracts}',
+            ],
+            [
+                'dir' => dirname(__DIR__) . '/Blocks',
+                'namespace' => 'BackTo\\Framework\\Blocks\\',
+                'exclude' => '{DependencyInjection,Entity,Tests,Contracts}',
+            ],
+            [
+                'dir' => dirname(__DIR__) . '/PostType',
+                'namespace' => 'BackTo\\Framework\\PostType\\',
+                'exclude' => '{DependencyInjection,Entity,Tests,Contracts}',
+            ],
+            [
+                'dir' => dirname(__DIR__) . '/Taxonomy',
+                'namespace' => 'BackTo\\Framework\\Taxonomy\\',
+                'exclude' => '{DependencyInjection,Entity,Tests,Contracts}',
+            ],
+            [
+                'dir' => dirname(__DIR__) . '/PostMeta',
+                'namespace' => 'BackTo\\Framework\\PostMeta\\',
+                'exclude' => '{DependencyInjection,Entity,Tests,Contracts}',
+            ],
+        ];
+    }
 
     /**
-     * @param ContainerBuilder $containerBuilder
+     * Load framework bundles and the project's own services.
      *
+     * @param ContainerBuilder $containerBuilder
      * @throws Exception
      */
     protected function loadServices(ContainerBuilder $containerBuilder)
@@ -278,38 +279,46 @@ trait WordPressContainer
         $configBuilderGenerator = ConfigBuilderGenerator::class ? new ConfigBuilderGenerator(
             $this->getBuildDir()
         ) : null;
-        // TODO: refactor with bundles.
-        $fileLocator = new FileLocator(__DIR__);
-        $loader = new PhpFileLoader($containerBuilder, $fileLocator, $this->getEnvironment(), $configBuilderGenerator);
-        $loader->load('Resources/config/services.php');
 
-        // Get configuration.
+        // Load framework bundles.
+        $this->loadBundles($containerBuilder, $configBuilderGenerator);
+
+        // Load the kernel-specific services (Theme or Plugin I18n, etc.).
+        $this->loadKernelServices($containerBuilder, $configBuilderGenerator);
+
+        // Load the project's own services.
         $fileLocator = new FileLocator($this->getProjectDir());
         $loader = new PhpFileLoader($containerBuilder, $fileLocator, $this->getEnvironment(), $configBuilderGenerator);
         $loader->load('config/services.php');
     }
 
     /**
-     * @param ContainerBuilder $containerBuilder
-     *
-     * @return ContainerBuilder
+     * Load all registered framework bundles into the container.
      */
-    private function replaceResolveInstanceofConditionalsPass(ContainerBuilder $containerBuilder): ContainerBuilder
+    private function loadBundles(ContainerBuilder $containerBuilder, ?ConfigBuilderGenerator $configBuilderGenerator): void
     {
-        $beforeOptimizationPasses = $containerBuilder->getCompilerPassConfig()->getBeforeOptimizationPasses();
+        $bundles = $this->getBundles();
 
-        // Remove ResolveInstanceofConditionalsPass because of substr_replace() L97;
-        $beforeOptimizationPasses = array_filter(
-            $beforeOptimizationPasses,
-            function (CompilerPassInterface $compilerPass) {
-                return (get_class($compilerPass) !== ResolveInstanceofConditionalsPass::class);
-            }
-        );
-
-        $containerBuilder->getCompilerPassConfig()->setBeforeOptimizationPasses($beforeOptimizationPasses);
-        $containerBuilder->addCompilerPass(new ResolveInstanceOfConditionalPassWithVendorPrefix());
-
-        return $containerBuilder;
+        foreach ($bundles as $bundle) {
+            $fileLocator = new FileLocator($bundle['dir']);
+            $loader = new PhpFileLoader($containerBuilder, $fileLocator, $this->getEnvironment(), $configBuilderGenerator);
+            $loader->registerClasses(
+                $containerBuilder->register($bundle['namespace'])
+                    ->setAutowired(true)
+                    ->setAutoconfigured(true),
+                $bundle['namespace'],
+                $bundle['dir'] . '/*',
+                $bundle['dir'] . '/' . $bundle['exclude']
+            );
+        }
     }
 
+    /**
+     * Load kernel-specific services (I18n, etc.).
+     * Override in subclasses if the kernel has its own Resources/config/services.php.
+     */
+    protected function loadKernelServices(ContainerBuilder $containerBuilder, ?ConfigBuilderGenerator $configBuilderGenerator): void
+    {
+        // Default: no kernel-specific services. Override in AbstractKernel subclasses.
+    }
 }
