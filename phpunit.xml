@@ -60,6 +60,9 @@
             <directory>src/Security/Tests</directory>
             <directory>src/Security/TwoFactor/Tests</directory>
         </testsuite>
+        <testsuite name="performance">
+            <directory>src/Performance/Tests</directory>
+        </testsuite>
     </testsuites>
 
     <coverage cacheDirectory=".phpunit.cache/code-coverage">
