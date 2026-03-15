@@ -114,6 +114,11 @@ class CorsManager implements Hooks, SecurityRuleInterface, CorsManagerInterface
             return $headers;
         }
 
+        // Reject origins containing CRLF characters to prevent header injection
+        if (preg_match('/[\r\n]/', $requestOrigin) === 1) {
+            return $headers;
+        }
+
         $headers['Access-Control-Allow-Origin'] = $requestOrigin;
         $headers['Access-Control-Allow-Methods'] = implode(', ', $this->allowedMethods);
         $headers['Access-Control-Allow-Headers'] = implode(', ', $this->allowedHeaders);

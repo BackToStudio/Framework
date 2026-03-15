@@ -21,6 +21,8 @@ use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
  */
 class SecurityAuditLogger implements Hooks, SecurityRuleInterface
 {
+    use ClientIpTrait;
+
     private HookDispatcherInterface $hookDispatcher;
     private AuditLogRepositoryInterface $repository;
 
@@ -155,11 +157,6 @@ class SecurityAuditLogger implements Hooks, SecurityRuleInterface
     public function purgeOldEvents(int $olderThanDays = 90): int
     {
         return $this->repository->purge($olderThanDays);
-    }
-
-    protected function getClientIp(): string
-    {
-        return $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
     }
 
     private function sanitizeValue(mixed $value): string

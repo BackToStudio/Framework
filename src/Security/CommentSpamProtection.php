@@ -19,6 +19,8 @@ use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
  */
 class CommentSpamProtection implements Hooks, SecurityRuleInterface
 {
+    use ClientIpTrait;
+
     private HookDispatcherInterface $hookDispatcher;
     private LoggerInterface $logger;
 
@@ -188,11 +190,6 @@ class CommentSpamProtection implements Hooks, SecurityRuleInterface
     protected function getSiteHost(): string
     {
         return $_SERVER['HTTP_HOST'] ?? '';
-    }
-
-    protected function getClientIp(): string
-    {
-        return $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
     }
 
     protected function denyComment(string $message): void

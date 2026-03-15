@@ -58,15 +58,23 @@ class AuditLogAdminPage implements AdminPageInterface
         $offset = ($currentPage - 1) * $this->perPage;
 
         if ($this->isExportRequest()) {
-            $this->exportCsv($filters);
+            if (! $this->verifyNonce('backto_audit_export', '_export_nonce')) {
+                $this->renderNotice('Security check failed. Please try again.');
+            } else {
+                $this->exportCsv($filters);
 
-            return;
+                return;
+            }
         }
 
         if ($this->isPurgeRequest()) {
-            $days = $this->getPurgeDays();
-            $purged = $this->repository->purge($days);
-            $this->renderNotice('Purged ' . $purged . ' events older than ' . $days . ' days.');
+            if (! $this->verifyNonce('backto_audit_purge', '_purge_nonce')) {
+                $this->renderNotice('Security check failed. Please try again.');
+            } else {
+                $days = $this->getPurgeDays();
+                $purged = $this->repository->purge($days);
+                $this->renderNotice('Purged ' . $purged . ' events older than ' . $days . ' days.');
+            }
         }
 
         $events = $this->repository->getEvents($filters, $this->perPage, $offset);
@@ -202,11 +210,13 @@ class AuditLogAdminPage implements AdminPageInterface
         echo '<form method="get" style="display:inline;">';
         echo '<input type="hidden" name="page" value="backto-audit-log" />';
         echo '<input type="hidden" name="action" value="export" />';
+        $this->renderNonceField('backto_audit_export', '_export_nonce');
         echo '<button type="submit" class="button">Export CSV</button>';
         echo '</form> ';
 
         echo '<form method="post" style="display:inline;">';
         echo '<input type="hidden" name="action" value="purge" />';
+        $this->renderNonceField('backto_audit_purge', '_purge_nonce');
         echo '<label>Purge events older than <input type="number" name="days" value="90" min="1" max="365" style="width:60px;" /> days</label> ';
         echo '<button type="submit" class="button" onclick="return confirm(\'Are you sure?\');">Purge</button>';
         echo '</form>';
@@ -254,12 +264,21 @@ class AuditLogAdminPage implements AdminPageInterface
     {
         $filters = [];
 
-        if (isset($_GET['event']) && $_GET['event'] !== '') {
-            $filters['event'] = (string) $_GET['event'];
+        $allowedEvents = [
+            'login_success', 'login_failed', 'user_role_changed',
+            'critical_option_changed', 'plugin_activated', 'plugin_deactivated',
+            'theme_switched', 'user_created', 'user_deleted',
+            'self_promotion_blocked', 'privileged_role_granted',
+        ];
+
+        $event = (string) ($_GET['event'] ?? '');
+        if ($event !== '' && in_array($event, $allowedEvents, true)) {
+            $filters['event'] = $event;
         }
 
-        if (isset($_GET['severity']) && $_GET['severity'] !== '') {
-            $filters['severity'] = (string) $_GET['severity'];
+        $severity = (string) ($_GET['severity'] ?? '');
+        if ($severity !== '' && in_array($severity, ['info', 'warning', 'critical'], true)) {
+            $filters['severity'] = $severity;
         }
 
         return $filters;
@@ -307,6 +326,33 @@ class AuditLogAdminPage implements AdminPageInterface
     protected function openOutputStream()
     {
         return fopen('php://output', 'w');
+    }
+
+    protected function verifyNonce(string $action, string $queryArg): bool
+    {
+        $nonce = $_REQUEST[$queryArg] ?? '';
+
+        if (! is_string($nonce) || $nonce === '') {
+            return false;
+        }
+
+        return $this->wpVerifyNonce($nonce, $action);
+    }
+
+    protected function wpVerifyNonce(string $nonce, string $action): bool
+    {
+        if (function_exists('wp_verify_nonce')) {
+            return wp_verify_nonce($nonce, $action) !== false;
+        }
+
+        return false;
+    }
+
+    protected function renderNonceField(string $action, string $name): void
+    {
+        if (function_exists('wp_create_nonce')) {
+            echo '<input type="hidden" name="' . $this->escapeAttr($name) . '" value="' . $this->escapeAttr(wp_create_nonce($action)) . '" />';
+        }
     }
 
     protected function escapeAttr(string $value): string

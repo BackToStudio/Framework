@@ -43,14 +43,16 @@ class BackupCodeManager implements BackupCodeManagerInterface
     public function findMatchingIndex(string $code, array $hashedCodes): ?int
     {
         $normalized = $this->normalizeCode($code);
+        $matchedIndex = null;
 
+        // Iterate all codes to prevent timing side-channel leaks
         foreach ($hashedCodes as $index => $hashedCode) {
             if (password_verify($normalized, $hashedCode)) {
-                return $index;
+                $matchedIndex = $index;
             }
         }
 
-        return null;
+        return $matchedIndex;
     }
 
     private function generateSingleCode(): string

@@ -91,19 +91,21 @@ HTACCESS;
         ];
     }
 
-    protected function writeProtectionFile(string $path, string $content): void
+    protected function writeProtectionFile(string $path, string $content): bool
     {
         if (file_exists($path)) {
-            return;
+            return true;
         }
 
         $dir = dirname($path);
 
         if (!is_dir($dir)) {
-            return;
+            return false;
         }
 
-        file_put_contents($path, $content);
+        $result = file_put_contents($path, $content);
+
+        return $result !== false;
     }
 
     protected function getUploadDir(): ?string

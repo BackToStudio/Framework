@@ -20,6 +20,8 @@ use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
  */
 class CapabilityHardening implements Hooks, SecurityRuleInterface
 {
+    use ClientIpTrait;
+
     private HookDispatcherInterface $hookDispatcher;
     private LoggerInterface $logger;
     private AuditLogRepositoryInterface $auditLog;
@@ -190,11 +192,6 @@ class CapabilityHardening implements Hooks, SecurityRuleInterface
         }
 
         return 0;
-    }
-
-    protected function getClientIp(): string
-    {
-        return $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
     }
 
     /**

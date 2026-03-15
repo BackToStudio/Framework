@@ -17,6 +17,8 @@ use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
  */
 class RestApiRateLimiter implements Hooks, SecurityRuleInterface
 {
+    use ClientIpTrait;
+
     private HookDispatcherInterface $hookDispatcher;
     private RateLimiterRepositoryInterface $repository;
 
@@ -148,11 +150,6 @@ class RestApiRateLimiter implements Hooks, SecurityRuleInterface
         }
 
         return '/unknown';
-    }
-
-    protected function getClientIp(): string
-    {
-        return $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
     }
 
     protected function sendRateLimitHeaders(int $limit, int $hits, string $key): void

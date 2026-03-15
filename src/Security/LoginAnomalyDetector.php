@@ -20,6 +20,8 @@ use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
  */
 class LoginAnomalyDetector implements Hooks, SecurityRuleInterface
 {
+    use ClientIpTrait;
+
     private HookDispatcherInterface $hookDispatcher;
     private LoginLocationRepositoryInterface $repository;
     private LoggerInterface $logger;
@@ -122,11 +124,6 @@ class LoginAnomalyDetector implements Hooks, SecurityRuleInterface
         }
 
         return $anomalies;
-    }
-
-    protected function getClientIp(): string
-    {
-        return $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
     }
 
     protected function getUserAgent(): string

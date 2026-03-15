@@ -144,6 +144,8 @@ class FileIntegrityMonitor implements Hooks, SecurityRuleInterface
 
             if ($hash !== null) {
                 $hashes[$file] = $hash;
+            } else {
+                $this->logger->warning('Failed to hash file during integrity check', ['file' => $file]);
             }
         }
 
@@ -161,6 +163,13 @@ class FileIntegrityMonitor implements Hooks, SecurityRuleInterface
 
     protected function fileExists(string $path): bool
     {
+        // Reject symlinks to prevent directory traversal attacks
+        if (is_link($path)) {
+            $this->logger->info('Skipping symlink during integrity check', ['path' => $path]);
+
+            return false;
+        }
+
         return is_file($path) && is_readable($path);
     }
 

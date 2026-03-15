@@ -80,6 +80,16 @@ class TestableAuditLogAdminPage extends AuditLogAdminPage
     {
         echo '<div class="notice">' . htmlspecialchars($message, ENT_QUOTES, 'UTF-8') . '</div>';
     }
+
+    protected function verifyNonce(string $action, string $queryArg): bool
+    {
+        return true;
+    }
+
+    protected function renderNonceField(string $action, string $name): void
+    {
+        // No-op in tests
+    }
 }
 
 class AuditLogAdminPageTest extends TestCase

@@ -21,6 +21,8 @@ use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
  */
 class AdminUrlObfuscation implements Hooks, SecurityRuleInterface
 {
+    use ClientIpTrait;
+
     private HookDispatcherInterface $hookDispatcher;
     private LoggerInterface $logger;
 
@@ -144,11 +146,6 @@ class AdminUrlObfuscation implements Hooks, SecurityRuleInterface
     protected function getRequestUri(): string
     {
         return $_SERVER['REQUEST_URI'] ?? '';
-    }
-
-    protected function getClientIp(): string
-    {
-        return $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
     }
 
     protected function isLoggedIn(): bool

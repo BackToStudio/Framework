@@ -12,6 +12,8 @@ use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
 
 class LoginHardening implements Hooks, SecurityRuleInterface
 {
+    use ClientIpTrait;
+
     private HookDispatcherInterface $hookDispatcher;
     private LoginThrottleInterface $loginThrottle;
     private LoggerInterface $logger;
@@ -108,11 +110,6 @@ class LoginHardening implements Hooks, SecurityRuleInterface
             'ip' => $ip,
             'username' => $username,
         ]);
-    }
-
-    protected function getClientIp(): string
-    {
-        return $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
     }
 
     /**

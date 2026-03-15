@@ -22,6 +22,8 @@ use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
  */
 class SecurityNotifier implements Hooks, SecurityRuleInterface, SecurityNotifierInterface
 {
+    use ClientIpTrait;
+
     private HookDispatcherInterface $hookDispatcher;
 
     /** @var string[] */
@@ -227,11 +229,6 @@ class SecurityNotifier implements Hooks, SecurityRuleInterface, SecurityNotifier
         }
 
         return 'WordPress';
-    }
-
-    protected function getClientIp(): string
-    {
-        return $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
     }
 
     protected function sendEmail(string $to, string $subject, string $body): bool
