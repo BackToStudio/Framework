@@ -178,7 +178,7 @@ trait WordPressContainer
             if ($this->isDebug()) {
                 throw $e;
             }
-            \error_log(sprintf('[BackTo Framework] %s', $e->getMessage()));
+            \error_log(\sprintf('[BackTo Framework] %s in %s:%d', $e->getMessage(), $e->getFile(), $e->getLine()));
         }
     }
 

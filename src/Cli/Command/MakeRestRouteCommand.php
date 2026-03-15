@@ -27,7 +27,13 @@ class MakeRestRouteCommand extends AbstractMakeCommand
     {
         $replacements = parent::buildReplacements($name, $assocArgs);
 
-        $replacements['{{routeNamespace}}'] = $assocArgs['route-namespace'] ?? 'app/v1';
+        $routeNamespace = $assocArgs['route-namespace'] ?? 'app/v1';
+
+        if (!\preg_match('/^[a-z0-9_-]+\/[a-z0-9_-]+$/', $routeNamespace)) {
+            throw new \InvalidArgumentException('Invalid REST namespace: format must be namespace/version (e.g., app/v1).');
+        }
+
+        $replacements['{{routeNamespace}}'] = $routeNamespace;
         $replacements['{{route}}'] = '/' . \str_replace('_', '-', $replacements['{{key}}']);
 
         return $replacements;

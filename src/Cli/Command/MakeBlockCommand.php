@@ -28,6 +28,11 @@ class MakeBlockCommand extends AbstractMakeCommand
         $replacements = parent::buildReplacements($name, $assocArgs);
 
         $namespace = $assocArgs['block-namespace'] ?? 'custom';
+
+        if (!\preg_match('/^[a-z0-9_-]+$/', $namespace)) {
+            throw new \InvalidArgumentException('Invalid block namespace: use lowercase alphanumeric, hyphens, and underscores.');
+        }
+
         $replacements['{{name}}'] = $namespace . '/' . $replacements['{{key}}'];
 
         return $replacements;
