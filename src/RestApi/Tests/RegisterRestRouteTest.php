@@ -12,6 +12,24 @@ use BackTo\Framework\RestApi\RegisterRestRoute;
 use BackTo\Framework\RestApi\RestRouteRegistry;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * Testable subclass to control isUserLoggedIn().
+ */
+class TestableRegisterRestRoute extends RegisterRestRoute
+{
+    private bool $loggedIn = false;
+
+    public function setLoggedIn(bool $loggedIn): void
+    {
+        $this->loggedIn = $loggedIn;
+    }
+
+    protected function isUserLoggedIn(): bool
+    {
+        return $this->loggedIn;
+    }
+}
+
 class RegisterRestRouteTest extends TestCase
 {
     public function testImplementsHooks(): void
@@ -41,7 +59,7 @@ class RegisterRestRouteTest extends TestCase
         $register->hooks();
     }
 
-    public function testRegisterRoutesCallsRegistrar(): void
+    public function testRegisterRoutesUsesSecureDefaultPermission(): void
     {
         $route = $this->createMock(RestRouteInterface::class);
         $route->method('getNamespace')->willReturn('myplugin/v1');
@@ -60,7 +78,8 @@ class RegisterRestRouteTest extends TestCase
                 '/items',
                 $this->callback(function (array $args) {
                     return $args['methods'] === ['GET']
-                        && $args['permission_callback'] === '__return_true';
+                        && is_array($args['permission_callback'])
+                        && $args['permission_callback'][1] === 'requireAuthentication';
                 }),
             );
 
@@ -120,5 +139,29 @@ class RegisterRestRouteTest extends TestCase
         );
 
         $register->registerRoutes();
+    }
+
+    public function testRequireAuthenticationDeniesUnauthenticated(): void
+    {
+        $register = new TestableRegisterRestRoute(
+            new RestRouteRegistry(),
+            $this->createMock(RestRouteRegistrarInterface::class),
+            $this->createMock(HookDispatcherInterface::class),
+        );
+
+        $register->setLoggedIn(false);
+        $this->assertFalse($register->requireAuthentication());
+    }
+
+    public function testRequireAuthenticationAllowsAuthenticated(): void
+    {
+        $register = new TestableRegisterRestRoute(
+            new RestRouteRegistry(),
+            $this->createMock(RestRouteRegistrarInterface::class),
+            $this->createMock(HookDispatcherInterface::class),
+        );
+
+        $register->setLoggedIn(true);
+        $this->assertTrue($register->requireAuthentication());
     }
 }

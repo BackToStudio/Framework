@@ -98,6 +98,7 @@ class LoginHardeningTest extends TestCase
     public function testThrottleLoginReturnsUserWhenNotLocked(): void
     {
         $this->throttle->method('isLocked')->willReturn(false);
+        $this->throttle->method('isAccountLocked')->willReturn(false);
 
         $user = new \stdClass();
         $result = $this->rule->throttleLogin($user, 'admin', 'pass');
@@ -105,7 +106,7 @@ class LoginHardeningTest extends TestCase
         $this->assertSame($user, $result);
     }
 
-    public function testThrottleLoginReturnsErrorWhenLocked(): void
+    public function testThrottleLoginReturnsErrorWhenIpLocked(): void
     {
         $this->throttle->method('isLocked')->willReturn(true);
         $this->throttle->method('getLockoutRemainingSeconds')->willReturn(600);
@@ -118,18 +119,35 @@ class LoginHardeningTest extends TestCase
         $this->assertSame('too_many_attempts', $result->code);
     }
 
-    public function testOnLoginFailedRecordsAttempt(): void
+    public function testThrottleLoginReturnsErrorWhenAccountLocked(): void
+    {
+        $this->throttle->method('isLocked')->willReturn(false);
+        $this->throttle->method('isAccountLocked')->with('admin')->willReturn(true);
+        $this->throttle->method('getAccountLockoutRemainingSeconds')->with('admin')->willReturn(1200);
+
+        $this->logger->expects($this->once())->method('warning');
+
+        $result = $this->rule->throttleLogin(null, 'admin', 'pass');
+
+        $this->assertTrue($this->rule->wasLockoutErrorCreated());
+        $this->assertSame('too_many_attempts', $result->code);
+        $this->assertSame(1200, $result->remainingSeconds);
+    }
+
+    public function testOnLoginFailedRecordsIpAndAccountAttempt(): void
     {
         $this->throttle->expects($this->once())->method('recordFailedAttempt');
+        $this->throttle->expects($this->once())->method('recordFailedAccountAttempt')->with('admin');
         $this->throttle->method('getFailedAttempts')->willReturn(1);
         $this->logger->expects($this->once())->method('warning');
 
         $this->rule->onLoginFailed('admin');
     }
 
-    public function testOnLoginSuccessResetsThrottle(): void
+    public function testOnLoginSuccessResetsIpAndAccountThrottle(): void
     {
         $this->throttle->expects($this->once())->method('reset');
+        $this->throttle->expects($this->once())->method('resetAccount')->with('admin');
         $this->logger->expects($this->once())->method('info');
 
         $this->rule->onLoginSuccess('admin');

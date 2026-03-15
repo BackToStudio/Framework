@@ -55,7 +55,19 @@ class LoginHardening implements Hooks, SecurityRuleInterface
         if ($this->loginThrottle->isLocked($ip)) {
             $remaining = $this->loginThrottle->getLockoutRemainingSeconds($ip);
 
-            $this->logger->warning('Login attempt blocked (throttled)', [
+            $this->logger->warning('Login attempt blocked (IP throttled)', [
+                'ip' => $ip,
+                'username' => $username,
+                'remaining_seconds' => $remaining,
+            ]);
+
+            return $this->createLockoutError($remaining);
+        }
+
+        if ($this->loginThrottle->isAccountLocked($username)) {
+            $remaining = $this->loginThrottle->getAccountLockoutRemainingSeconds($username);
+
+            $this->logger->warning('Login attempt blocked (account throttled)', [
                 'ip' => $ip,
                 'username' => $username,
                 'remaining_seconds' => $remaining,
@@ -77,6 +89,7 @@ class LoginHardening implements Hooks, SecurityRuleInterface
         $ip = $this->getClientIp();
 
         $this->loginThrottle->recordFailedAttempt($ip);
+        $this->loginThrottle->recordFailedAccountAttempt($username);
 
         $this->logger->warning('Failed login attempt', [
             'ip' => $ip,
@@ -89,6 +102,7 @@ class LoginHardening implements Hooks, SecurityRuleInterface
     {
         $ip = $this->getClientIp();
         $this->loginThrottle->reset($ip);
+        $this->loginThrottle->resetAccount($username);
 
         $this->logger->info('Successful login', [
             'ip' => $ip,

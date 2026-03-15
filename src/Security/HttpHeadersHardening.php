@@ -38,6 +38,7 @@ class HttpHeadersHardening implements Hooks, SecurityRuleInterface
         header('X-Frame-Options: SAMEORIGIN');
         header('Referrer-Policy: strict-origin-when-cross-origin');
         header('Permissions-Policy: camera=(), microphone=(), geolocation=()');
+        header('Strict-Transport-Security: max-age=31536000; includeSubDomains; preload');
         header_remove('X-Powered-By');
     }
 }
