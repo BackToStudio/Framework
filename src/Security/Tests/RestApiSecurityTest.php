@@ -68,6 +68,12 @@ class RestApiSecurityTest extends TestCase
         $this->rule = new TestableRestApiSecurity($this->dispatcher);
     }
 
+    public function testConstructorAcceptsAdditionalPublicPatterns(): void
+    {
+        $rule = new RestApiSecurity($this->dispatcher, ['#^/custom/#']);
+        $this->assertInstanceOf(RestApiSecurity::class, $rule);
+    }
+
     public function testImplementsRequiredInterfaces(): void
     {
         $this->assertInstanceOf(Hooks::class, $this->rule);

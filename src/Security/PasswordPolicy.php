@@ -101,9 +101,9 @@ class PasswordPolicy implements Hooks, SecurityRuleInterface
             return $errors;
         }
 
-        $password = $_POST['pass1'] ?? '';
+        $password = $this->getRegistrationPassword();
 
-        if (!is_string($password) || $password === '') {
+        if ($password === '') {
             return $errors;
         }
 
@@ -119,5 +119,16 @@ class PasswordPolicy implements Hooks, SecurityRuleInterface
     public function getMinLength(): int
     {
         return $this->minLength;
+    }
+
+    protected function getRegistrationPassword(): string
+    {
+        $password = $_POST['pass1'] ?? '';
+
+        if (!is_string($password)) {
+            return '';
+        }
+
+        return $password;
     }
 }

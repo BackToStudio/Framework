@@ -16,6 +16,8 @@ class AuditLogAdminPage implements AdminPageInterface
 
     private const DEFAULT_PER_PAGE = 50;
     private const MENU_POSITION = 81;
+    private const EXPORT_LIMIT = 10000;
+    private const EXPORT_COOLDOWN_SECONDS = 60;
 
     private AuditLogRepositoryInterface $repository;
 
@@ -65,7 +67,10 @@ class AuditLogAdminPage implements AdminPageInterface
         if ($this->isExportRequest()) {
             if (! $this->verifyNonce('backto_audit_export', '_export_nonce')) {
                 $this->renderNotice('Security check failed. Please try again.');
+            } elseif (! $this->canExport()) {
+                $this->renderNotice('Please wait before exporting again.');
             } else {
+                $this->markExported();
                 $this->exportCsv($filters);
 
                 return;
@@ -234,7 +239,7 @@ class AuditLogAdminPage implements AdminPageInterface
      */
     public function exportCsv(array $filters): void
     {
-        $events = $this->repository->getEvents($filters, 10000, 0);
+        $events = $this->repository->getEvents($filters, self::EXPORT_LIMIT, 0);
 
         $this->sendCsvHeaders();
 
@@ -360,4 +365,19 @@ class AuditLogAdminPage implements AdminPageInterface
         }
     }
 
+    protected function canExport(): bool
+    {
+        if (!function_exists('get_transient')) {
+            return true;
+        }
+
+        return get_transient('backto_audit_export_lock') === false;
+    }
+
+    protected function markExported(): void
+    {
+        if (function_exists('set_transient')) {
+            set_transient('backto_audit_export_lock', '1', self::EXPORT_COOLDOWN_SECONDS);
+        }
+    }
 }

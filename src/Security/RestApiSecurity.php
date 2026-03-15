@@ -12,9 +12,16 @@ class RestApiSecurity implements Hooks, SecurityRuleInterface
 {
     private HookDispatcherInterface $hookDispatcher;
 
-    public function __construct(HookDispatcherInterface $hookDispatcher)
+    /** @var string[] */
+    private array $additionalPublicPatterns;
+
+    /**
+     * @param string[] $additionalPublicPatterns Extra regex patterns for public routes.
+     */
+    public function __construct(HookDispatcherInterface $hookDispatcher, array $additionalPublicPatterns = [])
     {
         $this->hookDispatcher = $hookDispatcher;
+        $this->additionalPublicPatterns = $additionalPublicPatterns;
     }
 
     public function getName(): string
@@ -78,10 +85,10 @@ class RestApiSecurity implements Hooks, SecurityRuleInterface
      */
     protected function getPublicRoutePatterns(): array
     {
-        return [
+        return array_merge([
             '#^/oembed/#',
             '#^/wp-site-health/#',
-        ];
+        ], $this->additionalPublicPatterns);
     }
 
     protected function isPublicRoute(): bool
