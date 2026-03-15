@@ -11,8 +11,4 @@ class InvalidTaxonomyException extends FrameworkException
         return new self('WordPress requires a taxonomy key.');
     }
 
-    public static function emptyPostTypes(): self
-    {
-        return new self('Taxonomy requires at least one associated post type.');
-    }
 }
