@@ -72,6 +72,11 @@ class PerformanceExtension implements ExtensionInterface
 
             // Database cleanup
             'framework.performance.db_cleanup.revisions_limit' => 5,
+
+            // Cache preloading
+            'framework.performance.cache_preload.enabled' => true,
+            'framework.performance.cache_preload.delay' => 5,
+            'framework.performance.cache_preload.batch_size' => 50,
         ];
     }
 
