@@ -1,0 +1,38 @@
+{
+    "name": "backto/compose",
+    "description": "Core kernel, DI container and service configuration for the BackTo Framework",
+    "type": "library",
+    "license": "proprietary",
+    "authors": [
+        {
+            "name": "Florian Truchot",
+            "email": "florian@truchot.co"
+        }
+    ],
+    "require": {
+        "php": ">=8.2",
+        "backto/contracts": "^1.0",
+        "backto/hooks": "^1.0",
+        "backto/admin": "^1.0",
+        "backto/assets": "^1.0",
+        "backto/blocks": "^1.0",
+        "backto/observability": "^1.0",
+        "backto/options": "^1.0",
+        "backto/post-meta": "^1.0",
+        "backto/post-type": "^1.0",
+        "backto/rest-api": "^1.0",
+        "backto/security": "^1.0",
+        "backto/taxonomy": "^1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "BackTo\\Framework\\Compose\\": ""
+        }
+    },
+    "minimum-stability": "stable",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0-dev"
+        }
+    }
+}

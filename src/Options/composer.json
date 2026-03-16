@@ -1,0 +1,26 @@
+{
+    "name": "backto/options",
+    "description": "WordPress options management for the BackTo Framework",
+    "type": "library",
+    "license": "proprietary",
+    "authors": [
+        {
+            "name": "Florian Truchot",
+            "email": "florian@truchot.co"
+        }
+    ],
+    "require": {
+        "php": ">=8.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "BackTo\\Framework\\Options\\": ""
+        }
+    },
+    "minimum-stability": "stable",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0-dev"
+        }
+    }
+}

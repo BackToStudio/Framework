@@ -1,0 +1,29 @@
+{
+    "name": "backto/observability",
+    "description": "Error handling, health checks and performance monitoring for the BackTo Framework",
+    "type": "library",
+    "license": "proprietary",
+    "authors": [
+        {
+            "name": "Florian Truchot",
+            "email": "florian@truchot.co"
+        }
+    ],
+    "require": {
+        "php": ">=8.2",
+        "backto/contracts": "^1.0",
+        "backto/cache": "^1.0",
+        "backto/compose": "^1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "BackTo\\Framework\\Observability\\": ""
+        }
+    },
+    "minimum-stability": "stable",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0-dev"
+        }
+    }
+}
