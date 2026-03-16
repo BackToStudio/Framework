@@ -1,0 +1,88 @@
+name: Split Packages
+
+on:
+    push:
+        branches:
+            - master
+        tags:
+            - '*'
+
+jobs:
+    split:
+        runs-on: ubuntu-latest
+        strategy:
+            fail-fast: false
+            matrix:
+                package:
+                    - name: 'Admin'
+                      local_path: 'src/Admin'
+                      split_repository: 'backto/admin'
+                    - name: 'Assets'
+                      local_path: 'src/Assets'
+                      split_repository: 'backto/assets'
+                    - name: 'Blocks'
+                      local_path: 'src/Blocks'
+                      split_repository: 'backto/blocks'
+                    - name: 'Cache'
+                      local_path: 'src/Cache'
+                      split_repository: 'backto/cache'
+                    - name: 'Cli'
+                      local_path: 'src/Cli'
+                      split_repository: 'backto/cli'
+                    - name: 'Compose'
+                      local_path: 'src/Compose'
+                      split_repository: 'backto/compose'
+                    - name: 'Contracts'
+                      local_path: 'src/Contracts'
+                      split_repository: 'backto/contracts'
+                    - name: 'Exception'
+                      local_path: 'src/Exception'
+                      split_repository: 'backto/exception'
+                    - name: 'Hooks'
+                      local_path: 'src/Hooks'
+                      split_repository: 'backto/hooks'
+                    - name: 'Observability'
+                      local_path: 'src/Observability'
+                      split_repository: 'backto/observability'
+                    - name: 'Options'
+                      local_path: 'src/Options'
+                      split_repository: 'backto/options'
+                    - name: 'Plugin'
+                      local_path: 'src/Plugin'
+                      split_repository: 'backto/plugin'
+                    - name: 'PostMeta'
+                      local_path: 'src/PostMeta'
+                      split_repository: 'backto/post-meta'
+                    - name: 'PostType'
+                      local_path: 'src/PostType'
+                      split_repository: 'backto/post-type'
+                    - name: 'RestApi'
+                      local_path: 'src/RestApi'
+                      split_repository: 'backto/rest-api'
+                    - name: 'Security'
+                      local_path: 'src/Security'
+                      split_repository: 'backto/security'
+                    - name: 'Seo'
+                      local_path: 'src/Seo'
+                      split_repository: 'backto/seo'
+                    - name: 'Taxonomy'
+                      local_path: 'src/Taxonomy'
+                      split_repository: 'backto/taxonomy'
+                    - name: 'Theme'
+                      local_path: 'src/Theme'
+                      split_repository: 'backto/theme'
+
+        name: Split ${{ matrix.package.name }}
+
+        steps:
+            -   uses: actions/checkout@v4
+                with:
+                    fetch-depth: 0
+
+            -   name: Split and push ${{ matrix.package.name }}
+                uses: claudiodekker/splitsh-action@v1
+                env:
+                    GITHUB_TOKEN: ${{ secrets.SPLIT_TOKEN }}
+                with:
+                    source: ${{ matrix.package.local_path }}
+                    target: ${{ matrix.package.split_repository }}

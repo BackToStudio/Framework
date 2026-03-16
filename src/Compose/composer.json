@@ -1,0 +1,42 @@
+{
+    "name": "backto/compose",
+    "description": "Core kernel, DI container and service configuration for the BackTo Framework",
+    "type": "library",
+    "license": "proprietary",
+    "authors": [
+        {
+            "name": "Florian Truchot",
+            "email": "florian@truchot.co"
+        }
+    ],
+    "require": {
+        "php": ">=8.2",
+        "backto/contracts": "^1.0"
+    },
+    "suggest": {
+        "backto/hooks": "Hook dispatcher and registration",
+        "backto/admin": "Admin page management",
+        "backto/assets": "Asset handling (SVG, scripts, styles)",
+        "backto/blocks": "Custom block registration",
+        "backto/cache": "Caching strategies",
+        "backto/observability": "Error handling, logging, health checks",
+        "backto/options": "WordPress options management",
+        "backto/post-meta": "Post meta field management",
+        "backto/post-type": "Custom post type registration",
+        "backto/rest-api": "REST route registration",
+        "backto/security": "Security hardening, 2FA, CSP, CORS",
+        "backto/seo": "SEO plugin integrations",
+        "backto/taxonomy": "Custom taxonomy registration"
+    },
+    "autoload": {
+        "psr-4": {
+            "BackTo\\Framework\\Compose\\": ""
+        }
+    },
+    "minimum-stability": "stable",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0-dev"
+        }
+    }
+}

@@ -1,0 +1,30 @@
+{
+    "name": "backto/plugin",
+    "description": "Plugin kernel and i18n for the BackTo Framework",
+    "type": "library",
+    "license": "proprietary",
+    "authors": [
+        {
+            "name": "Florian Truchot",
+            "email": "florian@truchot.co"
+        }
+    ],
+    "require": {
+        "php": ">=8.2",
+        "backto/contracts": "^1.0",
+        "backto/compose": "^1.0",
+        "backto/hooks": "^1.0",
+        "backto/theme": "^1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "BackTo\\Framework\\Plugin\\": ""
+        }
+    },
+    "minimum-stability": "stable",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0-dev"
+        }
+    }
+}
