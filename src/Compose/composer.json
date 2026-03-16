@@ -11,18 +11,22 @@
     ],
     "require": {
         "php": ">=8.2",
-        "backto/contracts": "^1.0",
-        "backto/hooks": "^1.0",
-        "backto/admin": "^1.0",
-        "backto/assets": "^1.0",
-        "backto/blocks": "^1.0",
-        "backto/observability": "^1.0",
-        "backto/options": "^1.0",
-        "backto/post-meta": "^1.0",
-        "backto/post-type": "^1.0",
-        "backto/rest-api": "^1.0",
-        "backto/security": "^1.0",
-        "backto/taxonomy": "^1.0"
+        "backto/contracts": "^1.0"
+    },
+    "suggest": {
+        "backto/hooks": "Hook dispatcher and registration",
+        "backto/admin": "Admin page management",
+        "backto/assets": "Asset handling (SVG, scripts, styles)",
+        "backto/blocks": "Custom block registration",
+        "backto/cache": "Caching strategies",
+        "backto/observability": "Error handling, logging, health checks",
+        "backto/options": "WordPress options management",
+        "backto/post-meta": "Post meta field management",
+        "backto/post-type": "Custom post type registration",
+        "backto/rest-api": "REST route registration",
+        "backto/security": "Security hardening, 2FA, CSP, CORS",
+        "backto/seo": "SEO plugin integrations",
+        "backto/taxonomy": "Custom taxonomy registration"
     },
     "autoload": {
         "psr-4": {

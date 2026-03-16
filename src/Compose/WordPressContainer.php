@@ -4,12 +4,29 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Compose;
 
-use BackTo\Framework\Compose\DependencyInjection\WordPressExtension;
+use BackTo\Framework\Admin\AdminExtension;
+use BackTo\Framework\Assets\AssetsExtension;
+use BackTo\Framework\Blocks\BlocksExtension;
+use BackTo\Framework\Cache\CacheExtension;
+use BackTo\Framework\Compose\DependencyInjection\Compiler\ResolveInstanceOfConditionalPassWithVendorPrefix;
+use BackTo\Framework\Contracts\ExtensionInterface;
+use BackTo\Framework\Contracts\RegistryInterface;
+use BackTo\Framework\Hooks\HooksExtension;
+use BackTo\Framework\Hooks\HookRegistry;
+use BackTo\Framework\Observability\ObservabilityExtension;
+use BackTo\Framework\Options\OptionsExtension;
+use BackTo\Framework\PostMeta\PostMetaExtension;
+use BackTo\Framework\PostType\PostTypeExtension;
+use BackTo\Framework\RestApi\RestApiExtension;
+use BackTo\Framework\Security\SecurityExtension;
+use BackTo\Framework\Seo\SeoExtension;
+use BackTo\Framework\Taxonomy\TaxonomyExtension;
 use Exception;
 use LogicException;
 use ReflectionObject;
-use BackTo\Framework\Hooks\HookRegistry;
 use BackToVendor\Symfony\Component\Config\Builder\ConfigBuilderGenerator;
+use BackToVendor\Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use BackToVendor\Symfony\Component\DependencyInjection\Compiler\ResolveInstanceofConditionalsPass;
 use BackToVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
 use BackToVendor\Symfony\Component\DependencyInjection\ContainerInterface;
 use BackToVendor\Symfony\Component\DependencyInjection\Dumper\PhpDumper;
@@ -182,93 +199,94 @@ trait WordPressContainer
         }
     }
 
+    /**
+     * Return the extensions to load into the container.
+     *
+     * Override this method in your kernel to compose only the modules you need:
+     *
+     *     protected function getExtensions(): array
+     *     {
+     *         return [
+     *             new HooksExtension(),
+     *             new SecurityExtension(),
+     *         ];
+     *     }
+     *
+     * @return ExtensionInterface[]
+     */
+    protected function getExtensions(): array
+    {
+        return [
+            new HooksExtension(),
+            new AssetsExtension(),
+            new BlocksExtension(),
+            new PostTypeExtension(),
+            new TaxonomyExtension(),
+            new PostMetaExtension(),
+            new CacheExtension(),
+            new SeoExtension(),
+            new AdminExtension(),
+            new OptionsExtension(),
+            new RestApiExtension(),
+            new ObservabilityExtension(),
+            new SecurityExtension(),
+        ];
+    }
+
+    /**
+     * Configure the DI container using registered extensions.
+     */
     protected function configureWordPressContainer(ContainerBuilder $containerBuilder): ContainerBuilder
     {
-        $extension = new WordPressExtension();
-        $extension->configure($containerBuilder);
+        $this->replaceResolveInstanceofConditionalsPass($containerBuilder);
+
+        // Core autoconfiguration (Compose-level concern).
+        $containerBuilder->registerForAutoconfiguration(RegistryInterface::class)
+            ->setPublic(true);
+
+        // Register each extension.
+        foreach ($this->getExtensions() as $extension) {
+            // Apply default configuration parameters.
+            foreach ($extension->getDefaultConfiguration() as $key => $value) {
+                if (!$containerBuilder->hasParameter($key)) {
+                    $containerBuilder->setParameter($key, $value);
+                }
+            }
+
+            // Register compiler passes, autoconfiguration, and port bindings.
+            $extension->register($containerBuilder);
+        }
 
         return $containerBuilder;
     }
 
     /**
-     * Return the service bundle directories to load.
+     * Return the service bundle directories to load, derived from extensions.
      *
      * @return array<array{dir: string, namespace: string, exclude: string}>
      */
     protected function getBundles(): array
     {
-        return [
-            [
-                'dir' => dirname(__DIR__) . '/Assets',
-                'namespace' => 'BackTo\\Framework\\Assets\\',
-                'exclude' => '{DependencyInjection,Entity,Tests,Contracts,Infrastructure}',
-            ],
-            [
-                'dir' => dirname(__DIR__) . '/Hooks',
-                'namespace' => 'BackTo\\Framework\\Hooks\\',
-                'exclude' => '{DependencyInjection,Entity,Tests,Contracts,Infrastructure}',
-            ],
-            [
-                'dir' => dirname(__DIR__) . '/Blocks',
-                'namespace' => 'BackTo\\Framework\\Blocks\\',
-                'exclude' => '{DependencyInjection,Entity,Tests,Contracts,Infrastructure}',
-            ],
-            [
-                'dir' => dirname(__DIR__) . '/PostType',
-                'namespace' => 'BackTo\\Framework\\PostType\\',
-                'exclude' => '{DependencyInjection,Entity,Tests,Contracts,Infrastructure}',
-            ],
-            [
-                'dir' => dirname(__DIR__) . '/Taxonomy',
-                'namespace' => 'BackTo\\Framework\\Taxonomy\\',
-                'exclude' => '{DependencyInjection,Entity,Tests,Contracts,Infrastructure}',
-            ],
-            [
-                'dir' => dirname(__DIR__) . '/PostMeta',
-                'namespace' => 'BackTo\\Framework\\PostMeta\\',
-                'exclude' => '{DependencyInjection,Entity,Tests,Contracts,Infrastructure}',
-            ],
-            [
-                'dir' => dirname(__DIR__) . '/Cache',
-                'namespace' => 'BackTo\\Framework\\Cache\\',
-                'exclude' => '{Tests,Contracts}',
-            ],
-            [
-                'dir' => dirname(__DIR__) . '/Seo',
-                'namespace' => 'BackTo\\Framework\\Seo\\',
-                'exclude' => '{Tests,Contracts}',
-            ],
-            [
-                'dir' => dirname(__DIR__) . '/Admin',
-                'namespace' => 'BackTo\\Framework\\Admin\\',
-                'exclude' => '{DependencyInjection,Tests,Contracts,Infrastructure}',
-            ],
-            [
-                'dir' => dirname(__DIR__) . '/Options',
-                'namespace' => 'BackTo\\Framework\\Options\\',
-                'exclude' => '{Tests,Contracts,Infrastructure}',
-            ],
-            [
-                'dir' => dirname(__DIR__) . '/RestApi',
-                'namespace' => 'BackTo\\Framework\\RestApi\\',
-                'exclude' => '{DependencyInjection,Tests,Contracts,Infrastructure}',
-            ],
-            [
-                'dir' => dirname(__DIR__) . '/Observability',
-                'namespace' => 'BackTo\\Framework\\Observability\\',
-                'exclude' => '{DependencyInjection,Tests,Contracts,Infrastructure,HealthCheck}',
-            ],
-            [
-                'dir' => dirname(__DIR__) . '/Security',
-                'namespace' => 'BackTo\\Framework\\Security\\',
-                'exclude' => '{DependencyInjection,Tests,Contracts,Infrastructure,HealthCheck,TwoFactor}',
-            ],
-            [
-                'dir' => dirname(__DIR__) . '/Security/TwoFactor',
-                'namespace' => 'BackTo\\Framework\\Security\\TwoFactor\\',
-                'exclude' => '{Contracts,Infrastructure,Tests}',
-            ],
-        ];
+        $bundles = [];
+
+        foreach ($this->getExtensions() as $extension) {
+            // Extensions with multiple bundles (e.g., Security + TwoFactor).
+            if (method_exists($extension, 'getBundles')) {
+                /** @var array<array{dir: string, namespace: string, exclude: string}> $extensionBundles */
+                $extensionBundles = $extension->getBundles();
+                foreach ($extensionBundles as $bundle) {
+                    $bundles[] = $bundle;
+                }
+                continue;
+            }
+
+            $bundle = $extension->getBundle();
+            if ($bundle !== null) {
+                $bundles[] = $bundle;
+            }
+        }
+
+        return $bundles;
     }
 
     /**
@@ -307,5 +325,20 @@ trait WordPressContainer
     protected function loadKernelServices(ContainerBuilder $containerBuilder, ConfigBuilderGenerator $configBuilderGenerator): void
     {
         // Default: no kernel-specific services. Override in AbstractKernel subclasses.
+    }
+
+    private function replaceResolveInstanceofConditionalsPass(ContainerBuilder $containerBuilder): void
+    {
+        $beforeOptimizationPasses = $containerBuilder->getCompilerPassConfig()->getBeforeOptimizationPasses();
+
+        $beforeOptimizationPasses = array_filter(
+            $beforeOptimizationPasses,
+            function (CompilerPassInterface $compilerPass) {
+                return (\get_class($compilerPass) !== ResolveInstanceofConditionalsPass::class);
+            }
+        );
+
+        $containerBuilder->getCompilerPassConfig()->setBeforeOptimizationPasses($beforeOptimizationPasses);
+        $containerBuilder->addCompilerPass(new ResolveInstanceOfConditionalPassWithVendorPrefix());
     }
 }
