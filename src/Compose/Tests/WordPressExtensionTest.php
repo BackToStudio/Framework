@@ -113,7 +113,7 @@ class WordPressExtensionTest extends TestCase
 
         // Autoconfiguration registered
         $autoconfigured = $this->containerBuilder->getAutoconfiguredInstanceof();
-        $this->assertCount(10, $autoconfigured);
+        $this->assertCount(11, $autoconfigured);
 
         // Compiler passes registered
         $passes = $this->containerBuilder->getCompilerPassConfig()->getBeforeOptimizationPasses();

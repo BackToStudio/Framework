@@ -29,6 +29,23 @@ class RegisterRestRoute implements Hooks
         $this->hookDispatcher->addAction('rest_api_init', [$this, 'registerRoutes']);
     }
 
+    protected function isUserLoggedIn(): bool
+    {
+        if (function_exists('is_user_logged_in')) {
+            return is_user_logged_in();
+        }
+
+        return false;
+    }
+
+    /**
+     * Default permission callback: require authenticated user.
+     */
+    public function requireAuthentication(): bool
+    {
+        return $this->isUserLoggedIn();
+    }
+
     public function registerRoutes(): void
     {
         foreach ($this->registry->getRoutes() as $route) {
@@ -41,7 +58,7 @@ class RegisterRestRoute implements Hooks
             if ($permissionCallback !== null) {
                 $args['permission_callback'] = $permissionCallback;
             } else {
-                $args['permission_callback'] = '__return_true';
+                $args['permission_callback'] = [$this, 'requireAuthentication'];
             }
 
             $this->registrar->register(
