@@ -18,6 +18,7 @@ use BackTo\Framework\Options\OptionsExtension;
 use BackTo\Framework\PostMeta\PostMetaExtension;
 use BackTo\Framework\PostType\PostTypeExtension;
 use BackTo\Framework\RestApi\RestApiExtension;
+use BackTo\Framework\Gdpr\GdprExtension;
 use BackTo\Framework\Security\SecurityExtension;
 use BackTo\Framework\Seo\SeoExtension;
 use BackTo\Framework\Taxonomy\TaxonomyExtension;
@@ -230,6 +231,7 @@ trait WordPressContainer
             new RestApiExtension(),
             new ObservabilityExtension(),
             new SecurityExtension(),
+            new GdprExtension(),
         ];
     }
 

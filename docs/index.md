@@ -26,6 +26,7 @@ Practical guides for accomplishing specific tasks.
 - [How to use WP-CLI scaffolding](how-to/use-cli-scaffolding.md)
 - [How to use the observability module](how-to/use-observability.md)
 - [How to debug with Query Monitor](how-to/debug-with-query-monitor.md)
+- [How to manage GDPR consent and tracking scripts](how-to/manage-gdpr-consent.md)
 
 ## Reference
 
@@ -44,3 +45,4 @@ Background, design decisions, and conceptual understanding.
 - [Why a WordPress framework?](explanation/why-a-framework.md)
 - [Clean Architecture and DDD in WordPress](explanation/clean-architecture.md)
 - [Vendor scoping with php-scoper](explanation/vendor-scoping.md)
+- [GDPR consent management design](explanation/gdpr-consent-design.md)
