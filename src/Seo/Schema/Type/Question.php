@@ -1,0 +1,36 @@
+<?php
+
+declare(strict_types=1);
+
+namespace BackTo\Framework\Seo\Schema\Type;
+
+use BackTo\Framework\Seo\Schema\SchemaType;
+
+class Question extends SchemaType
+{
+    public function __construct()
+    {
+        parent::__construct('Question');
+    }
+
+    /** @return $this */
+    public function name(string $question): static
+    {
+        return $this->set('name', $question);
+    }
+
+    /** @return $this */
+    public function acceptedAnswer(SchemaType $answer): static
+    {
+        return $this->set('acceptedAnswer', $answer);
+    }
+
+    /**
+     * @param SchemaType[] $answers
+     * @return $this
+     */
+    public function suggestedAnswer(array $answers): static
+    {
+        return $this->set('suggestedAnswer', $answers);
+    }
+}

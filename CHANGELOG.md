@@ -8,6 +8,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **SEO Schema**: `SchemaRef` value object for `@id` cross-referencing between nodes in a JSON-LD `@graph`
+- **SEO Schema**: `Schema::ref()` factory method for creating `@id` references
+- **SEO Schema**: `SchemaType::id()` method to set `@id` on any schema node
+- **SEO Schema**: Schema validation with `validate()` and `isValid()` methods — checks required properties per Google's rich results guidelines for Article, Product, Event, Course, JobPosting, VideoObject, FAQPage, Review, LocalBusiness, Offer
+- **SEO Schema**: `SchemaManager::validate()` to validate all registered schemas at once
+- **SEO Schema**: `PostTypeSchemaResolver` for mapping custom post types to schema generators
+- **SEO Schema**: `SeoConfig` class to load schema configuration from `config/seo.php` (post type map, disable plugin schema)
+- **SEO Schema**: Built-in generators (WebSite, Organization, Article) now use `@id` linking and `Schema::ref()` for a connected graph
+- **Documentation**: Schema structured data sections in SEO how-to and reference docs
 - **Admin module**: `AdminPageInterface`, `AdminPageRegistry`, `RegisterAdminPage` orchestrator, `WordPressAdminPageRegistrar` adapter
 - **Options module**: `OptionsRepositoryInterface` port with `WordPressOptionsRepository` adapter
 - **REST API module**: `RestRouteInterface`, `RestRouteRegistry`, `RegisterRestRoute` orchestrator, `WordPressRestRouteRegistrar` adapter

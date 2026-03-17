@@ -1,0 +1,33 @@
+<?php
+
+declare(strict_types=1);
+
+namespace BackTo\Framework\Seo\Schema\Type;
+
+use BackTo\Framework\Seo\Schema\SchemaType;
+
+class ListItem extends SchemaType
+{
+    public function __construct()
+    {
+        parent::__construct('ListItem');
+    }
+
+    /** @return $this */
+    public function position(int $position): static
+    {
+        return $this->set('position', $position);
+    }
+
+    /** @return $this */
+    public function name(string $name): static
+    {
+        return $this->set('name', $name);
+    }
+
+    /** @return $this */
+    public function url(string $url): static
+    {
+        return $this->set('item', $url);
+    }
+}

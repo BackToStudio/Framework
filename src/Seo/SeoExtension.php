@@ -14,7 +14,7 @@ class SeoExtension implements ExtensionInterface
         return [
             'dir' => __DIR__,
             'namespace' => 'BackTo\\Framework\\Seo\\',
-            'exclude' => '{Tests,Contracts}',
+            'exclude' => '{Tests,Contracts,Schema/Type,Schema/SchemaType.php,Schema/SchemaRef.php}',
         ];
     }
 
