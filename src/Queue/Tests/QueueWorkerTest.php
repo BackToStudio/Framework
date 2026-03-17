@@ -163,4 +163,178 @@ class QueueWorkerTest extends TestCase
 
         $this->assertSame(3, $processed);
     }
+
+    public function testProcessQueueReschedulesRecurringJob(): void
+    {
+        $handler = $this->createMock(JobInterface::class);
+        $handler->method('getKey')->willReturn('recurring_job');
+        $handler->method('getLabel')->willReturn('Recurring Job');
+        $handler->method('getGroup')->willReturn('default');
+        $handler->method('getMaxRetries')->willReturn(3);
+
+        $this->registry->add($handler);
+
+        $job = new Job();
+        $job->setId(1)
+            ->setKey('recurring_job')
+            ->setGroup('sync')
+            ->setPayload(['source' => 'api'])
+            ->setStatus(JobStatus::Running)
+            ->setMaxRetries(3)
+            ->setIntervalSeconds(3600);
+
+        $this->repository->method('claimNextPending')
+            ->willReturnOnConsecutiveCalls($job, null);
+
+        $this->repository->expects($this->once())->method('markCompleted')->with(1);
+
+        // Should enqueue a new job for the next recurrence.
+        $this->repository->expects($this->once())
+            ->method('enqueue')
+            ->with($this->callback(function (Job $newJob): bool {
+                return $newJob->getKey() === 'recurring_job'
+                    && $newJob->getGroup() === 'sync'
+                    && $newJob->getPayload() === ['source' => 'api']
+                    && $newJob->getIntervalSeconds() === 3600
+                    && $newJob->isRecurring();
+            }));
+
+        $this->worker->processQueue();
+    }
+
+    public function testProcessQueueDoesNotRescheduleNonRecurringJob(): void
+    {
+        $handler = $this->createMock(JobInterface::class);
+        $handler->method('getKey')->willReturn('one_off_job');
+        $handler->method('getLabel')->willReturn('One Off Job');
+        $handler->method('getGroup')->willReturn('default');
+        $handler->method('getMaxRetries')->willReturn(3);
+
+        $this->registry->add($handler);
+
+        $job = new Job();
+        $job->setId(1)
+            ->setKey('one_off_job')
+            ->setStatus(JobStatus::Running)
+            ->setIntervalSeconds(0);
+
+        $this->repository->method('claimNextPending')
+            ->willReturnOnConsecutiveCalls($job, null);
+
+        $this->repository->expects($this->once())->method('markCompleted')->with(1);
+        $this->repository->expects($this->never())->method('enqueue');
+
+        $this->worker->processQueue();
+    }
+
+    public function testProcessQueueDoesNotRescheduleFailedRecurringJob(): void
+    {
+        $handler = $this->createMock(JobInterface::class);
+        $handler->method('getKey')->willReturn('recurring_fail');
+        $handler->method('getLabel')->willReturn('Recurring Fail');
+        $handler->method('getGroup')->willReturn('default');
+        $handler->method('getMaxRetries')->willReturn(1);
+        $handler->method('handle')->willThrowException(new \RuntimeException('Crash'));
+
+        $this->registry->add($handler);
+
+        $job = new Job();
+        $job->setId(1)
+            ->setKey('recurring_fail')
+            ->setStatus(JobStatus::Running)
+            ->setMaxRetries(1)
+            ->setAttempts(0)
+            ->setIntervalSeconds(600);
+
+        $exhaustedJob = new Job();
+        $exhaustedJob->setId(1)
+            ->setKey('recurring_fail')
+            ->setStatus(JobStatus::Failed)
+            ->setMaxRetries(1)
+            ->setAttempts(1)
+            ->setIntervalSeconds(600);
+
+        $this->repository->method('claimNextPending')
+            ->willReturnOnConsecutiveCalls($job, null);
+
+        $this->repository->method('find')->with(1)->willReturn($exhaustedJob);
+
+        // Should not enqueue a rescheduled job since it failed.
+        $this->repository->expects($this->never())->method('enqueue');
+        $this->repository->expects($this->once())->method('markFailed');
+
+        $this->worker->processQueue();
+    }
+
+    public function testProcessQueuePassesPayloadToHandler(): void
+    {
+        $receivedPayload = null;
+
+        $handler = $this->createMock(JobInterface::class);
+        $handler->method('getKey')->willReturn('payload_job');
+        $handler->method('getLabel')->willReturn('Payload Job');
+        $handler->method('getGroup')->willReturn('default');
+        $handler->method('getMaxRetries')->willReturn(3);
+        $handler->method('handle')->willReturnCallback(function (array $payload) use (&$receivedPayload) {
+            $receivedPayload = $payload;
+        });
+
+        $this->registry->add($handler);
+
+        $expectedPayload = ['email' => 'test@example.com', 'template' => 'welcome'];
+
+        $job = new Job();
+        $job->setId(1)->setKey('payload_job')->setStatus(JobStatus::Running)->setPayload($expectedPayload);
+
+        $this->repository->method('claimNextPending')
+            ->willReturnOnConsecutiveCalls($job, null);
+
+        $this->worker->processQueue();
+
+        $this->assertSame($expectedPayload, $receivedPayload);
+    }
+
+    public function testProcessQueueWithSpecificGroup(): void
+    {
+        $handler = $this->createMock(JobInterface::class);
+        $handler->method('getKey')->willReturn('group_job');
+        $handler->method('getLabel')->willReturn('Group Job');
+        $handler->method('getGroup')->willReturn('emails');
+        $handler->method('getMaxRetries')->willReturn(3);
+
+        $this->registry->add($handler);
+
+        $this->repository->expects($this->once())
+            ->method('claimNextPending')
+            ->with('emails')
+            ->willReturn(null);
+
+        $this->worker->processQueue('emails');
+    }
+
+    public function testProcessQueueHandlesFailureWhenFindReturnsNull(): void
+    {
+        $handler = $this->createMock(JobInterface::class);
+        $handler->method('getKey')->willReturn('vanishing_job');
+        $handler->method('getLabel')->willReturn('Vanishing Job');
+        $handler->method('getGroup')->willReturn('default');
+        $handler->method('getMaxRetries')->willReturn(3);
+        $handler->method('handle')->willThrowException(new \RuntimeException('Error'));
+
+        $this->registry->add($handler);
+
+        $job = new Job();
+        $job->setId(99)->setKey('vanishing_job')->setStatus(JobStatus::Running);
+
+        $this->repository->method('claimNextPending')
+            ->willReturnOnConsecutiveCalls($job, null);
+
+        $this->repository->expects($this->once())->method('markFailed');
+        // find returns null (job deleted between markFailed and find).
+        $this->repository->method('find')->with(99)->willReturn(null);
+        // Should not call release since we can't find the job.
+        $this->repository->expects($this->never())->method('release');
+
+        $this->worker->processQueue();
+    }
 }

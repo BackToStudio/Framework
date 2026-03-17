@@ -111,4 +111,71 @@ class JobTest extends TestCase
 
         $this->assertFalse($job->canRetry());
     }
+
+    public function testCannotRetryWhenExceeded(): void
+    {
+        $job = new Job();
+        $job->setMaxRetries(2)->setAttempts(5);
+
+        $this->assertFalse($job->canRetry());
+    }
+
+    public function testCannotRetryWhenZeroRetries(): void
+    {
+        $job = new Job();
+        $job->setMaxRetries(0)->setAttempts(0);
+
+        $this->assertFalse($job->canRetry());
+    }
+
+    public function testIsNotRecurringByDefault(): void
+    {
+        $job = new Job();
+
+        $this->assertFalse($job->isRecurring());
+        $this->assertSame(0, $job->getIntervalSeconds());
+    }
+
+    public function testNullDatesBeforeSet(): void
+    {
+        $job = new Job();
+
+        $this->assertNull($job->getScheduledAt());
+        $this->assertNull($job->getClaimedAt());
+        $this->assertNull($job->getCompletedAt());
+        $this->assertNull($job->getCreatedAt());
+    }
+
+    public function testIsNotReadyForCompletedStatus(): void
+    {
+        $job = new Job();
+        $job->setStatus(JobStatus::Completed);
+
+        $this->assertFalse($job->isReady());
+    }
+
+    public function testIsNotReadyForFailedStatus(): void
+    {
+        $job = new Job();
+        $job->setStatus(JobStatus::Failed);
+
+        $this->assertFalse($job->isReady());
+    }
+
+    public function testIsNotReadyForCancelledStatus(): void
+    {
+        $job = new Job();
+        $job->setStatus(JobStatus::Cancelled);
+
+        $this->assertFalse($job->isReady());
+    }
+
+    public function testIsReadyWhenScheduledAtExactlyNow(): void
+    {
+        $job = new Job();
+        $job->setStatus(JobStatus::Pending)
+            ->setScheduledAt(new \DateTimeImmutable('now', new \DateTimeZone('UTC')));
+
+        $this->assertTrue($job->isReady());
+    }
 }
