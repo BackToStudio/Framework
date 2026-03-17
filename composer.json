@@ -29,6 +29,7 @@
     "backto/security": "self.version",
     "backto/seo": "self.version",
     "backto/taxonomy": "self.version",
+    "backto/queue": "self.version",
     "backto/theme": "self.version"
   },
   "require-dev": {

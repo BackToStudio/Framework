@@ -63,6 +63,9 @@
         <testsuite name="performance">
             <directory>src/Performance/Tests</directory>
         </testsuite>
+        <testsuite name="queue">
+            <directory>src/Queue/Tests</directory>
+        </testsuite>
     </testsuites>
 
     <coverage cacheDirectory=".phpunit.cache/code-coverage">
