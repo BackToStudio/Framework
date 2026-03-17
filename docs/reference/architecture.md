@@ -88,6 +88,7 @@ Interfaces are auto-tagged in the DI container:
 | `PostMetaStructureInterface` | `wordpress.post_meta` | `RegisterPostMetaStructurePass` |
 | `HookInterface` | `wordpress.hook` | `RegisterHookPass` |
 | `SecurityRuleInterface` | `wordpress.security_rule` | `RegisterSecurityRulePass` |
+| `JobInterface` | `wordpress.queue_job` | `RegisterQueuePass` |
 | `RegistryInterface` | *(set public)* | — |
 
 ## Port bindings (Clean Architecture)
@@ -111,6 +112,7 @@ Port interfaces are bound to WordPress adapters in `WordPressExtension`:
 | `RateLimiterRepositoryInterface` | `WordPressRateLimiterRepository` |
 | `LoginLocationRepositoryInterface` | `WordPressLoginLocationRepository` |
 | `TwoFactorRepositoryInterface` | `WordPressTwoFactorRepository` |
+| `QueueRepositoryInterface` | `WordPressQueueRepository` |
 
 ## Bundle system
 
