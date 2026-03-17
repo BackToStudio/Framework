@@ -6,6 +6,7 @@ namespace BackTo\Framework\Security\Tests;
 
 use BackTo\Framework\Admin\Contracts\AdminPageInterface;
 use BackTo\Framework\Security\AuditLogAdminPage;
+use BackTo\Framework\Security\AuditLogCsvExporter;
 use BackTo\Framework\Security\Contracts\AuditLogRepositoryInterface;
 use PHPUnit\Framework\TestCase;
 
@@ -69,11 +70,6 @@ class TestableAuditLogAdminPage extends AuditLogAdminPage
     protected function getPurgeDays(): int
     {
         return $this->purgeDays;
-    }
-
-    protected function sendCsvHeaders(): void
-    {
-        // No-op in tests
     }
 
     protected function renderNotice(string $message): void
@@ -259,8 +255,15 @@ class AuditLogAdminPageTest extends TestCase
             ['timestamp' => 1700000000, 'event' => 'login_success', 'severity' => 'info', 'context' => ['ip' => '1.2.3.4']],
         ]);
 
+        $exporter = new class ($this->repository) extends AuditLogCsvExporter {
+            protected function sendCsvHeaders(): void
+            {
+                // No-op in tests
+            }
+        };
+
         ob_start();
-        $this->page->exportCsv([]);
+        $exporter->export([]);
         $output = ob_get_clean();
 
         $this->assertStringContainsString('Timestamp', $output);

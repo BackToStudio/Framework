@@ -287,57 +287,72 @@ final class RemoveUnusedCss implements Hooks
      */
     private static function isSingleSelectorUsed(string $selector, array $selectors): bool
     {
-        // Split by combinators (space, >, ~, +) to get the subject (last part)
-        // For `.parent .child`, we need to check `.child` specifically
         $parts = preg_split('/\s*[>~+\s]\s*/', $selector);
+
         if ($parts === false || $parts === []) {
             return false;
         }
 
-        // Check the LAST part (the subject of the selector)
         $subject = end($parts);
-
-        // Remove pseudo-classes/elements for matching purposes
         $subject = preg_replace('/:{1,2}[a-zA-Z-]+(\([^)]*\))?/', '', $subject);
 
-        // Extract ALL classes from the subject — ALL must be present (compound selector)
-        preg_match_all('/\.([a-zA-Z_-][a-zA-Z0-9_-]*)/', $subject, $classMatches);
-        $subjectClasses = $classMatches[1] ?? [];
+        return self::matchesClassSelectors($subject, $selectors['classes'])
+            ?? self::matchesIdSelectors($subject, $selectors['ids'])
+            ?? self::matchesTagSelectors($subject, $selectors['tags'])
+            ?? false;
+    }
 
-        if (!empty($subjectClasses)) {
-            $allClassesUsed = true;
-            foreach ($subjectClasses as $cls) {
-                if (!isset($selectors['classes'][$cls])) {
-                    $allClassesUsed = false;
-                    break;
-                }
-            }
+    /**
+     * @param array<string, true> $usedClasses
+     */
+    private static function matchesClassSelectors(string $subject, array $usedClasses): ?bool
+    {
+        preg_match_all('/\.([a-zA-Z_-][a-zA-Z0-9_-]*)/', $subject, $matches);
+        $classes = $matches[1] ?? [];
 
-            if ($allClassesUsed) {
-                return true;
-            }
-
-            // If not all classes match, this compound selector is unused
-            return false;
+        if (empty($classes)) {
+            return null; // No class selectors, try next matcher
         }
 
-        // Check ID selectors
-        preg_match_all('/#([a-zA-Z_-][a-zA-Z0-9_-]*)/', $subject, $idMatches);
-        foreach ($idMatches[1] as $id) {
-            if (isset($selectors['ids'][$id])) {
-                return true;
+        foreach ($classes as $cls) {
+            if (!isset($usedClasses[$cls])) {
+                return false;
             }
         }
 
-        // Check tag selectors
+        return true;
+    }
+
+    /**
+     * @param array<string, true> $usedIds
+     */
+    private static function matchesIdSelectors(string $subject, array $usedIds): ?bool
+    {
+        preg_match_all('/#([a-zA-Z_-][a-zA-Z0-9_-]*)/', $subject, $matches);
+
+        foreach ($matches[1] as $id) {
+            if (isset($usedIds[$id])) {
+                return true;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @param array<string, true> $usedTags
+     */
+    private static function matchesTagSelectors(string $subject, array $usedTags): ?bool
+    {
         $cleaned = preg_replace('/[.#][a-zA-Z_-][a-zA-Z0-9_-]*/', '', $subject);
-        preg_match_all('/\b([a-z][a-z0-9]*)\b/i', $cleaned, $tagMatches);
-        foreach ($tagMatches[1] as $tag) {
-            if (isset($selectors['tags'][strtolower($tag)])) {
+        preg_match_all('/\b([a-z][a-z0-9]*)\b/i', $cleaned, $matches);
+
+        foreach ($matches[1] as $tag) {
+            if (isset($usedTags[strtolower($tag)])) {
                 return true;
             }
         }
 
-        return false;
+        return null;
     }
 }
