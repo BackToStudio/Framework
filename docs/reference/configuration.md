@@ -18,6 +18,19 @@ my-project/
 └── functions.php             # (theme) or plugin.php (plugin)
 ```
 
+## config/ directory
+
+The `config/` directory supports the main `services.php` plus optional per-module configuration files:
+
+```
+config/
+├── services.php          # Main service definitions (required)
+├── performance.php       # Performance module overrides (optional)
+└── security.php          # Security module overrides (optional)
+```
+
+Module config files use dedicated **configurator** objects with typed, fluent APIs — no need to know parameter key names.
+
 ## config/services.php
 
 The main service configuration file. Must return a closure receiving a `ContainerConfigurator`:
@@ -108,6 +121,36 @@ $container->parameters()->set('framework.cache.ttl', 7200);
 | `framework.assets.version_strategy` | `file` | Asset versioning strategy |
 | `framework.observability.log_level` | `error` | Minimum log level |
 | `framework.observability.performance_tracking` | `false` | Enable performance collection |
+
+### Security defaults (config/security.php)
+
+Security parameters are managed by `SecurityConfiguration` and overridden via the fluent `SecurityConfigurator` in `config/security.php`:
+
+```php
+<?php
+
+use BackTo\Framework\Security\SecurityConfigurator;
+
+return static function (SecurityConfigurator $security): void {
+    $security
+        ->passwordMinLength(16)
+        ->twoFactorEnabled(true)
+        ->twoFactorIssuer('MonApp');
+};
+```
+
+| Parameter | Default | Configurator method |
+|-----------|---------|---------------------|
+| `security.headers_enabled` | `true` | `headersEnabled(bool)` |
+| `security.xmlrpc_disabled` | `true` | `xmlrpcDisabled(bool)` |
+| `security.hide_version` | `true` | `hideVersion(bool)` |
+| `security.csp_report_only` | `false` | `cspReportOnly(bool)` |
+| `security.password_min_length` | `12` | `passwordMinLength(int)` |
+| `security.max_concurrent_sessions` | `1` | `maxConcurrentSessions(int)` |
+| `security.rest_api_require_auth` | `true` | `restApiRequireAuth(bool)` |
+| `security.disable_file_editor` | `true` | `disableFileEditor(bool)` |
+| `security.two_factor_enabled` | `false` | `twoFactorEnabled(bool)` |
+| `security.two_factor_issuer` | `'WordPress'` | `twoFactorIssuer(string)` |
 
 ## Binding parameters in services.php
 

@@ -180,10 +180,12 @@ WP-CLI scaffolding commands.
 
 ## Security
 
-Comprehensive WordPress security hardening with autoconfigured rules.
+Comprehensive WordPress security hardening with autoconfigured rules. Configure via `config/security.php` using the fluent `SecurityConfigurator`.
 
 | Class | Role |
 |-------|------|
+| `SecurityConfiguration` | Default parameter values for the Security module |
+| `SecurityConfigurator` | Fluent configurator for `config/security.php` (implements `ModuleConfiguratorInterface`) |
 | `Contracts\SecurityRuleInterface` | Marker interface for security rules (extends `HookInterface`) |
 | `SecurityRuleRegistry` | Collects all registered security rules |
 | `DependencyInjection\Compiler\RegisterSecurityRulePass` | Auto-tags `SecurityRuleInterface` services |

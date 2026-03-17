@@ -20,6 +20,8 @@ use BackTo\Framework\PostType\PostTypeExtension;
 use BackTo\Framework\RestApi\RestApiExtension;
 use BackTo\Framework\Gdpr\GdprExtension;
 use BackTo\Framework\Performance\PerformanceExtension;
+use BackTo\Framework\Contracts\ModuleConfiguratorInterface;
+use BackTo\Framework\Security\SecurityConfigurator;
 use BackTo\Framework\Security\SecurityExtension;
 use BackTo\Framework\Seo\SeoExtension;
 use BackTo\Framework\Taxonomy\TaxonomyExtension;
@@ -313,7 +315,19 @@ trait WordPressContainer
     /**
      * Load optional per-module configuration files from config/.
      *
-     * Looks for config/performance.php alongside config/services.php.
+     * Each file can either be a standard Symfony config file (ContainerConfigurator)
+     * or return a closure that receives a dedicated module configurator.
+     *
+     * @var array<string, class-string> Maps filename to its configurator class.
+     */
+    private const MODULE_CONFIGURATORS = [
+        'security.php' => SecurityConfigurator::class,
+    ];
+
+    /**
+     * Load optional per-module configuration files from config/.
+     *
+     * Looks for config/performance.php, config/security.php alongside config/services.php.
      * This allows overriding module defaults without polluting services.php.
      */
     private function loadOptionalConfigFiles(ContainerBuilder $containerBuilder, ConfigBuilderGenerator $configBuilderGenerator): void
@@ -323,11 +337,42 @@ trait WordPressContainer
 
         foreach ($optionalFiles as $file) {
             $filePath = $configDir . '/' . $file;
-            if (file_exists($filePath)) {
-                $fileLocator = new FileLocator($configDir);
-                $loader = new PhpFileLoader($containerBuilder, $fileLocator, $this->getEnvironment(), $configBuilderGenerator);
-                $loader->load($file);
+            if (!file_exists($filePath)) {
+                continue;
             }
+
+            // Module configurator mode: the file returns a closure that receives a typed configurator.
+            if (isset(self::MODULE_CONFIGURATORS[$file])) {
+                $this->loadModuleConfigFile($filePath, self::MODULE_CONFIGURATORS[$file], $containerBuilder);
+                continue;
+            }
+
+            // Standard Symfony ContainerConfigurator mode.
+            $fileLocator = new FileLocator($configDir);
+            $loader = new PhpFileLoader($containerBuilder, $fileLocator, $this->getEnvironment(), $configBuilderGenerator);
+            $loader->load($file);
+        }
+    }
+
+    /**
+     * Load a module config file that returns a closure receiving a typed configurator.
+     *
+     * @param class-string $configuratorClass
+     */
+    private function loadModuleConfigFile(string $filePath, string $configuratorClass, ContainerBuilder $containerBuilder): void
+    {
+        $callback = require $filePath;
+
+        if (!is_callable($callback)) {
+            return;
+        }
+
+        /** @var ModuleConfiguratorInterface $configurator */
+        $configurator = new $configuratorClass();
+        $callback($configurator);
+
+        foreach ($configurator->toParameters() as $key => $value) {
+            $containerBuilder->setParameter($key, $value);
         }
     }
 

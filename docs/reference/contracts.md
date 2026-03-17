@@ -663,6 +663,22 @@ interface TwoFactorRepositoryInterface
 }
 ```
 
+## Configuration contracts
+
+### `ModuleConfiguratorInterface`
+
+Contract for module configurators used in `config/*.php` files. Implementations provide a fluent API for setting module parameters without exposing internal key names.
+
+```php
+interface ModuleConfiguratorInterface
+{
+    /** @return array<string, mixed> */
+    public function toParameters(): array;
+}
+```
+
+Implementations: `SecurityConfigurator`.
+
 ## Registry contracts
 
 ### `RegistryInterface`
