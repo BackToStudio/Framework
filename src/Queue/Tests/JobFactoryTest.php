@@ -73,6 +73,59 @@ class JobFactoryTest extends TestCase
         $this->factory->create('');
     }
 
+    public function testCreateJobWithKeyTooLongThrows(): void
+    {
+        $this->expectException(FrameworkException::class);
+        $this->expectExceptionMessage('Job key cannot exceed 255 characters.');
+
+        $this->factory->create(\str_repeat('a', 256));
+    }
+
+    public function testCreateJobWithGroupTooLongThrows(): void
+    {
+        $this->expectException(FrameworkException::class);
+        $this->expectExceptionMessage('Job group cannot exceed 255 characters.');
+
+        $this->factory->create('valid_key', [], \str_repeat('g', 256));
+    }
+
+    public function testCreateJobWithNegativeDelayClampsToZero(): void
+    {
+        $before = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
+        $job = $this->factory->create('send_email', [], 'default', 3, -10);
+
+        $this->assertNotNull($job->getScheduledAt());
+        // Should be scheduled at now, not in the past.
+        $this->assertGreaterThanOrEqual($before, $job->getScheduledAt());
+        $this->assertLessThanOrEqual($before->modify('+2 seconds'), $job->getScheduledAt());
+    }
+
+    public function testCreateJobWithNegativeIntervalClampsToZero(): void
+    {
+        $job = $this->factory->create('send_email', [], 'default', 3, 0, -600);
+
+        $this->assertSame(0, $job->getIntervalSeconds());
+        $this->assertFalse($job->isRecurring());
+    }
+
+    public function testCreateJobComputesPayloadHash(): void
+    {
+        $payload = ['to' => 'user@example.com'];
+        $job = $this->factory->create('send_email', $payload);
+
+        $expectedHash = \md5(\json_encode($payload, \JSON_THROW_ON_ERROR));
+        $this->assertSame($expectedHash, $job->getPayloadHash());
+    }
+
+    public function testCreateJobEmptyPayloadHasConsistentHash(): void
+    {
+        $job1 = $this->factory->create('job_a');
+        $job2 = $this->factory->create('job_b');
+
+        $this->assertSame($job1->getPayloadHash(), $job2->getPayloadHash());
+        $this->assertSame(\md5('[]'), $job1->getPayloadHash());
+    }
+
     public function testFromRowHydration(): void
     {
         $row = [
@@ -80,15 +133,18 @@ class JobFactoryTest extends TestCase
             'job_key' => 'process_image',
             'job_group' => 'media',
             'payload' => '{"url":"https://example.com/image.jpg"}',
+            'payload_hash' => 'abc123',
             'status' => 'running',
             'attempts' => '1',
             'max_retries' => '5',
             'last_error' => 'Timeout',
+            'claim_token' => 'token123',
             'interval_seconds' => '0',
             'scheduled_at' => '2025-01-15 10:30:00',
             'claimed_at' => '2025-01-15 10:31:00',
             'completed_at' => '0000-00-00 00:00:00',
             'created_at' => '2025-01-15 10:00:00',
+            'updated_at' => '2025-01-15 10:31:00',
         ];
 
         $job = $this->factory->fromRow($row);
@@ -97,14 +153,17 @@ class JobFactoryTest extends TestCase
         $this->assertSame('process_image', $job->getKey());
         $this->assertSame('media', $job->getGroup());
         $this->assertSame(['url' => 'https://example.com/image.jpg'], $job->getPayload());
+        $this->assertSame('abc123', $job->getPayloadHash());
         $this->assertSame(JobStatus::Running, $job->getStatus());
         $this->assertSame(1, $job->getAttempts());
         $this->assertSame(5, $job->getMaxRetries());
         $this->assertSame('Timeout', $job->getLastError());
+        $this->assertSame('token123', $job->getClaimToken());
         $this->assertNotNull($job->getScheduledAt());
         $this->assertNotNull($job->getClaimedAt());
         $this->assertNull($job->getCompletedAt());
         $this->assertNotNull($job->getCreatedAt());
+        $this->assertNotNull($job->getUpdatedAt());
         $this->assertFalse($job->isRecurring());
     }
 
@@ -132,5 +191,29 @@ class JobFactoryTest extends TestCase
         $job = $this->factory->fromRow($row);
 
         $this->assertSame(JobStatus::Pending, $job->getStatus());
+    }
+
+    public function testTruncateErrorShortMessage(): void
+    {
+        $message = 'Short error';
+
+        $this->assertSame($message, JobFactory::truncateError($message));
+    }
+
+    public function testTruncateErrorLongMessage(): void
+    {
+        $message = \str_repeat('x', 6000);
+
+        $truncated = JobFactory::truncateError($message);
+
+        $this->assertSame(5000, \strlen($truncated));
+        $this->assertStringEndsWith(' [truncated]', $truncated);
+    }
+
+    public function testTruncateErrorExactLimit(): void
+    {
+        $message = \str_repeat('x', 5000);
+
+        $this->assertSame($message, JobFactory::truncateError($message));
     }
 }

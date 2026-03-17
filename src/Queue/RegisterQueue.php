@@ -14,9 +14,8 @@ use BackTo\Framework\Queue\Contracts\QueueRepositoryInterface;
  * Orchestrates the queue system lifecycle and cron-based processing.
  *
  * - Creates the jobs table on activation.
- * - Drops the table on deactivation.
- * - Registers a WP-Cron event to process jobs periodically.
- * - Rescues stuck jobs on each cron tick.
+ * - Registers WP-Cron events to process, rescue, and cleanup jobs.
+ * - Uses a transient-based lock to prevent concurrent cron execution.
  */
 class RegisterQueue implements Hooks, ActivationHooks, DeactivationHooks
 {
@@ -24,6 +23,8 @@ class RegisterQueue implements Hooks, ActivationHooks, DeactivationHooks
     private const RESCUE_HOOK = 'backto_queue_rescue';
     private const CLEANUP_HOOK = 'backto_queue_cleanup';
     private const SCHEDULE_INTERVAL = 'every_minute';
+    private const LOCK_KEY = 'backto_queue_lock';
+    private const LOCK_TIMEOUT = 300;
 
     private QueueRepositoryInterface $repository;
     private QueueWorker $worker;
@@ -59,7 +60,7 @@ class RegisterQueue implements Hooks, ActivationHooks, DeactivationHooks
         $this->hookDispatcher->addAction('init', [$this, 'ensureCronScheduled']);
         $this->hookDispatcher->addAction(self::CRON_HOOK, [$this, 'processAllGroups']);
         $this->hookDispatcher->addAction(self::RESCUE_HOOK, [$this, 'rescueStuckJobs']);
-        $this->hookDispatcher->addAction(self::CLEANUP_HOOK, [$this, 'cleanupCompletedJobs']);
+        $this->hookDispatcher->addAction(self::CLEANUP_HOOK, [$this, 'cleanupJobs']);
     }
 
     /**
@@ -100,14 +101,22 @@ class RegisterQueue implements Hooks, ActivationHooks, DeactivationHooks
     }
 
     /**
-     * Process all registered queue groups.
+     * Process all queue groups with a transient-based lock to prevent overlap.
      */
     public function processAllGroups(): void
     {
-        $groups = $this->collectGroups();
+        if (!$this->acquireLock()) {
+            return;
+        }
 
-        foreach ($groups as $group) {
-            $this->worker->processQueue($group);
+        try {
+            $groups = $this->collectGroups();
+
+            foreach ($groups as $group) {
+                $this->worker->processQueue($group);
+            }
+        } finally {
+            $this->releaseLock();
         }
     }
 
@@ -120,15 +129,16 @@ class RegisterQueue implements Hooks, ActivationHooks, DeactivationHooks
     }
 
     /**
-     * Clean up completed jobs older than 24 hours.
+     * Clean up completed jobs (>24h) and exhausted failed jobs (>7 days).
      */
-    public function cleanupCompletedJobs(): void
+    public function cleanupJobs(): void
     {
         $this->repository->cleanup(86400);
+        $this->repository->cleanupFailed(604800);
     }
 
     /**
-     * Collect all unique groups from registered job handlers.
+     * Collect all unique groups from registered handlers AND active DB jobs.
      *
      * @return string[]
      */
@@ -138,6 +148,12 @@ class RegisterQueue implements Hooks, ActivationHooks, DeactivationHooks
 
         foreach ($this->registry->getJobs() as $job) {
             $group = $job->getGroup();
+            if (!\in_array($group, $groups, true)) {
+                $groups[] = $group;
+            }
+        }
+
+        foreach ($this->repository->getActiveGroups() as $group) {
             if (!\in_array($group, $groups, true)) {
                 $groups[] = $group;
             }
@@ -166,5 +182,21 @@ class RegisterQueue implements Hooks, ActivationHooks, DeactivationHooks
         \wp_clear_scheduled_hook(self::CRON_HOOK);
         \wp_clear_scheduled_hook(self::RESCUE_HOOK);
         \wp_clear_scheduled_hook(self::CLEANUP_HOOK);
+    }
+
+    protected function acquireLock(): bool
+    {
+        if (\get_transient(self::LOCK_KEY)) {
+            return false;
+        }
+
+        \set_transient(self::LOCK_KEY, \getmypid() ?: 1, self::LOCK_TIMEOUT);
+
+        return true;
+    }
+
+    protected function releaseLock(): void
+    {
+        \delete_transient(self::LOCK_KEY);
     }
 }

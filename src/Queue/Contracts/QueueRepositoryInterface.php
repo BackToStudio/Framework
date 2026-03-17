@@ -75,6 +75,11 @@ interface QueueRepositoryInterface
     public function cleanup(int $olderThanSeconds = 86400): int;
 
     /**
+     * Delete failed jobs (retries exhausted) older than the given number of seconds.
+     */
+    public function cleanupFailed(int $olderThanSeconds = 604800): int;
+
+    /**
      * Cancel a pending job.
      */
     public function cancel(int $jobId): void;
@@ -86,4 +91,19 @@ interface QueueRepositoryInterface
      * considered stuck and will be released back to pending.
      */
     public function rescueStuck(int $timeoutSeconds = 300): int;
+
+    /**
+     * Check if a pending job with the given key and payload hash exists.
+     *
+     * @param string $jobKey The job type key.
+     * @param string $payloadHash MD5 hash of the JSON-encoded payload.
+     */
+    public function hasPendingDuplicate(string $jobKey, string $payloadHash): bool;
+
+    /**
+     * Get all distinct group names that have pending or running jobs.
+     *
+     * @return string[]
+     */
+    public function getActiveGroups(): array;
 }

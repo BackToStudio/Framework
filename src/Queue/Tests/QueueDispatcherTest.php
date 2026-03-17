@@ -147,4 +147,55 @@ class QueueDispatcherTest extends TestCase
 
         $this->dispatcher->schedule('import_data', 1800, $payload, 'sync');
     }
+
+    public function testDispatchUniqueSkipsWhenDuplicateExists(): void
+    {
+        $payload = ['sku' => 'ABC123'];
+        $payloadHash = \md5(\json_encode($payload, \JSON_THROW_ON_ERROR));
+
+        $this->repository->expects($this->once())
+            ->method('hasPendingDuplicate')
+            ->with('sync_inventory', $payloadHash)
+            ->willReturn(true);
+
+        $this->repository->expects($this->never())->method('enqueue');
+
+        $result = $this->dispatcher->dispatchUnique('sync_inventory', $payload);
+
+        $this->assertNull($result);
+    }
+
+    public function testDispatchUniqueDispatchesWhenNoDuplicate(): void
+    {
+        $payload = ['sku' => 'ABC123'];
+        $payloadHash = \md5(\json_encode($payload, \JSON_THROW_ON_ERROR));
+
+        $this->repository->expects($this->once())
+            ->method('hasPendingDuplicate')
+            ->with('sync_inventory', $payloadHash)
+            ->willReturn(false);
+
+        $this->repository->expects($this->once())
+            ->method('enqueue')
+            ->willReturn(42);
+
+        $result = $this->dispatcher->dispatchUnique('sync_inventory', $payload);
+
+        $this->assertSame(42, $result);
+    }
+
+    public function testDispatchedJobContainsPayloadHash(): void
+    {
+        $payload = ['to' => 'user@example.com'];
+        $expectedHash = \md5(\json_encode($payload, \JSON_THROW_ON_ERROR));
+
+        $this->repository->expects($this->once())
+            ->method('enqueue')
+            ->with($this->callback(function (Job $job) use ($expectedHash): bool {
+                return $job->getPayloadHash() === $expectedHash;
+            }))
+            ->willReturn(1);
+
+        $this->dispatcher->dispatch('send_email', $payload);
+    }
 }

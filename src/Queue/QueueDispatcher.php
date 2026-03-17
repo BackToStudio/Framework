@@ -7,7 +7,6 @@ namespace BackTo\Framework\Queue;
 use BackTo\Framework\Queue\Contracts\QueueDispatcherInterface;
 use BackTo\Framework\Queue\Contracts\QueueRepositoryInterface;
 use BackTo\Framework\Queue\Factory\JobFactory;
-use BackTo\Framework\Queue\Infrastructure\WordPressQueueRepository;
 
 class QueueDispatcher implements QueueDispatcherInterface
 {
@@ -37,9 +36,10 @@ class QueueDispatcher implements QueueDispatcherInterface
 
     public function dispatchUnique(string $jobKey, array $payload = [], int $delay = 0, string $group = 'default'): ?int
     {
-        $payloadJson = \wp_json_encode($payload) ?: '[]';
+        $payloadJson = \json_encode($payload, \JSON_THROW_ON_ERROR);
+        $payloadHash = \md5($payloadJson);
 
-        if ($this->repository instanceof WordPressQueueRepository && $this->repository->hasPendingDuplicate($jobKey, $payloadJson)) {
+        if ($this->repository->hasPendingDuplicate($jobKey, $payloadHash)) {
             return null;
         }
 

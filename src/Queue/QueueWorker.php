@@ -16,6 +16,8 @@ use BackTo\Framework\Queue\Factory\JobFactory;
  */
 class QueueWorker
 {
+    private const MAX_BATCH_SIZE = 100;
+
     private QueueRepositoryInterface $repository;
     private QueueRegistry $registry;
     private JobFactory $factory;
@@ -34,12 +36,13 @@ class QueueWorker
      * Process a batch of jobs from the queue.
      *
      * @param string $group The queue group to process.
-     * @param int $batchSize Maximum number of jobs to process in this run.
+     * @param int $batchSize Maximum number of jobs to process in this run (capped at 100).
      *
      * @return int Number of jobs processed.
      */
     public function processQueue(string $group = 'default', int $batchSize = 10): int
     {
+        $batchSize = \min(\max($batchSize, 1), self::MAX_BATCH_SIZE);
         $processed = 0;
 
         for ($i = 0; $i < $batchSize; $i++) {

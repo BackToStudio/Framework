@@ -15,14 +15,17 @@ class Job
 
     /** @var array<string, mixed> */
     private array $payload = [];
+    private string $payloadHash = '';
     private JobStatus $status = JobStatus::Pending;
     private int $attempts = 0;
     private int $maxRetries = 3;
     private string $lastError = '';
+    private string $claimToken = '';
     private ?\DateTimeImmutable $scheduledAt = null;
     private ?\DateTimeImmutable $claimedAt = null;
     private ?\DateTimeImmutable $completedAt = null;
     private ?\DateTimeImmutable $createdAt = null;
+    private ?\DateTimeImmutable $updatedAt = null;
     private int $intervalSeconds = 0;
 
     public function getId(): int
@@ -79,6 +82,18 @@ class Job
         return $this;
     }
 
+    public function getPayloadHash(): string
+    {
+        return $this->payloadHash;
+    }
+
+    public function setPayloadHash(string $payloadHash): self
+    {
+        $this->payloadHash = $payloadHash;
+
+        return $this;
+    }
+
     public function getStatus(): JobStatus
     {
         return $this->status;
@@ -127,6 +142,18 @@ class Job
         return $this;
     }
 
+    public function getClaimToken(): string
+    {
+        return $this->claimToken;
+    }
+
+    public function setClaimToken(string $claimToken): self
+    {
+        $this->claimToken = $claimToken;
+
+        return $this;
+    }
+
     public function getScheduledAt(): ?\DateTimeImmutable
     {
         return $this->scheduledAt;
@@ -171,6 +198,18 @@ class Job
     public function setCreatedAt(?\DateTimeImmutable $createdAt): self
     {
         $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?\DateTimeImmutable
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(?\DateTimeImmutable $updatedAt): self
+    {
+        $this->updatedAt = $updatedAt;
 
         return $this;
     }

@@ -24,6 +24,11 @@ class RegisterQueueTest extends TestCase
     private HookDispatcherInterface $hookDispatcher;
     private RegisterQueue $registerQueue;
 
+    public static function setUpBeforeClass(): void
+    {
+        require_once __DIR__ . '/wp_stubs.php';
+    }
+
     protected function setUp(): void
     {
         $this->repository = $this->createMock(QueueRepositoryInterface::class);
@@ -114,52 +119,6 @@ class RegisterQueueTest extends TestCase
         $this->assertSame('Custom Every Minute', $schedules['every_minute']['display']);
     }
 
-    public function testProcessAllGroupsProcessesDefaultGroup(): void
-    {
-        // With no registered jobs, only 'default' group should be processed.
-        // Worker will call claimNextPending('default').
-        $this->repository->expects($this->once())
-            ->method('claimNextPending')
-            ->with('default')
-            ->willReturn(null);
-
-        $this->registerQueue->processAllGroups();
-    }
-
-    public function testProcessAllGroupsProcessesMultipleGroups(): void
-    {
-        $emailJob = $this->createMock(JobInterface::class);
-        $emailJob->method('getKey')->willReturn('send_email');
-        $emailJob->method('getLabel')->willReturn('Send Email');
-        $emailJob->method('getGroup')->willReturn('emails');
-        $emailJob->method('getMaxRetries')->willReturn(3);
-
-        $mediaJob = $this->createMock(JobInterface::class);
-        $mediaJob->method('getKey')->willReturn('process_image');
-        $mediaJob->method('getLabel')->willReturn('Process Image');
-        $mediaJob->method('getGroup')->willReturn('media');
-        $mediaJob->method('getMaxRetries')->willReturn(5);
-
-        $this->registry->add($emailJob);
-        $this->registry->add($mediaJob);
-
-        $processedGroups = [];
-
-        $this->repository->method('claimNextPending')
-            ->willReturnCallback(function (string $group) use (&$processedGroups) {
-                $processedGroups[] = $group;
-
-                return null;
-            });
-
-        $this->registerQueue->processAllGroups();
-
-        $this->assertContains('default', $processedGroups);
-        $this->assertContains('emails', $processedGroups);
-        $this->assertContains('media', $processedGroups);
-        $this->assertCount(3, $processedGroups);
-    }
-
     public function testRescueStuckJobsDelegatesToRepository(): void
     {
         $this->repository->expects($this->once())
@@ -169,13 +128,17 @@ class RegisterQueueTest extends TestCase
         $this->registerQueue->rescueStuckJobs();
     }
 
-    public function testCleanupCompletedJobsDelegatesToRepository(): void
+    public function testCleanupJobsDelegatesToRepository(): void
     {
         $this->repository->expects($this->once())
             ->method('cleanup')
             ->with(86400);
 
-        $this->registerQueue->cleanupCompletedJobs();
+        $this->repository->expects($this->once())
+            ->method('cleanupFailed')
+            ->with(604800);
+
+        $this->registerQueue->cleanupJobs();
     }
 
     public function testProcessAllGroupsDeduplicatesGroups(): void
@@ -195,6 +158,8 @@ class RegisterQueueTest extends TestCase
         $this->registry->add($job1);
         $this->registry->add($job2);
 
+        $this->repository->method('getActiveGroups')->willReturn([]);
+
         $processedGroups = [];
 
         $this->repository->method('claimNextPending')
@@ -206,8 +171,72 @@ class RegisterQueueTest extends TestCase
 
         $this->registerQueue->processAllGroups();
 
-        // Should only process 'default' once, not twice.
         $this->assertCount(1, $processedGroups);
         $this->assertSame(['default'], $processedGroups);
+    }
+
+    public function testProcessAllGroupsMergesDbGroups(): void
+    {
+        $emailJob = $this->createMock(JobInterface::class);
+        $emailJob->method('getKey')->willReturn('send_email');
+        $emailJob->method('getLabel')->willReturn('Send Email');
+        $emailJob->method('getGroup')->willReturn('emails');
+        $emailJob->method('getMaxRetries')->willReturn(3);
+
+        $this->registry->add($emailJob);
+
+        $this->repository->method('getActiveGroups')->willReturn(['emails', 'orphan_group']);
+
+        $processedGroups = [];
+
+        $this->repository->method('claimNextPending')
+            ->willReturnCallback(function (string $group) use (&$processedGroups) {
+                $processedGroups[] = $group;
+
+                return null;
+            });
+
+        $this->registerQueue->processAllGroups();
+
+        $this->assertContains('default', $processedGroups);
+        $this->assertContains('emails', $processedGroups);
+        $this->assertContains('orphan_group', $processedGroups);
+        $this->assertCount(3, $processedGroups);
+    }
+
+    public function testProcessAllGroupsProcessesMultipleGroups(): void
+    {
+        $emailJob = $this->createMock(JobInterface::class);
+        $emailJob->method('getKey')->willReturn('send_email');
+        $emailJob->method('getLabel')->willReturn('Send Email');
+        $emailJob->method('getGroup')->willReturn('emails');
+        $emailJob->method('getMaxRetries')->willReturn(3);
+
+        $mediaJob = $this->createMock(JobInterface::class);
+        $mediaJob->method('getKey')->willReturn('process_image');
+        $mediaJob->method('getLabel')->willReturn('Process Image');
+        $mediaJob->method('getGroup')->willReturn('media');
+        $mediaJob->method('getMaxRetries')->willReturn(5);
+
+        $this->registry->add($emailJob);
+        $this->registry->add($mediaJob);
+
+        $this->repository->method('getActiveGroups')->willReturn([]);
+
+        $processedGroups = [];
+
+        $this->repository->method('claimNextPending')
+            ->willReturnCallback(function (string $group) use (&$processedGroups) {
+                $processedGroups[] = $group;
+
+                return null;
+            });
+
+        $this->registerQueue->processAllGroups();
+
+        $this->assertContains('default', $processedGroups);
+        $this->assertContains('emails', $processedGroups);
+        $this->assertContains('media', $processedGroups);
+        $this->assertCount(3, $processedGroups);
     }
 }

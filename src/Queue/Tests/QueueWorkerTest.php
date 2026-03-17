@@ -164,6 +164,26 @@ class QueueWorkerTest extends TestCase
         $this->assertSame(3, $processed);
     }
 
+    public function testProcessQueueClampsExcessiveBatchSize(): void
+    {
+        $this->repository->method('claimNextPending')->willReturn(null);
+
+        // Should not crash or loop 10000 times — capped at 100.
+        $processed = $this->worker->processQueue('default', 10000);
+
+        $this->assertSame(0, $processed);
+    }
+
+    public function testProcessQueueClampsZeroBatchSize(): void
+    {
+        $this->repository->method('claimNextPending')->willReturn(null);
+
+        // Zero should be clamped to 1.
+        $processed = $this->worker->processQueue('default', 0);
+
+        $this->assertSame(0, $processed);
+    }
+
     public function testProcessQueueReschedulesRecurringJob(): void
     {
         $handler = $this->createMock(JobInterface::class);
