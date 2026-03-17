@@ -13,6 +13,11 @@ class VideoObject extends SchemaType
         parent::__construct('VideoObject');
     }
 
+    protected function getRequiredProperties(): array
+    {
+        return ['name', 'thumbnailUrl', 'uploadDate'];
+    }
+
     /** @return $this */
     public function name(string $name): static
     {

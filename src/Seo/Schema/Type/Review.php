@@ -13,6 +13,11 @@ class Review extends SchemaType
         parent::__construct('Review');
     }
 
+    protected function getRequiredProperties(): array
+    {
+        return ['itemReviewed', 'reviewRating', 'author'];
+    }
+
     /** @return $this */
     public function itemReviewed(SchemaType $item): static
     {

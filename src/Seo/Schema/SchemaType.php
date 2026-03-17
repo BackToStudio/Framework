@@ -77,6 +77,53 @@ class SchemaType implements \JsonSerializable
         return $data;
     }
 
+    /**
+     * Validate the schema against Google's required properties.
+     *
+     * Returns an array of missing required property names.
+     * An empty array means the schema is valid for rich results.
+     *
+     * @return string[]
+     */
+    public function validate(): array
+    {
+        $required = $this->getRequiredProperties();
+
+        if ($required === []) {
+            return [];
+        }
+
+        $missing = [];
+
+        foreach ($required as $property) {
+            if (!isset($this->properties[$property])) {
+                $missing[] = $property;
+            }
+        }
+
+        return $missing;
+    }
+
+    /**
+     * Whether this schema has all required properties for Google rich results.
+     */
+    public function isValid(): bool
+    {
+        return $this->validate() === [];
+    }
+
+    /**
+     * Return the list of properties required by Google for this schema type.
+     *
+     * Override in concrete types to define required properties.
+     *
+     * @return string[]
+     */
+    protected function getRequiredProperties(): array
+    {
+        return [];
+    }
+
     public function jsonSerialize(): mixed
     {
         return $this->toArray();
@@ -87,6 +134,10 @@ class SchemaType implements \JsonSerializable
      */
     private function resolveValue(mixed $value): mixed
     {
+        if ($value instanceof SchemaRef) {
+            return $value->toArray();
+        }
+
         if ($value instanceof self) {
             return $value->toArray();
         }

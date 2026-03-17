@@ -10,7 +10,8 @@ use BackTo\Framework\Seo\Schema\SchemaType;
 /**
  * Generates a WebSite schema from WordPress site settings.
  *
- * Produces a WebSite node with a SearchAction (sitelinks search box).
+ * Produces a WebSite node with @id "#website", linked to "#organization" as publisher,
+ * and a SearchAction for the sitelinks search box.
  */
 class WebSiteSchemaGenerator
 {
@@ -19,9 +20,11 @@ class WebSiteSchemaGenerator
         $siteUrl = \home_url('/');
 
         return Schema::webSite()
+            ->id($siteUrl . '#website')
             ->name(\get_bloginfo('name'))
             ->url($siteUrl)
             ->description(\get_bloginfo('description'))
+            ->publisher(Schema::ref($siteUrl . '#organization'))
             ->potentialAction(
                 Schema::searchAction()
                     ->target($siteUrl . '?s={search_term_string}')

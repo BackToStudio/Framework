@@ -10,6 +10,8 @@ use BackTo\Framework\Seo\SeoManager;
 
 /**
  * Generates an Organization schema from WordPress settings and SEO provider social links.
+ *
+ * Produces an Organization node with @id "#organization".
  */
 class OrganizationSchemaGenerator
 {
@@ -22,9 +24,12 @@ class OrganizationSchemaGenerator
 
     public function generate(): SchemaType
     {
+        $siteUrl = \home_url('/');
+
         $org = Schema::organization()
+            ->id($siteUrl . '#organization')
             ->name(\get_bloginfo('name'))
-            ->url(\home_url('/'));
+            ->url($siteUrl);
 
         $customLogoId = \get_theme_mod('custom_logo');
 

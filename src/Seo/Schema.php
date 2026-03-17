@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Seo;
 
+use BackTo\Framework\Seo\Schema\SchemaRef;
 use BackTo\Framework\Seo\Schema\SchemaType;
 use BackTo\Framework\Seo\Schema\Type\AggregateRating;
 use BackTo\Framework\Seo\Schema\Type\Answer;
@@ -207,5 +208,15 @@ final class Schema
     public static function type(string $type): SchemaType
     {
         return new SchemaType($type);
+    }
+
+    /**
+     * Create a reference to another schema node by @id.
+     *
+     * Usage: Schema::ref('#organization') produces {"@id": "#organization"}
+     */
+    public static function ref(string $id): SchemaRef
+    {
+        return new SchemaRef($id);
     }
 }

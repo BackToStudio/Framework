@@ -13,6 +13,11 @@ class FAQPage extends SchemaType
         parent::__construct('FAQPage');
     }
 
+    protected function getRequiredProperties(): array
+    {
+        return ['mainEntity'];
+    }
+
     /**
      * @param SchemaType[] $questions Question instances
      * @return $this

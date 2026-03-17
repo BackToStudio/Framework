@@ -13,6 +13,11 @@ class Event extends SchemaType
         parent::__construct('Event');
     }
 
+    protected function getRequiredProperties(): array
+    {
+        return ['name', 'startDate', 'location'];
+    }
+
     /** @return $this */
     public function name(string $name): static
     {

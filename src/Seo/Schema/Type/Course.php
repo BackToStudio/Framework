@@ -13,6 +13,11 @@ class Course extends SchemaType
         parent::__construct('Course');
     }
 
+    protected function getRequiredProperties(): array
+    {
+        return ['name', 'description', 'provider'];
+    }
+
     /** @return $this */
     public function name(string $name): static
     {

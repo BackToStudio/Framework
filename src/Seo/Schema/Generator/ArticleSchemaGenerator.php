@@ -9,6 +9,8 @@ use BackTo\Framework\Seo\Schema\SchemaType;
 
 /**
  * Generates an Article schema from a WordPress post.
+ *
+ * Links to "#organization" as publisher and "#website" as isPartOf.
  */
 class ArticleSchemaGenerator
 {
@@ -24,11 +26,17 @@ class ArticleSchemaGenerator
             return null;
         }
 
+        $siteUrl = \home_url('/');
+        $permalink = \get_permalink($post);
+
         $article = Schema::article()
+            ->id($permalink . '#article')
             ->headline($post->post_title)
-            ->url(\get_permalink($post))
+            ->url($permalink)
             ->datePublished(\get_the_date('c', $post))
-            ->dateModified(\get_the_modified_date('c', $post));
+            ->dateModified(\get_the_modified_date('c', $post))
+            ->set('isPartOf', Schema::ref($siteUrl . '#website'))
+            ->publisher(Schema::ref($siteUrl . '#organization'));
 
         $author = \get_userdata($post->post_author);
 

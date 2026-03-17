@@ -13,6 +13,11 @@ class Offer extends SchemaType
         parent::__construct('Offer');
     }
 
+    protected function getRequiredProperties(): array
+    {
+        return ['price', 'priceCurrency'];
+    }
+
     /** @return $this */
     public function price(string|float|int $price): static
     {

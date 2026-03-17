@@ -13,6 +13,11 @@ class Article extends SchemaType
         parent::__construct('Article');
     }
 
+    protected function getRequiredProperties(): array
+    {
+        return ['headline', 'author', 'datePublished'];
+    }
+
     /** @return $this */
     public function headline(string $headline): static
     {

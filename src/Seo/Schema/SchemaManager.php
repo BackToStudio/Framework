@@ -45,6 +45,29 @@ class SchemaManager
     }
 
     /**
+     * Validate all registered schemas.
+     *
+     * Returns an array keyed by schema type with missing required properties.
+     * An empty array means all schemas are valid.
+     *
+     * @return array<string, string[]>
+     */
+    public function validate(): array
+    {
+        $errors = [];
+
+        foreach ($this->schemas as $schema) {
+            $missing = $schema->validate();
+
+            if ($missing !== []) {
+                $errors[$schema->getType()] = $missing;
+            }
+        }
+
+        return $errors;
+    }
+
+    /**
      * Export all schemas as an array of JSON-LD data.
      *
      * @return array<int, array<string, mixed>>

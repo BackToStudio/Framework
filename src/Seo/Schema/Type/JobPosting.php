@@ -13,6 +13,11 @@ class JobPosting extends SchemaType
         parent::__construct('JobPosting');
     }
 
+    protected function getRequiredProperties(): array
+    {
+        return ['title', 'description', 'datePosted', 'hiringOrganization'];
+    }
+
     /** @return $this */
     public function title(string $title): static
     {

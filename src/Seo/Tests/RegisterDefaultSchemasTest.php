@@ -6,9 +6,9 @@ namespace BackTo\Framework\Seo\Tests;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Seo\Hooks\RegisterDefaultSchemas;
-use BackTo\Framework\Seo\Schema\Generator\ArticleSchemaGenerator;
 use BackTo\Framework\Seo\Schema\Generator\BreadcrumbSchemaGenerator;
 use BackTo\Framework\Seo\Schema\Generator\OrganizationSchemaGenerator;
+use BackTo\Framework\Seo\Schema\Generator\PostTypeSchemaResolver;
 use BackTo\Framework\Seo\Schema\Generator\WebSiteSchemaGenerator;
 use BackTo\Framework\Seo\Schema\SchemaManager;
 use BackTo\Framework\Seo\Schema\SchemaType;
@@ -28,7 +28,7 @@ class RegisterDefaultSchemasTest extends TestCase
             $dispatcher,
             $this->createMock(WebSiteSchemaGenerator::class),
             $this->createMock(OrganizationSchemaGenerator::class),
-            $this->createMock(ArticleSchemaGenerator::class),
+            new PostTypeSchemaResolver(),
             $this->createMock(BreadcrumbSchemaGenerator::class),
         );
 
@@ -47,9 +47,6 @@ class RegisterDefaultSchemasTest extends TestCase
         $orgGen->expects($this->once())->method('generate')
             ->willReturn(new SchemaType('Organization'));
 
-        $articleGen = $this->createMock(ArticleSchemaGenerator::class);
-        $articleGen->method('generate')->willReturn(null);
-
         $breadcrumbGen = $this->createMock(BreadcrumbSchemaGenerator::class);
         $breadcrumbGen->method('generate')->willReturn(null);
 
@@ -58,7 +55,7 @@ class RegisterDefaultSchemasTest extends TestCase
             $this->createMock(HookDispatcherInterface::class),
             $webSiteGen,
             $orgGen,
-            $articleGen,
+            new PostTypeSchemaResolver(),
             $breadcrumbGen,
         );
 
@@ -67,37 +64,6 @@ class RegisterDefaultSchemasTest extends TestCase
         $this->assertCount(2, $manager->getSchemas());
         $this->assertSame('WebSite', $manager->getSchemas()[0]->getType());
         $this->assertSame('Organization', $manager->getSchemas()[1]->getType());
-    }
-
-    public function testRegistersArticleWhenAvailable(): void
-    {
-        $manager = new SchemaManager();
-
-        $webSiteGen = $this->createMock(WebSiteSchemaGenerator::class);
-        $webSiteGen->method('generate')->willReturn(new SchemaType('WebSite'));
-
-        $orgGen = $this->createMock(OrganizationSchemaGenerator::class);
-        $orgGen->method('generate')->willReturn(new SchemaType('Organization'));
-
-        $articleGen = $this->createMock(ArticleSchemaGenerator::class);
-        $articleGen->method('generate')->willReturn(new SchemaType('Article'));
-
-        $breadcrumbGen = $this->createMock(BreadcrumbSchemaGenerator::class);
-        $breadcrumbGen->method('generate')->willReturn(null);
-
-        $hook = new RegisterDefaultSchemas(
-            $manager,
-            $this->createMock(HookDispatcherInterface::class),
-            $webSiteGen,
-            $orgGen,
-            $articleGen,
-            $breadcrumbGen,
-        );
-
-        $hook->register();
-
-        $this->assertCount(3, $manager->getSchemas());
-        $this->assertSame('Article', $manager->getSchemas()[2]->getType());
     }
 
     public function testRegistersBreadcrumbWhenAvailable(): void
@@ -110,9 +76,6 @@ class RegisterDefaultSchemasTest extends TestCase
         $orgGen = $this->createMock(OrganizationSchemaGenerator::class);
         $orgGen->method('generate')->willReturn(new SchemaType('Organization'));
 
-        $articleGen = $this->createMock(ArticleSchemaGenerator::class);
-        $articleGen->method('generate')->willReturn(null);
-
         $breadcrumbGen = $this->createMock(BreadcrumbSchemaGenerator::class);
         $breadcrumbGen->method('generate')->willReturn(new SchemaType('BreadcrumbList'));
 
@@ -121,7 +84,7 @@ class RegisterDefaultSchemasTest extends TestCase
             $this->createMock(HookDispatcherInterface::class),
             $webSiteGen,
             $orgGen,
-            $articleGen,
+            new PostTypeSchemaResolver(),
             $breadcrumbGen,
         );
 
@@ -131,7 +94,7 @@ class RegisterDefaultSchemasTest extends TestCase
         $this->assertSame('BreadcrumbList', $manager->getSchemas()[2]->getType());
     }
 
-    public function testRegistersAllFourWhenAvailable(): void
+    public function testSkipsNullBreadcrumb(): void
     {
         $manager = new SchemaManager();
 
@@ -140,44 +103,6 @@ class RegisterDefaultSchemasTest extends TestCase
 
         $orgGen = $this->createMock(OrganizationSchemaGenerator::class);
         $orgGen->method('generate')->willReturn(new SchemaType('Organization'));
-
-        $articleGen = $this->createMock(ArticleSchemaGenerator::class);
-        $articleGen->method('generate')->willReturn(new SchemaType('Article'));
-
-        $breadcrumbGen = $this->createMock(BreadcrumbSchemaGenerator::class);
-        $breadcrumbGen->method('generate')->willReturn(new SchemaType('BreadcrumbList'));
-
-        $hook = new RegisterDefaultSchemas(
-            $manager,
-            $this->createMock(HookDispatcherInterface::class),
-            $webSiteGen,
-            $orgGen,
-            $articleGen,
-            $breadcrumbGen,
-        );
-
-        $hook->register();
-
-        $schemas = $manager->getSchemas();
-        $this->assertCount(4, $schemas);
-        $this->assertSame('WebSite', $schemas[0]->getType());
-        $this->assertSame('Organization', $schemas[1]->getType());
-        $this->assertSame('Article', $schemas[2]->getType());
-        $this->assertSame('BreadcrumbList', $schemas[3]->getType());
-    }
-
-    public function testSkipsNullArticleAndBreadcrumb(): void
-    {
-        $manager = new SchemaManager();
-
-        $webSiteGen = $this->createMock(WebSiteSchemaGenerator::class);
-        $webSiteGen->method('generate')->willReturn(new SchemaType('WebSite'));
-
-        $orgGen = $this->createMock(OrganizationSchemaGenerator::class);
-        $orgGen->method('generate')->willReturn(new SchemaType('Organization'));
-
-        $articleGen = $this->createMock(ArticleSchemaGenerator::class);
-        $articleGen->method('generate')->willReturn(null);
 
         $breadcrumbGen = $this->createMock(BreadcrumbSchemaGenerator::class);
         $breadcrumbGen->method('generate')->willReturn(null);
@@ -187,7 +112,7 @@ class RegisterDefaultSchemasTest extends TestCase
             $this->createMock(HookDispatcherInterface::class),
             $webSiteGen,
             $orgGen,
-            $articleGen,
+            new PostTypeSchemaResolver(),
             $breadcrumbGen,
         );
 

@@ -13,6 +13,11 @@ class Product extends SchemaType
         parent::__construct('Product');
     }
 
+    protected function getRequiredProperties(): array
+    {
+        return ['name', 'image', 'offers'];
+    }
+
     /** @return $this */
     public function name(string $name): static
     {

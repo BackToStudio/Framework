@@ -13,6 +13,11 @@ class LocalBusiness extends SchemaType
         parent::__construct('LocalBusiness');
     }
 
+    protected function getRequiredProperties(): array
+    {
+        return ['name', 'address'];
+    }
+
     /** @return $this */
     public function name(string $name): static
     {
