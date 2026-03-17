@@ -16,10 +16,12 @@ use BackTo\Framework\Security\Contracts\LoginThrottleInterface;
 use BackTo\Framework\Security\Contracts\NonceManagerInterface;
 use BackTo\Framework\Security\Contracts\OutputEscaperInterface;
 use BackTo\Framework\Security\Contracts\RateLimiterRepositoryInterface;
+use BackTo\Framework\Security\Contracts\MailerInterface;
 use BackTo\Framework\Security\Contracts\SecurityNotifierInterface;
 use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
 use BackTo\Framework\Security\Contracts\SubresourceIntegrityInterface;
 use BackTo\Framework\Security\DependencyInjection\Compiler\RegisterSecurityRulePass;
+use BackTo\Framework\Security\Infrastructure\WordPressMailer;
 use BackTo\Framework\Security\Infrastructure\WordPressAuditLogRepository;
 use BackTo\Framework\Security\Infrastructure\WordPressFileIntegrityRepository;
 use BackTo\Framework\Security\Infrastructure\WordPressInputSanitizer;
@@ -128,6 +130,9 @@ class SecurityExtension implements ExtensionInterface
 
         $containerBuilder->register(RateLimiterRepositoryInterface::class, WordPressRateLimiterRepository::class);
         $containerBuilder->setAlias(WordPressRateLimiterRepository::class, RateLimiterRepositoryInterface::class);
+
+        $containerBuilder->register(MailerInterface::class, WordPressMailer::class);
+        $containerBuilder->setAlias(WordPressMailer::class, MailerInterface::class);
 
         $containerBuilder->register(SecurityNotifierInterface::class, SecurityNotifier::class)
             ->setAutowired(true);

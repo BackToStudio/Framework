@@ -6,6 +6,7 @@ namespace BackTo\Framework\Cache\Tests;
 
 use BackTo\Framework\Cache\Contracts\CacheInterface;
 use BackTo\Framework\Cache\Contracts\InvalidArgumentException;
+use BackTo\Framework\Cache\Contracts\TransientCleanerInterface;
 use BackTo\Framework\Cache\Strategy\TransientCache;
 use PHPUnit\Framework\TestCase;
 
@@ -17,34 +18,41 @@ use PHPUnit\Framework\TestCase;
  */
 class TransientCacheTest extends TestCase
 {
+    private TransientCleanerInterface $cleaner;
+
+    protected function setUp(): void
+    {
+        $this->cleaner = $this->createMock(TransientCleanerInterface::class);
+    }
+
     public function testImplementsCacheInterface(): void
     {
-        $cache = new TransientCache();
+        $cache = new TransientCache($this->cleaner);
         $this->assertInstanceOf(CacheInterface::class, $cache);
     }
 
     public function testDefaultPrefix(): void
     {
-        $cache = new TransientCache();
+        $cache = new TransientCache($this->cleaner);
         $this->assertInstanceOf(TransientCache::class, $cache);
     }
 
     public function testCustomPrefix(): void
     {
-        $cache = new TransientCache('myapp_');
+        $cache = new TransientCache($this->cleaner, 'myapp_');
         $this->assertInstanceOf(TransientCache::class, $cache);
     }
 
     public function testInvalidKeyThrowsException(): void
     {
-        $cache = new TransientCache();
+        $cache = new TransientCache($this->cleaner);
         $this->expectException(InvalidArgumentException::class);
         $cache->get('invalid{key}');
     }
 
     public function testEmptyKeyThrowsException(): void
     {
-        $cache = new TransientCache();
+        $cache = new TransientCache($this->cleaner);
         $this->expectException(InvalidArgumentException::class);
         $cache->get('');
     }
@@ -54,7 +62,7 @@ class TransientCacheTest extends TestCase
      */
     public function testReservedCharactersThrowException(string $key): void
     {
-        $cache = new TransientCache();
+        $cache = new TransientCache($this->cleaner);
         $this->expectException(InvalidArgumentException::class);
         $cache->has($key);
     }

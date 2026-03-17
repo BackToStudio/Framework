@@ -6,6 +6,8 @@ namespace BackTo\Framework\Security;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
+use BackTo\Framework\Options\Contracts\OptionsRepositoryInterface;
+use BackTo\Framework\Security\Contracts\MailerInterface;
 use BackTo\Framework\Security\Contracts\SecurityNotifierInterface;
 use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
 
@@ -30,6 +32,8 @@ class SecurityNotifier implements Hooks, SecurityRuleInterface, SecurityNotifier
     use ClientIpTrait;
 
     private HookDispatcherInterface $hookDispatcher;
+    private MailerInterface $mailer;
+    private OptionsRepositoryInterface $options;
 
     /** @var string[] */
     private array $recipients = [];
@@ -51,9 +55,14 @@ class SecurityNotifier implements Hooks, SecurityRuleInterface, SecurityNotifier
     /** @var array<string, int> IP => failed count for current request cycle */
     private array $failedLoginCounts = [];
 
-    public function __construct(HookDispatcherInterface $hookDispatcher)
-    {
+    public function __construct(
+        HookDispatcherInterface $hookDispatcher,
+        MailerInterface $mailer,
+        OptionsRepositoryInterface $options
+    ) {
         $this->hookDispatcher = $hookDispatcher;
+        $this->mailer = $mailer;
+        $this->options = $options;
     }
 
     public function getName(): string
@@ -220,28 +229,16 @@ class SecurityNotifier implements Hooks, SecurityRuleInterface, SecurityNotifier
 
     protected function getAdminEmail(): string
     {
-        if (function_exists('get_option')) {
-            return (string) get_option('admin_email', '');
-        }
-
-        return '';
+        return (string) $this->options->get('admin_email', '');
     }
 
     protected function getSiteName(): string
     {
-        if (function_exists('get_option')) {
-            return (string) get_option('blogname', 'WordPress');
-        }
-
-        return 'WordPress';
+        return (string) $this->options->get('blogname', 'WordPress');
     }
 
     protected function sendEmail(string $to, string $subject, string $body): bool
     {
-        if (function_exists('wp_mail')) {
-            return wp_mail($to, $subject, $body);
-        }
-
-        return false;
+        return $this->mailer->send($to, $subject, $body);
     }
 }

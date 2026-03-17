@@ -6,56 +6,43 @@ namespace BackTo\Framework\Security\Tests;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
+use BackTo\Framework\Options\Contracts\OptionsRepositoryInterface;
+use BackTo\Framework\Security\Contracts\MailerInterface;
 use BackTo\Framework\Security\Contracts\SecurityNotifierInterface;
 use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
 use BackTo\Framework\Security\SecurityNotifier;
 use PHPUnit\Framework\TestCase;
 
-class TestableSecurityNotifier extends SecurityNotifier
-{
-    /** @var array<int, array{to: string, subject: string, body: string}> */
-    public array $sentEmails = [];
-
-    private string $adminEmail = 'admin@example.com';
-    private string $siteName = 'Test Site';
-
-    protected function sendEmail(string $to, string $subject, string $body): bool
-    {
-        $this->sentEmails[] = ['to' => $to, 'subject' => $subject, 'body' => $body];
-
-        return true;
-    }
-
-    protected function getAdminEmail(): string
-    {
-        return $this->adminEmail;
-    }
-
-    protected function getSiteName(): string
-    {
-        return $this->siteName;
-    }
-
-    protected function getClientIp(): string
-    {
-        return '1.2.3.4';
-    }
-
-    public function setAdminEmail(string $email): void
-    {
-        $this->adminEmail = $email;
-    }
-}
-
 class SecurityNotifierTest extends TestCase
 {
     private HookDispatcherInterface $dispatcher;
-    private TestableSecurityNotifier $notifier;
+    private MailerInterface $mailer;
+    private OptionsRepositoryInterface $options;
+    private SecurityNotifier $notifier;
+
+    /** @var array<int, array{to: string, subject: string, body: string}> */
+    private array $sentEmails = [];
 
     protected function setUp(): void
     {
         $this->dispatcher = $this->createMock(HookDispatcherInterface::class);
-        $this->notifier = new TestableSecurityNotifier($this->dispatcher);
+
+        $this->sentEmails = [];
+        $this->mailer = $this->createMock(MailerInterface::class);
+        $this->mailer->method('send')
+            ->willReturnCallback(function (string $to, string $subject, string $body): bool {
+                $this->sentEmails[] = ['to' => $to, 'subject' => $subject, 'body' => $body];
+                return true;
+            });
+
+        $this->options = $this->createMock(OptionsRepositoryInterface::class);
+        $this->options->method('get')
+            ->willReturnMap([
+                ['admin_email', '', 'admin@example.com'],
+                ['blogname', 'WordPress', 'Test Site'],
+            ]);
+
+        $this->notifier = new SecurityNotifier($this->dispatcher, $this->mailer, $this->options);
     }
 
     public function testImplementsRequiredInterfaces(): void
@@ -90,8 +77,8 @@ class SecurityNotifierTest extends TestCase
     {
         $this->notifier->notify('test_event', 'critical', ['key' => 'value']);
 
-        $this->assertCount(1, $this->notifier->sentEmails);
-        $this->assertSame('admin@example.com', $this->notifier->sentEmails[0]['to']);
+        $this->assertCount(1, $this->sentEmails);
+        $this->assertSame('admin@example.com', $this->sentEmails[0]['to']);
     }
 
     public function testNotifySendsToCustomRecipients(): void
@@ -99,17 +86,24 @@ class SecurityNotifierTest extends TestCase
         $this->notifier->setRecipients(['a@test.com', 'b@test.com']);
         $this->notifier->notify('test_event', 'warning', []);
 
-        $this->assertCount(2, $this->notifier->sentEmails);
-        $this->assertSame('a@test.com', $this->notifier->sentEmails[0]['to']);
-        $this->assertSame('b@test.com', $this->notifier->sentEmails[1]['to']);
+        $this->assertCount(2, $this->sentEmails);
+        $this->assertSame('a@test.com', $this->sentEmails[0]['to']);
+        $this->assertSame('b@test.com', $this->sentEmails[1]['to']);
     }
 
     public function testNotifyDoesNothingWithNoRecipients(): void
     {
-        $this->notifier->setAdminEmail('');
-        $this->notifier->notify('test_event', 'critical', []);
+        $options = $this->createMock(OptionsRepositoryInterface::class);
+        $options->method('get')
+            ->willReturnMap([
+                ['admin_email', '', ''],
+                ['blogname', 'WordPress', 'Test Site'],
+            ]);
 
-        $this->assertCount(0, $this->notifier->sentEmails);
+        $notifier = new SecurityNotifier($this->dispatcher, $this->mailer, $options);
+        $notifier->notify('test_event', 'critical', []);
+
+        $this->assertCount(0, $this->sentEmails);
     }
 
     public function testBuildSubject(): void
@@ -148,36 +142,36 @@ class SecurityNotifierTest extends TestCase
     {
         $this->notifier->onSecurityEvent('self_promotion_blocked', 'critical', ['user_id' => 42]);
 
-        $this->assertCount(1, $this->notifier->sentEmails);
+        $this->assertCount(1, $this->sentEmails);
     }
 
     public function testOnSecurityEventIgnoresNonCriticalEvent(): void
     {
         $this->notifier->onSecurityEvent('some_unknown_event', 'info', []);
 
-        $this->assertCount(0, $this->notifier->sentEmails);
+        $this->assertCount(0, $this->sentEmails);
     }
 
     public function testOnRoleChangeNotifiesForNewAdmin(): void
     {
         $this->notifier->onRoleChange(42, 'administrator', ['subscriber']);
 
-        $this->assertCount(1, $this->notifier->sentEmails);
-        $this->assertStringContainsString('Privileged role granted', $this->notifier->sentEmails[0]['subject']);
+        $this->assertCount(1, $this->sentEmails);
+        $this->assertStringContainsString('Privileged role granted', $this->sentEmails[0]['subject']);
     }
 
     public function testOnRoleChangeIgnoresNonAdminRole(): void
     {
         $this->notifier->onRoleChange(42, 'editor', ['subscriber']);
 
-        $this->assertCount(0, $this->notifier->sentEmails);
+        $this->assertCount(0, $this->sentEmails);
     }
 
     public function testOnRoleChangeIgnoresAlreadyAdmin(): void
     {
         $this->notifier->onRoleChange(42, 'administrator', ['administrator']);
 
-        $this->assertCount(0, $this->notifier->sentEmails);
+        $this->assertCount(0, $this->sentEmails);
     }
 
     public function testOnLoginFailedNotifiesAtThreshold(): void
@@ -186,10 +180,10 @@ class SecurityNotifierTest extends TestCase
 
         $this->notifier->onLoginFailed('admin');
         $this->notifier->onLoginFailed('admin');
-        $this->assertCount(0, $this->notifier->sentEmails);
+        $this->assertCount(0, $this->sentEmails);
 
         $this->notifier->onLoginFailed('admin');
-        $this->assertCount(1, $this->notifier->sentEmails);
+        $this->assertCount(1, $this->sentEmails);
     }
 
     public function testOnLoginFailedDoesNotNotifyBeforeThreshold(): void
@@ -200,7 +194,7 @@ class SecurityNotifierTest extends TestCase
             $this->notifier->onLoginFailed('admin');
         }
 
-        $this->assertCount(0, $this->notifier->sentEmails);
+        $this->assertCount(0, $this->sentEmails);
     }
 
     public function testGetCriticalEvents(): void
