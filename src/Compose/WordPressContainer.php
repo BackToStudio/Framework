@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace BackTo\Framework\Compose;
 
 use BackTo\Framework\Admin\AdminExtension;
+use BackTo\Framework\Assets\AssetsConfigurator;
 use BackTo\Framework\Assets\AssetsExtension;
 use BackTo\Framework\Blocks\BlocksExtension;
 use BackTo\Framework\Cache\CacheConfigurator;
@@ -14,10 +15,12 @@ use BackTo\Framework\Contracts\ExtensionInterface;
 use BackTo\Framework\Contracts\RegistryInterface;
 use BackTo\Framework\Hooks\HooksExtension;
 use BackTo\Framework\Hooks\HookRegistry;
+use BackTo\Framework\Observability\ObservabilityConfigurator;
 use BackTo\Framework\Observability\ObservabilityExtension;
 use BackTo\Framework\Options\OptionsExtension;
 use BackTo\Framework\PostMeta\PostMetaExtension;
 use BackTo\Framework\PostType\PostTypeExtension;
+use BackTo\Framework\RestApi\RestApiConfigurator;
 use BackTo\Framework\RestApi\RestApiExtension;
 use BackTo\Framework\Gdpr\GdprExtension;
 use BackTo\Framework\Performance\PerformanceConfigurator;
@@ -324,8 +327,11 @@ trait WordPressContainer
      * @var array<string, class-string> Maps filename to its configurator class.
      */
     private const MODULE_CONFIGURATORS = [
+        'assets.php' => AssetsConfigurator::class,
         'cache.php' => CacheConfigurator::class,
+        'observability.php' => ObservabilityConfigurator::class,
         'performance.php' => PerformanceConfigurator::class,
+        'rest-api.php' => RestApiConfigurator::class,
         'security.php' => SecurityConfigurator::class,
         'seo.php' => SeoConfigurator::class,
     ];
@@ -339,7 +345,7 @@ trait WordPressContainer
     private function loadOptionalConfigFiles(ContainerBuilder $containerBuilder, ConfigBuilderGenerator $configBuilderGenerator): void
     {
         $configDir = $this->getProjectDir() . '/config';
-        $optionalFiles = ['cache.php', 'performance.php', 'security.php', 'seo.php'];
+        $optionalFiles = ['assets.php', 'cache.php', 'observability.php', 'performance.php', 'rest-api.php', 'security.php', 'seo.php'];
 
         foreach ($optionalFiles as $file) {
             $filePath = $configDir . '/' . $file;

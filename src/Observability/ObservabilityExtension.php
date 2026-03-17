@@ -44,9 +44,6 @@ class ObservabilityExtension implements ExtensionInterface
 
     public function getDefaultConfiguration(): array
     {
-        return [
-            'framework.observability.log_level' => 'error',
-            'framework.observability.performance_tracking' => false,
-        ];
+        return ObservabilityConfiguration::getDefaults();
     }
 }

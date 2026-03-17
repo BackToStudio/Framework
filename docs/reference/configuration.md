@@ -25,16 +25,22 @@ The `config/` directory supports the main `services.php` plus optional per-modul
 ```
 config/
 ├── services.php          # Main service definitions (required)
+├── assets.php            # Assets module overrides (optional)
 ├── cache.php             # Cache module overrides (optional)
+├── observability.php     # Observability module overrides (optional)
 ├── performance.php       # Performance module overrides (optional)
+├── rest-api.php          # REST API module overrides (optional)
 ├── security.php          # Security module overrides (optional)
 └── seo.php               # SEO module overrides (optional)
 ```
 
 Module config files use dedicated **configurator** objects with typed, fluent APIs — no need to know parameter key names. See individual module references for details:
 
+- [Assets configuration](modules/assets.md#configuration)
 - [Cache configuration](modules/cache.md#configuration)
+- [Observability configuration](modules/observability.md#configuration)
 - [Performance configuration](modules/performance.md#configuration)
+- [REST API configuration](modules/rest-api.md#configuration)
 - [Security configuration](modules/security.md#configuration)
 - [SEO configuration](modules/seo.md#configuration)
 
@@ -109,21 +115,9 @@ When `$debug` is `false`:
 | `%pluginDirectory%` | Project root directory (auto-detected) |
 | `%pluginTextDomain%` | Text domain set via `setTextDomain()` |
 
-### Framework defaults
+### Module defaults
 
-These parameters are set by `FrameworkConfiguration` and can be overridden in your `config/services.php`:
-
-```php
-$container->parameters()->set('framework.rest_api.default_namespace', 'custom/v2');
-```
-
-| Parameter | Default | Description |
-|-----------|---------|-------------|
-| `framework.rest_api.default_namespace` | `app/v1` | Default REST namespace |
-| `framework.rest_api.default_per_page` | `10` | Default results per page |
-| `framework.assets.version_strategy` | `file` | Asset versioning strategy |
-| `framework.observability.log_level` | `error` | Minimum log level |
-| `framework.observability.performance_tracking` | `false` | Enable performance collection |
+Each module manages its own default parameters. Override them via dedicated `config/*.php` files using fluent configurators. See the [modules reference](modules.md) for details.
 
 ## Binding parameters in services.php
 

@@ -2,6 +2,27 @@
 
 Logging, error handling, health checks, and performance monitoring.
 
+## Configuration
+
+Observability parameters are managed by `ObservabilityConfiguration` and overridden via the fluent `ObservabilityConfigurator` in `config/observability.php`:
+
+```php
+<?php
+
+use BackTo\Framework\Observability\ObservabilityConfigurator;
+
+return static function (ObservabilityConfigurator $observability): void {
+    $observability
+        ->logLevel('debug')
+        ->performanceTracking(true);
+};
+```
+
+| Parameter | Default | Configurator method |
+|-----------|---------|---------------------|
+| `observability.log_level` | `error` | `logLevel(string)` |
+| `observability.performance_tracking` | `false` | `performanceTracking(bool)` |
+
 ## Contracts
 
 ### `LoggerInterface`

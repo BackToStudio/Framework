@@ -28,8 +28,6 @@ class AssetsExtension implements ExtensionInterface
 
     public function getDefaultConfiguration(): array
     {
-        return [
-            'framework.assets.version_strategy' => 'file',
-        ];
+        return AssetsConfiguration::getDefaults();
     }
 }
