@@ -46,7 +46,7 @@ class RegisterPostType implements Hooks, ActivationHooks
     {
         foreach ($this->registry->getPostTypes() as $postType) {
             if ($this->registrar->exists($postType->getKey())) {
-                return;
+                continue;
             }
             try {
                 $newPostType = $this->factory->createPostType($postType->getKey(), $postType->getArgs());
