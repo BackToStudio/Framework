@@ -28,7 +28,7 @@ class WordPressPageCache implements PageCacheInterface
         $this->filesystem = $filesystem ?? new Filesystem();
 
         if (!$this->filesystem->exists($this->cacheDir)) {
-            $this->filesystem->mkdir($this->cacheDir, 0775);
+            $this->filesystem->mkdir($this->cacheDir, 0755);
         }
     }
 
@@ -91,7 +91,7 @@ class WordPressPageCache implements PageCacheInterface
     {
         if ($this->filesystem->exists($this->cacheDir)) {
             $this->filesystem->remove($this->cacheDir);
-            $this->filesystem->mkdir($this->cacheDir, 0775);
+            $this->filesystem->mkdir($this->cacheDir, 0755);
         }
     }
 

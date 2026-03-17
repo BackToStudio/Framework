@@ -22,7 +22,13 @@ class DatabaseHardening implements Hooks, SecurityRuleInterface
     private LoggerInterface $logger;
     private bool $debugMode;
 
-    /** @var string[] Dangerous SQL patterns that should never appear in normal queries */
+    /**
+     * Single combined regex for all dangerous SQL patterns.
+     * Avoids running 9 separate preg_match() calls per query.
+     */
+    private const DANGEROUS_PATTERN = '/\b(?:DROP\s+TABLE|TRUNCATE\s+TABLE|ALTER\s+TABLE|LOAD_FILE\s*\(|INTO\s+(?:OUTFILE|DUMPFILE)|UNION\s+SELECT|SLEEP\s*\(|BENCHMARK\s*\()/i';
+
+    /** @var string[] Individual patterns kept for reporting which pattern matched */
     private const DANGEROUS_PATTERNS = [
         '/\bDROP\s+TABLE\b/i',
         '/\bTRUNCATE\s+TABLE\b/i',
@@ -90,10 +96,19 @@ class DatabaseHardening implements Hooks, SecurityRuleInterface
     /**
      * Detect dangerous SQL patterns in a query.
      *
+     * Uses a single combined regex for fast-path rejection, then
+     * falls back to individual patterns only when a match is found.
+     *
      * @return string[]
      */
     public function detectDangerousPatterns(string $query): array
     {
+        // Fast path: single regex check rejects ~99% of safe queries
+        if (preg_match(self::DANGEROUS_PATTERN, $query) !== 1) {
+            return [];
+        }
+
+        // Slow path: identify which specific patterns matched (for logging)
         $matches = [];
 
         foreach (self::DANGEROUS_PATTERNS as $pattern) {
@@ -139,14 +154,26 @@ class DatabaseHardening implements Hooks, SecurityRuleInterface
 
     protected function isFromSafeCaller(): bool
     {
-        $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 10);
+        // Fast path: check current script before falling back to expensive backtrace
+        $script = $_SERVER['SCRIPT_FILENAME'] ?? '';
 
-        foreach ($trace as $frame) {
-            $file = $frame['file'] ?? '';
+        foreach (self::SAFE_CALLERS as $safeCaller) {
+            if (str_contains($script, $safeCaller)) {
+                return true;
+            }
+        }
 
-            foreach (self::SAFE_CALLERS as $safeCaller) {
-                if (str_contains($file, $safeCaller)) {
-                    return true;
+        // Only use backtrace in debug mode (expensive operation)
+        if ($this->debugMode) {
+            $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 10);
+
+            foreach ($trace as $frame) {
+                $file = $frame['file'] ?? '';
+
+                foreach (self::SAFE_CALLERS as $safeCaller) {
+                    if (str_contains($file, $safeCaller)) {
+                        return true;
+                    }
                 }
             }
         }

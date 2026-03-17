@@ -129,6 +129,15 @@ class PerformanceConfigurator implements ModuleConfiguratorInterface
         return $this;
     }
 
+    // ── Remove unused CSS ─────────────────────────────────
+
+    public function removeUnusedCss(bool $enabled): self
+    {
+        $this->overrides['performance.remove_unused_css'] = $enabled;
+
+        return $this;
+    }
+
     // ── Resource hints ───────────────────────────────────────
 
     /**

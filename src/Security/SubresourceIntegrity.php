@@ -44,6 +44,12 @@ class SubresourceIntegrity implements Hooks, SecurityRuleInterface, SubresourceI
 
     public function registerHash(string $handle, string $hash): self
     {
+        if (preg_match('/^sha(256|384|512)-[A-Za-z0-9+\/=]+$/', $hash) !== 1) {
+            throw new \InvalidArgumentException(
+                'Invalid SRI hash format. Expected "sha256-...", "sha384-...", or "sha512-...".'
+            );
+        }
+
         $this->hashes[$handle] = $hash;
 
         return $this;
@@ -85,7 +91,7 @@ class SubresourceIntegrity implements Hooks, SecurityRuleInterface, SubresourceI
             return $tag;
         }
 
-        $integrityAttr = 'integrity="' . $hash . '" crossorigin="anonymous" ';
+        $integrityAttr = 'integrity="' . htmlspecialchars($hash, ENT_QUOTES, 'UTF-8') . '" crossorigin="anonymous" ';
 
         return str_replace($tagPrefix, $tagPrefix . $integrityAttr, $tag);
     }

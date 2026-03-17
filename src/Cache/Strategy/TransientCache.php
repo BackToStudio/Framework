@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Cache\Strategy;
 
+use BackTo\Framework\Cache\Contracts\TransientCleanerInterface;
 use DateInterval;
 
 /**
@@ -16,9 +17,11 @@ use DateInterval;
 class TransientCache extends AbstractCache
 {
     private string $prefix;
+    private TransientCleanerInterface $transientCleaner;
 
-    public function __construct(string $prefix = 'btf_')
+    public function __construct(TransientCleanerInterface $transientCleaner, string $prefix = 'btf_')
     {
+        $this->transientCleaner = $transientCleaner;
         $this->prefix = $prefix;
     }
 
@@ -61,17 +64,7 @@ class TransientCache extends AbstractCache
 
     public function clear(): bool
     {
-        global $wpdb;
-
-        $wpdb->query(
-            $wpdb->prepare(
-                "DELETE FROM {$wpdb->options} WHERE option_name LIKE %s OR option_name LIKE %s",
-                '_transient_' . $wpdb->esc_like($this->prefix) . '%',
-                '_transient_timeout_' . $wpdb->esc_like($this->prefix) . '%'
-            )
-        );
-
-        return true;
+        return $this->transientCleaner->clearByPrefix($this->prefix);
     }
 
     public function has(string $key): bool

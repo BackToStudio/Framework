@@ -63,6 +63,32 @@ class SvgFactory
             return '';
         }
 
-        return html_entity_decode($res);
+        return $this->sanitizeSvg(html_entity_decode($res));
+    }
+
+    /**
+     * Strip dangerous elements and attributes from SVG content.
+     */
+    private function sanitizeSvg(string $svg): string
+    {
+        // Remove script tags and their contents
+        $svg = preg_replace('/<script\b[^>]*>.*?<\/script>/is', '', $svg) ?? $svg;
+
+        // Remove dangerous elements (self-closing and open/close)
+        $dangerousTags = ['foreignObject', 'set', 'animate', 'animateTransform', 'animateMotion', 'handler', 'listener'];
+        foreach ($dangerousTags as $tag) {
+            $svg = preg_replace('/<' . $tag . '\b[^>]*\/>/is', '', $svg) ?? $svg;
+            $svg = preg_replace('/<' . $tag . '\b[^>]*>.*?<\/' . $tag . '>/is', '', $svg) ?? $svg;
+        }
+
+        // Remove event handler attributes (onload, onclick, onerror, etc.)
+        $svg = preg_replace('/\s+on\w+\s*=\s*"[^"]*"/i', '', $svg) ?? $svg;
+        $svg = preg_replace("/\s+on\w+\s*=\s*'[^']*'/i", '', $svg) ?? $svg;
+
+        // Remove javascript: and data: URIs in href attributes
+        $svg = preg_replace('/href\s*=\s*["\']?\s*javascript:[^"\'>\s]*/i', 'href="removed"', $svg) ?? $svg;
+        $svg = preg_replace('/href\s*=\s*["\']?\s*data:[^"\'>\s]*/i', 'href="removed"', $svg) ?? $svg;
+
+        return $svg;
     }
 }

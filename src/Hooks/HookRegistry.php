@@ -48,18 +48,21 @@ class HookRegistry implements RegistryInterface
 
     public function runHooks(): void
     {
+        $isAdmin = $this->hookDispatcher->isAdmin();
+        $hasPluginFile = $this->pluginFile !== null;
+
         foreach ($this->getHooks() as $action) {
             if ($action instanceof Hooks) {
                 $action->hooks();
-            } elseif ($action instanceof AdminHooks && $this->hookDispatcher->isAdmin()) {
+            } elseif ($action instanceof AdminHooks && $isAdmin) {
                 $action->hooks();
             }
 
-            if ($this->pluginFile !== null && $action instanceof ActivationHooks) {
+            if ($hasPluginFile && $action instanceof ActivationHooks) {
                 $this->hookDispatcher->registerActivationHook($this->pluginFile, [$action, 'activate']);
             }
 
-            if ($this->pluginFile !== null && $action instanceof DeactivationHooks) {
+            if ($hasPluginFile && $action instanceof DeactivationHooks) {
                 $this->hookDispatcher->registerDeactivationHook($this->pluginFile, [$action, 'deactivate']);
             }
         }

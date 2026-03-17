@@ -24,7 +24,7 @@ class FilesystemCache extends AbstractCache
         $this->filesystem = $filesystem ?? new Filesystem();
 
         if (!$this->filesystem->exists($this->directory)) {
-            $this->filesystem->mkdir($this->directory, 0775);
+            $this->filesystem->mkdir($this->directory, 0755);
         }
     }
 
@@ -91,7 +91,7 @@ class FilesystemCache extends AbstractCache
     {
         if ($this->filesystem->exists($this->directory)) {
             $this->filesystem->remove($this->directory);
-            $this->filesystem->mkdir($this->directory, 0775);
+            $this->filesystem->mkdir($this->directory, 0755);
         }
 
         return true;

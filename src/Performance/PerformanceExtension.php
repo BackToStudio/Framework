@@ -8,6 +8,8 @@ use BackTo\Framework\Contracts\ExtensionInterface;
 use BackTo\Framework\Performance\Contracts\DatabaseOptimizerInterface;
 use BackTo\Framework\Performance\Contracts\HtmlOptimizerInterface;
 use BackTo\Framework\Performance\Contracts\PageCacheInterface;
+use BackTo\Framework\Performance\Hooks\MinifyHtml;
+use BackTo\Framework\Performance\Hooks\RemoveUnusedCss;
 use BackTo\Framework\Performance\Infrastructure\WordPressDatabaseOptimizer;
 use BackTo\Framework\Performance\Infrastructure\WordPressHtmlOptimizer;
 use BackTo\Framework\Performance\Infrastructure\WordPressPageCache;
@@ -27,11 +29,21 @@ class PerformanceExtension implements ExtensionInterface
     public function register(ContainerBuilder $containerBuilder): void
     {
         $this->registerPortBindings($containerBuilder);
+        $this->configureConditionalHooks($containerBuilder);
     }
 
     public function getDefaultConfiguration(): array
     {
         return PerformanceConfiguration::getDefaults();
+    }
+
+    private function configureConditionalHooks(ContainerBuilder $containerBuilder): void
+    {
+        $containerBuilder->getDefinition(MinifyHtml::class)
+            ->setArgument('$enabled', '%performance.minify_html%');
+
+        $containerBuilder->getDefinition(RemoveUnusedCss::class)
+            ->setArgument('$enabled', '%performance.remove_unused_css%');
     }
 
     private function registerPortBindings(ContainerBuilder $containerBuilder): void

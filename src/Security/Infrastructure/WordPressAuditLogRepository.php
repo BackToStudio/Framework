@@ -20,6 +20,9 @@ class WordPressAuditLogRepository implements AuditLogRepositoryInterface
     private const OPTION_KEY = 'backto_security_audit_log';
     private const MAX_STORED_EVENTS = 1000;
 
+    /** @var array<int, array<string, mixed>>|null In-memory cache to avoid repeated deserialization */
+    private ?array $cachedEvents = null;
+
     /**
      * @param array<string, mixed> $context
      */
@@ -40,6 +43,7 @@ class WordPressAuditLogRepository implements AuditLogRepositoryInterface
         }
 
         update_option(self::OPTION_KEY, $events, false);
+        $this->cachedEvents = $events;
     }
 
     /**
@@ -78,6 +82,7 @@ class WordPressAuditLogRepository implements AuditLogRepositoryInterface
         $events = array_filter($events, fn (array $e) => $e['timestamp'] >= $cutoff);
 
         update_option(self::OPTION_KEY, $events, false);
+        $this->cachedEvents = array_values($events);
 
         return $originalCount - count($events);
     }
@@ -87,8 +92,13 @@ class WordPressAuditLogRepository implements AuditLogRepositoryInterface
      */
     private function loadEvents(): array
     {
-        $events = get_option(self::OPTION_KEY, []);
+        if ($this->cachedEvents !== null) {
+            return $this->cachedEvents;
+        }
 
-        return is_array($events) ? $events : [];
+        $events = get_option(self::OPTION_KEY, []);
+        $this->cachedEvents = is_array($events) ? $events : [];
+
+        return $this->cachedEvents;
     }
 }

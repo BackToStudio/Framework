@@ -50,9 +50,26 @@ class FileIntegrityMonitor implements Hooks, SecurityRuleInterface
         return 'file_integrity_monitor';
     }
 
+    private const CRON_HOOK = 'backto_file_integrity_check';
+
     public function hooks(): void
     {
-        $this->hookDispatcher->addAction('admin_init', [$this, 'scheduleCheck']);
+        $this->hookDispatcher->addAction('admin_init', [$this, 'ensureScheduled']);
+        $this->hookDispatcher->addAction(self::CRON_HOOK, [$this, 'scheduleCheck']);
+    }
+
+    /**
+     * Ensure the cron event is scheduled (lightweight check on admin_init).
+     */
+    public function ensureScheduled(): void
+    {
+        if (! function_exists('wp_next_scheduled') || ! function_exists('wp_schedule_event')) {
+            return;
+        }
+
+        if (! \wp_next_scheduled(self::CRON_HOOK)) {
+            \wp_schedule_event(time(), 'hourly', self::CRON_HOOK);
+        }
     }
 
     public function scheduleCheck(): void

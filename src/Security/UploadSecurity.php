@@ -24,6 +24,15 @@ class UploadSecurity implements Hooks, SecurityRuleInterface
         'svg' => "<?xml",
     ];
 
+    /** @var string[] SVG elements and attributes that can execute scripts */
+    private const SVG_DANGEROUS_TAGS = [
+        'script', 'foreignObject', 'set', 'animate', 'animateTransform',
+        'animateMotion', 'handler', 'listener',
+    ];
+
+    /** @var string Pattern matching event handler attributes (onload, onclick, etc.) */
+    private const SVG_EVENT_HANDLER_PATTERN = '/\bon\w+\s*=/i';
+
     /** @var string[] */
     private const DANGEROUS_EXTENSIONS = [
         'php', 'php3', 'php4', 'php5', 'php7', 'php8', 'phtml', 'pht',
@@ -155,6 +164,50 @@ class UploadSecurity implements Hooks, SecurityRuleInterface
 
         $expected = self::MAGIC_BYTES[$extension];
 
-        return str_starts_with($bytes, $expected);
+        if (!str_starts_with($bytes, $expected)) {
+            return false;
+        }
+
+        if ($extension === 'svg') {
+            return $this->isSvgSafe($filePath);
+        }
+
+        return true;
+    }
+
+    /**
+     * Check that an SVG file does not contain dangerous elements or attributes.
+     */
+    public function isSvgSafe(string $filePath): bool
+    {
+        $content = file_get_contents($filePath);
+
+        if ($content === false) {
+            return false;
+        }
+
+        $contentLower = strtolower($content);
+
+        foreach (self::SVG_DANGEROUS_TAGS as $tag) {
+            if (str_contains($contentLower, '<' . $tag)) {
+                return false;
+            }
+        }
+
+        if (preg_match(self::SVG_EVENT_HANDLER_PATTERN, $content) === 1) {
+            return false;
+        }
+
+        // Block data: URIs in href/xlink:href (can execute JS)
+        if (preg_match('/href\s*=\s*["\']?\s*data:/i', $content) === 1) {
+            return false;
+        }
+
+        // Block javascript: URIs
+        if (preg_match('/href\s*=\s*["\']?\s*javascript:/i', $content) === 1) {
+            return false;
+        }
+
+        return true;
     }
 }

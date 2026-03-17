@@ -25,7 +25,6 @@ class WordPressRateLimiterRepository implements RateLimiterRepositoryInterface
 
         if (! is_array($data) || ! isset($data['count'])) {
             $data = ['count' => 0, 'expires' => time() + $windowSeconds];
-            set_transient($transientKey, $data, $windowSeconds);
         }
 
         $data['count']++;
