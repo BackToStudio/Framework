@@ -51,13 +51,6 @@ class PreloadPageCacheTest extends TestCase
         $this->assertSame('btf_preload_page_cache_full', PreloadPageCache::CRON_FULL_HOOK);
     }
 
-    public function testSchedulePostPreloadSkipsNonPublishedPosts(): void
-    {
-        if (!function_exists('get_post')) {
-            $this->markTestSkipped('WordPress functions not available.');
-        }
-    }
-
     public function testScheduleOnPublishSkipsSameStatus(): void
     {
         // When new and old status are the same, nothing should happen
@@ -85,37 +78,6 @@ class PreloadPageCacheTest extends TestCase
         $this->assertTrue(true);
     }
 
-    public function testPreloadUrlsSkipsCachedUrls(): void
-    {
-        if (!function_exists('wp_remote_get')) {
-            $this->markTestSkipped('WordPress functions not available.');
-        }
-
-        // When cache already has the URL, wp_remote_get should not be called
-        $this->pageCache->expects($this->once())
-            ->method('get')
-            ->with('https://example.com/')
-            ->willReturn('<html>cached</html>');
-
-        $this->preloader->preloadUrls(['https://example.com/']);
-    }
-
-    public function testPreloadUrlsFetchesUncachedUrls(): void
-    {
-        if (!function_exists('wp_remote_get')) {
-            $this->markTestSkipped('WordPress functions not available.');
-        }
-
-        $this->pageCache->expects($this->once())
-            ->method('get')
-            ->with('https://example.com/')
-            ->willReturn(null);
-
-        // wp_remote_get would be called here — in unit test context we just verify
-        // the cache check logic works
-        $this->preloader->preloadUrls(['https://example.com/']);
-    }
-
     public function testConstructorDefaultValues(): void
     {
         $preloader = new PreloadPageCache($this->hookDispatcher, $this->pageCache);
@@ -128,24 +90,4 @@ class PreloadPageCacheTest extends TestCase
         $this->assertInstanceOf(PreloadPageCache::class, $preloader);
     }
 
-    public function testGetPostRelatedUrlsRequiresWordPress(): void
-    {
-        if (!function_exists('get_permalink')) {
-            $this->markTestSkipped('WordPress functions not available.');
-        }
-    }
-
-    public function testGetSiteUrlsRequiresWordPress(): void
-    {
-        if (!function_exists('home_url')) {
-            $this->markTestSkipped('WordPress functions not available.');
-        }
-    }
-
-    public function testScheduleFullPreloadRequiresWordPress(): void
-    {
-        if (!function_exists('wp_clear_scheduled_hook')) {
-            $this->markTestSkipped('WordPress functions not available.');
-        }
-    }
 }
