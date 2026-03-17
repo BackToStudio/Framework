@@ -6,21 +6,34 @@ namespace BackTo\Framework\Seo;
 
 use BackTo\Framework\Seo\Schema\SchemaType;
 use BackTo\Framework\Seo\Schema\Type\AggregateRating;
+use BackTo\Framework\Seo\Schema\Type\Answer;
 use BackTo\Framework\Seo\Schema\Type\Article;
+use BackTo\Framework\Seo\Schema\Type\Brand;
 use BackTo\Framework\Seo\Schema\Type\BreadcrumbList;
+use BackTo\Framework\Seo\Schema\Type\Clip;
 use BackTo\Framework\Seo\Schema\Type\Course;
 use BackTo\Framework\Seo\Schema\Type\CourseInstance;
 use BackTo\Framework\Seo\Schema\Type\Event;
+use BackTo\Framework\Seo\Schema\Type\FAQPage;
 use BackTo\Framework\Seo\Schema\Type\GeoCoordinates;
 use BackTo\Framework\Seo\Schema\Type\ImageObject;
+use BackTo\Framework\Seo\Schema\Type\JobPosting;
 use BackTo\Framework\Seo\Schema\Type\ListItem;
 use BackTo\Framework\Seo\Schema\Type\LocalBusiness;
+use BackTo\Framework\Seo\Schema\Type\MerchantReturnPolicy;
+use BackTo\Framework\Seo\Schema\Type\MonetaryAmount;
 use BackTo\Framework\Seo\Schema\Type\Offer;
+use BackTo\Framework\Seo\Schema\Type\OfferShippingDetails;
 use BackTo\Framework\Seo\Schema\Type\Organization;
 use BackTo\Framework\Seo\Schema\Type\Person;
 use BackTo\Framework\Seo\Schema\Type\Place;
 use BackTo\Framework\Seo\Schema\Type\PostalAddress;
+use BackTo\Framework\Seo\Schema\Type\Product;
+use BackTo\Framework\Seo\Schema\Type\Question;
+use BackTo\Framework\Seo\Schema\Type\Rating;
+use BackTo\Framework\Seo\Schema\Type\Review;
 use BackTo\Framework\Seo\Schema\Type\SearchAction;
+use BackTo\Framework\Seo\Schema\Type\VideoObject;
 use BackTo\Framework\Seo\Schema\Type\VirtualLocation;
 use BackTo\Framework\Seo\Schema\Type\WebSite;
 
@@ -121,6 +134,71 @@ final class Schema
     public static function aggregateRating(): AggregateRating
     {
         return new AggregateRating();
+    }
+
+    public static function product(): Product
+    {
+        return new Product();
+    }
+
+    public static function brand(): Brand
+    {
+        return new Brand();
+    }
+
+    public static function offerShippingDetails(): OfferShippingDetails
+    {
+        return new OfferShippingDetails();
+    }
+
+    public static function merchantReturnPolicy(): MerchantReturnPolicy
+    {
+        return new MerchantReturnPolicy();
+    }
+
+    public static function monetaryAmount(): MonetaryAmount
+    {
+        return new MonetaryAmount();
+    }
+
+    public static function review(): Review
+    {
+        return new Review();
+    }
+
+    public static function rating(): Rating
+    {
+        return new Rating();
+    }
+
+    public static function videoObject(): VideoObject
+    {
+        return new VideoObject();
+    }
+
+    public static function clip(): Clip
+    {
+        return new Clip();
+    }
+
+    public static function faqPage(): FAQPage
+    {
+        return new FAQPage();
+    }
+
+    public static function question(): Question
+    {
+        return new Question();
+    }
+
+    public static function answer(): Answer
+    {
+        return new Answer();
+    }
+
+    public static function jobPosting(): JobPosting
+    {
+        return new JobPosting();
     }
 
     /**
