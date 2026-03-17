@@ -7,7 +7,7 @@ namespace BackTo\Framework\Cli\Command;
 /**
  * WP-CLI command: wp make:taxonomy <name> [--namespace=<namespace>] [--dir=<dir>] [--post-types=<types>] [--force]
  */
-class MakeTaxonomyCommand extends AbstractMakeCommand
+final class MakeTaxonomyCommand extends AbstractMakeCommand
 {
     protected function getTemplateName(): string
     {

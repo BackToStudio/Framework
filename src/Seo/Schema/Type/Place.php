@@ -6,7 +6,7 @@ namespace BackTo\Framework\Seo\Schema\Type;
 
 use BackTo\Framework\Seo\Schema\SchemaType;
 
-class Place extends SchemaType
+final class Place extends SchemaType
 {
     public function __construct()
     {

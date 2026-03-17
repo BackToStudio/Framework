@@ -19,7 +19,7 @@ use BackToVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
  *             ->htaccessGzip(false);
  *     };
  */
-class PerformanceConfiguration
+final class PerformanceConfiguration
 {
     /**
      * @return array<string, mixed>

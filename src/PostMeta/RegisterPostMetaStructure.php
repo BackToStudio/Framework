@@ -8,14 +8,14 @@ use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
 use BackTo\Framework\PostMeta\Contracts\PostMetaRegistrarInterface;
 
-class RegisterPostMetaStructure implements Hooks
+final class RegisterPostMetaStructure implements Hooks
 {
 
-    private PostMetaStructureRegistry $registry;
+    private readonly PostMetaStructureRegistry $registry;
 
-    private PostMetaRegistrarInterface $registrar;
+    private readonly PostMetaRegistrarInterface $registrar;
 
-    private HookDispatcherInterface $hookDispatcher;
+    private readonly HookDispatcherInterface $hookDispatcher;
 
     public function __construct(
         PostMetaStructureRegistry $postMetaStructureRegistry,

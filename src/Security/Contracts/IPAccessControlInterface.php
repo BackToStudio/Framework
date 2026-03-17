@@ -17,13 +17,9 @@ interface IPAccessControlInterface
 
     public function isBlocked(string $ip): bool;
 
-    /**
-     * @return string[]
-     */
+    
     public function getWhitelist(): array;
 
-    /**
-     * @return string[]
-     */
+    
     public function getBlacklist(): array;
 }

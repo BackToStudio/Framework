@@ -12,7 +12,7 @@ use BackTo\Framework\Observability\Contracts\LoggerInterface;
  * Writes to PHP error_log with structured formatting.
  * Respects configured minimum log level.
  */
-class WordPressLogger implements LoggerInterface
+final class WordPressLogger implements LoggerInterface
 {
     private const LEVELS = [
         'emergency' => 0,
@@ -25,8 +25,8 @@ class WordPressLogger implements LoggerInterface
         'debug' => 7,
     ];
 
-    private string $minLevel;
-    private string $channel;
+    private readonly string $minLevel;
+    private readonly string $channel;
 
     public function __construct(string $minLevel = 'debug', string $channel = 'BackTo Framework')
     {

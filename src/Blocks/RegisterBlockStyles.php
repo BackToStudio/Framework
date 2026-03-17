@@ -8,14 +8,14 @@ use BackTo\Framework\Blocks\Contracts\BlockStyleRegistrarInterface;
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
 
-class RegisterBlockStyles implements Hooks
+final class RegisterBlockStyles implements Hooks
 {
 
-    protected BlockStyleRegistry $registry;
+    protected readonly BlockStyleRegistry $registry;
 
-    private HookDispatcherInterface $hookDispatcher;
+    private readonly HookDispatcherInterface $hookDispatcher;
 
-    private BlockStyleRegistrarInterface $registrar;
+    private readonly BlockStyleRegistrarInterface $registrar;
 
     public function __construct(
         BlockStyleRegistry $registry,

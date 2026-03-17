@@ -13,18 +13,16 @@ use BackTo\Framework\Contracts\Hooks;
  * Improves FCP/LCP by preventing render-blocking scripts.
  * Removing query strings improves CDN and proxy cache hit rates.
  */
-class DeferScripts implements Hooks
+final class DeferScripts implements Hooks
 {
-    private HookDispatcherInterface $hookDispatcher;
+    private readonly HookDispatcherInterface $hookDispatcher;
 
     /** @var string[] Script handles to exclude from deferring */
-    private array $excludedHandles;
+    private readonly array $excludedHandles;
 
-    private bool $removeQueryStrings;
+    private readonly bool $removeQueryStrings;
 
-    /**
-     * @param string[] $excludedHandles
-     */
+    
     public function __construct(
         HookDispatcherInterface $hookDispatcher,
         array $excludedHandles = ['jquery-core', 'jquery-migrate'],

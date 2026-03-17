@@ -6,7 +6,7 @@ namespace BackTo\Framework\Seo\Schema\Type;
 
 use BackTo\Framework\Seo\Schema\SchemaType;
 
-class Person extends SchemaType
+final class Person extends SchemaType
 {
     public function __construct()
     {
@@ -37,10 +37,7 @@ class Person extends SchemaType
         return $this->set('image', $image);
     }
 
-    /**
-     * @param string[] $urls
-     * @return $this
-     */
+    
     public function sameAs(array $urls): static
     {
         return $this->set('sameAs', $urls);

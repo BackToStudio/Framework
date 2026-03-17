@@ -14,10 +14,10 @@ use DateInterval;
  * Keys are prefixed to avoid collisions and truncated to respect the
  * WordPress transient key limit of 172 characters.
  */
-class TransientCache extends AbstractCache
+final class TransientCache extends AbstractCache
 {
-    private string $prefix;
-    private TransientCleanerInterface $transientCleaner;
+    private readonly string $prefix;
+    private readonly TransientCleanerInterface $transientCleaner;
 
     public function __construct(TransientCleanerInterface $transientCleaner, string $prefix = 'btf_')
     {

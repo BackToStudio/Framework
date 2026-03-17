@@ -9,7 +9,7 @@ use BackTo\Framework\Contracts\Hooks;
 
 use function load_theme_textdomain;
 
-class LoadThemeTextDomain implements Hooks
+final class LoadThemeTextDomain implements Hooks
 {
 
     /**

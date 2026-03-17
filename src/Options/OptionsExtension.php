@@ -9,7 +9,7 @@ use BackTo\Framework\Options\Contracts\OptionsRepositoryInterface;
 use BackTo\Framework\Options\Infrastructure\WordPressOptionsRepository;
 use BackToVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class OptionsExtension implements ExtensionInterface
+final class OptionsExtension implements ExtensionInterface
 {
     public function getBundle(): ?array
     {

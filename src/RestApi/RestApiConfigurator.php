@@ -18,7 +18,7 @@ use BackTo\Framework\Contracts\ModuleConfiguratorInterface;
  *             ->defaultPerPage(25);
  *     };
  */
-class RestApiConfigurator implements ModuleConfiguratorInterface
+final class RestApiConfigurator implements ModuleConfiguratorInterface
 {
     /** @var array<string, mixed> */
     private array $overrides = [];

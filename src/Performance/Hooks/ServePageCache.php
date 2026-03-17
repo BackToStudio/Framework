@@ -19,18 +19,16 @@ use BackTo\Framework\Performance\Contracts\PageCacheInterface;
  * Excluded pages: admin, REST API, POST requests, logged-in users,
  * WooCommerce cart/checkout, search results, 404s.
  */
-class ServePageCache implements Hooks
+final class ServePageCache implements Hooks
 {
-    private HookDispatcherInterface $hookDispatcher;
-    private PageCacheInterface $pageCache;
-    private int $ttl;
+    private readonly HookDispatcherInterface $hookDispatcher;
+    private readonly PageCacheInterface $pageCache;
+    private readonly int $ttl;
 
     /** @var string[] URL path prefixes to exclude from caching */
-    private array $excludedPrefixes;
+    private readonly array $excludedPrefixes;
 
-    /**
-     * @param string[] $excludedPrefixes
-     */
+    
     public function __construct(
         HookDispatcherInterface $hookDispatcher,
         PageCacheInterface $pageCache,

@@ -7,7 +7,7 @@ namespace BackTo\Framework\PostMeta\Factory;
 use BackTo\Framework\PostMeta\Contracts\PostMetaInterface;
 use BackTo\Framework\PostMeta\Entity\PostMeta;
 
-class PostMetaFactory
+final class PostMetaFactory
 {
     public function create(int $postId, string $metaKey, mixed $metaValue): PostMetaInterface
     {

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Exception;
 
-class TermNotFoundException extends FrameworkException
+final class TermNotFoundException extends FrameworkException
 {
     public static function withId(int $id, string $taxonomy): self
     {

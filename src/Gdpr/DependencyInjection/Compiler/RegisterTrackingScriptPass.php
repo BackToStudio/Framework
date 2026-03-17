@@ -7,7 +7,7 @@ namespace BackTo\Framework\Gdpr\DependencyInjection\Compiler;
 use BackTo\Framework\Compose\DependencyInjection\Compiler\AbstractTaggedServiceCompilerPass;
 use BackTo\Framework\Gdpr\TrackingScriptRegistry;
 
-class RegisterTrackingScriptPass extends AbstractTaggedServiceCompilerPass
+final class RegisterTrackingScriptPass extends AbstractTaggedServiceCompilerPass
 {
     protected function getRegistryClass(): string
     {

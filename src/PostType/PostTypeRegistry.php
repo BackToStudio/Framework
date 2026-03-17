@@ -8,7 +8,7 @@ use BackTo\Framework\Contracts\RegistryInterface;
 use BackTo\Framework\PostType\Contracts\PostTypeInterface;
 use BackTo\Framework\PostType\Contracts\PostTypeRegistryInterface;
 
-class PostTypeRegistry implements RegistryInterface, PostTypeRegistryInterface
+final class PostTypeRegistry implements RegistryInterface, PostTypeRegistryInterface
 {
     /** @var PostTypeInterface[] */
     private array $postTypes = [];
@@ -20,9 +20,7 @@ class PostTypeRegistry implements RegistryInterface, PostTypeRegistryInterface
         return $this;
     }
 
-    /**
-     * @return PostTypeInterface[]
-     */
+    
     public function getPostTypes(): array
     {
         return $this->postTypes;

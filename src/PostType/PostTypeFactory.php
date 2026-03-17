@@ -8,7 +8,7 @@ use BackTo\Framework\Exception\InvalidPostTypeException;
 use BackTo\Framework\PostType\Contracts\PostTypeInterface;
 use BackTo\Framework\PostType\Entity\PostType;
 
-class PostTypeFactory
+final class PostTypeFactory
 {
     /**
      * @param array<string, mixed> $args

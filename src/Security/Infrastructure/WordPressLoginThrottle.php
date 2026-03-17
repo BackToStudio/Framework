@@ -13,7 +13,7 @@ use function delete_transient;
 /**
  * WordPress adapter for login throttling using transients.
  */
-class WordPressLoginThrottle implements LoginThrottleInterface
+final class WordPressLoginThrottle implements LoginThrottleInterface
 {
     private const TRANSIENT_PREFIX = 'backto_login_attempts_';
     private const LOCKOUT_PREFIX = 'backto_login_lockout_';

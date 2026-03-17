@@ -9,9 +9,9 @@ use BackTo\Framework\Contracts\HookDispatcherInterface;
 
 use function add_menu_page;
 
-class AddReusableBlockMenu implements AdminHooks {
+final class AddReusableBlockMenu implements AdminHooks {
 
-	private HookDispatcherInterface $hookDispatcher;
+	private readonly HookDispatcherInterface $hookDispatcher;
 
 	public function __construct(HookDispatcherInterface $hookDispatcher)
 	{

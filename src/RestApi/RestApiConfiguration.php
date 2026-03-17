@@ -19,7 +19,7 @@ use BackToVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
  *             ->defaultPerPage(25);
  *     };
  */
-class RestApiConfiguration
+final class RestApiConfiguration
 {
     /**
      * @return array<string, mixed>

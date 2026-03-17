@@ -6,7 +6,7 @@ namespace BackTo\Framework\Cache\Strategy;
 
 use DateInterval;
 
-class MemoryCache extends AbstractCache
+final class MemoryCache extends AbstractCache
 {
     /** @var array<string, mixed> */
     private array $store = [];

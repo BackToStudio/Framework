@@ -21,7 +21,7 @@ use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
  */
 class CorsManager implements Hooks, SecurityRuleInterface, CorsManagerInterface
 {
-    private HookDispatcherInterface $hookDispatcher;
+    private readonly HookDispatcherInterface $hookDispatcher;
 
     /** @var string[] */
     private array $allowedOrigins = [];
@@ -178,25 +178,19 @@ class CorsManager implements Hooks, SecurityRuleInterface, CorsManagerInterface
         return $served;
     }
 
-    /**
-     * @return string[]
-     */
+    
     public function getAllowedOrigins(): array
     {
         return $this->allowedOrigins;
     }
 
-    /**
-     * @return string[]
-     */
+    
     public function getAllowedMethods(): array
     {
         return $this->allowedMethods;
     }
 
-    /**
-     * @return string[]
-     */
+    
     public function getAllowedHeaders(): array
     {
         return $this->allowedHeaders;

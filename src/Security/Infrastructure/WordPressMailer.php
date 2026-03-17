@@ -9,7 +9,7 @@ use BackTo\Framework\Security\Contracts\MailerInterface;
 /**
  * WordPress adapter for sending emails via wp_mail().
  */
-class WordPressMailer implements MailerInterface
+final class WordPressMailer implements MailerInterface
 {
     public function send(string $to, string $subject, string $body): bool
     {

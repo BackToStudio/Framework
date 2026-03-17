@@ -14,13 +14,13 @@ use BackTo\Framework\Queue\Factory\JobFactory;
  * The worker claims pending jobs, executes their handlers,
  * manages retries, and handles recurring job rescheduling.
  */
-class QueueWorker
+final class QueueWorker
 {
     private const MAX_BATCH_SIZE = 100;
 
-    private QueueRepositoryInterface $repository;
-    private QueueRegistry $registry;
-    private JobFactory $factory;
+    private readonly QueueRepositoryInterface $repository;
+    private readonly QueueRegistry $registry;
+    private readonly JobFactory $factory;
 
     public function __construct(
         QueueRepositoryInterface $repository,

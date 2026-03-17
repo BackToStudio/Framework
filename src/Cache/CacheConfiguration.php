@@ -19,7 +19,7 @@ use BackToVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
  *             ->enabled(false);
  *     };
  */
-class CacheConfiguration
+final class CacheConfiguration
 {
     /**
      * @return array<string, mixed>

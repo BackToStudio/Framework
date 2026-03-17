@@ -18,7 +18,7 @@ use BackTo\Framework\Contracts\ModuleConfiguratorInterface;
  *             ->robotsDefault('noindex, nofollow');
  *     };
  */
-class SeoConfigurator implements ModuleConfiguratorInterface
+final class SeoConfigurator implements ModuleConfiguratorInterface
 {
     /** @var array<string, mixed> */
     private array $overrides = [];

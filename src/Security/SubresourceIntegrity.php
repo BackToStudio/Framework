@@ -19,9 +19,9 @@ use BackTo\Framework\Security\Contracts\SubresourceIntegrityInterface;
  *   $sri->registerHash('jquery', 'sha384-abc123...');
  *   // Automatically adds integrity="sha384-abc123..." crossorigin="anonymous" to the tag
  */
-class SubresourceIntegrity implements Hooks, SecurityRuleInterface, SubresourceIntegrityInterface
+final class SubresourceIntegrity implements Hooks, SecurityRuleInterface, SubresourceIntegrityInterface
 {
-    private HookDispatcherInterface $hookDispatcher;
+    private readonly HookDispatcherInterface $hookDispatcher;
 
     /** @var array<string, string> handle => hash */
     private array $hashes = [];

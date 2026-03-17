@@ -17,7 +17,7 @@ use BackTo\Framework\Performance\Contracts\HtmlOptimizerInterface;
  * - Collapsing whitespace between inline tags (> <)
  * - Removing optional type attributes from script/style tags
  */
-class WordPressHtmlOptimizer implements HtmlOptimizerInterface
+final class WordPressHtmlOptimizer implements HtmlOptimizerInterface
 {
     /**
      * Block-level elements where whitespace between closing/opening tags is insignificant.

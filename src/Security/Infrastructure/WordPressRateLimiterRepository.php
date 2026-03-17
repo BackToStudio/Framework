@@ -12,7 +12,7 @@ use function set_transient;
 /**
  * WordPress adapter for rate limiter persistence using transients.
  */
-class WordPressRateLimiterRepository implements RateLimiterRepositoryInterface
+final class WordPressRateLimiterRepository implements RateLimiterRepositoryInterface
 {
     private const PREFIX = 'backto_rl_';
 

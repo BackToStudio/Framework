@@ -7,16 +7,16 @@ namespace BackTo\Framework\Observability\Contracts;
 /**
  * Value object representing the result of a health check.
  */
-class HealthCheckResult
+final class HealthCheckResult
 {
     public const STATUS_HEALTHY = 'healthy';
     public const STATUS_DEGRADED = 'degraded';
     public const STATUS_UNHEALTHY = 'unhealthy';
 
     private string $status;
-    private string $message;
+    private readonly string $message;
     /** @var array<string, mixed> */
-    private array $metadata;
+    private readonly array $metadata;
 
     /**
      * @param array<string, mixed> $metadata

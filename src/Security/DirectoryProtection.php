@@ -11,7 +11,7 @@ use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
 
 class DirectoryProtection implements Hooks, ActivationHooks, SecurityRuleInterface
 {
-    private HookDispatcherInterface $hookDispatcher;
+    private readonly HookDispatcherInterface $hookDispatcher;
 
     private const HTACCESS_CONTENT = <<<'HTACCESS'
 # Disable directory browsing
@@ -74,9 +74,7 @@ HTACCESS;
         $this->writeProtectionFile($uploadDir . '/index.php', self::INDEX_CONTENT);
     }
 
-    /**
-     * @return string[]
-     */
+    
     public function getProtectedPaths(): array
     {
         $uploadDir = $this->getUploadDir();

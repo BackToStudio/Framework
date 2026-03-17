@@ -9,7 +9,7 @@ use BackTo\Framework\Compose\Type;
 /**
  * @deprecated Use BackTo\Framework\Compose\Type enum directly.
  */
-class PostMetaType
+final class PostMetaType
 {
     public const STRING = 'string';
     public const BOOLEAN = 'boolean';

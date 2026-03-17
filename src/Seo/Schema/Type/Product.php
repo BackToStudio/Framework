@@ -6,7 +6,7 @@ namespace BackTo\Framework\Seo\Schema\Type;
 
 use BackTo\Framework\Seo\Schema\SchemaType;
 
-class Product extends SchemaType
+final class Product extends SchemaType
 {
     public function __construct()
     {
@@ -90,10 +90,7 @@ class Product extends SchemaType
         return $this->set('material', $material);
     }
 
-    /**
-     * @param SchemaType|SchemaType[] $offers
-     * @return $this
-     */
+    
     public function offers(SchemaType|array $offers): static
     {
         return $this->set('offers', $offers);
@@ -105,10 +102,7 @@ class Product extends SchemaType
         return $this->set('aggregateRating', $rating);
     }
 
-    /**
-     * @param SchemaType|SchemaType[] $reviews
-     * @return $this
-     */
+    
     public function review(SchemaType|array $reviews): static
     {
         return $this->set('review', $reviews);

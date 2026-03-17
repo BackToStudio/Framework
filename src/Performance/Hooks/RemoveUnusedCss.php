@@ -17,13 +17,13 @@ use BackTo\Framework\Contracts\Hooks;
  * Hooks into template_redirect at a lower priority than MinifyHtml so it runs
  * on the raw HTML before minification.
  */
-class RemoveUnusedCss implements Hooks
+final class RemoveUnusedCss implements Hooks
 {
-    private HookDispatcherInterface $hookDispatcher;
-    private bool $enabled;
+    private readonly HookDispatcherInterface $hookDispatcher;
+    private readonly bool $enabled;
 
     /** @var string[] CSS block IDs to never touch */
-    private array $preserveIds;
+    private readonly array $preserveIds;
 
     /**
      * @param string[] $preserveIds Style block IDs to never strip (e.g., 'global-styles-inline-css')

@@ -17,10 +17,10 @@ use BackToVendor\Symfony\Component\Filesystem\Filesystem;
  *   {cacheDir}/{md5(url)}.html     - The cached HTML content
  *   {cacheDir}/{md5(url)}.meta     - Metadata (expiry, original URL)
  */
-class WordPressPageCache implements PageCacheInterface
+final class WordPressPageCache implements PageCacheInterface
 {
-    private Filesystem $filesystem;
-    private string $cacheDir;
+    private readonly Filesystem $filesystem;
+    private readonly string $cacheDir;
 
     public function __construct(string $cacheDir, ?Filesystem $filesystem = null)
     {

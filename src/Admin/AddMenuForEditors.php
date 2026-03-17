@@ -12,9 +12,9 @@ use function current_user_can;
 use function get_role;
 use function remove_submenu_page;
 
-class AddMenuForEditors implements AdminHooks {
+final class AddMenuForEditors implements AdminHooks {
 
-	private HookDispatcherInterface $hookDispatcher;
+	private readonly HookDispatcherInterface $hookDispatcher;
 
 	public function __construct(HookDispatcherInterface $hookDispatcher)
 	{

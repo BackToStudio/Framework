@@ -12,7 +12,7 @@ use function update_user_meta;
 /**
  * WordPress adapter for login location persistence using user meta.
  */
-class WordPressLoginLocationRepository implements LoginLocationRepositoryInterface
+final class WordPressLoginLocationRepository implements LoginLocationRepositoryInterface
 {
     private const META_HISTORY = '_backto_login_history';
     private const META_COUNTRIES = '_backto_known_countries';
@@ -63,9 +63,7 @@ class WordPressLoginLocationRepository implements LoginLocationRepositoryInterfa
         return array_slice($history, 0, $limit);
     }
 
-    /**
-     * @return string[]
-     */
+    
     public function getKnownCountries(int $userId): array
     {
         /** @var mixed $countries */

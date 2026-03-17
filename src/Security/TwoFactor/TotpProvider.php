@@ -14,7 +14,7 @@ use BackTo\Framework\Security\TwoFactor\Contracts\TotpProviderInterface;
  * @see https://datatracker.ietf.org/doc/html/rfc6238
  * @see https://datatracker.ietf.org/doc/html/rfc4226
  */
-class TotpProvider implements TotpProviderInterface
+final class TotpProvider implements TotpProviderInterface
 {
     private const PERIOD = 30;
     private const DIGITS = 6;

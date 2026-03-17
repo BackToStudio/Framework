@@ -11,7 +11,7 @@ use BackTo\Framework\PostType\DependencyInjection\Compiler\RegisterPostTypePass;
 use BackTo\Framework\PostType\Infrastructure\WordPressPostTypeRegistrar;
 use BackToVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class PostTypeExtension implements ExtensionInterface
+final class PostTypeExtension implements ExtensionInterface
 {
     public function getBundle(): ?array
     {

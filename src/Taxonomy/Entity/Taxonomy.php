@@ -6,7 +6,7 @@ namespace BackTo\Framework\Taxonomy\Entity;
 
 use BackTo\Framework\Taxonomy\Contracts\TaxonomyInterface;
 
-class Taxonomy implements TaxonomyInterface
+final class Taxonomy implements TaxonomyInterface
 {
     private string $key = '';
 
@@ -46,17 +46,13 @@ class Taxonomy implements TaxonomyInterface
         return $this;
     }
 
-    /**
-     * @return string[]
-     */
+    
     public function getPostTypes(): array
     {
         return $this->postTypes;
     }
 
-    /**
-     * @param string[] $postTypes
-     */
+    
     public function setPostTypes(array $postTypes): TaxonomyInterface
     {
         $this->postTypes = $postTypes;

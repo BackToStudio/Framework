@@ -26,22 +26,22 @@ class OptimizeHtaccess implements Hooks, ActivationHooks
 {
     public const MARKER = 'BackTo Performance';
 
-    private HookDispatcherInterface $hookDispatcher;
+    private readonly HookDispatcherInterface $hookDispatcher;
 
     /** @var bool Whether to enable gzip compression */
-    private bool $gzip;
+    private readonly bool $gzip;
 
     /** @var bool Whether to set browser cache (Expires + Cache-Control) */
-    private bool $browserCache;
+    private readonly bool $browserCache;
 
     /** @var bool Whether to remove ETags */
-    private bool $removeEtags;
+    private readonly bool $removeEtags;
 
     /** @var bool Whether to enable Keep-Alive */
-    private bool $keepAlive;
+    private readonly bool $keepAlive;
 
     /** @var int Default cache TTL in seconds for static assets */
-    private int $staticTtl;
+    private readonly int $staticTtl;
 
     public function __construct(
         HookDispatcherInterface $hookDispatcher,

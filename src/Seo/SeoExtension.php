@@ -7,7 +7,7 @@ namespace BackTo\Framework\Seo;
 use BackTo\Framework\Contracts\ExtensionInterface;
 use BackToVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class SeoExtension implements ExtensionInterface
+final class SeoExtension implements ExtensionInterface
 {
     public function getBundle(): ?array
     {

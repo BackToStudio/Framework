@@ -6,7 +6,7 @@ namespace BackTo\Framework\Seo\Schema\Type;
 
 use BackTo\Framework\Seo\Schema\SchemaType;
 
-class ImageObject extends SchemaType
+final class ImageObject extends SchemaType
 {
     public function __construct()
     {

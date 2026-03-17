@@ -12,7 +12,7 @@ use BackTo\Framework\Queue\DependencyInjection\Compiler\RegisterQueuePass;
 use BackTo\Framework\Queue\Infrastructure\WordPressQueueRepository;
 use BackToVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class QueueExtension implements ExtensionInterface
+final class QueueExtension implements ExtensionInterface
 {
     public function getBundle(): ?array
     {

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Exception;
 
-class PostNotFoundException extends FrameworkException
+final class PostNotFoundException extends FrameworkException
 {
     public static function withId(int $id): self
     {

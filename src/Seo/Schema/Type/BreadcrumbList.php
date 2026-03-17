@@ -6,7 +6,7 @@ namespace BackTo\Framework\Seo\Schema\Type;
 
 use BackTo\Framework\Seo\Schema\SchemaType;
 
-class BreadcrumbList extends SchemaType
+final class BreadcrumbList extends SchemaType
 {
     public function __construct()
     {

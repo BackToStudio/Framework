@@ -7,7 +7,7 @@ namespace BackTo\Framework\Observability\DependencyInjection\Compiler;
 use BackTo\Framework\Compose\DependencyInjection\Compiler\AbstractTaggedServiceCompilerPass;
 use BackTo\Framework\Observability\HealthCheckRegistry;
 
-class RegisterHealthCheckPass extends AbstractTaggedServiceCompilerPass
+final class RegisterHealthCheckPass extends AbstractTaggedServiceCompilerPass
 {
     protected function getRegistryClass(): string
     {

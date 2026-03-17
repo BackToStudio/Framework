@@ -12,9 +12,9 @@ use function preg_match;
 use function str_ends_with;
 use function str_replace;
 
-class ReplaceImgTagBySvgTag
+final class ReplaceImgTagBySvgTag
 {
-    private SvgFactory $factory;
+    private readonly SvgFactory $factory;
 
     public function __construct(SvgFactory $factory)
     {

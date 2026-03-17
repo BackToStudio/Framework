@@ -13,10 +13,10 @@ use function wp_localize_script;
 use function wp_register_script;
 use function wp_register_style;
 
-class WordPressScriptsAssets
+final class WordPressScriptsAssets
 {
-    private string $assetDirectory;
-    private string $assetDirectoryUri;
+    private readonly string $assetDirectory;
+    private readonly string $assetDirectoryUri;
 
     public function __construct(string $assetDirectory, string $assetDirectoryUri)
     {

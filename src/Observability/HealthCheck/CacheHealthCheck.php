@@ -11,9 +11,9 @@ use BackTo\Framework\Observability\Contracts\HealthCheckResult;
 /**
  * Verifies that the cache subsystem is operational.
  */
-class CacheHealthCheck implements HealthCheckInterface
+final class CacheHealthCheck implements HealthCheckInterface
 {
-    private CacheInterface $cache;
+    private readonly CacheInterface $cache;
 
     public function __construct(CacheInterface $cache)
     {

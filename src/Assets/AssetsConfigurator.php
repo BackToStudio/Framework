@@ -16,7 +16,7 @@ use BackTo\Framework\Contracts\ModuleConfiguratorInterface;
  *         $assets->versionStrategy('timestamp');
  *     };
  */
-class AssetsConfigurator implements ModuleConfiguratorInterface
+final class AssetsConfigurator implements ModuleConfiguratorInterface
 {
     /** @var array<string, mixed> */
     private array $overrides = [];

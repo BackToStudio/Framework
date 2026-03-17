@@ -11,7 +11,7 @@ use BackTo\Framework\Seo\Contracts\SeoProviderInterface;
  *
  * Iterates over registered providers and returns the first active one.
  */
-class SeoManager
+final class SeoManager
 {
     /** @var SeoProviderInterface[] */
     private array $providers;
@@ -19,9 +19,7 @@ class SeoManager
     private ?SeoProviderInterface $resolved = null;
     private bool $wasResolved = false;
 
-    /**
-     * @param SeoProviderInterface[] $providers
-     */
+    
     public function __construct(array $providers = [])
     {
         $this->providers = $providers;

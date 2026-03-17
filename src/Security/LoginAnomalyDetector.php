@@ -26,9 +26,9 @@ class LoginAnomalyDetector implements Hooks, SecurityRuleInterface
 {
     use ClientIpTrait;
 
-    private HookDispatcherInterface $hookDispatcher;
-    private LoginLocationRepositoryInterface $repository;
-    private LoggerInterface $logger;
+    private readonly HookDispatcherInterface $hookDispatcher;
+    private readonly LoginLocationRepositoryInterface $repository;
+    private readonly LoggerInterface $logger;
 
     /** @var int Max seconds between logins from different countries to flag impossible travel */
     private const IMPOSSIBLE_TRAVEL_THRESHOLD = 3600; // 1 hour

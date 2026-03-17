@@ -13,11 +13,11 @@ use BackTo\Framework\Seo\Schema\SchemaManager;
  *
  * Usage in Twig: {{ schema.render()|raw }}
  */
-class AddSchemaToTimberContext implements Hooks
+final class AddSchemaToTimberContext implements Hooks
 {
-    private SchemaManager $schemaManager;
+    private readonly SchemaManager $schemaManager;
 
-    private HookDispatcherInterface $hookDispatcher;
+    private readonly HookDispatcherInterface $hookDispatcher;
 
     public function __construct(SchemaManager $schemaManager, HookDispatcherInterface $hookDispatcher)
     {

@@ -13,10 +13,10 @@ use BackTo\Framework\Observability\Contracts\LoggerInterface;
  * In debug mode, exceptions are re-thrown for immediate visibility.
  * In production, exceptions are logged and execution continues gracefully.
  */
-class ErrorHandler implements ErrorHandlerInterface
+final class ErrorHandler implements ErrorHandlerInterface
 {
-    private LoggerInterface $logger;
-    private bool $debug;
+    private readonly LoggerInterface $logger;
+    private readonly bool $debug;
 
     public function __construct(LoggerInterface $logger, bool $debug = false)
     {

@@ -10,10 +10,10 @@ use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
 
 class RestApiSecurity implements Hooks, SecurityRuleInterface
 {
-    private HookDispatcherInterface $hookDispatcher;
+    private readonly HookDispatcherInterface $hookDispatcher;
 
     /** @var string[] */
-    private array $additionalPublicPatterns;
+    private readonly array $additionalPublicPatterns;
 
     /**
      * @param string[] $additionalPublicPatterns Extra regex patterns for public routes.
@@ -80,9 +80,7 @@ class RestApiSecurity implements Hooks, SecurityRuleInterface
         return $response;
     }
 
-    /**
-     * @return string[]
-     */
+    
     protected function getPublicRoutePatterns(): array
     {
         return array_merge([
@@ -125,9 +123,7 @@ class RestApiSecurity implements Hooks, SecurityRuleInterface
         return function_exists('is_user_logged_in') && is_user_logged_in();
     }
 
-    /**
-     * @return \WP_Error
-     */
+    
     protected function createAuthenticationError(): mixed
     {
         return new \WP_Error(

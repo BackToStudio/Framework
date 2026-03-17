@@ -9,10 +9,10 @@ use BackTo\Framework\Contracts\Hooks;
 use BackTo\Framework\Security\Contracts\ContentSecurityPolicyInterface;
 use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
 
-class ContentSecurityPolicyManager implements Hooks, SecurityRuleInterface, ContentSecurityPolicyInterface
+final class ContentSecurityPolicyManager implements Hooks, SecurityRuleInterface, ContentSecurityPolicyInterface
 {
-    private HookDispatcherInterface $hookDispatcher;
-    private bool $reportOnly;
+    private readonly HookDispatcherInterface $hookDispatcher;
+    private readonly bool $reportOnly;
     private string $nonce = '';
 
     /** @var array<string, string[]> */
@@ -49,9 +49,7 @@ class ContentSecurityPolicyManager implements Hooks, SecurityRuleInterface, Cont
         $this->hookDispatcher->addFilter('script_loader_tag', [$this, 'addNonceToScripts'], 10, 2);
     }
 
-    /**
-     * @param string|string[] $value
-     */
+    
     public function addDirective(string $directive, string|array $value): self
     {
         $values = is_array($value) ? $value : [$value];

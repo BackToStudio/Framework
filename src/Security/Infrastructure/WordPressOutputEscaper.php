@@ -15,7 +15,7 @@ use function esc_url;
 /**
  * WordPress adapter for output escaping.
  */
-class WordPressOutputEscaper implements OutputEscaperInterface
+final class WordPressOutputEscaper implements OutputEscaperInterface
 {
     public function html(string $input): string
     {

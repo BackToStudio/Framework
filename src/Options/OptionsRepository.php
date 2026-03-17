@@ -9,9 +9,9 @@ use BackTo\Framework\Options\Contracts\OptionsRepositoryInterface;
 /**
  * @deprecated Use OptionsRepositoryInterface with WordPressOptionsRepository instead.
  */
-class OptionsRepository
+final class OptionsRepository
 {
-    private OptionsRepositoryInterface $repository;
+    private readonly OptionsRepositoryInterface $repository;
 
     public function __construct(OptionsRepositoryInterface $repository)
     {

@@ -9,7 +9,7 @@ use BackTo\Framework\Cache\Infrastructure\WordPressTransientCleaner;
 use BackTo\Framework\Contracts\ExtensionInterface;
 use BackToVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class CacheExtension implements ExtensionInterface
+final class CacheExtension implements ExtensionInterface
 {
     public function getBundle(): ?array
     {

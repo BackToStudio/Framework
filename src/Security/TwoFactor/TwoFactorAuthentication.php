@@ -23,12 +23,12 @@ use BackTo\Framework\Security\TwoFactor\Contracts\TwoFactorRepositoryInterface;
  */
 class TwoFactorAuthentication implements Hooks, SecurityRuleInterface
 {
-    private HookDispatcherInterface $hookDispatcher;
-    private TwoFactorRepositoryInterface $repository;
-    private TotpProviderInterface $totpProvider;
-    private BackupCodeManagerInterface $backupCodeManager;
-    private LoggerInterface $logger;
-    private string $issuer;
+    private readonly HookDispatcherInterface $hookDispatcher;
+    private readonly TwoFactorRepositoryInterface $repository;
+    private readonly TotpProviderInterface $totpProvider;
+    private readonly BackupCodeManagerInterface $backupCodeManager;
+    private readonly LoggerInterface $logger;
+    private readonly string $issuer;
 
     public function __construct(
         HookDispatcherInterface $hookDispatcher,
@@ -263,9 +263,7 @@ class TwoFactorAuthentication implements Hooks, SecurityRuleInterface
         return null;
     }
 
-    /**
-     * @return \WP_Error
-     */
+    
     protected function createTwoFactorRequiredError(int $userId): mixed
     {
         return new \WP_Error(
@@ -275,9 +273,7 @@ class TwoFactorAuthentication implements Hooks, SecurityRuleInterface
         );
     }
 
-    /**
-     * @return \WP_Error
-     */
+    
     protected function createInvalidCodeError(): mixed
     {
         return new \WP_Error(

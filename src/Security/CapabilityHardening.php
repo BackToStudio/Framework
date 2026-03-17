@@ -22,9 +22,9 @@ class CapabilityHardening implements Hooks, SecurityRuleInterface
 {
     use ClientIpTrait;
 
-    private HookDispatcherInterface $hookDispatcher;
-    private LoggerInterface $logger;
-    private AuditLogRepositoryInterface $auditLog;
+    private readonly HookDispatcherInterface $hookDispatcher;
+    private readonly LoggerInterface $logger;
+    private readonly AuditLogRepositoryInterface $auditLog;
 
     /** @var string[] Roles that require elevated verification */
     private const PRIVILEGED_ROLES = [
@@ -177,9 +177,7 @@ class CapabilityHardening implements Hooks, SecurityRuleInterface
         return false;
     }
 
-    /**
-     * @return string[]
-     */
+    
     public function getSensitiveCapabilities(): array
     {
         return self::SENSITIVE_CAPABILITIES;
@@ -194,9 +192,7 @@ class CapabilityHardening implements Hooks, SecurityRuleInterface
         return 0;
     }
 
-    /**
-     * @param string[] $oldRoles
-     */
+    
     protected function revertRole(int $userId, array $oldRoles): void
     {
         $role = $oldRoles[0] ?? 'subscriber';

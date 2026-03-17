@@ -11,7 +11,7 @@ use BackTo\Framework\Taxonomy\DependencyInjection\Compiler\RegisterTaxonomyPass;
 use BackTo\Framework\Taxonomy\Infrastructure\WordPressTaxonomyRegistrar;
 use BackToVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class TaxonomyExtension implements ExtensionInterface
+final class TaxonomyExtension implements ExtensionInterface
 {
     public function getBundle(): ?array
     {

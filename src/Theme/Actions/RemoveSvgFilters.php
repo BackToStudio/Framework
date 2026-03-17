@@ -8,7 +8,7 @@ use BackTo\Framework\Contracts\Hooks;
 
 use function remove_action;
 
-class RemoveSvgFilters implements Hooks
+final class RemoveSvgFilters implements Hooks
 {
 
     public function hooks(): void

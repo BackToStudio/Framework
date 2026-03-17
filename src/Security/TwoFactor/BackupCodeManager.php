@@ -6,13 +6,11 @@ namespace BackTo\Framework\Security\TwoFactor;
 
 use BackTo\Framework\Security\TwoFactor\Contracts\BackupCodeManagerInterface;
 
-class BackupCodeManager implements BackupCodeManagerInterface
+final class BackupCodeManager implements BackupCodeManagerInterface
 {
     private const CODE_LENGTH = 8;
 
-    /**
-     * @return string[]
-     */
+    
     public function generate(int $count = 8): array
     {
         $codes = [];
@@ -29,17 +27,13 @@ class BackupCodeManager implements BackupCodeManagerInterface
         return password_hash($this->normalizeCode($code), PASSWORD_BCRYPT);
     }
 
-    /**
-     * @param string[] $hashedCodes
-     */
+    
     public function verify(string $code, array $hashedCodes): bool
     {
         return $this->findMatchingIndex($code, $hashedCodes) !== null;
     }
 
-    /**
-     * @param string[] $hashedCodes
-     */
+    
     public function findMatchingIndex(string $code, array $hashedCodes): ?int
     {
         $normalized = $this->normalizeCode($code);

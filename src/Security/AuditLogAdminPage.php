@@ -19,7 +19,7 @@ class AuditLogAdminPage implements AdminPageInterface
     private const EXPORT_LIMIT = 10000;
     private const EXPORT_COOLDOWN_SECONDS = 60;
 
-    private AuditLogRepositoryInterface $repository;
+    private readonly AuditLogRepositoryInterface $repository;
 
     private int $perPage = self::DEFAULT_PER_PAGE;
 
@@ -330,9 +330,7 @@ class AuditLogAdminPage implements AdminPageInterface
         header('Content-Disposition: attachment; filename="audit-log-' . gmdate('Y-m-d') . '.csv"');
     }
 
-    /**
-     * @return resource|false
-     */
+    
     protected function openOutputStream()
     {
         return fopen('php://output', 'w');

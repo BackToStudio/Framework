@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * WordPress function stubs for unit testing outside of WordPress.
  * These are only defined if the real functions don't exist.

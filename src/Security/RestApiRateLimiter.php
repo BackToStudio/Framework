@@ -19,8 +19,8 @@ class RestApiRateLimiter implements Hooks, SecurityRuleInterface
 {
     use ClientIpTrait;
 
-    private HookDispatcherInterface $hookDispatcher;
-    private RateLimiterRepositoryInterface $repository;
+    private readonly HookDispatcherInterface $hookDispatcher;
+    private readonly RateLimiterRepositoryInterface $repository;
 
     private const DEFAULT_RATE_LIMIT = 60;
     private const DEFAULT_RATE_WINDOW = 60;
@@ -171,9 +171,7 @@ class RestApiRateLimiter implements Hooks, SecurityRuleInterface
         return headers_sent();
     }
 
-    /**
-     * @return \WP_Error
-     */
+    
     protected function buildRateLimitResponse(string $key, int $limit): mixed
     {
         $retryAfter = $this->repository->getTtl($key);

@@ -7,10 +7,10 @@ namespace BackTo\Framework\Theme\Actions;
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
 
-class RemoveNavigationFallback implements Hooks
+final class RemoveNavigationFallback implements Hooks
 {
 
-    private HookDispatcherInterface $hookDispatcher;
+    private readonly HookDispatcherInterface $hookDispatcher;
 
     public function __construct(HookDispatcherInterface $hookDispatcher)
     {

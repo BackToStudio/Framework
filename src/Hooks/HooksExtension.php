@@ -11,7 +11,7 @@ use BackTo\Framework\Hooks\DependencyInjection\Compiler\RegisterHookPass;
 use BackTo\Framework\Hooks\Infrastructure\WordPressHookDispatcher;
 use BackToVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class HooksExtension implements ExtensionInterface
+final class HooksExtension implements ExtensionInterface
 {
     public function getBundle(): ?array
     {

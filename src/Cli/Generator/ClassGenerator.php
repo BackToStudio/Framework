@@ -9,7 +9,7 @@ namespace BackTo\Framework\Cli\Generator;
  *
  * Used by WP-CLI commands to scaffold framework components.
  */
-class ClassGenerator
+final class ClassGenerator
 {
     /**
      * @param array<string, string> $replacements

@@ -18,7 +18,7 @@ use BackTo\Framework\Contracts\ModuleConfiguratorInterface;
  *             ->performanceTracking(true);
  *     };
  */
-class ObservabilityConfigurator implements ModuleConfiguratorInterface
+final class ObservabilityConfigurator implements ModuleConfiguratorInterface
 {
     /** @var array<string, mixed> */
     private array $overrides = [];

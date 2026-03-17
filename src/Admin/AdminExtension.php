@@ -11,7 +11,7 @@ use BackTo\Framework\Admin\Infrastructure\WordPressAdminPageRegistrar;
 use BackTo\Framework\Contracts\ExtensionInterface;
 use BackToVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class AdminExtension implements ExtensionInterface
+final class AdminExtension implements ExtensionInterface
 {
     public function getBundle(): ?array
     {

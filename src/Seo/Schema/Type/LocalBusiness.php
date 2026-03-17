@@ -6,7 +6,7 @@ namespace BackTo\Framework\Seo\Schema\Type;
 
 use BackTo\Framework\Seo\Schema\SchemaType;
 
-class LocalBusiness extends SchemaType
+final class LocalBusiness extends SchemaType
 {
     public function __construct()
     {
@@ -84,10 +84,7 @@ class LocalBusiness extends SchemaType
         return $this->set('geo', $geo);
     }
 
-    /**
-     * @param string[] $urls
-     * @return $this
-     */
+    
     public function sameAs(array $urls): static
     {
         return $this->set('sameAs', $urls);

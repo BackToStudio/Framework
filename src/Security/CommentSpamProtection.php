@@ -22,8 +22,8 @@ class CommentSpamProtection implements Hooks, SecurityRuleInterface
     use ClientIpTrait;
     use HtmlEscapeTrait;
 
-    private HookDispatcherInterface $hookDispatcher;
-    private LoggerInterface $logger;
+    private readonly HookDispatcherInterface $hookDispatcher;
+    private readonly LoggerInterface $logger;
 
     private int $maxLinksAllowed = 2;
     private string $honeypotFieldName = 'website_url_confirm';

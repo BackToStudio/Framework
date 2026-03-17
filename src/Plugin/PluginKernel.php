@@ -6,7 +6,7 @@ namespace BackTo\Framework\Plugin;
 
 use BackTo\Framework\Compose\AbstractKernel;
 
-class PluginKernel extends AbstractKernel
+final class PluginKernel extends AbstractKernel
 {
     protected function getDirectoryParameterName(): string
     {

@@ -10,12 +10,12 @@ use BackTo\Framework\Exception\FrameworkException;
 use BackTo\Framework\Exception\InvalidTaxonomyException;
 use BackTo\Framework\Taxonomy\Contracts\TaxonomyRegistrarInterface;
 
-class RegisterTaxonomy implements Hooks
+final class RegisterTaxonomy implements Hooks
 {
-    private TaxonomyRegistry $registry;
-    private TaxonomyFactory $factory;
-    private TaxonomyRegistrarInterface $registrar;
-    private HookDispatcherInterface $hookDispatcher;
+    private readonly TaxonomyRegistry $registry;
+    private readonly TaxonomyFactory $factory;
+    private readonly TaxonomyRegistrarInterface $registrar;
+    private readonly HookDispatcherInterface $hookDispatcher;
 
     public function __construct(
         TaxonomyRegistry $taxonomyRegistry,

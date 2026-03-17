@@ -13,10 +13,10 @@ use DateInterval;
  * Each cache entry is stored as a serialized PHP file.
  * Uses Symfony Filesystem (already scoped) for file operations.
  */
-class FilesystemCache extends AbstractCache
+final class FilesystemCache extends AbstractCache
 {
-    private Filesystem $filesystem;
-    private string $directory;
+    private readonly Filesystem $filesystem;
+    private readonly string $directory;
 
     public function __construct(string $directory, ?Filesystem $filesystem = null)
     {

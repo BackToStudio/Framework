@@ -22,7 +22,7 @@ namespace BackTo\Framework\Seo;
 class SeoConfig
 {
     /** @var array<string, mixed> */
-    private array $config;
+    private readonly array $config;
 
     /**
      * @param string $themeDirectory The project/theme root directory

@@ -17,7 +17,7 @@ use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
  */
 class DisablePublicCron implements Hooks, SecurityRuleInterface
 {
-    private HookDispatcherInterface $hookDispatcher;
+    private readonly HookDispatcherInterface $hookDispatcher;
 
     public function __construct(HookDispatcherInterface $hookDispatcher)
     {

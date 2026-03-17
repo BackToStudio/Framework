@@ -6,7 +6,7 @@ namespace BackTo\Framework\Seo\Schema\Type;
 
 use BackTo\Framework\Seo\Schema\SchemaType;
 
-class AggregateRating extends SchemaType
+final class AggregateRating extends SchemaType
 {
     public function __construct()
     {

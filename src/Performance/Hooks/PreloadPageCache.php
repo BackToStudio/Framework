@@ -22,19 +22,19 @@ use BackTo\Framework\Performance\Contracts\PageCacheInterface;
  * 3. WP-Cron fires the event, which fetches each URL via a non-blocking
  *    loopback HTTP request, triggering ServePageCache to store fresh HTML
  */
-class PreloadPageCache implements Hooks
+final class PreloadPageCache implements Hooks
 {
     public const CRON_HOOK = 'btf_preload_page_cache';
     public const CRON_FULL_HOOK = 'btf_preload_page_cache_full';
 
-    private HookDispatcherInterface $hookDispatcher;
-    private PageCacheInterface $pageCache;
+    private readonly HookDispatcherInterface $hookDispatcher;
+    private readonly PageCacheInterface $pageCache;
 
     /** @var int Delay in seconds before the cron event fires */
-    private int $delay;
+    private readonly int $delay;
 
     /** @var int Maximum URLs to preload per batch */
-    private int $batchSize;
+    private readonly int $batchSize;
 
     public function __construct(
         HookDispatcherInterface $hookDispatcher,

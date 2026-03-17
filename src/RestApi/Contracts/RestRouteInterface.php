@@ -17,9 +17,7 @@ interface RestRouteInterface extends HookInterface
 
     public function getRoute(): string;
 
-    /**
-     * @return string[]
-     */
+    
     public function getMethods(): array;
 
     public function handle(WP_REST_Request $request): WP_REST_Response;

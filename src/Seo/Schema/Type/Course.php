@@ -6,7 +6,7 @@ namespace BackTo\Framework\Seo\Schema\Type;
 
 use BackTo\Framework\Seo\Schema\SchemaType;
 
-class Course extends SchemaType
+final class Course extends SchemaType
 {
     public function __construct()
     {
@@ -63,10 +63,7 @@ class Course extends SchemaType
         return $this->set('hasCourseInstance', $instances);
     }
 
-    /**
-     * @param SchemaType|SchemaType[] $offers
-     * @return $this
-     */
+    
     public function offers(SchemaType|array $offers): static
     {
         return $this->set('offers', $offers);
@@ -84,10 +81,7 @@ class Course extends SchemaType
         return $this->set('educationalLevel', $level);
     }
 
-    /**
-     * @param string[] $prerequisites
-     * @return $this
-     */
+    
     public function coursePrerequisites(array $prerequisites): static
     {
         return $this->set('coursePrerequisites', $prerequisites);

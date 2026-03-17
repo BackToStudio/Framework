@@ -19,7 +19,7 @@ use BackToVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
  *             ->set('security.two_factor_enabled', true);
  *     };
  */
-class SecurityConfiguration
+final class SecurityConfiguration
 {
     /**
      * @return array<string, mixed>

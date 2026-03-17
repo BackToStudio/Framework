@@ -7,7 +7,7 @@ namespace BackTo\Framework\Security\DependencyInjection\Compiler;
 use BackTo\Framework\Compose\DependencyInjection\Compiler\AbstractTaggedServiceCompilerPass;
 use BackTo\Framework\Security\SecurityRuleRegistry;
 
-class RegisterSecurityRulePass extends AbstractTaggedServiceCompilerPass
+final class RegisterSecurityRulePass extends AbstractTaggedServiceCompilerPass
 {
     protected function getRegistryClass(): string
     {

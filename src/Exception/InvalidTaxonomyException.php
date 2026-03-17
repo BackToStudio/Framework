@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Exception;
 
-class InvalidTaxonomyException extends FrameworkException
+final class InvalidTaxonomyException extends FrameworkException
 {
     public static function emptyKey(): self
     {

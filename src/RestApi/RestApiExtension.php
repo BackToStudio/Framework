@@ -11,7 +11,7 @@ use BackTo\Framework\RestApi\DependencyInjection\Compiler\RegisterRestRoutePass;
 use BackTo\Framework\RestApi\Infrastructure\WordPressRestRouteRegistrar;
 use BackToVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class RestApiExtension implements ExtensionInterface
+final class RestApiExtension implements ExtensionInterface
 {
     public function getBundle(): ?array
     {

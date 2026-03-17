@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Exception;
 
-class InvalidPostTypeException extends FrameworkException
+final class InvalidPostTypeException extends FrameworkException
 {
     public static function emptyKey(): self
     {

@@ -13,11 +13,11 @@ use BackTo\Framework\Performance\Contracts\HtmlOptimizerInterface;
  *
  * Reduces HTML transfer size by 15-25% by removing whitespace and comments.
  */
-class MinifyHtml implements Hooks
+final class MinifyHtml implements Hooks
 {
-    private HookDispatcherInterface $hookDispatcher;
-    private HtmlOptimizerInterface $htmlOptimizer;
-    private bool $enabled;
+    private readonly HookDispatcherInterface $hookDispatcher;
+    private readonly HtmlOptimizerInterface $htmlOptimizer;
+    private readonly bool $enabled;
 
     public function __construct(
         HookDispatcherInterface $hookDispatcher,

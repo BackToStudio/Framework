@@ -10,9 +10,9 @@ use function get_post_meta;
 use function update_post_meta;
 use function delete_post_meta;
 
-class PostMetaRepository
+final class PostMetaRepository
 {
-    private PostMetaFactory $factory;
+    private readonly PostMetaFactory $factory;
 
     public function __construct(PostMetaFactory $factory)
     {
@@ -32,9 +32,7 @@ class PostMetaRepository
         return $this->factory->create($postId, $metaKey, $postMetaValue);
     }
 
-    /**
-     * @return int|bool
-     */
+    
     public function update(PostMetaInterface $postMeta): int|bool
     {
         return update_post_meta($postMeta->getPostId(), $postMeta->getMetaKey(), $postMeta->getMetaValue());

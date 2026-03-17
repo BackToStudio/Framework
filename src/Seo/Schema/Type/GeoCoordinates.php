@@ -6,7 +6,7 @@ namespace BackTo\Framework\Seo\Schema\Type;
 
 use BackTo\Framework\Seo\Schema\SchemaType;
 
-class GeoCoordinates extends SchemaType
+final class GeoCoordinates extends SchemaType
 {
     public function __construct()
     {

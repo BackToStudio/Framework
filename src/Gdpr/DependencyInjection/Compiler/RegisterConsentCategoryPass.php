@@ -7,7 +7,7 @@ namespace BackTo\Framework\Gdpr\DependencyInjection\Compiler;
 use BackTo\Framework\Compose\DependencyInjection\Compiler\AbstractTaggedServiceCompilerPass;
 use BackTo\Framework\Gdpr\ConsentCategoryRegistry;
 
-class RegisterConsentCategoryPass extends AbstractTaggedServiceCompilerPass
+final class RegisterConsentCategoryPass extends AbstractTaggedServiceCompilerPass
 {
     protected function getRegistryClass(): string
     {

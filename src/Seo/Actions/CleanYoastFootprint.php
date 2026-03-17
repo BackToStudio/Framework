@@ -10,9 +10,9 @@ use BackTo\Framework\Contracts\Hooks;
 /**
  * Remove Yoast SEO debug markers and version information from the HTML output.
  */
-class CleanYoastFootprint implements Hooks
+final class CleanYoastFootprint implements Hooks
 {
-    private HookDispatcherInterface $hookDispatcher;
+    private readonly HookDispatcherInterface $hookDispatcher;
 
     public function __construct(HookDispatcherInterface $hookDispatcher)
     {

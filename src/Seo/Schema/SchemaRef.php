@@ -10,9 +10,9 @@ namespace BackTo\Framework\Seo\Schema;
  * Used to link schemas without duplicating data:
  *   "publisher": { "@id": "#organization" }
  */
-class SchemaRef implements \JsonSerializable
+final class SchemaRef implements \JsonSerializable
 {
-    private string $id;
+    private readonly string $id;
 
     public function __construct(string $id)
     {

@@ -7,7 +7,7 @@ namespace BackTo\Framework\PostMeta;
 use BackTo\Framework\Contracts\RegistryInterface;
 use BackTo\Framework\PostMeta\Contracts\PostMetaStructureInterface;
 
-class PostMetaStructureRegistry implements RegistryInterface
+final class PostMetaStructureRegistry implements RegistryInterface
 {
     /** @var PostMetaStructureInterface[] */
     private array $postMetaStructures = [];
@@ -19,9 +19,7 @@ class PostMetaStructureRegistry implements RegistryInterface
         return $this;
     }
 
-    /**
-     * @return PostMetaStructureInterface[]
-     */
+    
     public function getPostMetaStructures(): array
     {
         return $this->postMetaStructures;

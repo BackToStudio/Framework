@@ -12,7 +12,7 @@ use BackTo\Framework\Observability\Contracts\PerformanceCollectorInterface;
  * Tracks timing and counters for framework operations.
  * Integrates with Query Monitor via the 'qm/collect' filter when available.
  */
-class PerformanceCollector implements PerformanceCollectorInterface
+final class PerformanceCollector implements PerformanceCollectorInterface
 {
     /** @var array<string, float> */
     private array $timers = [];

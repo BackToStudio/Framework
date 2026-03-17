@@ -7,7 +7,7 @@ namespace BackTo\Framework\Security;
 use BackTo\Framework\Contracts\RegistryInterface;
 use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
 
-class SecurityRuleRegistry implements RegistryInterface
+final class SecurityRuleRegistry implements RegistryInterface
 {
     /** @var SecurityRuleInterface[] */
     private array $rules = [];
@@ -25,9 +25,7 @@ class SecurityRuleRegistry implements RegistryInterface
         return $this;
     }
 
-    /**
-     * @return SecurityRuleInterface[]
-     */
+    
     public function getRules(): array
     {
         return array_values($this->rules);
@@ -43,9 +41,7 @@ class SecurityRuleRegistry implements RegistryInterface
         return count($this->rules);
     }
 
-    /**
-     * @return string[]
-     */
+    
     public function getActiveRuleNames(): array
     {
         return array_keys($this->rules);

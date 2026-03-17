@@ -13,7 +13,7 @@ use BackTo\Framework\Gdpr\DependencyInjection\Compiler\RegisterTrackingScriptPas
 use BackTo\Framework\Gdpr\Infrastructure\CookieConsentStorage;
 use BackToVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class GdprExtension implements ExtensionInterface
+final class GdprExtension implements ExtensionInterface
 {
     public function getBundle(): ?array
     {

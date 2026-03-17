@@ -11,7 +11,7 @@ use function register_post_meta;
 /**
  * WordPress adapter for post meta registration.
  */
-class WordPressPostMetaRegistrar implements PostMetaRegistrarInterface
+final class WordPressPostMetaRegistrar implements PostMetaRegistrarInterface
 {
     /**
      * @param string $postType

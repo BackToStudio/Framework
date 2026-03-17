@@ -13,9 +13,9 @@ use BackTo\Framework\Contracts\Hooks;
  * Saves 200-500 KB of assets on pages that don't need them.
  * Only activates when WooCommerce is installed.
  */
-class OptimizeWooCommerce implements Hooks
+final class OptimizeWooCommerce implements Hooks
 {
-    private HookDispatcherInterface $hookDispatcher;
+    private readonly HookDispatcherInterface $hookDispatcher;
 
     public function __construct(HookDispatcherInterface $hookDispatcher)
     {

@@ -9,12 +9,12 @@ use BackTo\Framework\PostType\Factory\PostFactory;
 
 use function get_posts;
 
-class PostQueryBuilder
+final class PostQueryBuilder
 {
     /** @var array<string, mixed> */
     private array $args = [];
 
-    private PostFactory $factory;
+    private readonly PostFactory $factory;
 
     public function __construct(PostFactory $factory)
     {
@@ -33,9 +33,7 @@ class PostQueryBuilder
         return $this;
     }
 
-    /**
-     * @param string[] $statuses
-     */
+    
     public function statuses(array $statuses): self
     {
         $this->args['post_status'] = $statuses;
@@ -86,18 +84,14 @@ class PostQueryBuilder
         return $this;
     }
 
-    /**
-     * @param int[] $ids
-     */
+    
     public function whereIn(array $ids): self
     {
         $this->args['post__in'] = $ids;
         return $this;
     }
 
-    /**
-     * @param int[] $ids
-     */
+    
     public function whereNotIn(array $ids): self
     {
         $this->args['post__not_in'] = $ids;
@@ -147,33 +141,25 @@ class PostQueryBuilder
         return $this;
     }
 
-    /**
-     * @param int[] $termIds
-     */
+    
     public function inTaxonomyByIds(string $taxonomy, array $termIds): self
     {
         return $this->addTaxQuery($taxonomy, 'term_id', $termIds);
     }
 
-    /**
-     * @param string[] $slugs
-     */
+    
     public function inTaxonomyBySlugs(string $taxonomy, array $slugs): self
     {
         return $this->addTaxQuery($taxonomy, 'slug', $slugs);
     }
 
-    /**
-     * @param string[] $names
-     */
+    
     public function inTaxonomyByNames(string $taxonomy, array $names): self
     {
         return $this->addTaxQuery($taxonomy, 'name', $names);
     }
 
-    /**
-     * @return PostInterface[]
-     */
+    
     public function get(): array
     {
         $defaults = [
@@ -215,9 +201,7 @@ class PostQueryBuilder
         return $this->args;
     }
 
-    /**
-     * @param int[]|string[] $terms
-     */
+    
     private function addTaxQuery(string $taxonomy, string $field, array $terms): self
     {
         if (!isset($this->args['tax_query'])) {

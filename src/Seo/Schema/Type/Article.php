@@ -6,7 +6,7 @@ namespace BackTo\Framework\Seo\Schema\Type;
 
 use BackTo\Framework\Seo\Schema\SchemaType;
 
-class Article extends SchemaType
+final class Article extends SchemaType
 {
     public function __construct()
     {
@@ -78,10 +78,7 @@ class Article extends SchemaType
         return $this->set('articleSection', $section);
     }
 
-    /**
-     * @param string[] $keywords
-     * @return $this
-     */
+    
     public function keywords(array $keywords): static
     {
         return $this->set('keywords', $keywords);

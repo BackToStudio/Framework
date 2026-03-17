@@ -12,9 +12,9 @@ use BackTo\Framework\Contracts\Hooks;
  *
  * Reduces attack surface and prevents DDoS amplification via pingback.
  */
-class DisableXMLRPC implements Hooks
+final class DisableXMLRPC implements Hooks
 {
-    private HookDispatcherInterface $hookDispatcher;
+    private readonly HookDispatcherInterface $hookDispatcher;
 
     public function __construct(HookDispatcherInterface $hookDispatcher)
     {

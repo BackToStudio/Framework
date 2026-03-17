@@ -12,7 +12,7 @@ use BackTo\Framework\Seo\Schema\SchemaType;
  *
  * Links to "#organization" as publisher and "#website" as isPartOf.
  */
-class ArticleSchemaGenerator
+final class ArticleSchemaGenerator
 {
     public function generate(?int $postId = null): ?SchemaType
     {

@@ -15,12 +15,12 @@ use BackTo\Framework\Contracts\Hooks;
  * - Adds fetchpriority="high" on the first image (likely LCP element)
  * - Skips the first N images to avoid lazy-loading above-the-fold content
  */
-class OptimizeImages implements Hooks
+final class OptimizeImages implements Hooks
 {
-    private HookDispatcherInterface $hookDispatcher;
-    private int $skipFirst;
-    private bool $addDecodingAsync;
-    private bool $addFetchPriority;
+    private readonly HookDispatcherInterface $hookDispatcher;
+    private readonly int $skipFirst;
+    private readonly bool $addDecodingAsync;
+    private readonly bool $addFetchPriority;
 
     public function __construct(
         HookDispatcherInterface $hookDispatcher,

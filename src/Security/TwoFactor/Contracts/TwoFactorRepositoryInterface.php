@@ -26,9 +26,7 @@ interface TwoFactorRepositoryInterface
      */
     public function getBackupCodes(int $userId): array;
 
-    /**
-     * @param string[] $hashedCodes
-     */
+    
     public function setBackupCodes(int $userId, array $hashedCodes): void;
 
     public function deleteBackupCodes(int $userId): void;

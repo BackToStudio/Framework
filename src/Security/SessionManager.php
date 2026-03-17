@@ -8,10 +8,10 @@ use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
 use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
 
-class SessionManager implements Hooks, SecurityRuleInterface
+final class SessionManager implements Hooks, SecurityRuleInterface
 {
-    private HookDispatcherInterface $hookDispatcher;
-    private int $maxSessions;
+    private readonly HookDispatcherInterface $hookDispatcher;
+    private readonly int $maxSessions;
 
     public function __construct(HookDispatcherInterface $hookDispatcher, int $maxSessions = 1)
     {
@@ -92,9 +92,7 @@ class SessionManager implements Hooks, SecurityRuleInterface
         }
     }
 
-    /**
-     * @return \WP_Session_Tokens|null
-     */
+    
     protected function getWpSessionTokens(int $userId): mixed
     {
         if (!class_exists(\WP_Session_Tokens::class)) {

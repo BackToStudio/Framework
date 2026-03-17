@@ -8,7 +8,7 @@ use BackTo\Framework\Contracts\Hooks;
 
 use function remove_action;
 
-class CleanHead implements Hooks
+final class CleanHead implements Hooks
 {
 
     public function hooks(): void

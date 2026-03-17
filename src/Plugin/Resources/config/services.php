@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use BackToVendor\Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use BackTo\Framework\Contracts\ThemeInterface;
 use BackTo\Framework\Theme\Entity\Theme;

@@ -9,7 +9,7 @@ use BackTo\Framework\Compose\HasParentId;
 use BackTo\Framework\Compose\HasSlug;
 use BackTo\Framework\Taxonomy\Contracts\TermInterface;
 
-class Term implements TermInterface
+final class Term implements TermInterface
 {
     use HasId;
     use HasSlug;

@@ -19,7 +19,7 @@ use BackToVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
  *             ->performanceTracking(true);
  *     };
  */
-class ObservabilityConfiguration
+final class ObservabilityConfiguration
 {
     /**
      * @return array<string, mixed>

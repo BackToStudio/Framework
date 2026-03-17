@@ -12,9 +12,9 @@ use BackTo\Framework\Contracts\Hooks;
  *
  * Removes ~30 KB of inline JS/CSS that most sites do not need.
  */
-class DisableEmojis implements Hooks
+final class DisableEmojis implements Hooks
 {
-    private HookDispatcherInterface $hookDispatcher;
+    private readonly HookDispatcherInterface $hookDispatcher;
 
     public function __construct(HookDispatcherInterface $hookDispatcher)
     {

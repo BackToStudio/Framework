@@ -39,10 +39,7 @@ class PostFactory
         return $post;
     }
 
-    /**
-     * @param WP_Post[] $wpPosts
-     * @return PostInterface[]
-     */
+    
     public function createFromPosts(array $wpPosts): array
     {
         return array_map(

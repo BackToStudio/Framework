@@ -6,7 +6,7 @@ namespace BackTo\Framework\Gdpr\Infrastructure;
 
 use BackTo\Framework\Gdpr\Contracts\ConsentStorageInterface;
 
-class CookieConsentStorage implements ConsentStorageInterface
+final class CookieConsentStorage implements ConsentStorageInterface
 {
     private const COOKIE_NAME = 'gdpr_consent';
 

@@ -8,7 +8,7 @@ use BackTo\Framework\Contracts\RegistryInterface;
 use BackTo\Framework\Gdpr\Contracts\ConsentCategoryInterface;
 use BackTo\Framework\Gdpr\Contracts\ConsentCategoryRegistryInterface;
 
-class ConsentCategoryRegistry implements RegistryInterface, ConsentCategoryRegistryInterface
+final class ConsentCategoryRegistry implements RegistryInterface, ConsentCategoryRegistryInterface
 {
     /** @var array<string, ConsentCategoryInterface> */
     private array $categories = [];
@@ -20,9 +20,7 @@ class ConsentCategoryRegistry implements RegistryInterface, ConsentCategoryRegis
         return $this;
     }
 
-    /**
-     * @return ConsentCategoryInterface[]
-     */
+    
     public function getCategories(): array
     {
         return $this->categories;

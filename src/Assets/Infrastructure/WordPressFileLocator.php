@@ -12,7 +12,7 @@ use function wp_upload_dir;
 /**
  * WordPress adapter for file location (media library).
  */
-class WordPressFileLocator implements FileLocatorInterface
+final class WordPressFileLocator implements FileLocatorInterface
 {
     public function getAttachedFile(int $attachmentId): string
     {

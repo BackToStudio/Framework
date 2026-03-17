@@ -11,9 +11,7 @@ interface QueueRegistryInterface
 {
     public function add(JobInterface $job): self;
 
-    /**
-     * @return JobInterface[]
-     */
+    
     public function getJobs(): array;
 
     /**

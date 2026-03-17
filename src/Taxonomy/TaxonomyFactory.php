@@ -8,7 +8,7 @@ use BackTo\Framework\Exception\InvalidTaxonomyException;
 use BackTo\Framework\Taxonomy\Contracts\TaxonomyInterface;
 use BackTo\Framework\Taxonomy\Entity\Taxonomy;
 
-class TaxonomyFactory
+final class TaxonomyFactory
 {
     /**
      * @param string[] $postTypes

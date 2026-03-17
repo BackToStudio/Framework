@@ -7,7 +7,7 @@ namespace BackTo\Framework\RestApi;
 use BackTo\Framework\Contracts\RegistryInterface;
 use BackTo\Framework\RestApi\Contracts\RestRouteInterface;
 
-class RestRouteRegistry implements RegistryInterface
+final class RestRouteRegistry implements RegistryInterface
 {
     /** @var RestRouteInterface[] */
     private array $routes = [];
@@ -19,9 +19,7 @@ class RestRouteRegistry implements RegistryInterface
         return $this;
     }
 
-    /**
-     * @return RestRouteInterface[]
-     */
+    
     public function getRoutes(): array
     {
         return $this->routes;

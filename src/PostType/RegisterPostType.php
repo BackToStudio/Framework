@@ -10,12 +10,12 @@ use BackTo\Framework\Contracts\Hooks;
 use BackTo\Framework\Exception\FrameworkException;
 use BackTo\Framework\PostType\Contracts\PostTypeRegistrarInterface;
 
-class RegisterPostType implements Hooks, ActivationHooks
+final class RegisterPostType implements Hooks, ActivationHooks
 {
-    private PostTypeRegistry $registry;
-    private PostTypeFactory $factory;
-    private PostTypeRegistrarInterface $registrar;
-    private HookDispatcherInterface $hookDispatcher;
+    private readonly PostTypeRegistry $registry;
+    private readonly PostTypeFactory $factory;
+    private readonly PostTypeRegistrarInterface $registrar;
+    private readonly HookDispatcherInterface $hookDispatcher;
 
     public function __construct(
         PostTypeRegistry $postTypeRegistry,

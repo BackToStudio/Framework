@@ -7,7 +7,7 @@ namespace BackTo\Framework\Blocks;
 use BackTo\Framework\Contracts\BlockStyleInterface;
 use BackTo\Framework\Contracts\RegistryInterface;
 
-class BlockStyleRegistry implements RegistryInterface
+final class BlockStyleRegistry implements RegistryInterface
 {
     /** @var BlockStyleInterface[] */
     private array $blockStyles = [];
@@ -19,9 +19,7 @@ class BlockStyleRegistry implements RegistryInterface
         return $this;
     }
 
-    /**
-     * @return BlockStyleInterface[]
-     */
+    
     public function getBlockStyles(): array
     {
         return $this->blockStyles;

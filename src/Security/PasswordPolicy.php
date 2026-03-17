@@ -8,13 +8,13 @@ use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
 use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
 
-class PasswordPolicy implements Hooks, SecurityRuleInterface
+final class PasswordPolicy implements Hooks, SecurityRuleInterface
 {
-    private HookDispatcherInterface $hookDispatcher;
-    private int $minLength;
-    private bool $requireUppercase;
-    private bool $requireNumber;
-    private bool $requireSpecialChar;
+    private readonly HookDispatcherInterface $hookDispatcher;
+    private readonly int $minLength;
+    private readonly bool $requireUppercase;
+    private readonly bool $requireNumber;
+    private readonly bool $requireSpecialChar;
 
     public function __construct(
         HookDispatcherInterface $hookDispatcher,
@@ -69,11 +69,7 @@ class PasswordPolicy implements Hooks, SecurityRuleInterface
         return $errors;
     }
 
-    /**
-     * @param \WP_Error $errors
-     * @param bool      $update
-     * @param \stdClass $user
-     */
+    
     public function validatePassword(mixed $errors, bool $update, mixed $user): void
     {
         if (!is_object($user) || !isset($user->user_pass)) {
@@ -91,10 +87,7 @@ class PasswordPolicy implements Hooks, SecurityRuleInterface
         }
     }
 
-    /**
-     * @param \WP_Error $errors
-     * @return \WP_Error
-     */
+    
     public function validateRegistrationPassword(mixed $errors, string $sanitizedLogin, string $userEmail): mixed
     {
         if (!is_object($errors) || !method_exists($errors, 'add')) {

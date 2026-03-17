@@ -9,11 +9,11 @@ use BackTo\Framework\Contracts\DynamicBlock;
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
 
-class RegisterBlock implements Hooks
+final class RegisterBlock implements Hooks
 {
-    private BlockRegistry $registry;
-    private BlockRegistrarInterface $registrar;
-    private HookDispatcherInterface $hookDispatcher;
+    private readonly BlockRegistry $registry;
+    private readonly BlockRegistrarInterface $registrar;
+    private readonly HookDispatcherInterface $hookDispatcher;
 
     public function __construct(
         BlockRegistry $registry,

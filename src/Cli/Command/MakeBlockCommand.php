@@ -7,7 +7,7 @@ namespace BackTo\Framework\Cli\Command;
 /**
  * WP-CLI command: wp make:block <name> [--namespace=<namespace>] [--dir=<dir>] [--force]
  */
-class MakeBlockCommand extends AbstractMakeCommand
+final class MakeBlockCommand extends AbstractMakeCommand
 {
     protected function getTemplateName(): string
     {

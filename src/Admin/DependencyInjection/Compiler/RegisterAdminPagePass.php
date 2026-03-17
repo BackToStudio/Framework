@@ -7,7 +7,7 @@ namespace BackTo\Framework\Admin\DependencyInjection\Compiler;
 use BackTo\Framework\Admin\AdminPageRegistry;
 use BackTo\Framework\Compose\DependencyInjection\Compiler\AbstractTaggedServiceCompilerPass;
 
-class RegisterAdminPagePass extends AbstractTaggedServiceCompilerPass
+final class RegisterAdminPagePass extends AbstractTaggedServiceCompilerPass
 {
     protected function getRegistryClass(): string
     {

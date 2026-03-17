@@ -13,7 +13,7 @@ use BackTo\Framework\Blocks\DependencyInjection\Compiler\RegisterBlockStylePass;
 use BackTo\Framework\Blocks\Infrastructure\WordPressBlockStyleRegistrar;
 use BackToVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class BlocksExtension implements ExtensionInterface
+final class BlocksExtension implements ExtensionInterface
 {
     public function getBundle(): ?array
     {

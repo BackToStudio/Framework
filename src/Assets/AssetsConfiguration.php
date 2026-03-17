@@ -17,7 +17,7 @@ use BackToVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
  *         $assets->versionStrategy('timestamp');
  *     };
  */
-class AssetsConfiguration
+final class AssetsConfiguration
 {
     /**
      * @return array<string, mixed>

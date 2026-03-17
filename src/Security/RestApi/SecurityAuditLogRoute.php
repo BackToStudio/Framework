@@ -14,9 +14,9 @@ use WP_REST_Response;
  *
  * GET /backto/v1/security/audit-log?event=login_failed&severity=warning&per_page=50&page=1
  */
-class SecurityAuditLogRoute implements RestRouteInterface
+final class SecurityAuditLogRoute implements RestRouteInterface
 {
-    private AuditLogRepositoryInterface $repository;
+    private readonly AuditLogRepositoryInterface $repository;
 
     public function __construct(AuditLogRepositoryInterface $repository)
     {
@@ -33,9 +33,7 @@ class SecurityAuditLogRoute implements RestRouteInterface
         return '/security/audit-log';
     }
 
-    /**
-     * @return string[]
-     */
+    
     public function getMethods(): array
     {
         return ['GET'];

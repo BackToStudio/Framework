@@ -15,7 +15,7 @@ use BackTo\Framework\Performance\Infrastructure\WordPressHtmlOptimizer;
 use BackTo\Framework\Performance\Infrastructure\WordPressPageCache;
 use BackToVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class PerformanceExtension implements ExtensionInterface
+final class PerformanceExtension implements ExtensionInterface
 {
     public function getBundle(): ?array
     {

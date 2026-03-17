@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Exception;
 
-class AssetBuildNotFoundException extends FrameworkException
+final class AssetBuildNotFoundException extends FrameworkException
 {
     public static function forDirectory(string $directory): self
     {

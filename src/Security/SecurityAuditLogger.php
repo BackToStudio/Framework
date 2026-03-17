@@ -27,12 +27,12 @@ use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
  * - activated_plugin / deactivated_plugin (10): Standard priority
  * - switch_theme / user_register / delete_user (10): Standard priority
  */
-class SecurityAuditLogger implements Hooks, SecurityRuleInterface
+final class SecurityAuditLogger implements Hooks, SecurityRuleInterface
 {
     use ClientIpTrait;
 
-    private HookDispatcherInterface $hookDispatcher;
-    private AuditLogRepositoryInterface $repository;
+    private readonly HookDispatcherInterface $hookDispatcher;
+    private readonly AuditLogRepositoryInterface $repository;
 
     /** @var string[] Options considered security-critical */
     private const CRITICAL_OPTIONS = [
@@ -87,9 +87,7 @@ class SecurityAuditLogger implements Hooks, SecurityRuleInterface
         ]);
     }
 
-    /**
-     * @param string[] $oldRoles
-     */
+    
     public function onUserRoleChanged(int $userId, string $newRole, array $oldRoles): void
     {
         $this->repository->store('user_role_changed', 'warning', [

@@ -23,8 +23,8 @@ class AdminUrlObfuscation implements Hooks, SecurityRuleInterface
 {
     use ClientIpTrait;
 
-    private HookDispatcherInterface $hookDispatcher;
-    private LoggerInterface $logger;
+    private readonly HookDispatcherInterface $hookDispatcher;
+    private readonly LoggerInterface $logger;
 
     private string $loginSlug = '';
 

@@ -11,7 +11,7 @@ use BackTo\Framework\Observability\Contracts\HealthCheckResult;
 /**
  * Collects and executes all registered health checks.
  */
-class HealthCheckRegistry implements RegistryInterface
+final class HealthCheckRegistry implements RegistryInterface
 {
     /** @var HealthCheckInterface[] */
     private array $checks = [];

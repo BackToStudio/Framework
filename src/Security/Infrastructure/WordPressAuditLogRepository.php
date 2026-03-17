@@ -15,7 +15,7 @@ use function update_option;
  * Stores events as a serialized array in wp_options.
  * For high-volume sites, consider replacing with a custom table adapter.
  */
-class WordPressAuditLogRepository implements AuditLogRepositoryInterface
+final class WordPressAuditLogRepository implements AuditLogRepositoryInterface
 {
     private const OPTION_KEY = 'backto_security_audit_log';
     private const MAX_STORED_EVENTS = 1000;

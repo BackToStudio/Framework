@@ -7,7 +7,7 @@ namespace BackTo\Framework\Admin;
 use BackTo\Framework\Admin\Contracts\AdminPageInterface;
 use BackTo\Framework\Contracts\RegistryInterface;
 
-class AdminPageRegistry implements RegistryInterface
+final class AdminPageRegistry implements RegistryInterface
 {
     /** @var AdminPageInterface[] */
     private array $pages = [];
@@ -19,9 +19,7 @@ class AdminPageRegistry implements RegistryInterface
         return $this;
     }
 
-    /**
-     * @return AdminPageInterface[]
-     */
+    
     public function getPages(): array
     {
         return $this->pages;

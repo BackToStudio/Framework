@@ -9,7 +9,7 @@ namespace BackTo\Framework\Seo\Schema;
  *
  * Collects SchemaType instances and renders them as a JSON-LD script block.
  */
-class SchemaManager
+final class SchemaManager
 {
     /** @var SchemaType[] */
     private array $schemas = [];

@@ -17,9 +17,9 @@ use BackTo\Framework\Performance\Contracts\DatabaseOptimizerInterface;
  * - Spam comments
  * - Orphaned post/comment/user metadata
  */
-class WordPressDatabaseOptimizer implements DatabaseOptimizerInterface
+final class WordPressDatabaseOptimizer implements DatabaseOptimizerInterface
 {
-    private int $revisionsLimit;
+    private readonly int $revisionsLimit;
 
     public function __construct(int $revisionsLimit = 5)
     {
@@ -64,9 +64,7 @@ class WordPressDatabaseOptimizer implements DatabaseOptimizerInterface
         return $count;
     }
 
-    /**
-     * @param \wpdb $wpdb
-     */
+    
     private function deleteExcessRevisions($wpdb): int
     {
         if ($this->revisionsLimit <= 0) {
@@ -104,9 +102,7 @@ class WordPressDatabaseOptimizer implements DatabaseOptimizerInterface
         return count($revisionIds);
     }
 
-    /**
-     * @param \wpdb $wpdb
-     */
+    
     private function deleteAutoDrafts($wpdb): int
     {
         return (int) $wpdb->query(
@@ -114,9 +110,7 @@ class WordPressDatabaseOptimizer implements DatabaseOptimizerInterface
         );
     }
 
-    /**
-     * @param \wpdb $wpdb
-     */
+    
     private function deleteTrashedPosts($wpdb): int
     {
         return (int) $wpdb->query(
@@ -124,9 +118,7 @@ class WordPressDatabaseOptimizer implements DatabaseOptimizerInterface
         );
     }
 
-    /**
-     * @param \wpdb $wpdb
-     */
+    
     private function deleteSpamComments($wpdb): int
     {
         return (int) $wpdb->query(
@@ -134,9 +126,7 @@ class WordPressDatabaseOptimizer implements DatabaseOptimizerInterface
         );
     }
 
-    /**
-     * @param \wpdb $wpdb
-     */
+    
     private function deleteTrashedComments($wpdb): int
     {
         return (int) $wpdb->query(
@@ -144,9 +134,7 @@ class WordPressDatabaseOptimizer implements DatabaseOptimizerInterface
         );
     }
 
-    /**
-     * @param \wpdb $wpdb
-     */
+    
     private function deleteExpiredTransients($wpdb): int
     {
         return (int) $wpdb->query(
@@ -161,9 +149,7 @@ class WordPressDatabaseOptimizer implements DatabaseOptimizerInterface
         );
     }
 
-    /**
-     * @param \wpdb $wpdb
-     */
+    
     private function deleteOrphanedPostMeta($wpdb): int
     {
         return (int) $wpdb->query(
@@ -173,9 +159,7 @@ class WordPressDatabaseOptimizer implements DatabaseOptimizerInterface
         );
     }
 
-    /**
-     * @param \wpdb $wpdb
-     */
+    
     private function deleteOrphanedCommentMeta($wpdb): int
     {
         return (int) $wpdb->query(
