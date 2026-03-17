@@ -166,8 +166,8 @@ class WordPressExtensionTest extends TestCase
         $extension = new SecurityExtension();
         $defaults = $extension->getDefaultConfiguration();
 
-        $this->assertArrayHasKey('framework.security.headers_enabled', $defaults);
-        $this->assertArrayHasKey('framework.security.two_factor_enabled', $defaults);
+        $this->assertArrayHasKey('security.headers_enabled', $defaults);
+        $this->assertArrayHasKey('security.two_factor_enabled', $defaults);
     }
 
     public function testSecurityExtensionHasMultipleBundles(): void

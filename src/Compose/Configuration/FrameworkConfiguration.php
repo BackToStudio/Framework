@@ -39,18 +39,6 @@ class FrameworkConfiguration
             // Observability
             'framework.observability.log_level' => 'error',
             'framework.observability.performance_tracking' => false,
-
-            // Security
-            'framework.security.headers_enabled' => true,
-            'framework.security.xmlrpc_disabled' => true,
-            'framework.security.hide_version' => true,
-            'framework.security.csp_report_only' => false,
-            'framework.security.password_min_length' => 12,
-            'framework.security.max_concurrent_sessions' => 1,
-            'framework.security.rest_api_require_auth' => true,
-            'framework.security.disable_file_editor' => true,
-            'framework.security.two_factor_enabled' => false,
-            'framework.security.two_factor_issuer' => 'WordPress',
         ];
     }
 

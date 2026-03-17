@@ -319,7 +319,7 @@ trait WordPressContainer
     private function loadOptionalConfigFiles(ContainerBuilder $containerBuilder, ConfigBuilderGenerator $configBuilderGenerator): void
     {
         $configDir = $this->getProjectDir() . '/config';
-        $optionalFiles = ['performance.php'];
+        $optionalFiles = ['performance.php', 'security.php'];
 
         foreach ($optionalFiles as $file) {
             $filePath = $configDir . '/' . $file;
