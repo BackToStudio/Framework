@@ -85,13 +85,19 @@ class FileIntegrityMonitorTest extends TestCase
         $this->assertSame('file_integrity_monitor', $this->monitor->getName());
     }
 
-    public function testHooksRegistersAdminInit(): void
+    public function testHooksRegistersAdminInitAndCronHook(): void
     {
-        $this->dispatcher->expects($this->once())
+        $hooks = [];
+        $this->dispatcher->expects($this->exactly(2))
             ->method('addAction')
-            ->with('admin_init', $this->anything());
+            ->willReturnCallback(function (string $hook) use (&$hooks) {
+                $hooks[] = $hook;
+            });
 
         $this->monitor->hooks();
+
+        $this->assertContains('admin_init', $hooks);
+        $this->assertContains('backto_file_integrity_check', $hooks);
     }
 
     public function testHashFiles(): void

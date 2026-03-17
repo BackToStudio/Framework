@@ -14,6 +14,9 @@ class YoastProvider implements SeoProviderInterface
     private const PLUGIN_FILE = 'wordpress-seo/wp-seo.php';
     private const SOCIAL_OPTION = 'wpseo_social';
 
+    /** @var array<string, mixed>|null Cached social options to avoid repeated get_option() calls */
+    private ?array $socialOptionsCache = null;
+
     public function getName(): string
     {
         return 'yoast';
@@ -102,13 +105,16 @@ class YoastProvider implements SeoProviderInterface
 
     private function getSocialOption(string $key): ?string
     {
-        $options = \get_option(self::SOCIAL_OPTION, []);
+        if ($this->socialOptionsCache === null) {
+            $options = \get_option(self::SOCIAL_OPTION, []);
+            $this->socialOptionsCache = is_array($options) ? $options : [];
+        }
 
-        if (!is_array($options) || !isset($options[$key])) {
+        if (!isset($this->socialOptionsCache[$key])) {
             return null;
         }
 
-        $value = $options[$key];
+        $value = $this->socialOptionsCache[$key];
 
         return is_string($value) && $value !== '' ? $value : null;
     }
