@@ -1,8 +1,8 @@
-# Roadmap d'evolution - BackTo Framework 4.x -> 5.0
+# Roadmap d'evolution - BackTo Framework 4.0.0
 
 **Date :** 2026-03-17
 **Baseline :** v4.0.0 - Score audit 7.9/10
-**Objectif :** 9.2/10
+**Objectif :** 9.2/10 avant release stable
 
 ---
 
