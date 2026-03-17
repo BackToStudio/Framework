@@ -22,6 +22,7 @@ These modules expose public contracts or configuration:
 | [Gdpr](modules/gdpr.md) | GDPR consent management | — |
 | [Security](modules/security.md) | Security hardening (30+ rules, 2FA, CSP, audit log) | `config/security.php` |
 | [Performance](modules/performance.md) | Performance optimization (cache, minification, .htaccess) | `config/performance.php` |
+| [Queue](modules/queue.md) | Async job queue (dispatch, retry, recurring, groups) | — |
 
 ## Other modules
 

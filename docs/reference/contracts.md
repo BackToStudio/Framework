@@ -72,6 +72,71 @@ interface ModuleConfiguratorInterface
 
 Implementations: [`AssetsConfigurator`](modules/assets.md#configuration), [`CacheConfigurator`](modules/cache.md#configuration), [`ObservabilityConfigurator`](modules/observability.md#configuration), [`PerformanceConfigurator`](modules/performance.md#configuration), [`RestApiConfigurator`](modules/rest-api.md#configuration), [`SecurityConfigurator`](modules/security.md#configuration), [`SeoConfigurator`](modules/seo.md#configuration).
 
+## Queue contracts
+
+### `JobInterface`
+
+Defines a job handler that can be dispatched to the queue.
+
+```php
+interface JobInterface
+{
+    public function getKey(): string;
+    public function getLabel(): string;
+    public function getGroup(): string;
+    public function getMaxRetries(): int;
+    public function handle(array $payload): void;
+}
+```
+
+### `QueueDispatcherInterface`
+
+Port interface for dispatching jobs.
+
+```php
+interface QueueDispatcherInterface
+{
+    public function dispatch(string $jobKey, array $payload = [], int $delay = 0, string $group = 'default'): int;
+    public function dispatchUnique(string $jobKey, array $payload = [], int $delay = 0, string $group = 'default'): ?int;
+    public function schedule(string $jobKey, int $intervalSeconds, array $payload = [], string $group = 'default'): int;
+}
+```
+
+### `QueueRepositoryInterface`
+
+Port interface for queue job persistence.
+
+```php
+interface QueueRepositoryInterface
+{
+    public function createTable(): void;
+    public function dropTable(): void;
+    public function enqueue(Job $job): int;
+    public function claimNextPending(string $group = 'default'): ?Job;
+    public function markCompleted(int $jobId): void;
+    public function markFailed(int $jobId, string $errorMessage): void;
+    public function release(int $jobId): void;
+    public function find(int $jobId): ?Job;
+    public function findByStatus(JobStatus $status, int $limit = 20, int $offset = 0): array;
+    public function countByStatus(JobStatus $status): int;
+    public function cleanup(int $olderThanSeconds = 86400): int;
+    public function cancel(int $jobId): void;
+    public function rescueStuck(int $timeoutSeconds = 300): int;
+}
+```
+
+### `QueueRegistryInterface`
+
+```php
+interface QueueRegistryInterface
+{
+    public function add(JobInterface $job): self;
+    /** @return JobInterface[] */
+    public function getJobs(): array;
+    public function get(string $key): ?JobInterface;
+}
+```
+
 ## Registry contracts
 
 ### `RegistryInterface`
