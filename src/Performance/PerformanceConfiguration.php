@@ -9,15 +9,14 @@ use BackToVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
 /**
  * Default parameter values for the Performance module.
  *
- * Override any parameter in your project's config/performance.php:
+ * Override any parameter in your project's config/performance.php
+ * using the fluent PerformanceConfigurator:
  *
- *     use BackToVendor\Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
- *
- *     return static function (ContainerConfigurator $container): void {
- *         $container->parameters()
- *             ->set('performance.page_cache.enabled', true)
- *             ->set('performance.page_cache.ttl', 7200)
- *             ->set('performance.htaccess.gzip', false);
+ *     return static function (PerformanceConfigurator $performance): void {
+ *         $performance
+ *             ->pageCacheEnabled(true)
+ *             ->pageCacheTtl(7200)
+ *             ->htaccessGzip(false);
  *     };
  */
 class PerformanceConfiguration

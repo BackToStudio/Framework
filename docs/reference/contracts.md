@@ -677,7 +677,7 @@ interface ModuleConfiguratorInterface
 }
 ```
 
-Implementations: `SecurityConfigurator`.
+Implementations: `PerformanceConfigurator`, `SecurityConfigurator`.
 
 ## Registry contracts
 

@@ -19,6 +19,7 @@ use BackTo\Framework\PostMeta\PostMetaExtension;
 use BackTo\Framework\PostType\PostTypeExtension;
 use BackTo\Framework\RestApi\RestApiExtension;
 use BackTo\Framework\Gdpr\GdprExtension;
+use BackTo\Framework\Performance\PerformanceConfigurator;
 use BackTo\Framework\Performance\PerformanceExtension;
 use BackTo\Framework\Contracts\ModuleConfiguratorInterface;
 use BackTo\Framework\Security\SecurityConfigurator;
@@ -321,6 +322,7 @@ trait WordPressContainer
      * @var array<string, class-string> Maps filename to its configurator class.
      */
     private const MODULE_CONFIGURATORS = [
+        'performance.php' => PerformanceConfigurator::class,
         'security.php' => SecurityConfigurator::class,
     ];
 

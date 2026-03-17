@@ -261,6 +261,33 @@ GDPR consent management with cookie-based storage, consent banner, and condition
 | `Preset\HotjarScript` | Hotjar preset (site ID) |
 | `Preset\HubSpotScript` | HubSpot preset (portal ID) |
 
+## Performance
+
+WordPress performance optimization with autoconfigured rules. Configure via `config/performance.php` using the fluent `PerformanceConfigurator`.
+
+| Class | Role |
+|-------|------|
+| `PerformanceConfiguration` | Default parameter values for the Performance module |
+| `PerformanceConfigurator` | Fluent configurator for `config/performance.php` (implements `ModuleConfiguratorInterface`) |
+| `CleanHead` | Removes unnecessary tags from `<head>` |
+| `DisableEmojis` | Disables emoji scripts and styles |
+| `DisableEmbeds` | Disables oEmbed scripts |
+| `HeartbeatControl` | Controls heartbeat frequency and frontend disable |
+| `DeferScripts` | Defers script loading |
+| `RemoveQueryStrings` | Strips version query strings from assets |
+| `LazyLoadOptimizer` | Configures lazy loading, decoding, and fetchpriority |
+| `HtmlMinifier` | Minifies HTML output |
+| `ResourceHints` | Adds preconnect, dns-prefetch, and preload hints |
+| `RevisionLimiter` | Limits post revisions |
+| `WooCommerceOptimizer` | Disables unnecessary WooCommerce assets |
+| `PageCacheManager` | Full page cache |
+| `DatabaseCleanup` | Cleans up old revisions and transients |
+| `CachePreloader` | Preloads cache for popular pages |
+| `HtaccessOptimizer` | Gzip, browser cache, ETags, Keep-Alive |
+| `Contracts\HtmlOptimizerInterface` | Port interface for HTML optimization |
+| `Contracts\DatabaseOptimizerInterface` | Port interface for database optimization |
+| `Contracts\PageCacheInterface` | Port interface for page caching |
+
 ## Compose
 
 Framework kernel and container management.
