@@ -193,6 +193,73 @@ class JobFactoryTest extends TestCase
         $this->assertSame(JobStatus::Pending, $job->getStatus());
     }
 
+    public function testCreateJobWithPayloadTooLargeThrows(): void
+    {
+        $this->expectException(FrameworkException::class);
+        $this->expectExceptionMessage('Job payload exceeds maximum size');
+
+        // 1 MB + 1 byte payload.
+        $largePayload = ['data' => \str_repeat('x', 1048577)];
+        $this->factory->create('send_email', $largePayload);
+    }
+
+    public function testCreateJobWithPayloadAtLimitSucceeds(): void
+    {
+        // Just under 1 MB — should not throw.
+        $payload = ['data' => \str_repeat('x', 1000000)];
+        $job = $this->factory->create('send_email', $payload);
+
+        $this->assertSame('send_email', $job->getKey());
+    }
+
+    public function testSanitizeErrorStripsFilePaths(): void
+    {
+        $message = 'Error in /home/user/app/src/Service/PaymentGateway.php on line 42';
+        $sanitized = JobFactory::sanitizeError($message);
+
+        $this->assertStringNotContainsString('/home/user/app', $sanitized);
+        $this->assertStringContainsString('[path]', $sanitized);
+        $this->assertStringContainsString('on line 42', $sanitized);
+    }
+
+    public function testSanitizeErrorStripsConnectionStrings(): void
+    {
+        $message = 'Connection failed: mysql://admin:s3cret@db.example.com:3306/mydb';
+        $sanitized = JobFactory::sanitizeError($message);
+
+        $this->assertStringNotContainsString('s3cret', $sanitized);
+        $this->assertStringNotContainsString('db.example.com', $sanitized);
+        $this->assertStringContainsString('[redacted-dsn]', $sanitized);
+    }
+
+    public function testSanitizeErrorStripsLongTokens(): void
+    {
+        $token = \str_repeat('a', 40);
+        $message = "Authorization failed with token {$token} for user";
+        $sanitized = JobFactory::sanitizeError($message);
+
+        $this->assertStringNotContainsString($token, $sanitized);
+        $this->assertStringContainsString('[redacted]', $sanitized);
+    }
+
+    public function testSanitizeErrorPreservesShortMessages(): void
+    {
+        $message = 'Connection timeout after 30s';
+        $sanitized = JobFactory::sanitizeError($message);
+
+        $this->assertSame($message, $sanitized);
+    }
+
+    public function testSanitizeErrorTruncatesLongMessages(): void
+    {
+        // Use a message with spaces to avoid token-redaction patterns.
+        $message = \implode(' ', \array_fill(0, 1500, 'error occurred'));
+        $sanitized = JobFactory::sanitizeError($message);
+
+        $this->assertLessThanOrEqual(5000, \strlen($sanitized));
+        $this->assertStringEndsWith(' [truncated]', $sanitized);
+    }
+
     public function testTruncateErrorShortMessage(): void
     {
         $message = 'Short error';

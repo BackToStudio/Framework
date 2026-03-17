@@ -95,6 +95,13 @@ class RegisterQueueTest extends TestCase
         $this->registerQueue->activate();
     }
 
+    public function testUninstallDropsTableAndCleansTransient(): void
+    {
+        $this->repository->expects($this->once())->method('dropTable');
+
+        $this->registerQueue->uninstall();
+    }
+
     public function testRegisterCronScheduleAddsEveryMinute(): void
     {
         $schedules = $this->registerQueue->registerCronSchedule([]);

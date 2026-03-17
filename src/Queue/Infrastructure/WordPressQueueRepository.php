@@ -152,9 +152,10 @@ class WordPressQueueRepository implements QueueRepositoryInterface
             [
                 'status' => JobStatus::Completed->value,
                 'completed_at' => \gmdate('Y-m-d H:i:s'),
+                'claim_token' => '',
             ],
             ['id' => $jobId],
-            ['%s', '%s'],
+            ['%s', '%s', '%s'],
             ['%d']
         );
     }
@@ -166,10 +167,10 @@ class WordPressQueueRepository implements QueueRepositoryInterface
         $wpdb->query(
             $wpdb->prepare(
                 "UPDATE {$this->table}
-                 SET status = %s, last_error = %s, attempts = attempts + 1
+                 SET status = %s, last_error = %s, claim_token = '', attempts = attempts + 1
                  WHERE id = %d",
                 JobStatus::Failed->value,
-                JobFactory::truncateError($errorMessage),
+                JobFactory::sanitizeError($errorMessage),
                 $jobId
             )
         );

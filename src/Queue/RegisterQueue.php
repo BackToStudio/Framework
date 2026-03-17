@@ -54,6 +54,18 @@ class RegisterQueue implements Hooks, ActivationHooks, DeactivationHooks
         $this->unscheduleCronEvents();
     }
 
+    /**
+     * Clean up all queue data on plugin uninstall.
+     *
+     * Call this from your uninstall.php or register_uninstall_hook callback
+     * to remove the jobs table and any transients created by the queue.
+     */
+    public function uninstall(): void
+    {
+        $this->repository->dropTable();
+        \delete_transient(self::LOCK_KEY);
+    }
+
     public function hooks(): void
     {
         $this->hookDispatcher->addFilter('cron_schedules', [$this, 'registerCronSchedule']);

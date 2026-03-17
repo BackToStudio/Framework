@@ -13,6 +13,7 @@ class JobFactory
     private const MAX_KEY_LENGTH = 255;
     private const MAX_GROUP_LENGTH = 255;
     private const MAX_ERROR_LENGTH = 5000;
+    private const MAX_PAYLOAD_BYTES = 1048576; // 1 MB
 
     /**
      * Create a new Job entity ready for enqueuing.
@@ -59,6 +60,14 @@ class JobFactory
 
         $payloadJson = \json_encode($payload, \JSON_THROW_ON_ERROR);
 
+        if (\strlen($payloadJson) > self::MAX_PAYLOAD_BYTES) {
+            throw new FrameworkException(\sprintf(
+                'Job payload exceeds maximum size of %d bytes (%d bytes given).',
+                self::MAX_PAYLOAD_BYTES,
+                \strlen($payloadJson)
+            ));
+        }
+
         $job = new Job();
         $job->setKey($key)
             ->setGroup($group)
@@ -100,6 +109,27 @@ class JobFactory
             ->setIntervalSeconds((int) ($row['interval_seconds'] ?? 0));
 
         return $job;
+    }
+
+    /**
+     * Sanitize and truncate an error message for safe storage.
+     *
+     * Strips file paths, connection strings, and potential credentials
+     * to prevent sensitive information leakage (CWE-209).
+     */
+    public static function sanitizeError(string $message): string
+    {
+        // Strip absolute file paths (Unix and Windows).
+        $message = (string) \preg_replace('#(/[a-zA-Z0-9._\-]+){3,}(\.\w+)?#', '[path]', $message);
+        $message = (string) \preg_replace('#[A-Z]:\\\\([^\s\\\\]+\\\\){2,}#', '[path]', $message);
+
+        // Strip connection strings (mysql://, pgsql://, redis://, etc.).
+        $message = (string) \preg_replace('#\w+://[^\s]+@[^\s]+#', '[redacted-dsn]', $message);
+
+        // Strip potential API keys / tokens (long hex or base64 strings, 32+ chars).
+        $message = (string) \preg_replace('#(?<![a-zA-Z0-9])[a-zA-Z0-9+/=_\-]{32,}(?![a-zA-Z0-9])#', '[redacted]', $message);
+
+        return self::truncateError($message);
     }
 
     /**
