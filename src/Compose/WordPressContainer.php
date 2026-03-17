@@ -306,6 +306,29 @@ trait WordPressContainer
         $fileLocator = new FileLocator($this->getProjectDir());
         $loader = new PhpFileLoader($containerBuilder, $fileLocator, $this->getEnvironment(), $configBuilderGenerator);
         $loader->load('config/services.php');
+
+        $this->loadOptionalConfigFiles($containerBuilder, $configBuilderGenerator);
+    }
+
+    /**
+     * Load optional per-module configuration files from config/.
+     *
+     * Looks for config/performance.php alongside config/services.php.
+     * This allows overriding module defaults without polluting services.php.
+     */
+    private function loadOptionalConfigFiles(ContainerBuilder $containerBuilder, ConfigBuilderGenerator $configBuilderGenerator): void
+    {
+        $configDir = $this->getProjectDir() . '/config';
+        $optionalFiles = ['performance.php'];
+
+        foreach ($optionalFiles as $file) {
+            $filePath = $configDir . '/' . $file;
+            if (file_exists($filePath)) {
+                $fileLocator = new FileLocator($configDir);
+                $loader = new PhpFileLoader($containerBuilder, $fileLocator, $this->getEnvironment(), $configBuilderGenerator);
+                $loader->load($file);
+            }
+        }
     }
 
     private function loadBundles(ContainerBuilder $containerBuilder, ConfigBuilderGenerator $configBuilderGenerator): void
