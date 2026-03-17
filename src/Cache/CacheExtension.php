@@ -25,9 +25,6 @@ class CacheExtension implements ExtensionInterface
 
     public function getDefaultConfiguration(): array
     {
-        return [
-            'framework.cache.ttl' => 3600,
-            'framework.cache.enabled' => true,
-        ];
+        return CacheConfiguration::getDefaults();
     }
 }

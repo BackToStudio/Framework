@@ -25,14 +25,18 @@ The `config/` directory supports the main `services.php` plus optional per-modul
 ```
 config/
 ├── services.php          # Main service definitions (required)
+├── cache.php             # Cache module overrides (optional)
 ├── performance.php       # Performance module overrides (optional)
-└── security.php          # Security module overrides (optional)
+├── security.php          # Security module overrides (optional)
+└── seo.php               # SEO module overrides (optional)
 ```
 
 Module config files use dedicated **configurator** objects with typed, fluent APIs — no need to know parameter key names. See individual module references for details:
 
+- [Cache configuration](modules/cache.md#configuration)
 - [Performance configuration](modules/performance.md#configuration)
 - [Security configuration](modules/security.md#configuration)
+- [SEO configuration](modules/seo.md#configuration)
 
 ## config/services.php
 
@@ -110,15 +114,11 @@ When `$debug` is `false`:
 These parameters are set by `FrameworkConfiguration` and can be overridden in your `config/services.php`:
 
 ```php
-$container->parameters()->set('framework.cache.ttl', 7200);
+$container->parameters()->set('framework.rest_api.default_namespace', 'custom/v2');
 ```
 
 | Parameter | Default | Description |
 |-----------|---------|-------------|
-| `framework.cache.ttl` | `3600` | Default cache TTL in seconds |
-| `framework.cache.enabled` | `true` | Enable/disable cache |
-| `framework.seo.title_separator` | `\|` | SEO title separator |
-| `framework.seo.robots_default` | `index, follow` | Default robots meta |
 | `framework.rest_api.default_namespace` | `app/v1` | Default REST namespace |
 | `framework.rest_api.default_per_page` | `10` | Default results per page |
 | `framework.assets.version_strategy` | `file` | Asset versioning strategy |

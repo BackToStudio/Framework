@@ -70,7 +70,7 @@ interface ModuleConfiguratorInterface
 }
 ```
 
-Implementations: [`PerformanceConfigurator`](modules/performance.md#configuration), [`SecurityConfigurator`](modules/security.md#configuration).
+Implementations: [`CacheConfigurator`](modules/cache.md#configuration), [`PerformanceConfigurator`](modules/performance.md#configuration), [`SecurityConfigurator`](modules/security.md#configuration), [`SeoConfigurator`](modules/seo.md#configuration).
 
 ## Registry contracts
 

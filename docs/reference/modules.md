@@ -12,8 +12,8 @@ These modules expose public contracts or configuration:
 | [Taxonomy](modules/taxonomy.md) | Custom taxonomies | — |
 | [Blocks](modules/blocks.md) | Block styles | — |
 | [PostMeta](modules/post-meta.md) | Post meta fields | — |
-| [Cache](modules/cache.md) | PSR-16 SimpleCache (Memory, Transient, Filesystem) | — |
-| [Seo](modules/seo.md) | Unified SEO plugin integration (Yoast, SEOPress) | — |
+| [Cache](modules/cache.md) | PSR-16 SimpleCache (Memory, Transient, Filesystem) | `config/cache.php` |
+| [Seo](modules/seo.md) | Unified SEO plugin integration (Yoast, SEOPress) | `config/seo.php` |
 | [Admin](modules/admin.md) | Admin page management | — |
 | [Options](modules/options.md) | `wp_options` abstraction | — |
 | [RestApi](modules/rest-api.md) | REST API route management | — |

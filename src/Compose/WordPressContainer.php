@@ -7,6 +7,7 @@ namespace BackTo\Framework\Compose;
 use BackTo\Framework\Admin\AdminExtension;
 use BackTo\Framework\Assets\AssetsExtension;
 use BackTo\Framework\Blocks\BlocksExtension;
+use BackTo\Framework\Cache\CacheConfigurator;
 use BackTo\Framework\Cache\CacheExtension;
 use BackTo\Framework\Compose\DependencyInjection\Compiler\ResolveInstanceOfConditionalPassWithVendorPrefix;
 use BackTo\Framework\Contracts\ExtensionInterface;
@@ -24,6 +25,7 @@ use BackTo\Framework\Performance\PerformanceExtension;
 use BackTo\Framework\Contracts\ModuleConfiguratorInterface;
 use BackTo\Framework\Security\SecurityConfigurator;
 use BackTo\Framework\Security\SecurityExtension;
+use BackTo\Framework\Seo\SeoConfigurator;
 use BackTo\Framework\Seo\SeoExtension;
 use BackTo\Framework\Taxonomy\TaxonomyExtension;
 use Exception;
@@ -322,8 +324,10 @@ trait WordPressContainer
      * @var array<string, class-string> Maps filename to its configurator class.
      */
     private const MODULE_CONFIGURATORS = [
+        'cache.php' => CacheConfigurator::class,
         'performance.php' => PerformanceConfigurator::class,
         'security.php' => SecurityConfigurator::class,
+        'seo.php' => SeoConfigurator::class,
     ];
 
     /**
@@ -335,7 +339,7 @@ trait WordPressContainer
     private function loadOptionalConfigFiles(ContainerBuilder $containerBuilder, ConfigBuilderGenerator $configBuilderGenerator): void
     {
         $configDir = $this->getProjectDir() . '/config';
-        $optionalFiles = ['performance.php', 'security.php'];
+        $optionalFiles = ['cache.php', 'performance.php', 'security.php', 'seo.php'];
 
         foreach ($optionalFiles as $file) {
             $filePath = $configDir . '/' . $file;

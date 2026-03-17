@@ -16,20 +16,20 @@ class FrameworkConfigurationTest extends TestCase
 
         FrameworkConfiguration::apply($container);
 
-        $this->assertSame(3600, $container->getParameter('framework.cache.ttl'));
-        $this->assertTrue($container->getParameter('framework.cache.enabled'));
-        $this->assertSame('|', $container->getParameter('framework.seo.title_separator'));
         $this->assertSame('app/v1', $container->getParameter('framework.rest_api.default_namespace'));
+        $this->assertSame(10, $container->getParameter('framework.rest_api.default_per_page'));
+        $this->assertSame('file', $container->getParameter('framework.assets.version_strategy'));
+        $this->assertSame('error', $container->getParameter('framework.observability.log_level'));
     }
 
     public function testApplyDoesNotOverrideExistingParameters(): void
     {
         $container = new ContainerBuilder();
-        $container->setParameter('framework.cache.ttl', 7200);
+        $container->setParameter('framework.rest_api.default_per_page', 25);
 
         FrameworkConfiguration::apply($container);
 
-        $this->assertSame(7200, $container->getParameter('framework.cache.ttl'));
+        $this->assertSame(25, $container->getParameter('framework.rest_api.default_per_page'));
     }
 
     public function testGetDefaultsReturnsArray(): void
@@ -37,9 +37,10 @@ class FrameworkConfigurationTest extends TestCase
         $defaults = FrameworkConfiguration::getDefaults();
 
         $this->assertIsArray($defaults);
-        $this->assertArrayHasKey('framework.cache.ttl', $defaults);
-        $this->assertArrayHasKey('framework.seo.title_separator', $defaults);
         $this->assertArrayHasKey('framework.rest_api.default_namespace', $defaults);
         $this->assertArrayHasKey('framework.assets.version_strategy', $defaults);
+        $this->assertArrayHasKey('framework.observability.log_level', $defaults);
+        $this->assertArrayNotHasKey('cache.ttl', $defaults);
+        $this->assertArrayNotHasKey('seo.title_separator', $defaults);
     }
 }
