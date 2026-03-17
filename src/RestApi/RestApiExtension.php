@@ -35,9 +35,6 @@ class RestApiExtension implements ExtensionInterface
 
     public function getDefaultConfiguration(): array
     {
-        return [
-            'framework.rest_api.default_namespace' => 'app/v1',
-            'framework.rest_api.default_per_page' => 10,
-        ];
+        return RestApiConfiguration::getDefaults();
     }
 }

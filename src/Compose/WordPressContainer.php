@@ -5,21 +5,30 @@ declare(strict_types=1);
 namespace BackTo\Framework\Compose;
 
 use BackTo\Framework\Admin\AdminExtension;
+use BackTo\Framework\Assets\AssetsConfigurator;
 use BackTo\Framework\Assets\AssetsExtension;
 use BackTo\Framework\Blocks\BlocksExtension;
+use BackTo\Framework\Cache\CacheConfigurator;
 use BackTo\Framework\Cache\CacheExtension;
 use BackTo\Framework\Compose\DependencyInjection\Compiler\ResolveInstanceOfConditionalPassWithVendorPrefix;
 use BackTo\Framework\Contracts\ExtensionInterface;
 use BackTo\Framework\Contracts\RegistryInterface;
 use BackTo\Framework\Hooks\HooksExtension;
 use BackTo\Framework\Hooks\HookRegistry;
+use BackTo\Framework\Observability\ObservabilityConfigurator;
 use BackTo\Framework\Observability\ObservabilityExtension;
 use BackTo\Framework\Options\OptionsExtension;
 use BackTo\Framework\PostMeta\PostMetaExtension;
 use BackTo\Framework\PostType\PostTypeExtension;
+use BackTo\Framework\RestApi\RestApiConfigurator;
 use BackTo\Framework\RestApi\RestApiExtension;
 use BackTo\Framework\Gdpr\GdprExtension;
+use BackTo\Framework\Performance\PerformanceConfigurator;
+use BackTo\Framework\Performance\PerformanceExtension;
+use BackTo\Framework\Contracts\ModuleConfiguratorInterface;
+use BackTo\Framework\Security\SecurityConfigurator;
 use BackTo\Framework\Security\SecurityExtension;
+use BackTo\Framework\Seo\SeoConfigurator;
 use BackTo\Framework\Seo\SeoExtension;
 use BackTo\Framework\Taxonomy\TaxonomyExtension;
 use Exception;
@@ -232,6 +241,7 @@ trait WordPressContainer
             new ObservabilityExtension(),
             new SecurityExtension(),
             new GdprExtension(),
+            new PerformanceExtension(),
         ];
     }
 
@@ -304,6 +314,78 @@ trait WordPressContainer
         $fileLocator = new FileLocator($this->getProjectDir());
         $loader = new PhpFileLoader($containerBuilder, $fileLocator, $this->getEnvironment(), $configBuilderGenerator);
         $loader->load('config/services.php');
+
+        $this->loadOptionalConfigFiles($containerBuilder, $configBuilderGenerator);
+    }
+
+    /**
+     * Load optional per-module configuration files from config/.
+     *
+     * Each file can either be a standard Symfony config file (ContainerConfigurator)
+     * or return a closure that receives a dedicated module configurator.
+     *
+     * @var array<string, class-string> Maps filename to its configurator class.
+     */
+    private const MODULE_CONFIGURATORS = [
+        'assets.php' => AssetsConfigurator::class,
+        'cache.php' => CacheConfigurator::class,
+        'observability.php' => ObservabilityConfigurator::class,
+        'performance.php' => PerformanceConfigurator::class,
+        'rest-api.php' => RestApiConfigurator::class,
+        'security.php' => SecurityConfigurator::class,
+        'seo.php' => SeoConfigurator::class,
+    ];
+
+    /**
+     * Load optional per-module configuration files from config/.
+     *
+     * Looks for config/performance.php, config/security.php alongside config/services.php.
+     * This allows overriding module defaults without polluting services.php.
+     */
+    private function loadOptionalConfigFiles(ContainerBuilder $containerBuilder, ConfigBuilderGenerator $configBuilderGenerator): void
+    {
+        $configDir = $this->getProjectDir() . '/config';
+        $optionalFiles = ['assets.php', 'cache.php', 'observability.php', 'performance.php', 'rest-api.php', 'security.php', 'seo.php'];
+
+        foreach ($optionalFiles as $file) {
+            $filePath = $configDir . '/' . $file;
+            if (!file_exists($filePath)) {
+                continue;
+            }
+
+            // Module configurator mode: the file returns a closure that receives a typed configurator.
+            if (isset(self::MODULE_CONFIGURATORS[$file])) {
+                $this->loadModuleConfigFile($filePath, self::MODULE_CONFIGURATORS[$file], $containerBuilder);
+                continue;
+            }
+
+            // Standard Symfony ContainerConfigurator mode.
+            $fileLocator = new FileLocator($configDir);
+            $loader = new PhpFileLoader($containerBuilder, $fileLocator, $this->getEnvironment(), $configBuilderGenerator);
+            $loader->load($file);
+        }
+    }
+
+    /**
+     * Load a module config file that returns a closure receiving a typed configurator.
+     *
+     * @param class-string $configuratorClass
+     */
+    private function loadModuleConfigFile(string $filePath, string $configuratorClass, ContainerBuilder $containerBuilder): void
+    {
+        $callback = require $filePath;
+
+        if (!is_callable($callback)) {
+            return;
+        }
+
+        /** @var ModuleConfiguratorInterface $configurator */
+        $configurator = new $configuratorClass();
+        $callback($configurator);
+
+        foreach ($configurator->toParameters() as $key => $value) {
+            $containerBuilder->setParameter($key, $value);
+        }
     }
 
     private function loadBundles(ContainerBuilder $containerBuilder, ConfigBuilderGenerator $configBuilderGenerator): void

@@ -10,14 +10,44 @@ No manual registration is required — add the Security bundle to your kernel an
 
 ## Configure security parameters
 
-Set parameters in your `config/services.php`:
+Create a `config/security.php` file and use the fluent `SecurityConfigurator`:
 
 ```php
-$container->parameters()->set('framework.security.csp_report_only', false);
-$container->parameters()->set('framework.security.cors_allowed_origins', ['https://example.com']);
-$container->parameters()->set('framework.security.failed_login_threshold', 5);
-$container->parameters()->set('framework.security.audit_log_retention_days', 90);
+<?php
+
+use BackTo\Framework\Security\SecurityConfigurator;
+
+return static function (SecurityConfigurator $security): void {
+    $security
+        ->headersEnabled(true)
+        ->xmlrpcDisabled(true)
+        ->hideVersion(true)
+        ->cspReportOnly(false)
+        ->passwordMinLength(16)
+        ->maxConcurrentSessions(3)
+        ->restApiRequireAuth(true)
+        ->disableFileEditor(true)
+        ->twoFactorEnabled(true)
+        ->twoFactorIssuer('MonApp');
+};
 ```
+
+Only call the methods you want to override — unset values keep their defaults.
+
+### Available methods
+
+| Method | Type | Default | Description |
+|--------|------|---------|-------------|
+| `headersEnabled(bool)` | `bool` | `true` | Send hardened security headers |
+| `xmlrpcDisabled(bool)` | `bool` | `true` | Disable XML-RPC entirely |
+| `hideVersion(bool)` | `bool` | `true` | Remove WP version from output |
+| `cspReportOnly(bool)` | `bool` | `false` | CSP in report-only mode |
+| `passwordMinLength(int)` | `int` | `12` | Minimum password length |
+| `maxConcurrentSessions(int)` | `int` | `1` | Max concurrent sessions per user |
+| `restApiRequireAuth(bool)` | `bool` | `true` | Require auth for REST API |
+| `disableFileEditor(bool)` | `bool` | `true` | Disable theme/plugin file editor |
+| `twoFactorEnabled(bool)` | `bool` | `false` | Enable TOTP 2FA |
+| `twoFactorIssuer(string)` | `string` | `'WordPress'` | Issuer shown in authenticator apps |
 
 ## Use input sanitization
 

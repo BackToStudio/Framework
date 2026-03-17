@@ -1,0 +1,22 @@
+{
+	"core": "WordPress/WordPress#6.7.2",
+	"phpVersion": "8.2",
+	"plugins": [],
+	"themes": [],
+	"config": {
+		"WP_DEBUG": true,
+		"WP_DEBUG_LOG": true,
+		"SCRIPT_DEBUG": true
+	},
+	"mappings": {
+		"wp-content/mu-plugins/backto-framework": "."
+	},
+	"env": {
+		"tests": {
+			"config": {
+				"WP_DEBUG": true,
+				"WP_DEBUG_LOG": true
+			}
+		}
+	}
+}

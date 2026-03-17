@@ -25,9 +25,6 @@ class SeoExtension implements ExtensionInterface
 
     public function getDefaultConfiguration(): array
     {
-        return [
-            'framework.seo.title_separator' => '|',
-            'framework.seo.robots_default' => 'index, follow',
-        ];
+        return SeoConfiguration::getDefaults();
     }
 }

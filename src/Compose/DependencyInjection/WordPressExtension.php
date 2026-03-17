@@ -5,9 +5,14 @@ declare(strict_types=1);
 namespace BackTo\Framework\Compose\DependencyInjection;
 
 use BackTo\Framework\Admin\Contracts\AdminPageInterface;
-use BackTo\Framework\Compose\Configuration\FrameworkConfiguration;
 use BackTo\Framework\Admin\Contracts\AdminPageRegistrarInterface;
 use BackTo\Framework\Observability\Contracts\ErrorHandlerInterface;
+use BackTo\Framework\Performance\Contracts\DatabaseOptimizerInterface;
+use BackTo\Framework\Performance\Contracts\HtmlOptimizerInterface;
+use BackTo\Framework\Performance\Contracts\PageCacheInterface;
+use BackTo\Framework\Performance\Infrastructure\WordPressDatabaseOptimizer;
+use BackTo\Framework\Performance\Infrastructure\WordPressHtmlOptimizer;
+use BackTo\Framework\Performance\Infrastructure\WordPressPageCache;
 use BackTo\Framework\Observability\Contracts\HealthCheckInterface;
 use BackTo\Framework\Observability\Contracts\LoggerInterface;
 use BackTo\Framework\Observability\Contracts\PerformanceCollectorInterface;
@@ -244,6 +249,17 @@ class WordPressExtension
         $containerBuilder->register(SecurityNotifierInterface::class, SecurityNotifier::class)
             ->setAutowired(true);
         $containerBuilder->setAlias(SecurityNotifier::class, SecurityNotifierInterface::class);
+
+        $containerBuilder->register(HtmlOptimizerInterface::class, WordPressHtmlOptimizer::class);
+        $containerBuilder->setAlias(WordPressHtmlOptimizer::class, HtmlOptimizerInterface::class);
+
+        $containerBuilder->register(DatabaseOptimizerInterface::class, WordPressDatabaseOptimizer::class)
+            ->setAutowired(true);
+        $containerBuilder->setAlias(WordPressDatabaseOptimizer::class, DatabaseOptimizerInterface::class);
+
+        $containerBuilder->register(PageCacheInterface::class, WordPressPageCache::class)
+            ->setAutowired(true);
+        $containerBuilder->setAlias(WordPressPageCache::class, PageCacheInterface::class);
     }
 
     /**
@@ -251,7 +267,6 @@ class WordPressExtension
      */
     public function configure(ContainerBuilder $containerBuilder): void
     {
-        FrameworkConfiguration::apply($containerBuilder);
         $this->registerPortBindings($containerBuilder);
         $this->registerAutoconfiguration($containerBuilder);
         $this->registerCompilerPasses($containerBuilder);

@@ -75,18 +75,7 @@ class SecurityExtension implements ExtensionInterface
 
     public function getDefaultConfiguration(): array
     {
-        return [
-            'framework.security.headers_enabled' => true,
-            'framework.security.xmlrpc_disabled' => true,
-            'framework.security.hide_version' => true,
-            'framework.security.csp_report_only' => false,
-            'framework.security.password_min_length' => 12,
-            'framework.security.max_concurrent_sessions' => 1,
-            'framework.security.rest_api_require_auth' => true,
-            'framework.security.disable_file_editor' => true,
-            'framework.security.two_factor_enabled' => false,
-            'framework.security.two_factor_issuer' => 'WordPress',
-        ];
+        return SecurityConfiguration::getDefaults();
     }
 
     private function registerPortBindings(ContainerBuilder $containerBuilder): void
