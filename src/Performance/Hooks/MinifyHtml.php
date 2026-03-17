@@ -17,15 +17,24 @@ class MinifyHtml implements Hooks
 {
     private HookDispatcherInterface $hookDispatcher;
     private HtmlOptimizerInterface $htmlOptimizer;
+    private bool $enabled;
 
-    public function __construct(HookDispatcherInterface $hookDispatcher, HtmlOptimizerInterface $htmlOptimizer)
-    {
+    public function __construct(
+        HookDispatcherInterface $hookDispatcher,
+        HtmlOptimizerInterface $htmlOptimizer,
+        bool $enabled = false
+    ) {
         $this->hookDispatcher = $hookDispatcher;
         $this->htmlOptimizer = $htmlOptimizer;
+        $this->enabled = $enabled;
     }
 
     public function hooks(): void
     {
+        if (!$this->enabled) {
+            return;
+        }
+
         $this->hookDispatcher->addAction('template_redirect', [$this, 'startBuffering']);
     }
 

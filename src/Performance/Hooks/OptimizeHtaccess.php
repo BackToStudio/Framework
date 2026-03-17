@@ -69,8 +69,12 @@ class OptimizeHtaccess implements Hooks, ActivationHooks
         $this->applyDirectives();
     }
 
+    private const HASH_TRANSIENT = 'backto_htaccess_hash';
+
     /**
      * Write the performance directives into the root .htaccess.
+     *
+     * Skips the write if directives haven't changed since last apply.
      */
     public function applyDirectives(): void
     {
@@ -86,7 +90,15 @@ class OptimizeHtaccess implements Hooks, ActivationHooks
             return;
         }
 
+        // Skip redundant writes by comparing a hash of the directives
+        $hash = md5(implode("\n", $lines));
+
+        if ($this->getDirectivesHash() === $hash) {
+            return;
+        }
+
         $this->insertWithMarkers($htaccessPath, self::MARKER, $lines);
+        $this->storeDirectivesHash($hash);
     }
 
     /**
@@ -312,5 +324,23 @@ class OptimizeHtaccess implements Hooks, ActivationHooks
         }
 
         return \insert_with_markers($path, $marker, $lines);
+    }
+
+    protected function getDirectivesHash(): ?string
+    {
+        if (!function_exists('get_transient')) {
+            return null;
+        }
+
+        $hash = \get_transient(self::HASH_TRANSIENT);
+
+        return is_string($hash) ? $hash : null;
+    }
+
+    protected function storeDirectivesHash(string $hash): void
+    {
+        if (function_exists('set_transient')) {
+            \set_transient(self::HASH_TRANSIENT, $hash, DAY_IN_SECONDS);
+        }
     }
 }

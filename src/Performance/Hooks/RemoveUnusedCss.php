@@ -20,6 +20,7 @@ use BackTo\Framework\Contracts\Hooks;
 class RemoveUnusedCss implements Hooks
 {
     private HookDispatcherInterface $hookDispatcher;
+    private bool $enabled;
 
     /** @var string[] CSS block IDs to never touch */
     private array $preserveIds;
@@ -29,14 +30,20 @@ class RemoveUnusedCss implements Hooks
      */
     public function __construct(
         HookDispatcherInterface $hookDispatcher,
+        bool $enabled = false,
         array $preserveIds = ['global-styles-inline-css']
     ) {
         $this->hookDispatcher = $hookDispatcher;
+        $this->enabled = $enabled;
         $this->preserveIds = $preserveIds;
     }
 
     public function hooks(): void
     {
+        if (!$this->enabled) {
+            return;
+        }
+
         // Priority 9: run before MinifyHtml (default 10)
         $this->hookDispatcher->addAction('template_redirect', [$this, 'startBuffering'], 9);
     }

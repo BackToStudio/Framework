@@ -50,6 +50,9 @@ class PerformanceConfiguration
             // HTML minification
             'performance.minify_html' => false,
 
+            // Remove unused CSS
+            'performance.remove_unused_css' => false,
+
             // Resource hints
             'performance.resource_hints.preconnect' => [],
             'performance.resource_hints.dns_prefetch' => [],
