@@ -77,6 +77,13 @@ class PerformanceExtension implements ExtensionInterface
             'framework.performance.cache_preload.enabled' => true,
             'framework.performance.cache_preload.delay' => 5,
             'framework.performance.cache_preload.batch_size' => 50,
+
+            // .htaccess optimization
+            'framework.performance.htaccess.gzip' => true,
+            'framework.performance.htaccess.browser_cache' => true,
+            'framework.performance.htaccess.remove_etags' => true,
+            'framework.performance.htaccess.keep_alive' => true,
+            'framework.performance.htaccess.static_ttl' => 31536000,
         ];
     }
 
