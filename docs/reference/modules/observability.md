@@ -2,23 +2,6 @@
 
 Logging, error handling, health checks, and performance monitoring.
 
-## Classes
-
-| Class | Role |
-|-------|------|
-| `Contracts\LoggerInterface` | PSR-3 compatible logger port |
-| `Infrastructure\WordPressLogger` | WP adapter (error_log with structured formatting) |
-| `Infrastructure\NullLogger` | No-op logger for testing |
-| `ErrorHandler` | Error boundary with `capture()` pattern |
-| `Contracts\ErrorHandlerInterface` | Port for error handling |
-| `HealthCheckRegistry` | Collects and runs health checks |
-| `Contracts\HealthCheckInterface` | Port for health check definitions |
-| `Contracts\HealthCheckResult` | Value object (healthy/degraded/unhealthy) |
-| `HealthCheck\ContainerHealthCheck` | Verifies DI container state |
-| `HealthCheck\CacheHealthCheck` | Verifies cache operations |
-| `PerformanceCollector` | In-memory timing and counters |
-| `ObservableHookDispatcher` | Decorator adding instrumentation to hook dispatch |
-
 ## Contracts
 
 ### `LoggerInterface`
@@ -61,8 +44,6 @@ interface ErrorHandlerInterface
 
 ### `HealthCheckInterface`
 
-Verifies that a service or subsystem is operational.
-
 ```php
 interface HealthCheckInterface
 {
@@ -84,8 +65,6 @@ HealthCheckResult::unhealthy(string $message, array $metadata = []);
 Methods: `getStatus()`, `getMessage()`, `getMetadata()`, `isHealthy()`, `toArray()`.
 
 ### `PerformanceCollectorInterface`
-
-Collects performance metrics with nanosecond-precision timing.
 
 ```php
 interface PerformanceCollectorInterface

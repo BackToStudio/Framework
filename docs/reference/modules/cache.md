@@ -1,17 +1,6 @@
 # Cache
 
-PSR-16 SimpleCache implementation with 3 strategies.
-
-## Classes
-
-| Class | Role |
-|-------|------|
-| `Strategy\MemoryCache` | In-memory array (request-scoped) |
-| `Strategy\TransientCache` | WordPress transients (database) |
-| `Strategy\FilesystemCache` | Disk-based via Symfony Filesystem |
-| `Strategy\AbstractCache` | Shared key validation + TTL conversion |
-| `Contracts\CacheInterface` | PSR-16 compatible interface |
-| `Contracts\InvalidArgumentException` | Exception for invalid cache keys |
+PSR-16 SimpleCache implementation with 3 strategies: `MemoryCache` (request-scoped), `TransientCache` (database), `FilesystemCache` (disk).
 
 ## Contracts
 

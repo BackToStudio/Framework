@@ -2,19 +2,6 @@
 
 Registers WordPress custom taxonomies.
 
-## Classes
-
-| Class | Role |
-|-------|------|
-| `Entity\Taxonomy` | Domain entity holding key + args + post types |
-| `TaxonomyFactory` | Creates `Taxonomy` with default args |
-| `TaxonomyRegistry` | Collects registered taxonomies |
-| `RegisterTaxonomy` | Application orchestrator (hooks into `init`) |
-| `Contracts\TaxonomyInterface` | Interface for taxonomy definitions |
-| `Contracts\TaxonomyRegistrarInterface` | Port for WP registration |
-| `Infrastructure\WordPressTaxonomyRegistrar` | WP adapter |
-| `Repository\TermRepository` | Queries terms via `get_terms` |
-
 ## Contracts
 
 ### `TaxonomyInterface`

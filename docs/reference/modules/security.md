@@ -2,64 +2,6 @@
 
 Comprehensive WordPress security hardening with autoconfigured rules. Configure via `config/security.php` using the fluent `SecurityConfigurator`.
 
-## Classes
-
-| Class | Role |
-|-------|------|
-| `SecurityConfiguration` | Default parameter values for the Security module |
-| `SecurityConfigurator` | Fluent configurator for `config/security.php` (implements `ModuleConfiguratorInterface`) |
-| `Contracts\SecurityRuleInterface` | Marker interface for security rules (extends `HookInterface`) |
-| `SecurityRuleRegistry` | Collects all registered security rules |
-| `DependencyInjection\Compiler\RegisterSecurityRulePass` | Auto-tags `SecurityRuleInterface` services |
-| `LoginHardening` | Brute-force throttling (IP + account) with generic error messages |
-| `TwoFactor\TwoFactorAuthentication` | TOTP-based 2FA with backup codes |
-| `SecurityAuditLogger` | Persistent audit log (logins, role changes, options, plugins) |
-| `SecurityNotifier` | Email alerts on critical security events |
-| `ContentSecurityPolicyManager` | CSP header management with nonce support |
-| `CorsManager` | CORS header configuration |
-| `HttpHeadersHardening` | Security headers (X-Frame-Options, HSTS, etc.) |
-| `SecurityHeadersConfigurator` | Orchestrates all security header rules |
-| `CookieHardening` | Secure, HttpOnly, SameSite cookie flags |
-| `DisableXmlRpc` | Disables XML-RPC |
-| `DisableFileEditor` | Disables theme/plugin file editor |
-| `DisablePublicCron` | Disables public `wp-cron.php` |
-| `HideWordPressVersion` | Strips version info from output |
-| `DisableUserEnumeration` | Blocks `?author=N` enumeration |
-| `DatabaseHardening` | Database security settings |
-| `PhpConfigHardening` | PHP runtime security settings |
-| `UploadSecurity` | MIME type restrictions and upload validation |
-| `DirectoryProtection` | Directory listing prevention |
-| `CapabilityHardening` | Prevents capability self-escalation |
-| `PasswordPolicy` | Password complexity enforcement |
-| `CommentSpamProtection` | Comment spam filtering |
-| `AutoUpdatePolicy` | Auto-update configuration |
-| `AdminUrlObfuscation` | Login URL obfuscation |
-| `RestApiSecurity` | REST API access restriction |
-| `RestApiRateLimiter` | REST API rate limiting |
-| `SessionManager` | Secure session handling |
-| `IPAccessControl` | IP whitelist/blacklist enforcement |
-| `FileIntegrityMonitor` | Detects unauthorized file modifications |
-| `MalwareScanner` | Malware pattern scanning |
-| `LoginAnomalyDetector` | Unusual login pattern detection |
-| `SubresourceIntegrity` | SRI hashes for external assets |
-| `Infrastructure\WordPressAuditLogRepository` | WP adapter for audit log storage |
-| `Infrastructure\WordPressLoginThrottle` | WP adapter for login throttle |
-| `Infrastructure\WordPressNonceManager` | WP adapter for nonce operations |
-| `Infrastructure\WordPressInputSanitizer` | WP adapter for input sanitization |
-| `Infrastructure\WordPressOutputEscaper` | WP adapter for output escaping |
-| `Infrastructure\WordPressFileIntegrityRepository` | WP adapter for file integrity baselines |
-| `Infrastructure\WordPressRateLimiterRepository` | WP adapter for rate limiter state |
-| `Infrastructure\WordPressLoginLocationRepository` | WP adapter for login location history |
-| `TwoFactor\TotpProvider` | TOTP code generation/verification (RFC 6238) |
-| `TwoFactor\BackupCodeManager` | Backup code generation and verification |
-| `TwoFactor\Base32` | Base32 encoding for TOTP secrets |
-| `TwoFactor\Infrastructure\WordPressTwoFactorRepository` | WP adapter for 2FA user settings |
-| `RestApi\SecurityAuditLogRoute` | REST endpoint: `GET /backto/v1/security/audit-log` |
-| `RestApi\SecurityHealthRoute` | REST endpoint: `GET /backto/v1/security/health` |
-| `RestApi\SecurityScanRoute` | REST endpoint: `GET /backto/v1/security/scan` |
-| `HealthCheck\SecurityHealthCheck` | Health check: critical rules active, PHP version, file editor |
-| `AuditLogAdminPage` | Admin page for viewing audit logs |
-
 ## Configuration
 
 Security parameters are managed by `SecurityConfiguration` and overridden via the fluent `SecurityConfigurator` in `config/security.php`:

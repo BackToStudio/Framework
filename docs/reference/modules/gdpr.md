@@ -1,27 +1,6 @@
 # Gdpr
 
-GDPR consent management with cookie-based storage, consent banner, and conditional script loading.
-
-## Classes
-
-| Class | Role |
-|-------|------|
-| `Entity\ConsentCategory` | Immutable value object for a consent category |
-| `Entity\TrackingScript` | Immutable value object for a tracking script |
-| `ConsentCategoryRegistry` | Collects registered consent categories |
-| `TrackingScriptRegistry` | Collects registered tracking scripts |
-| `RegisterGdpr` | Application orchestrator (hooks into `wp_head` / `wp_footer`) |
-| `ConsentBanner` | Renders the consent banner HTML/CSS/JS |
-| `Contracts\ConsentCategoryInterface` | Interface for consent categories |
-| `Contracts\TrackingScriptInterface` | Interface for tracking scripts |
-| `Contracts\ConsentStorageInterface` | Port for reading user consent |
-| `Infrastructure\CookieConsentStorage` | Cookie-based adapter |
-| `Preset\GoogleTagManagerScript` | GTM preset (container ID) |
-| `Preset\GtagLoaderScript` | gtag.js loader preset (tracking ID) |
-| `Preset\GoogleAnalyticsScript` | GA4 preset (measurement ID) |
-| `Preset\GoogleAdsScript` | Google Ads preset (conversion ID) |
-| `Preset\HotjarScript` | Hotjar preset (site ID) |
-| `Preset\HubSpotScript` | HubSpot preset (portal ID) |
+GDPR consent management with cookie-based storage, consent banner, and conditional script loading. Built-in presets: GTM, gtag.js, GA4, Google Ads, Hotjar, HubSpot.
 
 ## Contracts
 
@@ -52,8 +31,6 @@ interface TrackingScriptInterface
 ```
 
 ### `ConsentStorageInterface`
-
-Port interface for reading user consent state.
 
 ```php
 interface ConsentStorageInterface

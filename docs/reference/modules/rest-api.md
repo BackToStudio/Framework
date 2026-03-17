@@ -2,21 +2,9 @@
 
 REST API route management with autoconfiguration.
 
-## Classes
-
-| Class | Role |
-|-------|------|
-| `RestRouteRegistry` | Collects registered REST routes |
-| `RegisterRestRoute` | Application orchestrator (hooks into `rest_api_init`) |
-| `Contracts\RestRouteInterface` | Interface for route definitions |
-| `Contracts\RestRouteRegistrarInterface` | Port for WP registration |
-| `Infrastructure\WordPressRestRouteRegistrar` | WP adapter (`register_rest_route`) |
-
 ## Contracts
 
 ### `RestRouteInterface` extends `HookInterface`
-
-Represents a REST API route to be registered.
 
 ```php
 interface RestRouteInterface extends HookInterface
