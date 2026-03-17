@@ -27,15 +27,16 @@ Practical guides for accomplishing specific tasks.
 - [How to use the observability module](how-to/use-observability.md)
 - [How to debug with Query Monitor](how-to/debug-with-query-monitor.md)
 - [How to manage GDPR consent and tracking scripts](how-to/manage-gdpr-consent.md)
+- [How to use WordPress security hardening](how-to/use-security.md)
 
 ## Reference
 
 Technical descriptions of the framework's modules, contracts, and architecture.
 
 - [Architecture overview](reference/architecture.md)
-- [Modules reference](reference/modules.md)
-- [Contracts and interfaces](reference/contracts.md)
-- [Configuration reference](reference/configuration.md)
+- [Modules reference](reference/modules.md) — index of all 17 modules with per-module detail pages
+- [Contracts and interfaces](reference/contracts.md) — shared cross-cutting contracts
+- [Configuration reference](reference/configuration.md) — framework-level configuration
 - [Compatibility matrix](reference/compatibility.md)
 
 ## Explanation

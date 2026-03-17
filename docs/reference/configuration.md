@@ -29,7 +29,10 @@ config/
 └── security.php          # Security module overrides (optional)
 ```
 
-Module config files use dedicated **configurator** objects with typed, fluent APIs — no need to know parameter key names.
+Module config files use dedicated **configurator** objects with typed, fluent APIs — no need to know parameter key names. See individual module references for details:
+
+- [Performance configuration](modules/performance.md#configuration)
+- [Security configuration](modules/security.md#configuration)
 
 ## config/services.php
 
@@ -121,86 +124,6 @@ $container->parameters()->set('framework.cache.ttl', 7200);
 | `framework.assets.version_strategy` | `file` | Asset versioning strategy |
 | `framework.observability.log_level` | `error` | Minimum log level |
 | `framework.observability.performance_tracking` | `false` | Enable performance collection |
-
-### Performance defaults (config/performance.php)
-
-Performance parameters are managed by `PerformanceConfiguration` and overridden via the fluent `PerformanceConfigurator` in `config/performance.php`:
-
-```php
-<?php
-
-use BackTo\Framework\Performance\PerformanceConfigurator;
-
-return static function (PerformanceConfigurator $performance): void {
-    $performance
-        ->pageCacheEnabled(true)
-        ->pageCacheTtl(7200)
-        ->minifyHtml(true)
-        ->htaccessGzip(false);
-};
-```
-
-| Parameter | Default | Configurator method |
-|-----------|---------|---------------------|
-| `performance.clean_head` | `true` | `cleanHead(bool)` |
-| `performance.disable_emojis` | `true` | `disableEmojis(bool)` |
-| `performance.disable_embeds` | `true` | `disableEmbeds(bool)` |
-| `performance.disable_xmlrpc` | `true` | `disableXmlrpc(bool)` |
-| `performance.heartbeat.disable_frontend` | `true` | `heartbeatDisableFrontend(bool)` |
-| `performance.heartbeat.admin_interval` | `60` | `heartbeatAdminInterval(int)` |
-| `performance.defer_scripts` | `true` | `deferScripts(bool)` |
-| `performance.defer_exclude` | `['jquery-core', 'jquery-migrate']` | `deferExclude(array)` |
-| `performance.remove_query_strings` | `true` | `removeQueryStrings(bool)` |
-| `performance.lazy_load_skip_first` | `1` | `lazyLoadSkipFirst(int)` |
-| `performance.add_decoding_async` | `true` | `addDecodingAsync(bool)` |
-| `performance.add_fetchpriority` | `true` | `addFetchpriority(bool)` |
-| `performance.minify_html` | `false` | `minifyHtml(bool)` |
-| `performance.resource_hints.preconnect` | `[]` | `preconnect(array)` |
-| `performance.resource_hints.dns_prefetch` | `[]` | `dnsPrefetch(array)` |
-| `performance.resource_hints.preload` | `[]` | `preload(array)` |
-| `performance.revisions_limit` | `5` | `revisionsLimit(int)` |
-| `performance.woocommerce_optimize` | `true` | `woocommerceOptimize(bool)` |
-| `performance.page_cache.enabled` | `false` | `pageCacheEnabled(bool)` |
-| `performance.page_cache.ttl` | `3600` | `pageCacheTtl(int)` |
-| `performance.db_cleanup.revisions_limit` | `5` | `dbCleanupRevisionsLimit(int)` |
-| `performance.cache_preload.enabled` | `true` | `cachePreloadEnabled(bool)` |
-| `performance.cache_preload.delay` | `5` | `cachePreloadDelay(int)` |
-| `performance.cache_preload.batch_size` | `50` | `cachePreloadBatchSize(int)` |
-| `performance.htaccess.gzip` | `true` | `htaccessGzip(bool)` |
-| `performance.htaccess.browser_cache` | `true` | `htaccessBrowserCache(bool)` |
-| `performance.htaccess.remove_etags` | `true` | `htaccessRemoveEtags(bool)` |
-| `performance.htaccess.keep_alive` | `true` | `htaccessKeepAlive(bool)` |
-| `performance.htaccess.static_ttl` | `31536000` | `htaccessStaticTtl(int)` |
-
-### Security defaults (config/security.php)
-
-Security parameters are managed by `SecurityConfiguration` and overridden via the fluent `SecurityConfigurator` in `config/security.php`:
-
-```php
-<?php
-
-use BackTo\Framework\Security\SecurityConfigurator;
-
-return static function (SecurityConfigurator $security): void {
-    $security
-        ->passwordMinLength(16)
-        ->twoFactorEnabled(true)
-        ->twoFactorIssuer('MonApp');
-};
-```
-
-| Parameter | Default | Configurator method |
-|-----------|---------|---------------------|
-| `security.headers_enabled` | `true` | `headersEnabled(bool)` |
-| `security.xmlrpc_disabled` | `true` | `xmlrpcDisabled(bool)` |
-| `security.hide_version` | `true` | `hideVersion(bool)` |
-| `security.csp_report_only` | `false` | `cspReportOnly(bool)` |
-| `security.password_min_length` | `12` | `passwordMinLength(int)` |
-| `security.max_concurrent_sessions` | `1` | `maxConcurrentSessions(int)` |
-| `security.rest_api_require_auth` | `true` | `restApiRequireAuth(bool)` |
-| `security.disable_file_editor` | `true` | `disableFileEditor(bool)` |
-| `security.two_factor_enabled` | `false` | `twoFactorEnabled(bool)` |
-| `security.two_factor_issuer` | `'WordPress'` | `twoFactorIssuer(string)` |
 
 ## Binding parameters in services.php
 

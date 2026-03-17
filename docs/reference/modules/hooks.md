@@ -1,8 +1,15 @@
-# Contracts and Interfaces Reference
+# Hooks
 
-This page documents shared, cross-cutting contracts. Module-specific contracts are documented in their respective [module reference pages](modules.md).
+Central hook orchestration.
 
-## Hook contracts
+## Classes
+
+| Class | Role |
+|-------|------|
+| `HookRegistry` | Collects and runs all hook services |
+| `Infrastructure\WordPressHookDispatcher` | WP adapter for `add_action`/`add_filter` |
+
+## Contracts
 
 ### `HookInterface`
 
@@ -56,28 +63,18 @@ interface DeactivationHooks extends HookInterface
 }
 ```
 
-## Configuration contracts
+### `HookDispatcherInterface`
 
-### `ModuleConfiguratorInterface`
-
-Contract for module configurators used in `config/*.php` files. Implementations provide a fluent API for setting module parameters without exposing internal key names.
+Abstracts the WordPress hook system.
 
 ```php
-interface ModuleConfiguratorInterface
+interface HookDispatcherInterface
 {
-    /** @return array<string, mixed> */
-    public function toParameters(): array;
+    public function addAction(string $hookName, callable $callback, int $priority = 10, int $acceptedArgs = 1): void;
+    public function addFilter(string $hookName, callable $callback, int $priority = 10, int $acceptedArgs = 1): void;
+    public function removeAction(string $hookName, callable $callback, int $priority = 10): void;
+    public function isAdmin(): bool;
+    public function registerActivationHook(string $file, callable $callback): void;
+    public function registerDeactivationHook(string $file, callable $callback): void;
 }
-```
-
-Implementations: [`PerformanceConfigurator`](modules/performance.md#configuration), [`SecurityConfigurator`](modules/security.md#configuration).
-
-## Registry contracts
-
-### `RegistryInterface`
-
-Marker interface. All registry services are automatically set as public in the DI container.
-
-```php
-interface RegistryInterface {}
 ```
