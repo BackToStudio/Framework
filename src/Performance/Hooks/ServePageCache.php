@@ -133,9 +133,22 @@ class ServePageCache implements Hooks
     private function getCurrentUrl(): string
     {
         $scheme = \is_ssl() ? 'https' : 'http';
-        $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+        $host = $this->getValidatedHost();
         $uri = $_SERVER['REQUEST_URI'] ?? '/';
 
         return $scheme . '://' . $host . strtok($uri, '?');
+    }
+
+    private function getValidatedHost(): string
+    {
+        $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+
+        $siteHost = (string) parse_url(\site_url(), PHP_URL_HOST);
+
+        if ($siteHost !== '' && $host !== $siteHost) {
+            return $siteHost;
+        }
+
+        return $host;
     }
 }

@@ -152,14 +152,22 @@ class LoginAnomalyDetector implements Hooks, SecurityRuleInterface
      */
     protected function getCountryFromIp(string $ip): string
     {
-        // CloudFlare header
-        if (isset($_SERVER['HTTP_CF_IPCOUNTRY'])) {
-            return strtoupper($_SERVER['HTTP_CF_IPCOUNTRY']);
-        }
+        $remoteAddr = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
+        $trustedProxies = function_exists('apply_filters')
+            ? \apply_filters('backto_trusted_proxies', [])
+            : [];
 
-        // Some CDNs set this
-        if (isset($_SERVER['HTTP_X_COUNTRY_CODE'])) {
-            return strtoupper($_SERVER['HTTP_X_COUNTRY_CODE']);
+        $isTrustedProxy = $trustedProxies !== [] && in_array($remoteAddr, $trustedProxies, true);
+
+        // Only trust CDN/proxy country headers when behind a trusted proxy
+        if ($isTrustedProxy) {
+            if (isset($_SERVER['HTTP_CF_IPCOUNTRY'])) {
+                return strtoupper($_SERVER['HTTP_CF_IPCOUNTRY']);
+            }
+
+            if (isset($_SERVER['HTTP_X_COUNTRY_CODE'])) {
+                return strtoupper($_SERVER['HTTP_X_COUNTRY_CODE']);
+            }
         }
 
         return 'unknown';

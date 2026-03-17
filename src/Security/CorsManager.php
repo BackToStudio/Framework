@@ -59,6 +59,13 @@ class CorsManager implements Hooks, SecurityRuleInterface, CorsManagerInterface
         $origins = is_array($origin) ? $origin : [$origin];
 
         foreach ($origins as $o) {
+            if ($o === '*' && $this->allowCredentials) {
+                throw new \InvalidArgumentException(
+                    'Cannot add wildcard (*) origin when credentials are enabled. '
+                    . 'Specify explicit allowed origins instead.'
+                );
+            }
+
             if (! in_array($o, $this->allowedOrigins, true)) {
                 $this->allowedOrigins[] = $o;
             }
@@ -97,6 +104,13 @@ class CorsManager implements Hooks, SecurityRuleInterface, CorsManagerInterface
 
     public function setAllowCredentials(bool $allow): self
     {
+        if ($allow && in_array('*', $this->allowedOrigins, true)) {
+            throw new \InvalidArgumentException(
+                'Cannot enable credentials with wildcard (*) origin. '
+                . 'Specify explicit allowed origins instead.'
+            );
+        }
+
         $this->allowCredentials = $allow;
 
         return $this;

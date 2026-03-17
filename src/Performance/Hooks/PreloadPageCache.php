@@ -304,7 +304,7 @@ class PreloadPageCache implements Hooks
             \wp_remote_get($url, [
                 'timeout'   => 30,
                 'blocking'  => false,
-                'sslverify' => false,
+                'sslverify' => true,
                 'headers'   => [
                     'X-Cache-Preload' => '1',
                     'Cache-Control'   => 'no-cache',

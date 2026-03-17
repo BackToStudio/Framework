@@ -190,7 +190,7 @@ class CommentSpamProtection implements Hooks, SecurityRuleInterface
 
     protected function getSiteHost(): string
     {
-        return $_SERVER['HTTP_HOST'] ?? '';
+        return (string) parse_url(\site_url(), PHP_URL_HOST);
     }
 
     protected function denyComment(string $message): void

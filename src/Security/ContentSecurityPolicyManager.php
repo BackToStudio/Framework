@@ -138,7 +138,7 @@ class ContentSecurityPolicyManager implements Hooks, SecurityRuleInterface, Cont
             return $tag;
         }
 
-        return str_replace('<script ', '<script nonce="' . $nonce . '" ', $tag);
+        return str_replace('<script ', '<script nonce="' . htmlspecialchars($nonce, ENT_QUOTES, 'UTF-8') . '" ', $tag);
     }
 
     public function isReportOnly(): bool
