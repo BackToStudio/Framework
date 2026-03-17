@@ -48,10 +48,15 @@ class WordPressDatabaseOptimizer implements DatabaseOptimizerInterface
     {
         global $wpdb;
 
-        $tables = $wpdb->get_col("SHOW TABLES LIKE '{$wpdb->prefix}%'");
+        $tables = $wpdb->get_col(
+            $wpdb->prepare("SHOW TABLES LIKE %s", $wpdb->esc_like($wpdb->prefix) . '%')
+        );
         $count = 0;
 
         foreach ($tables as $table) {
+            if (preg_match('/^[a-zA-Z0-9_]+$/', $table) !== 1) {
+                continue;
+            }
             $wpdb->query("OPTIMIZE TABLE `{$table}`");
             $count++;
         }
@@ -93,8 +98,8 @@ class WordPressDatabaseOptimizer implements DatabaseOptimizerInterface
             return 0;
         }
 
-        $ids = implode(',', array_map('intval', $revisionIds));
-        $wpdb->query("DELETE FROM {$wpdb->posts} WHERE ID IN ({$ids})");
+        $placeholders = implode(',', array_fill(0, count($revisionIds), '%d'));
+        $wpdb->query($wpdb->prepare("DELETE FROM {$wpdb->posts} WHERE ID IN ({$placeholders})", ...$revisionIds));
 
         return count($revisionIds);
     }

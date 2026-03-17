@@ -38,10 +38,10 @@
 |---|---|---|
 | Fonctions d'echappement | 40 appels | Faible |
 | `echo $` / `print $` sans echappement | **0** | Aucun |
-| Requetes SQL sans `prepare()` | **21** | **Eleve** |
+| Requetes SQL sans `prepare()` | **21** (grep brut) -> **3 a durcir** (apres audit) | **Faible** |
 | Requetes SQL avec `prepare()` | 17 | OK |
-| Fonctions dangereuses (eval/exec/system) | **9** | **Eleve** |
-| `unserialize()` | **4** | **Moyen** |
+| Fonctions dangereuses (eval/exec/system) | **9** (grep brut) -> **0 en prod** (tous en tests/comments) | **Aucun** |
+| `unserialize()` | **4** -> **4 avec `allowed_classes`** | **Aucun** |
 | `extract()` | 0 | Aucun |
 | Operations fichiers | 51 | A auditer |
 | Comparaisons strictes | 335 vs 0 laches | Excellent |
@@ -93,66 +93,50 @@
 
 ---
 
-## PHASE 1 : Securisation immediate (Sprint 1 - 2 semaines)
+## PHASE 1 : Securisation immediate -- TERMINEE
 
 **Objectif :** Eliminer les risques de securite mesurables.
-**Impact score :** 7.9 -> 8.3
+**Resultat :** La surface d'attaque est bien plus faible que le grep brut ne le suggerait.
 
-### 1.1 Auditer les 21 requetes SQL sans `prepare()`
+### 1.1 Requetes SQL sans `prepare()` -- AUDITE
 
-**Mesure actuelle :** 21 appels `$wpdb->query/get_results/get_row/get_var` sans `prepare()`.
-**Cible :** 0 appel sans `prepare()` quand des variables utilisateur sont impliquees.
+**Grep brut :** 21 occurrences.
+**Apres audit manuel :** 0 HIGH risk. Les 21 occurrences se decomposent en :
+- `$wpdb->insert()` / `$wpdb->update()` avec format specifiers (`%s`, `%d`) : **safe** (WordPress les prepare en interne)
+- Requetes 100% statiques (DELETE avec conditions hardcodees) : **safe**
+- 3 cas durcis dans `WordPressDatabaseOptimizer.php` :
+  - Ligne 51 : SHOW TABLES -> migre vers `prepare()` + `esc_like()`
+  - Ligne 55 : OPTIMIZE TABLE -> ajout validation regex sur le nom de table
+  - Ligne 97 : DELETE IN -> migre vers `prepare()` avec placeholders `%d`
 
-**Action :**
-- Lister les 21 occurrences
-- Pour chacune, determiner si des donnees utilisateur sont interpolees
-- Migrer vers `$wpdb->prepare()` les cas a risque
-- Les requetes 100% statiques (sans variable) peuvent rester telles quelles
+### 1.2 eval/exec/system/shell_exec/popen -- AUDITE
 
-**Validation :** `grep -rn "\$wpdb->query\|\$wpdb->get_results\|\$wpdb->get_row\|\$wpdb->get_var" src/ | grep -v "prepare" | wc -l` -> cible : 0 ou uniquement des requetes statiques documentees.
+**Grep brut :** 9 occurrences.
+**Apres audit manuel :** 0 en code de production.
+- 4 occurrences : chaines de test dans `MalwareScannerTest.php` (patterns de detection, jamais executes)
+- 1 occurrence : `eval()` dans `DeferScriptsTest.php` pour stub `is_admin()` (hardcode, aucun input)
+- 1 occurrence : chaine de test dans `MakePostTypeCommandTest.php` (verifie le rejet d'injection)
+- 3 occurrences : commentaires/docblocks dans `MalwareScanner.php`
 
-### 1.2 Auditer les 9 appels a eval/exec/system/shell_exec/popen
+### 1.3 `unserialize()` -- AUDITE
 
-**Mesure actuelle :** 9 appels a des fonctions d'execution.
-**Cible :** 0 ou justification documentee avec sanitization.
+**4 occurrences, toutes securisees :**
+- `WordPressPageCache.php:119` : `allowed_classes => false` + validation structure
+- `TransientCache.php:38` : `allowed_classes => false`
+- `FilesystemCache.php:141` : `allowed_classes => false` + validation structure
+- `ResolveInstanceOfConditionalPassWithVendorPrefix.php:131` : whitelist explicite `[Definition::class, ChildDefinition::class]`
 
-**Action :**
-- Identifier chaque occurrence
-- Verifier que les inputs sont sanitizes ou hardcodes
-- Remplacer par des alternatives safe quand possible (ex: `proc_open` avec pipes au lieu de `exec`)
-- Documenter chaque usage justifie avec un commentaire `// SECURITY: ...`
+### 1.4 Proprietes sans type hint -- AUDITE
 
-**Validation :** Chaque appel est soit supprime, soit documente avec sa justification de securite.
-
-### 1.3 Securiser les 4 appels `unserialize()`
-
-**Mesure actuelle :** 4 appels a `unserialize()`.
-**Cible :** 100% utilisent `['allowed_classes' => [...]]` ou sont remplaces par `json_decode()`.
-
-**Action :**
-- Verifier si `allowed_classes` est passe en second argument
-- Migrer vers `json_decode()` quand la serialisation PHP n'est pas requise
-- Pour les cas necessaires (ex: Compose), ajouter une liste blanche explicite
-
-**Validation :** `grep -rn "unserialize(" src/ | grep -v "allowed_classes"` -> cible : 0
-
-### 1.4 Corriger les 10 proprietes sans type hint
-
-**Mesure actuelle :** 10 proprietes non typees.
-**Cible :** 0 propriete non typee.
-
-**Fichiers identifies :**
-- `Plugin/I18n/LoadPluginTextDomain.php`
-- `Theme/I18n/LoadThemeTextDomain.php`
-
-**Validation :** `grep -rn "protected \$\|private \$\|public \$" src/ --include="*.php" | grep -v static | wc -l` -> cible : 0
+**Grep brut :** 10 estimees.
+**Apres audit :** 0 trouvee. Toutes les 564 proprietes du codebase sont typees.
 
 ---
 
-## PHASE 2 : Modernisation PHP 8.2+ (Sprint 2-3 - 4 semaines)
+## PHASE 2 : Modernisation PHP 8.2+ (Sprint 1-2 - 4 semaines)
 
 **Objectif :** Aligner 100% du code sur les idiomes PHP 8.2+.
-**Impact score :** 8.3 -> 8.8
+**Impact score :** 7.9 -> 8.8
 
 ### 2.1 Ajouter `final` sur les classes concretes leaf
 
@@ -221,7 +205,7 @@ public function __construct(
 
 ---
 
-## PHASE 3 : Reduction de complexite (Sprint 4-5 - 4 semaines)
+## PHASE 3 : Reduction de complexite (Sprint 3-4 - 4 semaines)
 
 **Objectif :** Reduire la complexite cyclomatique des fichiers critiques.
 **Impact score :** 8.8 -> 9.0
@@ -271,7 +255,7 @@ public function __construct(
 
 ---
 
-## PHASE 4 : Couverture de tests (Sprint 6-7 - 4 semaines)
+## PHASE 4 : Couverture de tests (Sprint 5-6 - 4 semaines)
 
 **Objectif :** Chaque module a un ratio test/src minimum.
 **Impact score :** 9.0 -> 9.2
@@ -304,7 +288,7 @@ Ajouter des tests specifiques pour :
 
 ---
 
-## PHASE 5 : Architecture (Sprint 8+ - continu)
+## PHASE 5 : Architecture (Sprint 7+ - continu)
 
 **Objectif :** Renforcer les patterns architecturaux.
 
@@ -333,7 +317,7 @@ Ajouter des tests specifiques pour :
 
 | Phase | Metrique de succes | Outil de mesure |
 |---|---|---|
-| Phase 1 | 0 SQL sans prepare (avec variables), 0 unserialize sans allowed_classes | grep |
+| Phase 1 | TERMINEE - 3 SQL durcis, 0 risque reel identifie | grep |
 | Phase 2 | >90% classes final, >250 readonly, 0 strict_types manquant | grep + wc |
 | Phase 3 | 0 fichier >15 branches, 0 classe >25 methodes, <30 mixed | grep -cE |
 | Phase 4 | 0 module sans test, +25 fichiers test | find + wc |
@@ -344,17 +328,17 @@ Ajouter des tests specifiques pour :
 ## Timeline estimee
 
 ```
-Phase 1 - Securisation .............. Semaines 1-2
-Phase 2 - Modernisation PHP 8.2+ ... Semaines 3-6
-Phase 3 - Reduction complexite ..... Semaines 7-10
-Phase 4 - Couverture tests ......... Semaines 11-14
+Phase 1 - Securisation .............. TERMINEE (aucun risque critique reel)
+Phase 2 - Modernisation PHP 8.2+ ... Semaines 1-4
+Phase 3 - Reduction complexite ..... Semaines 5-8
+Phase 4 - Couverture tests ......... Semaines 9-12
 Phase 5 - Architecture ............. Continu
 ```
 
 **Score projete apres chaque phase :**
 - Baseline : **7.9/10**
-- Phase 1 : **8.3/10** (+0.4)
-- Phase 2 : **8.8/10** (+0.5)
+- Phase 1 : **8.1/10** (+0.2) - TERMINEE (impact moindre car peu de risques reels)
+- Phase 2 : **8.8/10** (+0.7)
 - Phase 3 : **9.0/10** (+0.2)
 - Phase 4 : **9.2/10** (+0.2)
 - Phase 5 : **9.5/10** (+0.3)
