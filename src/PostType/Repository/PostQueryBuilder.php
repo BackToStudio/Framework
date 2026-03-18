@@ -8,6 +8,7 @@ use BackTo\Framework\PostMeta\ValueObject\MetaKey;
 use BackTo\Framework\PostType\Contracts\PostInterface;
 use BackTo\Framework\PostType\Entity\PostStatus;
 use BackTo\Framework\PostType\Factory\PostFactory;
+use BackTo\Framework\PostType\Specification\PostSpecification;
 
 use function get_posts;
 
@@ -21,6 +22,11 @@ final class PostQueryBuilder
     public function __construct(PostFactory $factory)
     {
         $this->factory = $factory;
+    }
+
+    public function matching(PostSpecification $specification): self
+    {
+        return $specification->apply($this);
     }
 
     public function postType(string $postType): self

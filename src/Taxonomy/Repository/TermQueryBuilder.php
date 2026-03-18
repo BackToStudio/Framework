@@ -8,6 +8,7 @@ use BackTo\Framework\PostType\Repository\MetaCompare;
 use BackTo\Framework\PostType\Repository\SortDirection;
 use BackTo\Framework\Taxonomy\Contracts\TermInterface;
 use BackTo\Framework\Taxonomy\Factory\TermFactory;
+use BackTo\Framework\Taxonomy\Specification\TermSpecification;
 
 use function get_terms;
 
@@ -21,6 +22,11 @@ final class TermQueryBuilder
     public function __construct(TermFactory $factory)
     {
         $this->factory = $factory;
+    }
+
+    public function matching(TermSpecification $specification): self
+    {
+        return $specification->apply($this);
     }
 
     public function taxonomy(string $taxonomy): self
