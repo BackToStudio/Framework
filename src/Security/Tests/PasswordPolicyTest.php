@@ -7,17 +7,20 @@ namespace BackTo\Framework\Security\Tests;
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
 use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
+use BackTo\Framework\Contracts\RequestContextInterface;
 use BackTo\Framework\Security\PasswordPolicy;
 use PHPUnit\Framework\TestCase;
 
 class PasswordPolicyTest extends TestCase
 {
     private PasswordPolicy $rule;
+    private RequestContextInterface $requestContext;
 
     protected function setUp(): void
     {
         $dispatcher = $this->createMock(HookDispatcherInterface::class);
-        $this->rule = new PasswordPolicy($dispatcher);
+        $this->requestContext = $this->createMock(RequestContextInterface::class);
+        $this->rule = new PasswordPolicy($dispatcher, $this->requestContext);
     }
 
     public function testImplementsRequiredInterfaces(): void
@@ -41,7 +44,8 @@ class PasswordPolicyTest extends TestCase
                 $this->assertContains($hook, ['user_profile_update_errors', 'registration_errors']);
             });
 
-        $rule = new PasswordPolicy($dispatcher);
+        $requestContext = $this->createMock(RequestContextInterface::class);
+        $rule = new PasswordPolicy($dispatcher, $requestContext);
         $rule->hooks();
     }
 
@@ -85,7 +89,8 @@ class PasswordPolicyTest extends TestCase
     public function testCustomMinLength(): void
     {
         $dispatcher = $this->createMock(HookDispatcherInterface::class);
-        $rule = new PasswordPolicy($dispatcher, 8);
+        $requestContext = $this->createMock(RequestContextInterface::class);
+        $rule = new PasswordPolicy($dispatcher, $requestContext, 8);
 
         $errors = $rule->validate('Ab1!cdef');
         $this->assertEmpty($errors);
@@ -95,7 +100,8 @@ class PasswordPolicyTest extends TestCase
     public function testDisabledRequirements(): void
     {
         $dispatcher = $this->createMock(HookDispatcherInterface::class);
-        $rule = new PasswordPolicy($dispatcher, 4, false, false, false);
+        $requestContext = $this->createMock(RequestContextInterface::class);
+        $rule = new PasswordPolicy($dispatcher, $requestContext, 4, false, false, false);
 
         $errors = $rule->validate('abcd');
         $this->assertEmpty($errors);

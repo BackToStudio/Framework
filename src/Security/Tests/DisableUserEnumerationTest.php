@@ -7,6 +7,7 @@ namespace BackTo\Framework\Security\Tests;
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
 use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
+use BackTo\Framework\Contracts\RequestContextInterface;
 use BackTo\Framework\Security\DisableUserEnumeration;
 use PHPUnit\Framework\TestCase;
 
@@ -33,7 +34,8 @@ class DisableUserEnumerationTest extends TestCase
     public function testImplementsRequiredInterfaces(): void
     {
         $dispatcher = $this->createMock(HookDispatcherInterface::class);
-        $rule = new DisableUserEnumeration($dispatcher);
+        $requestContext = $this->createMock(RequestContextInterface::class);
+        $rule = new DisableUserEnumeration($dispatcher, $requestContext);
 
         $this->assertInstanceOf(Hooks::class, $rule);
         $this->assertInstanceOf(SecurityRuleInterface::class, $rule);
@@ -42,7 +44,8 @@ class DisableUserEnumerationTest extends TestCase
     public function testGetName(): void
     {
         $dispatcher = $this->createMock(HookDispatcherInterface::class);
-        $rule = new DisableUserEnumeration($dispatcher);
+        $requestContext = $this->createMock(RequestContextInterface::class);
+        $rule = new DisableUserEnumeration($dispatcher, $requestContext);
 
         $this->assertSame('disable_user_enumeration', $rule->getName());
     }
@@ -59,14 +62,16 @@ class DisableUserEnumerationTest extends TestCase
             ->method('addFilter')
             ->with('rest_endpoints', $this->anything());
 
-        $rule = new DisableUserEnumeration($dispatcher);
+        $requestContext = $this->createMock(RequestContextInterface::class);
+        $rule = new DisableUserEnumeration($dispatcher, $requestContext);
         $rule->hooks();
     }
 
     public function testRestrictUserEndpointsRemovesUsersForGuests(): void
     {
         $dispatcher = $this->createMock(HookDispatcherInterface::class);
-        $rule = new TestableDisableUserEnumeration($dispatcher);
+        $requestContext = $this->createMock(RequestContextInterface::class);
+        $rule = new TestableDisableUserEnumeration($dispatcher, $requestContext);
         $rule->setUserLoggedIn(false);
 
         $endpoints = [
@@ -87,7 +92,8 @@ class DisableUserEnumerationTest extends TestCase
     public function testRestrictUserEndpointsKeepsUsersForLoggedIn(): void
     {
         $dispatcher = $this->createMock(HookDispatcherInterface::class);
-        $rule = new TestableDisableUserEnumeration($dispatcher);
+        $requestContext = $this->createMock(RequestContextInterface::class);
+        $rule = new TestableDisableUserEnumeration($dispatcher, $requestContext);
         $rule->setUserLoggedIn(true);
 
         $endpoints = [

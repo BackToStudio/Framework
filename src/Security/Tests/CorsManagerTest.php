@@ -6,6 +6,8 @@ namespace BackTo\Framework\Security\Tests;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
+use BackTo\Framework\Contracts\RequestContextInterface;
+use BackTo\Framework\Contracts\ResponseEmitterInterface;
 use BackTo\Framework\Security\Contracts\CorsManagerInterface;
 use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
 use BackTo\Framework\Security\CorsManager;
@@ -59,12 +61,16 @@ class TestableCorsManager extends CorsManager
 class CorsManagerTest extends TestCase
 {
     private HookDispatcherInterface $dispatcher;
+    private RequestContextInterface $requestContext;
+    private ResponseEmitterInterface $responseEmitter;
     private TestableCorsManager $cors;
 
     protected function setUp(): void
     {
         $this->dispatcher = $this->createMock(HookDispatcherInterface::class);
-        $this->cors = new TestableCorsManager($this->dispatcher);
+        $this->requestContext = $this->createMock(RequestContextInterface::class);
+        $this->responseEmitter = $this->createMock(ResponseEmitterInterface::class);
+        $this->cors = new TestableCorsManager($this->dispatcher, $this->requestContext, $this->responseEmitter);
     }
 
     public function testImplementsRequiredInterfaces(): void

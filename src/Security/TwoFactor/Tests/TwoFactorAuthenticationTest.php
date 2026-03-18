@@ -6,6 +6,7 @@ namespace BackTo\Framework\Security\TwoFactor\Tests;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
+use BackTo\Framework\Contracts\RequestContextInterface;
 use BackTo\Framework\Observability\Contracts\LoggerInterface;
 use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
 use BackTo\Framework\Security\TwoFactor\Contracts\BackupCodeManagerInterface;
@@ -92,6 +93,7 @@ class TwoFactorAuthenticationTest extends TestCase
     private TotpProviderInterface $totpProvider;
     private BackupCodeManagerInterface $backupCodeManager;
     private LoggerInterface $logger;
+    private RequestContextInterface $requestContext;
     private TestableTwoFactorAuth $rule;
 
     protected function setUp(): void
@@ -101,6 +103,7 @@ class TwoFactorAuthenticationTest extends TestCase
         $this->totpProvider = $this->createMock(TotpProviderInterface::class);
         $this->backupCodeManager = $this->createMock(BackupCodeManagerInterface::class);
         $this->logger = $this->createMock(LoggerInterface::class);
+        $this->requestContext = $this->createMock(RequestContextInterface::class);
 
         $this->rule = new TestableTwoFactorAuth(
             $this->dispatcher,
@@ -108,6 +111,7 @@ class TwoFactorAuthenticationTest extends TestCase
             $this->totpProvider,
             $this->backupCodeManager,
             $this->logger,
+            $this->requestContext,
             'TestApp',
         );
     }

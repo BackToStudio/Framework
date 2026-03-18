@@ -6,6 +6,7 @@ namespace BackTo\Framework\Security;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
+use BackTo\Framework\Contracts\RequestContextInterface;
 use BackTo\Framework\Observability\Contracts\LoggerInterface;
 use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
 
@@ -20,6 +21,7 @@ class DatabaseHardening implements Hooks, SecurityRuleInterface
 {
     private readonly HookDispatcherInterface $hookDispatcher;
     private readonly LoggerInterface $logger;
+    private readonly RequestContextInterface $requestContext;
     private readonly bool $debugMode;
 
     /**
@@ -51,10 +53,12 @@ class DatabaseHardening implements Hooks, SecurityRuleInterface
     public function __construct(
         HookDispatcherInterface $hookDispatcher,
         LoggerInterface $logger,
+        RequestContextInterface $requestContext,
         bool $debugMode = false,
     ) {
         $this->hookDispatcher = $hookDispatcher;
         $this->logger = $logger;
+        $this->requestContext = $requestContext;
         $this->debugMode = $debugMode;
     }
 
@@ -155,7 +159,7 @@ class DatabaseHardening implements Hooks, SecurityRuleInterface
     protected function isFromSafeCaller(): bool
     {
         // Fast path: check current script before falling back to expensive backtrace
-        $script = $_SERVER['SCRIPT_FILENAME'] ?? '';
+        $script = $this->requestContext->server('SCRIPT_FILENAME');
 
         foreach (self::SAFE_CALLERS as $safeCaller) {
             if (str_contains($script, $safeCaller)) {

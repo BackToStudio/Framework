@@ -8,6 +8,7 @@ use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
 use BackTo\Framework\Observability\Contracts\LoggerInterface;
 use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
+use BackTo\Framework\Contracts\RequestContextInterface;
 use BackTo\Framework\Security\DatabaseHardening;
 use PHPUnit\Framework\TestCase;
 
@@ -30,13 +31,15 @@ class DatabaseHardeningTest extends TestCase
 {
     private HookDispatcherInterface $dispatcher;
     private LoggerInterface $logger;
+    private RequestContextInterface $requestContext;
     private TestableDatabaseHardening $hardening;
 
     protected function setUp(): void
     {
         $this->dispatcher = $this->createMock(HookDispatcherInterface::class);
         $this->logger = $this->createMock(LoggerInterface::class);
-        $this->hardening = new TestableDatabaseHardening($this->dispatcher, $this->logger, true);
+        $this->requestContext = $this->createMock(RequestContextInterface::class);
+        $this->hardening = new TestableDatabaseHardening($this->dispatcher, $this->logger, $this->requestContext, true);
     }
 
     public function testImplementsRequiredInterfaces(): void
@@ -171,13 +174,13 @@ class DatabaseHardeningTest extends TestCase
     {
         $this->assertTrue($this->hardening->isDebugMode());
 
-        $nonDebug = new TestableDatabaseHardening($this->dispatcher, $this->logger, false);
+        $nonDebug = new TestableDatabaseHardening($this->dispatcher, $this->logger, $this->requestContext, false);
         $this->assertFalse($nonDebug->isDebugMode());
     }
 
     public function testInspectQuerySkipsUnpreparedDetectionWhenNotDebug(): void
     {
-        $nonDebug = new TestableDatabaseHardening($this->dispatcher, $this->logger, false);
+        $nonDebug = new TestableDatabaseHardening($this->dispatcher, $this->logger, $this->requestContext, false);
 
         // No info log for unprepared queries when not in debug mode
         $this->logger->expects($this->never())->method('info');
