@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Contracts;
 
+use BackTo\Framework\Compose\ValueObject\Slug;
+
 interface SlugInterface
 {
-    
-    public function getSlug(): string;
 
-    
-    public function setSlug(string $slug): SlugInterface;
+    public function getSlug(): Slug;
+
+
+    public function setSlug(Slug|string $slug): SlugInterface;
 
 }

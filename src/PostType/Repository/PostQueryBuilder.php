@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\PostType\Repository;
 
+use BackTo\Framework\PostMeta\ValueObject\MetaKey;
 use BackTo\Framework\PostType\Contracts\PostInterface;
+use BackTo\Framework\PostType\Entity\PostStatus;
 use BackTo\Framework\PostType\Factory\PostFactory;
 
 use function get_posts;
@@ -27,16 +29,21 @@ final class PostQueryBuilder
         return $this;
     }
 
-    public function status(string $status): self
+    public function status(PostStatus|string $status): self
     {
-        $this->args['post_status'] = $status;
+        $this->args['post_status'] = $status instanceof PostStatus ? $status->value : $status;
         return $this;
     }
 
-    
+    /**
+     * @param array<PostStatus|string> $statuses
+     */
     public function statuses(array $statuses): self
     {
-        $this->args['post_status'] = $statuses;
+        $this->args['post_status'] = array_map(
+            static fn (PostStatus|string $s): string => $s instanceof PostStatus ? $s->value : $s,
+            $statuses,
+        );
         return $this;
     }
 
@@ -104,14 +111,14 @@ final class PostQueryBuilder
         return $this;
     }
 
-    public function whereMeta(string $key, mixed $value, MetaCompare $compare = MetaCompare::EQUAL): self
+    public function whereMeta(MetaKey|string $key, mixed $value, MetaCompare $compare = MetaCompare::EQUAL): self
     {
         if (!isset($this->args['meta_query'])) {
             $this->args['meta_query'] = [];
         }
 
         $this->args['meta_query'][] = [
-            'key' => $key,
+            'key' => (string) $key,
             'value' => $value,
             'compare' => $compare->value,
         ];
@@ -119,28 +126,28 @@ final class PostQueryBuilder
         return $this;
     }
 
-    public function whereMetaExists(string $key): self
+    public function whereMetaExists(MetaKey|string $key): self
     {
         if (!isset($this->args['meta_query'])) {
             $this->args['meta_query'] = [];
         }
 
         $this->args['meta_query'][] = [
-            'key' => $key,
+            'key' => (string) $key,
             'compare' => MetaCompare::EXISTS->value,
         ];
 
         return $this;
     }
 
-    public function whereMetaNotExists(string $key): self
+    public function whereMetaNotExists(MetaKey|string $key): self
     {
         if (!isset($this->args['meta_query'])) {
             $this->args['meta_query'] = [];
         }
 
         $this->args['meta_query'][] = [
-            'key' => $key,
+            'key' => (string) $key,
             'compare' => MetaCompare::NOT_EXISTS->value,
         ];
 

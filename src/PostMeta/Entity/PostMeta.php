@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace BackTo\Framework\PostMeta\Entity;
 
 use BackTo\Framework\PostMeta\Contracts\PostMetaInterface;
+use BackTo\Framework\PostMeta\ValueObject\MetaKey;
 use BackTo\Framework\PostType\Contracts\PostInterface;
 
 final class PostMeta implements PostMetaInterface
@@ -12,7 +13,7 @@ final class PostMeta implements PostMetaInterface
     private int $id;
     private PostInterface $post;
     private int $postId;
-    private string $metaKey;
+    private MetaKey $metaKey;
     private mixed $metaValue;
 
     public function getId(): int
@@ -49,14 +50,14 @@ final class PostMeta implements PostMetaInterface
         return $this;
     }
 
-    public function getMetaKey(): string
+    public function getMetaKey(): MetaKey
     {
         return $this->metaKey;
     }
 
-    public function setMetaKey(string $metaKey): PostMetaInterface
+    public function setMetaKey(MetaKey|string $metaKey): PostMetaInterface
     {
-        $this->metaKey = $metaKey;
+        $this->metaKey = $metaKey instanceof MetaKey ? $metaKey : new MetaKey($metaKey);
         return $this;
     }
 

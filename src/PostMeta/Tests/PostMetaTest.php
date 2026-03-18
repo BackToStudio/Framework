@@ -6,6 +6,7 @@ namespace BackTo\Framework\PostMeta\Tests;
 
 use BackTo\Framework\PostMeta\Contracts\PostMetaInterface;
 use BackTo\Framework\PostMeta\Entity\PostMeta;
+use BackTo\Framework\PostMeta\ValueObject\MetaKey;
 use BackTo\Framework\PostType\Contracts\PostInterface;
 use PHPUnit\Framework\TestCase;
 
@@ -29,7 +30,26 @@ class PostMetaTest extends TestCase
     {
         $postMeta = new PostMeta();
         $postMeta->setMetaKey('_thumbnail_id');
-        $this->assertSame('_thumbnail_id', $postMeta->getMetaKey());
+        $this->assertInstanceOf(MetaKey::class, $postMeta->getMetaKey());
+        $this->assertSame('_thumbnail_id', (string) $postMeta->getMetaKey());
+    }
+
+    public function testSetMetaKeyWithValueObject(): void
+    {
+        $postMeta = new PostMeta();
+        $key = new MetaKey('_thumbnail_id');
+        $postMeta->setMetaKey($key);
+        $this->assertTrue($postMeta->getMetaKey()->equals($key));
+    }
+
+    public function testMetaKeyIsProtected(): void
+    {
+        $postMeta = new PostMeta();
+        $postMeta->setMetaKey('_private_key');
+        $this->assertTrue($postMeta->getMetaKey()->isProtected());
+
+        $postMeta->setMetaKey('public_key');
+        $this->assertFalse($postMeta->getMetaKey()->isProtected());
     }
 
     public function testSetAndGetMetaValue(): void

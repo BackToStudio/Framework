@@ -59,7 +59,7 @@ final class RegisterPostMetaStructure implements Hooks
 
             $this->registrar->register(
                 $postMetaStructure->getObjectType(),
-                $postMetaStructure->getMetaKey(),
+                (string) $postMetaStructure->getMetaKey(),
                 $args
             );
         }

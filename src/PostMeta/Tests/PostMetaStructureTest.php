@@ -6,6 +6,7 @@ namespace BackTo\Framework\PostMeta\Tests;
 
 use BackTo\Framework\PostMeta\Contracts\PostMetaStructureInterface;
 use BackTo\Framework\PostMeta\Entity\PostMetaStructure;
+use BackTo\Framework\PostMeta\ValueObject\MetaKey;
 use PHPUnit\Framework\TestCase;
 
 class PostMetaStructureTest extends TestCase
@@ -20,7 +21,6 @@ class PostMetaStructureTest extends TestCase
     {
         $structure = new PostMetaStructure();
         $this->assertSame('post', $structure->getObjectType());
-        $this->assertSame('', $structure->getMetaKey());
         $this->assertSame('', $structure->getType());
         $this->assertSame('', $structure->getLabel());
         $this->assertSame('', $structure->getDescription());
@@ -32,11 +32,19 @@ class PostMetaStructureTest extends TestCase
         $this->assertFalse($structure->isRevisionsEnabled());
     }
 
+    public function testGetMetaKeyThrowsWhenNotSet(): void
+    {
+        $structure = new PostMetaStructure();
+        $this->expectException(\LogicException::class);
+        $structure->getMetaKey();
+    }
+
     public function testSetMetaKey(): void
     {
         $structure = new PostMetaStructure();
         $result = $structure->setMetaKey('my_meta');
-        $this->assertSame('my_meta', $structure->getMetaKey());
+        $this->assertInstanceOf(MetaKey::class, $structure->getMetaKey());
+        $this->assertSame('my_meta', (string) $structure->getMetaKey());
         $this->assertInstanceOf(PostMetaStructureInterface::class, $result);
     }
 
@@ -83,7 +91,7 @@ class PostMetaStructureTest extends TestCase
             ->setShowInRest(true)
             ->setRevisionsEnabled(true);
 
-        $this->assertSame('key', $result->getMetaKey());
+        $this->assertSame('key', (string) $result->getMetaKey());
         $this->assertSame('string', $result->getType());
         $this->assertSame('Label', $result->getLabel());
         $this->assertSame('Desc', $result->getDescription());

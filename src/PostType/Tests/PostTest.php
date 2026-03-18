@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\PostType\Tests;
 
+use BackTo\Framework\Compose\ValueObject\Slug;
 use BackTo\Framework\PostType\Entity\Post;
+use BackTo\Framework\PostType\Entity\PostStatus;
 use BackTo\Framework\PostType\Entity\PostType;
 use PHPUnit\Framework\TestCase;
 use DateTime;
@@ -39,17 +41,25 @@ class PostTest extends TestCase
     public function testStatus()
     {
         $post = new Post();
-        $this->assertEmpty($post->getStatus());
-        $post->setStatus('published');
-        $this->assertSame('published', $post->getStatus());
+        $this->assertSame(PostStatus::Draft, $post->getStatus());
+        $post->setStatus(PostStatus::Publish);
+        $this->assertSame(PostStatus::Publish, $post->getStatus());
+    }
+
+    public function testStatusFromString()
+    {
+        $post = new Post();
+        $post->setStatus('publish');
+        $this->assertSame(PostStatus::Publish, $post->getStatus());
     }
 
     public function testSlug()
     {
         $post = new Post();
-        $this->assertEmpty($post->getSlug());
+        $this->assertInstanceOf(Slug::class, $post->getSlug());
+        $this->assertTrue($post->getSlug()->isEmpty());
         $post->setSlug('abc-def');
-        $this->assertSame('abc-def', $post->getSlug());
+        $this->assertSame('abc-def', (string) $post->getSlug());
     }
 
     public function testParentId()
