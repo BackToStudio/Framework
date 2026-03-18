@@ -29,6 +29,8 @@ Practical guides for accomplishing specific tasks.
 - [How to manage GDPR consent and tracking scripts](how-to/manage-gdpr-consent.md)
 - [How to use WordPress security hardening](how-to/use-security.md)
 - [How to use the async queue system](how-to/use-queue.md)
+- [How to use Specifications for querying](how-to/use-specifications.md)
+- [How to use Value Objects](how-to/use-value-objects.md)
 
 ## Reference
 
@@ -49,3 +51,4 @@ Background, design decisions, and conceptual understanding.
 - [Vendor scoping with php-scoper](explanation/vendor-scoping.md)
 - [GDPR consent management design](explanation/gdpr-consent-design.md)
 - [Queue system design](explanation/queue-design.md)
+- [DDD analysis of the framework](explanation/ddd-analysis.md)

@@ -35,8 +35,15 @@ src/PostType/
 │   ├── PostTypeInterface.php
 │   ├── PostTypeRegistryInterface.php
 │   └── PostTypeRegistrarInterface.php
-├── Entity/                       # Domain entities
-│   └── PostType.php
+├── Entity/                       # Domain entities and Value Objects
+│   ├── Post.php
+│   ├── PostType.php
+│   └── PostStatus.php            # Value Object (enum)
+├── Specification/                # Named query criteria
+│   ├── PostSpecification.php     # Interface
+│   ├── PublishedPosts.php
+│   ├── RecentPosts.php
+│   └── AndPostSpecification.php  # Composite
 ├── Infrastructure/               # WordPress adapters
 │   └── WordPressPostTypeRegistrar.php
 ├── DependencyInjection/
@@ -49,6 +56,15 @@ src/PostType/
 ├── PostTypeRegistry.php          # Domain registry
 └── RegisterPostType.php          # Application orchestrator
 ```
+
+## Shared Query namespace
+
+Cross-cutting query enums live in `src/Query/` to avoid circular dependencies between PostType, Taxonomy, and PostMeta:
+
+| Enum | Values |
+|------|--------|
+| `MetaCompare` | `EQUAL`, `NOT_EQUAL`, `GREATER_THAN`, `LIKE`, `IN`, `EXISTS`, etc. |
+| `SortDirection` | `ASC`, `DESC` |
 
 ## Kernel hierarchy
 

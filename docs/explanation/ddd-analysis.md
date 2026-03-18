@@ -20,6 +20,7 @@ Le framework est découpé en **contextes bornés** autonomes, chacun avec son p
 | **Taxonomy** | `src/Taxonomy/` | Gestion des taxonomies et des termes |
 | **PostMeta** | `src/PostMeta/` | Gestion des métadonnées de posts |
 | **Queue** | `src/Queue/` | Système de files d'attente de jobs asynchrones |
+| **Query** | `src/Query/` | Enums partagés pour les requêtes (MetaCompare, SortDirection) |
 | **GDPR** | `src/Gdpr/` | Consentement RGPD et scripts de tracking |
 | **Security** | `src/Security/` | Sécurité (nonce, throttling, 2FA, CSP, CORS, audit) |
 | **SEO** | `src/Seo/` | Référencement, balises meta, JSON-LD Schema |
@@ -45,6 +46,8 @@ Chaque contexte suit une **structure interne normalisée** :
 ├── Entity/           # Entités et Value Objects
 ├── Factory/          # Fabriques d'agrégats
 ├── Repository/       # Accès aux données
+├── Specification/    # Critères de requête nommés
+├── ValueObject/      # Objets-valeur immuables
 ├── Infrastructure/   # Adaptateurs WordPress
 ├── DependencyInjection/
 │   └── Compiler/     # Compiler passes pour l'auto-wiring
@@ -53,6 +56,20 @@ Chaque contexte suit une **structure interne normalisée** :
 ```
 
 Les contextes communiquent via les **interfaces définies dans `Contracts/`**, jamais par référence directe aux implémentations.
+
+#### Anti-Corruption Layer inter-contextes
+
+Le contexte PostMeta définit `PostReferenceInterface` — une vue minimale de ce dont il a besoin d'un Post — pour éviter toute dépendance vers le contexte PostType :
+
+```php
+// src/PostMeta/Contracts/PostReferenceInterface.php
+interface PostReferenceInterface
+{
+    public function getId(): ?int;
+}
+```
+
+Les enums partagés (`MetaCompare`, `SortDirection`) vivent dans le namespace `Query` — un **Shared Kernel** léger — plutôt que dans un contexte spécifique, évitant les dépendances circulaires entre PostType et Taxonomy.
 
 ---
 
@@ -67,55 +84,60 @@ Les entités sont des objets du domaine avec une **identité** qui persiste dans
 class Post implements PostInterface
 {
     use HasId;       // getId(), setId()
-    use HasSlug;     // getSlug(), setSlug()
+    use HasSlug;     // getSlug(), setSlug() — accepte Slug|string
     use HasParentId; // getParentId(), setParentId()
 
-    // Propriétés métier
+    private PostStatus|string $status;     // Value Object enum
     private string $title;
     private string $content;
     private string $excerpt;
-    private string $status;
-    private DateTimeInterface $date;
-    private DateTimeInterface $modifiedDate;
-    private int $authorId;
-    private string $type;
-    private string $mimeType;
-    private int $menuOrder;
     // ...
 }
 ```
 
-**Analyse** : `Post` est une entité riche qui compose des traits transversaux (`HasId`, `HasSlug`, `HasParentId`). Elle représente l'agrégat racine du contexte PostType, reliant PostMeta comme entité enfant.
+`Post` est l'agrégat racine du contexte PostType. Il utilise le Value Object `PostStatus` pour le statut et accepte `Slug|string` pour le slug (rétrocompatibilité).
 
 ### Term
 **Fichier** : `src/Taxonomy/Entity/Term.php`
 
 Même structure que `Post`, utilisant les mêmes traits d'identité. Représente un terme de taxonomie avec `name`, `description`, `count`, `taxonomyName`.
 
-### Job (Machine à états)
+### Job (Machine à états avec invariants)
 **Fichier** : `src/Queue/Entity/Job.php`
 
 ```php
-class Job
+final class Job
 {
-    private JobStatus $status;     // Pending, Running, Completed, Failed, Cancelled
+    private JobStatus $status;
     private int $attempts;
-    private ?int $maxRetries;
-    private ?DateTimeInterface $scheduledAt;
-    private ?string $interval;
+    private int $maxRetries;
 
-    public function isReady(): bool { /* logique de planification */ }
-    public function canRetry(): bool { /* logique de retry */ }
-    public function isRecurring(): bool { /* logique de récurrence */ }
+    // Guards — protègent les invariants
+    public function setAttempts(int $attempts): self;     // rejette < 0
+    public function setMaxRetries(int $maxRetries): self; // rejette < 0
+    public function setIntervalSeconds(int $s): self;     // rejette < 0
+
+    // Domain methods — transitions d'état contrôlées
+    public function markAsRunning(string $claimToken): self;  // Pending|Failed → Running
+    public function markAsCompleted(): self;                   // Running → Completed
+    public function markAsFailed(string $error): self;         // Running → Failed
+    public function cancel(): self;                            // !Completed → Cancelled
+    public function reschedule(\DateTimeImmutable $at): self;  // Completed|Failed → Pending
+    public function incrementAttempts(): self;
+
+    // Query methods
+    public function isReady(): bool;
+    public function canRetry(): bool;
+    public function isRecurring(): bool;
 }
 ```
 
-**Analyse** : `Job` est l'entité la plus riche en logique métier du framework. Elle implémente un **pattern Machine à états** avec 5 transitions de statut et contient de la logique de domaine significative (scheduling, retry, récurrence).
+`Job` est l'entité la plus riche du framework : machine à états avec 5 statuts, invariants protégés par guards, et méthodes de domaine expressives qui encapsulent les transitions d'état autorisées.
 
 ### PostMeta
 **Fichier** : `src/PostMeta/Entity/PostMeta.php`
 
-Entité liée à l'agrégat `Post`, représentant une paire clé-valeur de métadonnée.
+Entité liée à l'agrégat `Post`, représentant une paire clé-valeur de métadonnée. Utilise le Value Object `MetaKey` pour sa clé.
 
 ### PostMetaStructure
 **Fichier** : `src/PostMeta/Entity/PostMetaStructure.php`
@@ -125,7 +147,7 @@ Entité de configuration avec un **pattern Builder fluent** pour définir la str
 ### PostType et Taxonomy (Entités de configuration)
 **Fichiers** : `src/PostType/Entity/PostType.php`, `src/Taxonomy/Entity/Taxonomy.php`
 
-Ce sont des **entités de configuration** qui définissent les paramètres d'enregistrement WordPress (`key`, `args`, `postTypes` pour Taxonomy).
+Ce sont des **entités de configuration** qui définissent les paramètres d'enregistrement WordPress. `Taxonomy` valide que `addPostType()` reçoit une clé non vide.
 
 ---
 
@@ -133,66 +155,160 @@ Ce sont des **entités de configuration** qui définissent les paramètres d'enr
 
 Les Value Objects sont des objets **immuables** identifiés par leurs attributs plutôt que par une identité.
 
-### Objets immuables (readonly)
+### Value Objects readonly
 
-| Value Object | Fichier | Description |
-|-------------|---------|-------------|
-| `ConsentCategory` | `src/Gdpr/Entity/ConsentCategory.php` | Catégorie de consentement RGPD (readonly constructor) |
-| `TrackingScript` | `src/Gdpr/Entity/TrackingScript.php` | Script de tracking (readonly constructor) |
+| Value Object | Fichier | Validation | API |
+|-------------|---------|------------|-----|
+| `Slug` | `src/Compose/ValueObject/Slug.php` | Pas d'espaces | `fromString()`, `equals()`, `isEmpty()` |
+| `MetaKey` | `src/PostMeta/ValueObject/MetaKey.php` | Non vide | `fromString()`, `equals()`, `isProtected()` |
+| `ConsentCategory` | `src/Gdpr/Entity/ConsentCategory.php` | Constructor readonly | — |
+| `TrackingScript` | `src/Gdpr/Entity/TrackingScript.php` | Location valide | — |
+
+Exemple d'utilisation :
+
+```php
+$slug = Slug::fromString('mon-article');
+$slug->isEmpty();  // false
+$slug->equals(Slug::fromString('mon-article')); // true
+
+$key = MetaKey::fromString('_thumbnail_id');
+$key->isProtected(); // true (commence par _)
+```
 
 ### Enums comme Value Objects
 
-| Enum | Fichier | Valeurs |
-|------|---------|---------|
-| `JobStatus` | `src/Queue/Entity/JobStatus.php` | `Pending`, `Running`, `Completed`, `Failed`, `Cancelled` |
-| `MetaCompare` | `src/PostType/Repository/MetaCompare.php` | `=`, `!=`, `>`, `>=`, `<`, `<=`, `LIKE`, `NOT LIKE` |
-| `SortDirection` | `src/PostType/Repository/SortDirection.php` | `ASC`, `DESC` |
-| `Type` | `src/Compose/Type.php` | 6 valeurs de types de modules |
+| Enum | Fichier | Valeurs | Méthodes |
+|------|---------|---------|----------|
+| `PostStatus` | `src/PostType/Entity/PostStatus.php` | `Publish`, `Draft`, `Pending`, `Private`, `Trash`, `AutoDraft`, `Inherit`, `Future` | `isPublic()`, `isEditable()`, `isViewable()` |
+| `JobStatus` | `src/Queue/Entity/JobStatus.php` | `Pending`, `Running`, `Completed`, `Failed`, `Cancelled` | — |
+| `MetaCompare` | `src/Query/MetaCompare.php` | `EQUAL`, `NOT_EQUAL`, `GREATER_THAN`, `LIKE`, `IN`, `EXISTS`, etc. | — |
+| `SortDirection` | `src/Query/SortDirection.php` | `ASC`, `DESC` | — |
+| `Type` | `src/Compose/Type.php` | 6 valeurs de types de modules | — |
 
-**Analyse** : Le framework utilise judicieusement les **enums PHP 8.1** comme Value Objects pour les concepts à domaine fermé. Les objets `readonly` du GDPR garantissent l'immuabilité au niveau du langage.
+`PostStatus` enrichit l'enum avec de la **logique de domaine** :
+
+```php
+PostStatus::Publish->isPublic();    // true
+PostStatus::Draft->isEditable();    // true
+PostStatus::Trash->isViewable();    // false
+```
+
+### Rétrocompatibilité
+
+Les setters acceptent les union types `PostStatus|string`, `Slug|string`, `MetaKey|string` pour ne pas casser le code existant.
 
 ---
 
-## 4. Agrégats
+## 4. Specifications (Critères de requête)
+
+Le framework implémente le **Specification Pattern** pour composer des critères de requête nommés et réutilisables.
+
+### PostSpecification
+
+```php
+interface PostSpecification
+{
+    public function apply(PostQueryBuilder $builder): PostQueryBuilder;
+}
+```
+
+| Specification | Paramètres | Comportement |
+|---------------|------------|-------------|
+| `PublishedPosts` | — | `status(Publish)` |
+| `RecentPosts` | `int $limit = 10` | Published + tri par date DESC + limit |
+| `PostsByAuthor` | `int $authorId` | Filtre par auteur |
+| `PostsByStatus` | `PostStatus $status` | Filtre par statut |
+| `PostsByType` | `string $postType` | Filtre par type de contenu |
+| `PostsInTaxonomy` | `string $taxonomy, int[] $termIds` | Filtre par termes de taxonomie |
+| `PostsWithMeta` | `MetaKey\|string $key, mixed $value, MetaCompare` | Filtre par méta |
+| `AndPostSpecification` | `PostSpecification ...$specs` | Composite AND |
+
+### TermSpecification
+
+```php
+interface TermSpecification
+{
+    public function apply(TermQueryBuilder $builder): TermQueryBuilder;
+}
+```
+
+| Specification | Comportement |
+|---------------|-------------|
+| `TermsInTaxonomy` | Filtre par taxonomie |
+| `TopLevelTerms` | Termes sans parent |
+| `NonEmptyTerms` | Termes avec au moins un post |
+| `AndTermSpecification` | Composite AND |
+
+### Composition
+
+Les specifications se composent via `AndPostSpecification` :
+
+```php
+$spec = new AndPostSpecification(
+    new PublishedPosts(),
+    new PostsByType('article'),
+    new PostsInTaxonomy('category', [12, 34]),
+    new RecentPosts(5),
+);
+
+$posts = $repository->query()->matching($spec)->get();
+```
+
+---
+
+## 5. Agrégats
 
 ### Agrégat Post (PostType Context)
 
 ```
 Post [Agrégat Racine]
-├── PostMeta[]        [Entité enfant]
-└── PostMetaStructure [Configuration]
+├── PostStatus          [Value Object — statut]
+├── Slug                [Value Object — identifiant URL]
+├── PostMeta[]          [Entité enfant]
+└── PostMetaStructure   [Configuration]
 ```
 
 - **Racine** : `Post` (identifié par `id`)
-- **Invariants** : Les métadonnées sont toujours rattachées à un post
+- **Invariants** : Les métadonnées sont toujours rattachées à un post. Le statut est validé via l'enum `PostStatus`.
 - **Repository** : `PostRepository` ne manipule que l'agrégat racine
-- **Factory** : `PostFactory` construit l'agrégat à partir de `WP_Post`
+- **Factory** : `PostFactory` construit l'agrégat à partir de `WP_Post` (Anti-Corruption Layer)
 
 ### Agrégat Term (Taxonomy Context)
 
 ```
 Term [Agrégat Racine]
-└── Taxonomy [Configuration]
+└── Taxonomy [Configuration — valide les clés de post types]
 ```
 
 ### Agrégat Job (Queue Context)
 
 ```
 Job [Agrégat Racine, auto-contenu]
-└── JobStatus [Value Object - état interne]
+├── JobStatus              [Value Object — état interne]
+├── Guards                 [attempts ≥ 0, maxRetries ≥ 0, intervalSeconds ≥ 0]
+└── State Machine          [transitions contrôlées par domain methods]
 ```
 
-**Analyse** : Les agrégats sont relativement **plats** (peu de profondeur), ce qui est cohérent avec le domaine WordPress où les entités sont principalement des enregistrements avec métadonnées.
+**Transitions d'état autorisées** :
+
+```
+Pending ──markAsRunning()──→ Running
+Failed  ──markAsRunning()──→ Running
+Running ──markAsCompleted()──→ Completed
+Running ──markAsFailed()──→ Failed
+*       ──cancel()──→ Cancelled (sauf Completed)
+Completed|Failed ──reschedule()──→ Pending
+```
 
 ---
 
-## 5. Repositories
+## 6. Repositories
 
 ### PostRepository
-**Fichier** : `src/PostType/Repository/PostRepository.php`
+**Fichier** : `src/PostType/Infrastructure/WordPressPostRepository.php`
 
 ```php
-class PostRepository
+class WordPressPostRepository implements PostRepositoryInterface
 {
     public function find(int $id): ?PostInterface;
     public function findAll(array $args = []): array;
@@ -208,27 +324,28 @@ class PostRepository
 ```php
 $posts = $repository->query()
     ->postType('article')
-    ->status('publish')
+    ->status(PostStatus::Publish)
     ->whereMeta('featured', true, MetaCompare::EQUAL)
     ->inTaxonomyBySlugs('category', ['tech', 'design'])
     ->orderBy('date', SortDirection::DESC)
     ->limit(10)
+    ->matching(new PublishedPosts())  // accepte PostSpecification
     ->get();
 ```
 
-**Analyse** : Le `PostQueryBuilder` implémente un **pattern Specification** sous forme fluente. Il traduit les critères du domaine en `WP_Query` sans exposer la mécanique WordPress au code client. C'est l'une des implémentations DDD les plus abouties du framework.
+Le `PostQueryBuilder` traduit les critères du domaine en `WP_Query` sans exposer la mécanique WordPress au code client.
 
 ### TermRepository et TermQueryBuilder
-Mêmes patterns appliqués au contexte Taxonomy.
+Mêmes patterns appliqués au contexte Taxonomy, avec support des `TermSpecification`.
 
 ### PostMetaRepository
-**Fichier** : `src/PostMeta/Repository/PostMetaRepository.php`
+**Fichier** : `src/PostMeta/Infrastructure/WordPressPostMetaRepository.php`
 
-Opérations CRUD sur les métadonnées, toujours dans le périmètre d'un post (agrégat racine).
+Opérations CRUD sur les métadonnées, utilisant `MetaKey` pour les clés. Toujours dans le périmètre d'un post (agrégat racine).
 
 ---
 
-## 6. Factories
+## 7. Factories
 
 ### PostFactory
 **Fichier** : `src/PostType/Factory/PostFactory.php`
@@ -241,17 +358,17 @@ class PostFactory
 }
 ```
 
-**Rôle** : Transformer les objets WordPress natifs (`WP_Post`) en entités du domaine (`Post`). C'est un **Anti-Corruption Layer** qui protège le domaine de la structure de données WordPress.
+**Rôle** : Transformer les objets WordPress natifs (`WP_Post`) en entités du domaine (`Post`). C'est un **Anti-Corruption Layer** qui protège le domaine de la structure de données WordPress. La factory utilise `PostStatus::tryFrom()` pour convertir les strings WordPress en Value Objects.
 
 ### TermFactory
 Même pattern pour la transformation `WP_Term` → `Term`.
 
 ### PostMetaFactory
-Même pattern pour les métadonnées.
+Même pattern pour les métadonnées, avec conversion en `MetaKey`.
 
 ---
 
-## 7. Architecture Hexagonale (Ports & Adaptateurs)
+## 8. Architecture Hexagonale (Ports & Adaptateurs)
 
 Le framework implémente rigoureusement l'**architecture hexagonale** :
 
@@ -264,8 +381,7 @@ Le framework implémente rigoureusement l'**architecture hexagonale** :
 | `HookDispatcherInterface` | `src/Contracts/` | Dispatch d'actions/filtres |
 | `PostInterface` | `src/PostType/Contracts/` | Contrat de l'entité Post |
 | `TermInterface` | `src/Taxonomy/Contracts/` | Contrat de l'entité Term |
-| `PostTypeRegistryInterface` | `src/PostType/Contracts/` | Collection de post types |
-| `RegistryInterface` | `src/Contracts/` | Interface marqueur de registre |
+| `PostReferenceInterface` | `src/PostMeta/Contracts/` | Vue minimale d'un Post pour PostMeta (ACL) |
 
 ### Adaptateurs (Infrastructure)
 
@@ -274,8 +390,9 @@ Le framework implémente rigoureusement l'**architecture hexagonale** :
 | `WordPressPostTypeRegistrar` | `src/PostType/Infrastructure/` | `PostTypeRegistrarInterface` |
 | `WordPressTaxonomyRegistrar` | `src/Taxonomy/Infrastructure/` | `TaxonomyRegistrarInterface` |
 | `WordPressHookDispatcher` | `src/Hooks/Infrastructure/` | `HookDispatcherInterface` |
-| `WordPressNonceManager` | `src/Security/Infrastructure/` | Interface nonce |
-| `WordPressOptionsRepository` | `src/Options/` | Options WordPress |
+| `WordPressPostRepository` | `src/PostType/Infrastructure/` | `PostRepositoryInterface` |
+| `WordPressPostMetaRepository` | `src/PostMeta/Infrastructure/` | `PostMetaRepositoryInterface` |
+| `WordPressTermRepository` | `src/Taxonomy/Infrastructure/` | `TermRepositoryInterface` |
 
 ### Diagramme de dépendances
 
@@ -287,23 +404,23 @@ Le framework implémente rigoureusement l'**architecture hexagonale** :
 │  ┌─────────────────────────────────────────────┐    │
 │  │            DOMAINE (Entities)                │    │
 │  │  Post, Term, Job, PostMeta, ConsentCategory  │    │
-│  │  PostType, Taxonomy, TrackingScript          │    │
+│  │  Value Objects: PostStatus, Slug, MetaKey    │    │
+│  │  Specifications: PublishedPosts, RecentPosts │    │
 │  └──────────────────┬──────────────────────────┘    │
 │                     │ implémente                     │
 │  ┌──────────────────▼──────────────────────────┐    │
 │  │         PORTS (Contracts/Interfaces)          │    │
-│  │  PostTypeRegistrarInterface                   │    │
-│  │  TaxonomyRegistrarInterface                   │    │
-│  │  HookDispatcherInterface                      │    │
-│  │  PostInterface, TermInterface                 │    │
+│  │  PostRepositoryInterface                      │    │
+│  │  PostMetaRepositoryInterface                  │    │
+│  │  PostReferenceInterface (ACL)                 │    │
+│  │  PostSpecification, TermSpecification         │    │
 │  └──────────────────┬──────────────────────────┘    │
 │                     │ implémenté par                  │
 │  ┌──────────────────▼──────────────────────────┐    │
 │  │       ADAPTATEURS (Infrastructure)            │    │
-│  │  WordPressPostTypeRegistrar                   │    │
-│  │  WordPressTaxonomyRegistrar                   │    │
-│  │  WordPressHookDispatcher                      │    │
-│  │  WordPressNonceManager                        │    │
+│  │  WordPressPostRepository                      │    │
+│  │  WordPressPostMetaRepository                  │    │
+│  │  WordPressTermRepository                      │    │
 │  └──────────────────┬──────────────────────────┘    │
 │                     │ appelle                         │
 │  ┌──────────────────▼──────────────────────────┐    │
@@ -314,13 +431,11 @@ Le framework implémente rigoureusement l'**architecture hexagonale** :
 └─────────────────────────────────────────────────────┘
 ```
 
-**Analyse** : **L'inversion de dépendance est respectée** — le code domaine ne dépend jamais de WordPress. Seuls les adaptateurs dans `Infrastructure/` contiennent des appels aux fonctions WordPress natives.
-
 ---
 
-## 8. Patterns tactiques DDD implémentés
+## 9. Patterns tactiques DDD implémentés
 
-### 8.1. Registry Pattern (Collection de domaine)
+### 9.1. Registry Pattern (Collection de domaine)
 
 Chaque contexte possède un **Registre** qui collecte les objets de domaine enregistrés :
 
@@ -334,40 +449,43 @@ RestRouteRegistry    → collecte RestRouteInterface[]
 HealthCheckRegistry  → collecte HealthCheckInterface[]
 ```
 
-### 8.2. Compiler Pass (Composition Root)
+### 9.2. Specification Pattern (Critères nommés)
 
-Le pattern `AbstractTaggedServiceCompilerPass` automatise l'injection des services tagués dans les registres :
+Les Specifications encapsulent des critères de requête réutilisables et composables :
 
 ```php
-abstract class AbstractTaggedServiceCompilerPass implements CompilerPassInterface
-{
-    abstract protected function getRegistryClass(): string;
-    abstract protected function getTag(): string;
+// Specification simple
+$spec = new PublishedPosts();
 
-    public function process(ContainerBuilder $container): void
-    {
-        // Trouve tous les services tagués
-        // Les injecte dans le registre via add()
-    }
-}
+// Composition via AND
+$spec = new AndPostSpecification(
+    new PostsByType('article'),
+    new PostsInTaxonomy('category', [12]),
+    new RecentPosts(5),
+);
+
+// Application via le QueryBuilder
+$posts = $repository->query()->matching($spec)->get();
 ```
 
-**Implémentations** : `RegisterPostTypePass`, `RegisterHookPass`, `RegisterBlockPass`, `RegisterRestRoutePass`, `RegisterAdminPagePass`, `RegisterConsentCategoryPass`, `RegisterTrackingScriptPass`, `RegisterQueuePass`.
+Chaque Specification est une classe `final` avec des dépendances injectées via le constructeur. Les composites (`AndPostSpecification`, `AndTermSpecification`) permettent de combiner les critères sans couplage.
 
-### 8.3. Extension Pattern (Module autonome)
+### 9.3. Compiler Pass (Composition Root)
+
+Le pattern `AbstractTaggedServiceCompilerPass` automatise l'injection des services tagués dans les registres.
+
+### 9.4. Extension Pattern (Module autonome)
 
 ```php
 interface ExtensionInterface
 {
-    public function getBundle(): array;                    // Auto-découverte des services
-    public function register(ContainerBuilder $container): void;  // Compiler passes
-    public function getDefaultConfiguration(): array;       // Configuration par défaut
+    public function getBundle(): array;
+    public function register(ContainerBuilder $container): void;
+    public function getDefaultConfiguration(): array;
 }
 ```
 
-Chaque module fournit une extension qui s'auto-enregistre dans le conteneur DI.
-
-### 8.4. Kernel Pattern (Application Service)
+### 9.5. Kernel Pattern (Application Service)
 
 ```php
 AbstractKernel
@@ -375,64 +493,54 @@ AbstractKernel
 └── ThemeKernel     // Point d'entrée pour les thèmes
 ```
 
-Le kernel orchestre le cycle de vie complet :
-1. **Chargement** des extensions
-2. **Construction** du conteneur (compiler passes, auto-wiring)
-3. **Compilation** et dumping du conteneur en PHP
-4. **Exécution** des hooks enregistrés
-
-### 8.5. Configurator Pattern (Configuration fluente)
+### 9.6. Configurator Pattern (Configuration fluente)
 
 ```php
-// config/seo.php
 return static function (SeoConfigurator $seo): void {
     $seo->titleSeparator('|')->robotsDefault('index, follow');
 };
 ```
 
-Les configurateurs (`CacheConfigurator`, `SeoConfigurator`, `SecurityConfigurator`, etc.) offrent une API fluente typée pour la configuration des modules.
+### 9.7. Anti-Corruption Layer
 
-### 8.6. Anti-Corruption Layer
-
-Les **Factories** (`PostFactory`, `TermFactory`) servent d'**Anti-Corruption Layer** entre WordPress et le domaine :
+Les **Factories** (`PostFactory`, `TermFactory`) et les **interfaces minimales** (`PostReferenceInterface`) servent d'Anti-Corruption Layer :
 
 ```
-WP_Post ──→ PostFactory::create() ──→ Post (Entité du domaine)
-WP_Term ──→ TermFactory::create() ──→ Term (Entité du domaine)
+WP_Post ──→ PostFactory::create() ──→ Post (avec PostStatus Value Object)
+PostType ──PostReferenceInterface──→ PostMeta (sans dépendance directe)
 ```
-
-Cela isole le modèle de domaine des structures de données WordPress brutes.
 
 ---
 
-## 9. Patterns stratégiques DDD
+## 10. Patterns stratégiques DDD
 
-### 9.1. Shared Kernel (Noyau partagé)
+### 10.1. Shared Kernel (Noyau partagé)
 
-Le répertoire `src/Contracts/` et `src/Compose/` forment un **Shared Kernel** utilisé par tous les contextes :
+Deux niveaux de partage :
 
-- **Traits** : `HasId`, `HasSlug`, `HasParentId`
-- **Interfaces** : `IdInterface`, `SlugInterface`, `ParentIdInterface`
-- **Base** : `AbstractTaggedServiceCompilerPass`, `ExtensionInterface`
-- **Types** : `Type` enum
+| Namespace | Contenu | Utilisé par |
+|-----------|---------|-------------|
+| `Compose` | Traits (`HasId`, `HasSlug`, `HasParentId`), Value Objects (`Slug`), `AbstractKernel` | Tous les contextes |
+| `Query` | `MetaCompare`, `SortDirection` | PostType, Taxonomy, PostMeta |
+| `Contracts` | `HookDispatcherInterface`, `RegistryInterface` | Tous les contextes |
 
-### 9.2. Context Mapping
+### 10.2. Context Mapping
 
 ```
 ┌──────────────┐    ┌──────────────┐    ┌──────────────┐
 │   PostType   │◄──►│   PostMeta   │    │   Taxonomy   │
 │   Context    │    │   Context    │    │   Context    │
 └──────┬───────┘    └──────────────┘    └──────┬───────┘
+       │     PostReferenceInterface (ACL)       │
        │                                        │
-       │         via PostQueryBuilder            │
+       │          via Query (Shared Kernel)     │
        └──────────────────────────────────────┘
-       (relation cross-context dans les queries)
+       (MetaCompare, SortDirection partagés)
 
 ┌──────────────┐    ┌──────────────┐    ┌──────────────┐
 │    Hooks     │    │   Security   │    │     GDPR     │
 │   Context    │◄───┤   Context    │    │   Context    │
 └──────────────┘    └──────────────┘    └──────────────┘
-(Security utilise Hooks pour s'enregistrer)
 
 ┌──────────────┐    ┌──────────────┐
 │   Compose    │◄───┤  All Modules │
@@ -440,9 +548,7 @@ Le répertoire `src/Contracts/` et `src/Compose/` forment un **Shared Kernel** u
 └──────────────┘    └──────────────┘
 ```
 
-### 9.3. Ubiquitous Language (Langage omniprésent)
-
-Le framework définit un vocabulaire cohérent :
+### 10.3. Ubiquitous Language (Langage omniprésent)
 
 | Terme du domaine | Signification |
 |-----------------|---------------|
@@ -451,63 +557,55 @@ Le framework définit un vocabulaire cohérent :
 | **Kernel** | Point d'entrée applicatif (Plugin ou Theme) |
 | **Hook** | Point d'accroche WordPress (action/filtre) |
 | **Registrar** | Adaptateur qui enregistre un concept dans WordPress |
-| **Bundle** | Configuration d'auto-découverte de services |
-| **Compiler Pass** | Transformation du conteneur au moment de la compilation |
-| **Configurator** | API fluente de configuration d'un module |
+| **Specification** | Critère de requête nommé, composable et réutilisable |
+| **Value Object** | Objet immuable identifié par sa valeur, avec validation |
+| **Guard** | Validation d'invariant dans un setter d'entité |
 
 ---
 
-## 10. Forces et points d'attention
+## 11. Forces et points d'attention
 
 ### Forces DDD
 
 1. **Séparation claire des bounded contexts** — Chaque module est autonome avec sa propre structure Entity/Contract/Infrastructure
 2. **Inversion de dépendance rigoureuse** — Le domaine ne dépend jamais de WordPress
-3. **Anti-Corruption Layer** — Les Factories isolent le domaine des structures WordPress
-4. **Registres typés** — Les compiler passes auto-wirent les services tagués
-5. **Query Builder comme Specification** — `PostQueryBuilder` encapsule les critères de requête
-6. **Immuabilité des Value Objects** — Utilisation de `readonly` et d'enums PHP 8.1
+3. **Anti-Corruption Layer** — Factories + `PostReferenceInterface` isolent les contextes
+4. **Value Objects riches** — `PostStatus` avec logique métier, `Slug` et `MetaKey` avec validation
+5. **Specification Pattern** — Critères de requête nommés, testables et composables
+6. **Invariants protégés** — Guards dans `Job`, validation dans `Taxonomy`, transitions d'état contrôlées
 7. **Architecture hexagonale complète** — Ports (Contracts) et Adaptateurs (Infrastructure) séparés
-8. **Shared Kernel bien défini** — Traits et interfaces transversaux sans couplage fort
+8. **Shared Kernel bien défini** — `Compose` pour les traits, `Query` pour les enums partagés
 9. **Configuration typée** — Configurators fluents par module
 10. **Testabilité** — L'injection de dépendances permet le mocking de tous les adaptateurs
 
 ### Points d'attention et axes d'amélioration
 
 1. **Absence de Domain Events** — Aucun système d'événements de domaine n'est identifié. Les hooks WordPress remplacent partiellement ce besoin, mais un `DomainEventDispatcher` enrichirait la communication inter-contextes
-2. **Agrégats peu profonds** — Les agrégats sont principalement des entités isolées sans réelle protection des invariants d'agrégat (pas de méthodes de mutation contrôlée)
-3. **Logique métier limitée dans les entités** — À l'exception de `Job`, les entités sont principalement des conteneurs de données (modèle anémique). `Post` et `Term` pourraient bénéficier de méthodes métier
-4. **Pas de Value Objects explicites pour les concepts riches** — Des concepts comme `PostStatus`, `PostTitle`, `Email`, `Url` pourraient être encapsulés dans des Value Objects dédiés plutôt que des `string`
-5. **Pas de Domain Services explicites** — La logique métier transversale n'est pas encapsulée dans des services de domaine nommés
-6. **Couplage Query Builder ↔ WordPress** — Le `PostQueryBuilder` traduit directement vers `WP_Query`, ce qui couple le repository à l'infrastructure
-7. **Pas d'Aggregate Root enforcement** — Rien n'empêche d'accéder à `PostMeta` sans passer par l'agrégat `Post`
+2. **Pas de Domain Services explicites** — La logique métier transversale n'est pas encapsulée dans des services de domaine nommés
+3. **Couplage Query Builder ↔ WordPress** — Le `PostQueryBuilder` traduit directement vers `WP_Query`, ce qui couple le repository à l'infrastructure
 
 ---
 
-## 11. Recommandations DDD
+## 12. Recommandations DDD
 
 ### Court terme
 
-- **Introduire des Value Objects** pour `PostStatus`, `PostSlug`, `Email`, `Url`, `MetaKey`
-- **Ajouter de la logique métier** dans les entités (ex : `Post::publish()`, `Post::isDraft()`, `Job::markAsCompleted()`)
-- **Protéger les invariants d'agrégat** en contrôlant l'accès aux entités enfants via la racine
+- **Implémenter des Domain Events** (`PostPublished`, `JobCompleted`, `ConsentGranted`) pour la communication inter-contextes
+- **Créer des Domain Services** pour la logique métier qui ne relève pas d'une seule entité
 
 ### Moyen terme
 
-- **Implémenter des Domain Events** (`PostPublished`, `JobCompleted`, `ConsentGranted`) pour la communication inter-contextes
-- **Créer des Domain Services** pour la logique métier qui ne relève pas d'une seule entité
-- **Introduire des Specifications** nommées réutilisables pour les critères de requête communs
+- **Séparer le modèle de lecture/écriture** (CQRS) pour les contextes complexes comme Security et Queue
+- **Ajouter un Event Store** pour les contextes nécessitant un historique (Audit, GDPR)
 
 ### Long terme
 
-- **Séparer le modèle de lecture/écriture** (CQRS) pour les contextes complexes comme Security et Queue
-- **Ajouter un Event Store** pour les contextes nécessitant un historique (Audit, GDPR)
 - **Module Saga/Process Manager** pour orchestrer les workflows multi-contextes
 
 ---
 
-## 12. Conclusion
+## 13. Conclusion
 
-Le BackTo Framework implémente une **Architecture Hexagonale solide** avec des éléments DDD tactiques bien maîtrisés (Entities, Value Objects, Repositories, Factories, Anti-Corruption Layer). La séparation en bounded contexts via le système d'Extensions est exemplaire pour un framework WordPress.
+Le BackTo Framework implémente une **Architecture Hexagonale solide** avec des patterns DDD tactiques matures : Entities avec invariants protégés, Value Objects riches (`PostStatus`, `Slug`, `MetaKey`), Repositories avec Specification Pattern, Factories comme Anti-Corruption Layer, et Bounded Contexts isolés via interfaces et Shared Kernel.
 
-Les principaux axes de progression DDD se situent au niveau de l'enrichissement du modèle de domaine (Domain Events, Domain Services, Value Objects riches) et de la protection des invariants d'agrégat. Le framework pose néanmoins une **base architecturale de très haute qualité** qui rend ces évolutions naturelles et incrémentales.
+Les principaux axes de progression se situent au niveau des Domain Events et Domain Services. Le framework pose une **base architecturale de très haute qualité** qui rend ces évolutions naturelles et incrémentales.
