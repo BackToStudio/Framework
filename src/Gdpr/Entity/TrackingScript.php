@@ -8,6 +8,8 @@ use BackTo\Framework\Gdpr\Contracts\TrackingScriptInterface;
 
 final class TrackingScript implements TrackingScriptInterface
 {
+    private const ALLOWED_LOCATIONS = ['head', 'footer'];
+
     public function __construct(
         private readonly string $handle,
         private readonly string $categoryKey,
@@ -16,6 +18,19 @@ final class TrackingScript implements TrackingScriptInterface
         private string $location = 'head',
         private int $priority = 10,
     ) {
+        if ($handle === '') {
+            throw new \InvalidArgumentException('Tracking script handle cannot be empty.');
+        }
+
+        if ($source === '') {
+            throw new \InvalidArgumentException('Tracking script source cannot be empty.');
+        }
+
+        if (!in_array($location, self::ALLOWED_LOCATIONS, true)) {
+            throw new \InvalidArgumentException(
+                \sprintf('Invalid location "%s". Allowed: %s.', $location, implode(', ', self::ALLOWED_LOCATIONS))
+            );
+        }
     }
 
     public function getHandle(): string

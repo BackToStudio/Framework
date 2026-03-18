@@ -28,4 +28,18 @@ class PostTypeTest extends TestCase
         $postType->setArgs($args);
         $this->assertArrayHasKey('labels', $postType->getArgs());
     }
+
+    public function testSetKeyRejectsLongKey(): void
+    {
+        $postType = new PostType();
+        $this->expectException(\InvalidArgumentException::class);
+        $postType->setKey(str_repeat('a', 21));
+    }
+
+    public function testSetKeyAcceptsMaxLength(): void
+    {
+        $postType = new PostType();
+        $postType->setKey(str_repeat('a', 20));
+        $this->assertSame(str_repeat('a', 20), $postType->getKey());
+    }
 }

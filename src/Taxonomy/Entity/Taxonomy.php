@@ -23,6 +23,12 @@ final class Taxonomy implements TaxonomyInterface
 
     public function setKey(string $key): TaxonomyInterface
     {
+        if ($key !== '' && \strlen($key) > 32) {
+            throw new \InvalidArgumentException(
+                \sprintf('Taxonomy key cannot exceed 32 characters, got %d.', \strlen($key))
+            );
+        }
+
         $this->key = $key;
 
         return $this;
@@ -62,7 +68,13 @@ final class Taxonomy implements TaxonomyInterface
 
     public function addPostType(string $postType): TaxonomyInterface
     {
-        $this->postTypes[] = $postType;
+        if ($postType === '') {
+            throw new \InvalidArgumentException('Post type key cannot be empty.');
+        }
+
+        if (!in_array($postType, $this->postTypes, true)) {
+            $this->postTypes[] = $postType;
+        }
 
         return $this;
     }

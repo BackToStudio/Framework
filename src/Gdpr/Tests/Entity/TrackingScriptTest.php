@@ -44,4 +44,28 @@ class TrackingScriptTest extends TestCase
         $this->assertSame('head', $script->getLocation());
         $this->assertSame(10, $script->getPriority());
     }
+
+    public function testRejectsEmptyHandle(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        new TrackingScript('', 'analytics', 'https://example.com/ga.js');
+    }
+
+    public function testRejectsEmptySource(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        new TrackingScript('ga', 'analytics', '');
+    }
+
+    public function testRejectsInvalidLocation(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        new TrackingScript('ga', 'analytics', 'https://example.com/ga.js', false, 'body');
+    }
+
+    public function testAcceptsFooterLocation(): void
+    {
+        $script = new TrackingScript('ga', 'analytics', 'https://example.com/ga.js', false, 'footer');
+        $this->assertSame('footer', $script->getLocation());
+    }
 }

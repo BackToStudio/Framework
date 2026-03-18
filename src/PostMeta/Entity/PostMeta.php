@@ -11,8 +11,8 @@ use BackTo\Framework\PostType\Contracts\PostInterface;
 final class PostMeta implements PostMetaInterface
 {
     private int $id;
-    private PostInterface $post;
-    private int $postId;
+    private ?PostInterface $post = null;
+    private int $postId = 0;
     private MetaKey $metaKey;
     private mixed $metaValue;
 
@@ -29,6 +29,9 @@ final class PostMeta implements PostMetaInterface
 
     public function getPost(): PostInterface
     {
+        if ($this->post === null) {
+            throw new \LogicException('Post has not been set on this PostMeta.');
+        }
         return $this->post;
     }
 
@@ -39,6 +42,11 @@ final class PostMeta implements PostMetaInterface
         return $this;
     }
 
+    public function hasPost(): bool
+    {
+        return $this->post !== null;
+    }
+
     public function getPostId(): int
     {
         return $this->postId;
@@ -46,7 +54,12 @@ final class PostMeta implements PostMetaInterface
 
     public function setPostId(int $postId): PostMetaInterface
     {
+        if ($postId < 0) {
+            throw new \InvalidArgumentException('Post ID cannot be negative.');
+        }
+
         $this->postId = $postId;
+        $this->post = null;
         return $this;
     }
 

@@ -38,4 +38,28 @@ class TaxonomyTest extends TestCase
         $this->assertContains('abcde', $taxonomy->getPostTypes());
         $this->assertContains('fghijk', $taxonomy->getPostTypes());
     }
+
+    public function testAddPostTypePreventsDuplicates(): void
+    {
+        $taxonomy = new Taxonomy();
+        $taxonomy->addPostType('post');
+        $taxonomy->addPostType('post');
+        $taxonomy->addPostType('page');
+
+        $this->assertCount(2, $taxonomy->getPostTypes());
+    }
+
+    public function testAddPostTypeRejectsEmptyKey(): void
+    {
+        $taxonomy = new Taxonomy();
+        $this->expectException(\InvalidArgumentException::class);
+        $taxonomy->addPostType('');
+    }
+
+    public function testSetKeyRejectsLongKey(): void
+    {
+        $taxonomy = new Taxonomy();
+        $this->expectException(\InvalidArgumentException::class);
+        $taxonomy->setKey(str_repeat('a', 33));
+    }
 }

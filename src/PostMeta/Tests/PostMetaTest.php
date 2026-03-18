@@ -77,4 +77,45 @@ class PostMetaTest extends TestCase
         $this->assertSame($post, $postMeta->getPost());
         $this->assertSame(99, $postMeta->getPostId());
     }
+
+    // --- Invariant guards ---
+
+    public function testGetPostThrowsWhenNotSet(): void
+    {
+        $postMeta = new PostMeta();
+        $this->expectException(\LogicException::class);
+        $postMeta->getPost();
+    }
+
+    public function testHasPost(): void
+    {
+        $postMeta = new PostMeta();
+        $this->assertFalse($postMeta->hasPost());
+
+        $post = $this->createMock(PostInterface::class);
+        $post->method('getId')->willReturn(1);
+        $postMeta->setPost($post);
+        $this->assertTrue($postMeta->hasPost());
+    }
+
+    public function testSetPostIdInvalidatesPostReference(): void
+    {
+        $post = $this->createMock(PostInterface::class);
+        $post->method('getId')->willReturn(99);
+
+        $postMeta = new PostMeta();
+        $postMeta->setPost($post);
+        $this->assertTrue($postMeta->hasPost());
+
+        $postMeta->setPostId(42);
+        $this->assertFalse($postMeta->hasPost());
+        $this->assertSame(42, $postMeta->getPostId());
+    }
+
+    public function testSetPostIdRejectsNegativeValue(): void
+    {
+        $postMeta = new PostMeta();
+        $this->expectException(\InvalidArgumentException::class);
+        $postMeta->setPostId(-1);
+    }
 }

@@ -175,12 +175,127 @@ class JobTest extends TestCase
         $this->assertTrue($job->canRetry());
     }
 
-    public function testIsRecurringWithNegativeInterval(): void
+    // --- Invariant guards ---
+
+    public function testSetAttemptsRejectsNegativeValue(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        (new Job())->setAttempts(-1);
+    }
+
+    public function testSetMaxRetriesRejectsNegativeValue(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        (new Job())->setMaxRetries(-1);
+    }
+
+    public function testSetIntervalSecondsRejectsNegativeValue(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        (new Job())->setIntervalSeconds(-1);
+    }
+
+    // --- Domain methods ---
+
+    public function testIncrementAttempts(): void
     {
         $job = new Job();
-        $job->setIntervalSeconds(-1);
+        $this->assertSame(0, $job->getAttempts());
+        $job->incrementAttempts();
+        $this->assertSame(1, $job->getAttempts());
+        $job->incrementAttempts();
+        $this->assertSame(2, $job->getAttempts());
+    }
 
-        // Negative interval should not be considered recurring
-        $this->assertFalse($job->isRecurring());
+    public function testMarkAsRunning(): void
+    {
+        $job = new Job();
+        $job->setStatus(JobStatus::Pending);
+        $job->markAsRunning('token-abc');
+
+        $this->assertSame(JobStatus::Running, $job->getStatus());
+        $this->assertSame('token-abc', $job->getClaimToken());
+        $this->assertNotNull($job->getClaimedAt());
+    }
+
+    public function testMarkAsRunningFromCompletedThrows(): void
+    {
+        $job = new Job();
+        $job->setStatus(JobStatus::Completed);
+
+        $this->expectException(\LogicException::class);
+        $job->markAsRunning('token');
+    }
+
+    public function testMarkAsCompleted(): void
+    {
+        $job = new Job();
+        $job->setStatus(JobStatus::Running);
+        $job->markAsCompleted();
+
+        $this->assertSame(JobStatus::Completed, $job->getStatus());
+        $this->assertNotNull($job->getCompletedAt());
+        $this->assertSame('', $job->getClaimToken());
+    }
+
+    public function testMarkAsCompletedFromPendingThrows(): void
+    {
+        $job = new Job();
+        $job->setStatus(JobStatus::Pending);
+
+        $this->expectException(\LogicException::class);
+        $job->markAsCompleted();
+    }
+
+    public function testMarkAsFailed(): void
+    {
+        $job = new Job();
+        $job->setStatus(JobStatus::Running)->setAttempts(0);
+        $job->markAsFailed('Connection timeout');
+
+        $this->assertSame(JobStatus::Failed, $job->getStatus());
+        $this->assertSame('Connection timeout', $job->getLastError());
+        $this->assertSame(1, $job->getAttempts());
+        $this->assertSame('', $job->getClaimToken());
+    }
+
+    public function testCancel(): void
+    {
+        $job = new Job();
+        $job->setStatus(JobStatus::Pending);
+        $job->cancel();
+
+        $this->assertSame(JobStatus::Cancelled, $job->getStatus());
+    }
+
+    public function testCancelCompletedJobThrows(): void
+    {
+        $job = new Job();
+        $job->setStatus(JobStatus::Completed);
+
+        $this->expectException(\LogicException::class);
+        $job->cancel();
+    }
+
+    public function testReschedule(): void
+    {
+        $job = new Job();
+        $job->setStatus(JobStatus::Completed);
+
+        $future = new \DateTimeImmutable('+1 hour', new \DateTimeZone('UTC'));
+        $job->reschedule($future);
+
+        $this->assertSame(JobStatus::Pending, $job->getStatus());
+        $this->assertSame($future, $job->getScheduledAt());
+        $this->assertNull($job->getCompletedAt());
+    }
+
+    public function testRescheduleFromRunningThrows(): void
+    {
+        $job = new Job();
+        $job->setStatus(JobStatus::Running);
+
+        $this->expectException(\LogicException::class);
+        $job->reschedule(new \DateTimeImmutable('+1 hour', new \DateTimeZone('UTC')));
     }
 }
