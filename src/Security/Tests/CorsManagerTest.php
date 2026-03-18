@@ -256,4 +256,33 @@ class CorsManagerTest extends TestCase
 
         $this->assertSame($this->cors, $result);
     }
+
+    public function testWildcardOriginWithCredentialsThrows(): void
+    {
+        $this->cors->addAllowedOrigin('*');
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessageMatches('/credentials.*wildcard/is');
+
+        $this->cors->setAllowCredentials(true);
+    }
+
+    public function testCredentialsWithWildcardOriginThrows(): void
+    {
+        $this->cors->setAllowCredentials(true);
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessageMatches('/wildcard.*origin.*credentials/is');
+
+        $this->cors->addAllowedOrigin('*');
+    }
+
+    public function testBuildHeadersRejectsCrlfInOrigin(): void
+    {
+        $this->cors->addAllowedOrigin('*');
+
+        $headers = $this->cors->buildHeaders("https://evil.com\r\nX-Injected: true");
+
+        $this->assertSame([], $headers);
+    }
 }

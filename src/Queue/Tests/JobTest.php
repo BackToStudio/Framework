@@ -158,4 +158,29 @@ class JobTest extends TestCase
         $this->assertNull($job->getCreatedAt());
         $this->assertNull($job->getUpdatedAt());
     }
+
+    public function testCanRetryWhenAttemptsExceedMaxRetries(): void
+    {
+        $job = new Job();
+        $job->setMaxRetries(3)->setAttempts(5);
+
+        $this->assertFalse($job->canRetry());
+    }
+
+    public function testCanRetryWithOneRetryLeft(): void
+    {
+        $job = new Job();
+        $job->setMaxRetries(3)->setAttempts(2);
+
+        $this->assertTrue($job->canRetry());
+    }
+
+    public function testIsRecurringWithNegativeInterval(): void
+    {
+        $job = new Job();
+        $job->setIntervalSeconds(-1);
+
+        // Negative interval should not be considered recurring
+        $this->assertFalse($job->isRecurring());
+    }
 }

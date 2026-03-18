@@ -227,4 +227,27 @@ class PostQueryBuilderTest extends TestCase
         $qb->whereIn([5, 10, 15]);
         $this->assertSame([5, 10, 15], $qb->getArgs()['post__in']);
     }
+
+    public function testLimitThenPageOverridesNumberposts(): void
+    {
+        $qb = $this->createQueryBuilder();
+        $qb->limit(50)->page(2, 10);
+
+        $args = $qb->getArgs();
+        // page() sets posts_per_page, but limit() set numberposts — both present
+        $this->assertSame(50, $args['numberposts']);
+        $this->assertSame(10, $args['posts_per_page']);
+        $this->assertSame(2, $args['paged']);
+    }
+
+    public function testPageThenLimitOverridesPerPage(): void
+    {
+        $qb = $this->createQueryBuilder();
+        $qb->page(1, 20)->limit(5);
+
+        $args = $qb->getArgs();
+        // Both are set; limit() overwrites numberposts
+        $this->assertSame(5, $args['numberposts']);
+        $this->assertSame(20, $args['posts_per_page']);
+    }
 }

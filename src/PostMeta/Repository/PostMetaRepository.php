@@ -21,7 +21,15 @@ final class PostMetaRepository
 
     public function create(PostMetaInterface $postMeta): PostMetaInterface
     {
-        $this->update($postMeta);
+        $result = $this->update($postMeta);
+
+        if ($result === false) {
+            throw new \RuntimeException(sprintf(
+                'Failed to create post meta "%s" for post %d.',
+                $postMeta->getMetaKey(),
+                $postMeta->getPostId()
+            ));
+        }
 
         return $postMeta;
     }
@@ -32,7 +40,9 @@ final class PostMetaRepository
         return $this->factory->create($postId, $metaKey, $postMetaValue);
     }
 
-    
+    /**
+     * @return int|bool Meta ID on first insert, true on update, false on failure.
+     */
     public function update(PostMetaInterface $postMeta): int|bool
     {
         return update_post_meta($postMeta->getPostId(), $postMeta->getMetaKey(), $postMeta->getMetaValue());
