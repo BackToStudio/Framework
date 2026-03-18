@@ -149,6 +149,12 @@ final class UploadSecurity implements Hooks, SecurityRuleInterface
             return true; // No magic bytes to check for this extension
         }
 
+        $fileSize = @filesize($filePath);
+
+        if ($fileSize === false || $fileSize === 0) {
+            return false; // Empty files cannot be validated
+        }
+
         $handle = fopen($filePath, 'rb');
 
         if ($handle === false) {
@@ -186,25 +192,37 @@ final class UploadSecurity implements Hooks, SecurityRuleInterface
             return false;
         }
 
+        // Check both the full content AND the contents inside CDATA sections,
+        // which browsers may interpret as executable markup.
         $contentLower = strtolower($content);
 
+        // Extract CDATA contents to also scan them for dangerous patterns
+        $cdataContents = '';
+        if (preg_match_all('/<!\[CDATA\[(.*?)\]\]>/si', $content, $matches)) {
+            $cdataContents = implode(' ', $matches[1]);
+        }
+        $cdataLower = strtolower($cdataContents);
+
         foreach (self::SVG_DANGEROUS_TAGS as $tag) {
-            if (str_contains($contentLower, '<' . $tag)) {
+            if (str_contains($contentLower, '<' . $tag) || str_contains($cdataLower, '<' . $tag)) {
                 return false;
             }
         }
 
-        if (preg_match(self::SVG_EVENT_HANDLER_PATTERN, $content) === 1) {
+        if (preg_match(self::SVG_EVENT_HANDLER_PATTERN, $content) === 1
+            || preg_match(self::SVG_EVENT_HANDLER_PATTERN, $cdataContents) === 1) {
             return false;
         }
 
         // Block data: URIs in href/xlink:href (can execute JS)
-        if (preg_match('/href\s*=\s*["\']?\s*data:/i', $content) === 1) {
+        if (preg_match('/href\s*=\s*["\']?\s*data:/i', $content) === 1
+            || preg_match('/href\s*=\s*["\']?\s*data:/i', $cdataContents) === 1) {
             return false;
         }
 
         // Block javascript: URIs
-        if (preg_match('/href\s*=\s*["\']?\s*javascript:/i', $content) === 1) {
+        if (preg_match('/href\s*=\s*["\']?\s*javascript:/i', $content) === 1
+            || preg_match('/href\s*=\s*["\']?\s*javascript:/i', $cdataContents) === 1) {
             return false;
         }
 

@@ -357,4 +357,59 @@ class QueueWorkerTest extends TestCase
 
         $this->worker->processQueue();
     }
+
+    public function testRecurringJobIsRescheduledBeforeMarkingComplete(): void
+    {
+        $handler = $this->createMock(JobInterface::class);
+        $handler->method('getKey')->willReturn('recurring_job');
+        $handler->method('getLabel')->willReturn('Recurring Job');
+        $handler->method('getGroup')->willReturn('default');
+        $handler->method('getMaxRetries')->willReturn(3);
+
+        $this->registry->add($handler);
+
+        $job = new Job();
+        $job->setId(1)
+            ->setKey('recurring_job')
+            ->setGroup('default')
+            ->setStatus(JobStatus::Running)
+            ->setMaxRetries(3)
+            ->setIntervalSeconds(600);
+
+        $this->repository->method('claimNextPending')
+            ->willReturnOnConsecutiveCalls($job, null);
+
+        // Verify enqueue (reschedule) is called BEFORE markCompleted
+        // by making enqueue fail and checking markCompleted is NOT called.
+        $this->repository->expects($this->once())
+            ->method('enqueue')
+            ->willThrowException(new \RuntimeException('DB write failed'));
+
+        $this->repository->expects($this->never())->method('markCompleted');
+
+        $this->expectException(\RuntimeException::class);
+        $this->worker->processQueue();
+    }
+
+    public function testNonRecurringJobCompletesNormally(): void
+    {
+        $handler = $this->createMock(JobInterface::class);
+        $handler->method('getKey')->willReturn('simple_job');
+        $handler->method('getLabel')->willReturn('Simple Job');
+        $handler->method('getGroup')->willReturn('default');
+        $handler->method('getMaxRetries')->willReturn(3);
+
+        $this->registry->add($handler);
+
+        $job = new Job();
+        $job->setId(1)->setKey('simple_job')->setStatus(JobStatus::Running)->setIntervalSeconds(0);
+
+        $this->repository->method('claimNextPending')
+            ->willReturnOnConsecutiveCalls($job, null);
+
+        $this->repository->expects($this->once())->method('markCompleted')->with(1);
+        $this->repository->expects($this->never())->method('enqueue');
+
+        $this->worker->processQueue();
+    }
 }

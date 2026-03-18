@@ -116,6 +116,15 @@ class IPAccessControl implements Hooks, SecurityRuleInterface, IPAccessControlIn
         }
 
         [$subnet, $bits] = explode('/', $cidr, 2);
+
+        if (! ctype_digit($bits)) {
+            $this->logger->warning('Invalid CIDR notation: non-numeric prefix length', [
+                'cidr' => $cidr,
+            ]);
+
+            return false;
+        }
+
         $bits = (int) $bits;
 
         if (str_contains($ip, ':') || str_contains($subnet, ':')) {

@@ -201,4 +201,30 @@ class PostQueryBuilderTest extends TestCase
         $qb = $this->createQueryBuilder();
         $this->assertEmpty($qb->getArgs());
     }
+
+    public function testWhereInWithEmptyArrayUsesImpossibleId(): void
+    {
+        $qb = $this->createQueryBuilder();
+        $qb->whereIn([]);
+
+        // Empty post__in returns all posts in WordPress.
+        // Should use [0] to guarantee no results.
+        $this->assertSame([0], $qb->getArgs()['post__in']);
+    }
+
+    public function testWhereNotInWithEmptyArrayIsNoOp(): void
+    {
+        $qb = $this->createQueryBuilder();
+        $qb->whereNotIn([]);
+
+        // Empty post__not_in should not be set (no exclusions needed).
+        $this->assertArrayNotHasKey('post__not_in', $qb->getArgs());
+    }
+
+    public function testWhereInWithNonEmptyArrayPassesThrough(): void
+    {
+        $qb = $this->createQueryBuilder();
+        $qb->whereIn([5, 10, 15]);
+        $this->assertSame([5, 10, 15], $qb->getArgs()['post__in']);
+    }
 }

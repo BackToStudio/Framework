@@ -207,4 +207,56 @@ class IPAccessControlTest extends TestCase
 
         $this->assertSame($this->acl, $result);
     }
+
+    public function testMatchesCidrRejectsNonNumericBits(): void
+    {
+        $this->logger->expects($this->once())
+            ->method('warning')
+            ->with('Invalid CIDR notation: non-numeric prefix length', $this->anything());
+
+        $this->assertFalse($this->acl->matchesCidr('10.0.0.1', '10.0.0.0/abc'));
+    }
+
+    public function testMatchesCidrRejectsNegativeBitsString(): void
+    {
+        $this->logger->expects($this->once())->method('warning');
+
+        $this->assertFalse($this->acl->matchesCidr('10.0.0.1', '10.0.0.0/-1'));
+    }
+
+    public function testMatchesCidrRejectsOutOfRangeIpv4Bits(): void
+    {
+        $this->assertFalse($this->acl->matchesCidr('10.0.0.1', '10.0.0.0/33'));
+    }
+
+    public function testMatchesCidrRejectsOutOfRangeIpv6Bits(): void
+    {
+        $this->assertFalse($this->acl->matchesCidr('::1', '::0/129'));
+    }
+
+    public function testMatchesCidrHandlesInvalidIpv4Address(): void
+    {
+        $this->assertFalse($this->acl->matchesCidr('999.999.999.999', '10.0.0.0/24'));
+    }
+
+    public function testMatchesCidrHandlesMalformedIpv6(): void
+    {
+        $this->assertFalse($this->acl->matchesCidr('gggg::1', '::0/64'));
+    }
+
+    public function testMatchesCidrValidIpv6(): void
+    {
+        $this->assertTrue($this->acl->matchesCidr('2001:db8::1', '2001:db8::/32'));
+        $this->assertFalse($this->acl->matchesCidr('2001:db9::1', '2001:db8::/32'));
+    }
+
+    public function testWhitelistTakesPrecedenceOverBlacklist(): void
+    {
+        $this->acl->addToWhitelist('10.0.0.0/8');
+        $this->acl->addToBlacklist('10.1.1.1');
+
+        // When whitelist is active, only whitelist is checked
+        $this->assertTrue($this->acl->isAllowed('10.1.1.1'));
+        $this->assertFalse($this->acl->isAllowed('192.168.1.1'));
+    }
 }

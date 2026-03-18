@@ -74,14 +74,21 @@ final class QueueWorker
 
         try {
             $handler->handle($job->getPayload());
-            $this->repository->markCompleted($job->getId());
-
-            if ($job->isRecurring()) {
-                $this->rescheduleRecurring($job);
-            }
         } catch (\Throwable $e) {
             $this->handleFailure($job, $e);
+
+            return;
         }
+
+        // For recurring jobs, enqueue the next occurrence BEFORE marking
+        // the current job complete. This prevents silent loss of recurring
+        // jobs if the reschedule enqueue fails — the current job remains
+        // in "running" state and can be recovered.
+        if ($job->isRecurring()) {
+            $this->rescheduleRecurring($job);
+        }
+
+        $this->repository->markCompleted($job->getId());
     }
 
     /**

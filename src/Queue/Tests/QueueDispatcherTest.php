@@ -198,4 +198,25 @@ class QueueDispatcherTest extends TestCase
 
         $this->dispatcher->dispatch('send_email', $payload);
     }
+
+    public function testDispatchUniqueThrowsOnNonSerializablePayload(): void
+    {
+        // NAN is not JSON-serializable and will cause json_encode to fail.
+        $payload = ['value' => \NAN];
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessageMatches('/not JSON-serializable/');
+
+        $this->dispatcher->dispatchUnique('bad_job', $payload);
+    }
+
+    public function testDispatchUniqueThrowsWithJobKeyInMessage(): void
+    {
+        $payload = ['value' => \INF];
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessageMatches("/Cannot dispatch unique job 'inf_job'/");
+
+        $this->dispatcher->dispatchUnique('inf_job', $payload);
+    }
 }
