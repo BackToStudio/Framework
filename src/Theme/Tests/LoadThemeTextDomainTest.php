@@ -4,93 +4,75 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Theme\Tests;
 
-require_once __DIR__ . '/wp_stubs.php';
-
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
+use BackTo\Framework\Plugin\Contracts\TextDomainLoaderInterface;
 use BackTo\Framework\Theme\I18n\LoadThemeTextDomain;
 use PHPUnit\Framework\TestCase;
 
 class LoadThemeTextDomainTest extends TestCase
 {
+    private HookDispatcherInterface $dispatcher;
+    private TextDomainLoaderInterface $textDomainLoader;
+    private array $loadCalls;
+
     protected function setUp(): void
     {
-        $GLOBALS['_load_theme_textdomain_calls'] = [];
-    }
-
-    protected function tearDown(): void
-    {
-        unset($GLOBALS['_load_theme_textdomain_calls']);
+        $this->loadCalls = [];
+        $this->dispatcher = $this->createMock(HookDispatcherInterface::class);
+        $this->textDomainLoader = $this->createMock(TextDomainLoaderInterface::class);
+        $this->textDomainLoader->method('loadThemeTextDomain')
+            ->willReturnCallback(function (string $domain, string $path) {
+                $this->loadCalls[] = ['domain' => $domain, 'path' => $path];
+            });
     }
 
     public function testImplementsHooksInterface(): void
     {
-        $dispatcher = $this->createMock(HookDispatcherInterface::class);
-        $loader = new LoadThemeTextDomain('/path/to/theme', 'my-theme', $dispatcher);
+        $loader = new LoadThemeTextDomain('/path/to/theme', 'my-theme', $this->dispatcher, $this->textDomainLoader);
 
         $this->assertInstanceOf(Hooks::class, $loader);
     }
 
     public function testHooksRegistersAfterSetupThemeAction(): void
     {
-        $dispatcher = $this->createMock(HookDispatcherInterface::class);
-        $dispatcher->expects($this->once())
+        $this->dispatcher->expects($this->once())
             ->method('addAction')
             ->with('after_setup_theme', $this->anything());
 
-        $loader = new LoadThemeTextDomain('/path/to/theme', 'my-theme', $dispatcher);
-        $loader->hooks();
-    }
-
-    public function testUsesAfterSetupThemeNotInit(): void
-    {
-        $dispatcher = $this->createMock(HookDispatcherInterface::class);
-        $dispatcher->expects($this->once())
-            ->method('addAction')
-            ->with(
-                $this->callback(fn(string $hook) => $hook === 'after_setup_theme'),
-                $this->anything()
-            );
-
-        $loader = new LoadThemeTextDomain('/path', 'domain', $dispatcher);
+        $loader = new LoadThemeTextDomain('/path/to/theme', 'my-theme', $this->dispatcher, $this->textDomainLoader);
         $loader->hooks();
     }
 
     public function testLoadTranslationsPassesCorrectDomain(): void
     {
-        $dispatcher = $this->createMock(HookDispatcherInterface::class);
-        $loader = new LoadThemeTextDomain('/var/www/themes/my-theme', 'my-custom-theme', $dispatcher);
+        $loader = new LoadThemeTextDomain('/var/www/themes/my-theme', 'my-custom-theme', $this->dispatcher, $this->textDomainLoader);
 
         $loader->loadTranslations();
 
-        $this->assertCount(1, $GLOBALS['_load_theme_textdomain_calls']);
-        $this->assertSame('my-custom-theme', $GLOBALS['_load_theme_textdomain_calls'][0]['domain']);
+        $this->assertCount(1, $this->loadCalls);
+        $this->assertSame('my-custom-theme', $this->loadCalls[0]['domain']);
     }
 
     public function testLoadTranslationsUsesFullDirectoryPathWithLanguagesSuffix(): void
     {
-        $dispatcher = $this->createMock(HookDispatcherInterface::class);
         $themeDir = '/var/www/wp-content/themes/my-theme';
-        $loader = new LoadThemeTextDomain($themeDir, 'my-theme', $dispatcher);
+        $loader = new LoadThemeTextDomain($themeDir, 'my-theme', $this->dispatcher, $this->textDomainLoader);
 
         $loader->loadTranslations();
 
-        // Theme uses $themeDirectory . DIRECTORY_SEPARATOR . 'languages' (full path, not basename)
         $expectedPath = $themeDir . DIRECTORY_SEPARATOR . 'languages';
-        $this->assertSame($expectedPath, $GLOBALS['_load_theme_textdomain_calls'][0]['path']);
+        $this->assertSame($expectedPath, $this->loadCalls[0]['path']);
     }
 
     public function testThemeUsesFullPathWhilePluginUsesBasename(): void
     {
-        // This is a key difference: themes pass full directory path, plugins pass basename
-        $dispatcher = $this->createMock(HookDispatcherInterface::class);
         $themeDir = '/var/www/wp-content/themes/my-theme';
-        $loader = new LoadThemeTextDomain($themeDir, 'my-theme', $dispatcher);
+        $loader = new LoadThemeTextDomain($themeDir, 'my-theme', $this->dispatcher, $this->textDomainLoader);
 
         $loader->loadTranslations();
 
-        $path = $GLOBALS['_load_theme_textdomain_calls'][0]['path'];
-        // The theme path should start with '/' (absolute), unlike plugin which starts with basename
+        $path = $this->loadCalls[0]['path'];
         $this->assertStringStartsWith('/', $path);
     }
 }

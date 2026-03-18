@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace BackTo\Framework\Taxonomy\Tests;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
+use BackTo\Framework\Observability\Contracts\LoggerInterface;
 use BackTo\Framework\Taxonomy\Contracts\TaxonomyRegistrarInterface;
 use BackTo\Framework\Taxonomy\RegisterTaxonomy;
 use BackTo\Framework\Taxonomy\TaxonomyFactory;
@@ -25,12 +26,14 @@ class RegisterTaxonomyTest extends TestCase
         $this->registrar = $this->createMock(TaxonomyRegistrarInterface::class);
         $this->registry = new TaxonomyRegistry();
         $this->factory = new TaxonomyFactory();
+        $logger = $this->createMock(LoggerInterface::class);
 
         $this->registerTaxonomy = new RegisterTaxonomy(
             $this->registry,
             $this->factory,
             $this->registrar,
-            $this->hookDispatcher
+            $this->hookDispatcher,
+            $logger,
         );
     }
 

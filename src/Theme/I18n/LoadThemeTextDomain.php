@@ -6,38 +6,28 @@ namespace BackTo\Framework\Theme\I18n;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
-
-use function load_theme_textdomain;
+use BackTo\Framework\Plugin\Contracts\TextDomainLoaderInterface;
 
 final class LoadThemeTextDomain implements Hooks
 {
-
-    /**
-     * @var string
-     */
-    protected $themeDirectory;
-
-    /**
-     * @var string
-     */
-    protected $textDomain;
-
-    /**
-     * @var HookDispatcherInterface
-     */
-    private $hookDispatcher;
+    private readonly string $themeDirectory;
+    private readonly string $textDomain;
+    private readonly HookDispatcherInterface $hookDispatcher;
+    private readonly TextDomainLoaderInterface $textDomainLoader;
 
     /**
      * Params are auto-injected by Dependency Injection.
-     *
-     * @param string $themeDirectory
-     * @param string $themeTextDomain
      */
-    public function __construct(string $themeDirectory, string $themeTextDomain, HookDispatcherInterface $hookDispatcher)
-    {
+    public function __construct(
+        string $themeDirectory,
+        string $themeTextDomain,
+        HookDispatcherInterface $hookDispatcher,
+        TextDomainLoaderInterface $textDomainLoader,
+    ) {
         $this->themeDirectory = $themeDirectory;
         $this->textDomain = $themeTextDomain;
         $this->hookDispatcher = $hookDispatcher;
+        $this->textDomainLoader = $textDomainLoader;
     }
 
     public function hooks(): void
@@ -46,11 +36,11 @@ final class LoadThemeTextDomain implements Hooks
     }
 
     /**
-     * Load plugin translations.
+     * Load theme translations.
      */
     public function loadTranslations(): void
     {
-        load_theme_textdomain(
+        $this->textDomainLoader->loadThemeTextDomain(
             $this->textDomain,
             $this->themeDirectory . DIRECTORY_SEPARATOR . 'languages'
         );

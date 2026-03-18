@@ -4,36 +4,43 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Theme\Tests;
 
-require_once __DIR__ . '/wp_stubs.php';
-
+use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
 use BackTo\Framework\Theme\Actions\RemoveEmojis;
 use PHPUnit\Framework\TestCase;
 
 class RemoveEmojisTest extends TestCase
 {
+    private HookDispatcherInterface $hookDispatcher;
+    private array $removedActions;
+    private array $removedFilters;
+
     protected function setUp(): void
     {
-        $GLOBALS['_removed_actions'] = [];
-        $GLOBALS['_removed_filters'] = [];
-    }
-
-    protected function tearDown(): void
-    {
-        unset($GLOBALS['_removed_actions'], $GLOBALS['_removed_filters']);
+        $this->removedActions = [];
+        $this->removedFilters = [];
+        $this->hookDispatcher = $this->createMock(HookDispatcherInterface::class);
+        $this->hookDispatcher->method('removeAction')
+            ->willReturnCallback(function (string $tag, $callback, int $priority = 10) {
+                $this->removedActions[] = ['tag' => $tag, 'callback' => $callback, 'priority' => $priority];
+            });
+        $this->hookDispatcher->method('removeFilter')
+            ->willReturnCallback(function (string $tag, $callback, int $priority = 10) {
+                $this->removedFilters[] = ['tag' => $tag, 'callback' => $callback, 'priority' => $priority];
+            });
     }
 
     public function testImplementsHooksInterface(): void
     {
-        $this->assertInstanceOf(Hooks::class, new RemoveEmojis());
+        $this->assertInstanceOf(Hooks::class, new RemoveEmojis($this->hookDispatcher));
     }
 
     public function testRemovesEmojiActions(): void
     {
-        $action = new RemoveEmojis();
+        $action = new RemoveEmojis($this->hookDispatcher);
         $action->hooks();
 
-        $callbacks = array_column($GLOBALS['_removed_actions'], 'callback');
+        $callbacks = array_column($this->removedActions, 'callback');
 
         $this->assertContains('wp_enqueue_emoji_styles', $callbacks);
         $this->assertContains('print_emoji_detection_script', $callbacks);
@@ -42,10 +49,10 @@ class RemoveEmojisTest extends TestCase
 
     public function testRemovesEmojiFilters(): void
     {
-        $action = new RemoveEmojis();
+        $action = new RemoveEmojis($this->hookDispatcher);
         $action->hooks();
 
-        $callbacks = array_column($GLOBALS['_removed_filters'], 'callback');
+        $callbacks = array_column($this->removedFilters, 'callback');
 
         $this->assertContains('wp_staticize_emoji', $callbacks);
         $this->assertContains('wp_staticize_emoji_for_email', $callbacks);
@@ -53,12 +60,11 @@ class RemoveEmojisTest extends TestCase
 
     public function testRemovesEmojiStylesFromAllContexts(): void
     {
-        $action = new RemoveEmojis();
+        $action = new RemoveEmojis($this->hookDispatcher);
         $action->hooks();
 
-        // wp_enqueue_emoji_styles should be removed from admin, embed, and front
         $emojiStyleRemovals = array_filter(
-            $GLOBALS['_removed_actions'],
+            $this->removedActions,
             fn(array $r) => $r['callback'] === 'wp_enqueue_emoji_styles'
         );
 
@@ -70,11 +76,11 @@ class RemoveEmojisTest extends TestCase
 
     public function testRemovesEmojiDetectionScriptFromWpHead(): void
     {
-        $action = new RemoveEmojis();
+        $action = new RemoveEmojis($this->hookDispatcher);
         $action->hooks();
 
         $found = false;
-        foreach ($GLOBALS['_removed_actions'] as $removed) {
+        foreach ($this->removedActions as $removed) {
             if ($removed['callback'] === 'print_emoji_detection_script' && $removed['tag'] === 'wp_head') {
                 $found = true;
                 $this->assertSame(7, $removed['priority']);
@@ -85,11 +91,11 @@ class RemoveEmojisTest extends TestCase
 
     public function testRemovesEmailEmojiFilter(): void
     {
-        $action = new RemoveEmojis();
+        $action = new RemoveEmojis($this->hookDispatcher);
         $action->hooks();
 
         $mailFilters = array_filter(
-            $GLOBALS['_removed_filters'],
+            $this->removedFilters,
             fn(array $r) => $r['tag'] === 'wp_mail'
         );
 
@@ -98,11 +104,11 @@ class RemoveEmojisTest extends TestCase
 
     public function testTotalRemovalsCount(): void
     {
-        $action = new RemoveEmojis();
+        $action = new RemoveEmojis($this->hookDispatcher);
         $action->hooks();
 
-        // 8 remove_action + 3 remove_filter = 11 total
-        $totalRemovals = count($GLOBALS['_removed_actions']) + count($GLOBALS['_removed_filters']);
-        $this->assertSame(11, $totalRemovals);
+        // 7 remove_action + 3 remove_filter = 10 total (removed duplicate print_emoji_styles)
+        $totalRemovals = count($this->removedActions) + count($this->removedFilters);
+        $this->assertSame(10, $totalRemovals);
     }
 }

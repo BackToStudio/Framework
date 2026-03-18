@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace BackTo\Framework\Assets;
 
 
+use BackTo\Framework\Observability\Contracts\LoggerInterface;
 use Exception;
 
 use function array_key_exists;
@@ -15,10 +16,12 @@ use function str_replace;
 final class ReplaceImgTagBySvgTag
 {
     private readonly SvgFactory $factory;
+    private readonly LoggerInterface $logger;
 
-    public function __construct(SvgFactory $factory)
+    public function __construct(SvgFactory $factory, LoggerInterface $logger)
     {
         $this->factory = $factory;
+        $this->logger = $logger;
     }
 
     function fromHtml(string $blockContent): string
@@ -29,7 +32,7 @@ final class ReplaceImgTagBySvgTag
             try {
                 $blockContent = str_replace($matches[0], $this->factory->getFromSrc($matches[1]), $blockContent);
             } catch (Exception $e) {
-                error_log($e->getMessage());
+                $this->logger->warning($e->getMessage());
             }
         }
 

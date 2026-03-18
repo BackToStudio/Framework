@@ -7,6 +7,7 @@ namespace BackTo\Framework\Performance\Tests;
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Performance\Contracts\PageCacheInterface;
 use BackTo\Framework\Performance\Hooks\PreloadPageCache;
+use BackTo\Framework\Queue\Contracts\CronSchedulerInterface;
 use PHPUnit\Framework\TestCase;
 
 class PreloadPageCacheTest extends TestCase
@@ -14,12 +15,14 @@ class PreloadPageCacheTest extends TestCase
     private PreloadPageCache $preloader;
     private HookDispatcherInterface $hookDispatcher;
     private PageCacheInterface $pageCache;
+    private CronSchedulerInterface $cronScheduler;
 
     protected function setUp(): void
     {
         $this->hookDispatcher = $this->createMock(HookDispatcherInterface::class);
         $this->pageCache = $this->createMock(PageCacheInterface::class);
-        $this->preloader = new PreloadPageCache($this->hookDispatcher, $this->pageCache);
+        $this->cronScheduler = $this->createMock(CronSchedulerInterface::class);
+        $this->preloader = new PreloadPageCache($this->hookDispatcher, $this->pageCache, $this->cronScheduler);
     }
 
     public function testHooksRegistersAllActions(): void
@@ -80,13 +83,13 @@ class PreloadPageCacheTest extends TestCase
 
     public function testConstructorDefaultValues(): void
     {
-        $preloader = new PreloadPageCache($this->hookDispatcher, $this->pageCache);
+        $preloader = new PreloadPageCache($this->hookDispatcher, $this->pageCache, $this->cronScheduler);
         $this->assertInstanceOf(PreloadPageCache::class, $preloader);
     }
 
     public function testConstructorCustomValues(): void
     {
-        $preloader = new PreloadPageCache($this->hookDispatcher, $this->pageCache, 10, 100);
+        $preloader = new PreloadPageCache($this->hookDispatcher, $this->pageCache, $this->cronScheduler, 10, 100);
         $this->assertInstanceOf(PreloadPageCache::class, $preloader);
     }
 

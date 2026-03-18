@@ -18,7 +18,7 @@ final class PostMetaStructureFactory
             'type' => 'text',
             'show_in_rest' => true,
             'single' => true,
-            'sanitize_callback' => "sanitize_text_field",
+            'sanitize_callback' => null,
         ];
         $args = array_merge($defaultArgs, $args);
 

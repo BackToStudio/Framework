@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Cli\Command;
 
+use BackTo\Framework\Cli\Contracts\CliOutputInterface;
+use BackTo\Framework\Cli\Contracts\FilesystemInterface;
 use BackTo\Framework\Cli\Generator\ClassGenerator;
 
 /**
@@ -14,10 +16,16 @@ use BackTo\Framework\Cli\Generator\ClassGenerator;
 abstract class AbstractMakeCommand
 {
     protected readonly ClassGenerator $generator;
+    protected readonly CliOutputInterface $output;
+    protected readonly FilesystemInterface $filesystem;
 
-    public function __construct()
-    {
-        $this->generator = new ClassGenerator();
+    public function __construct(
+        FilesystemInterface $filesystem,
+        CliOutputInterface $output,
+    ) {
+        $this->filesystem = $filesystem;
+        $this->output = $output;
+        $this->generator = new ClassGenerator($filesystem);
     }
 
     abstract protected function getTemplateName(): string;
@@ -28,7 +36,7 @@ abstract class AbstractMakeCommand
     {
         $templatePath = \dirname(__DIR__) . '/Generator/Templates/' . $this->getTemplateName() . '.php.tpl';
 
-        $content = \file_get_contents($templatePath);
+        $content = $this->filesystem->readFile($templatePath);
 
         if ($content === false) {
             return '';
@@ -68,12 +76,12 @@ abstract class AbstractMakeCommand
         $name = $args[0] ?? '';
 
         if ($name === '') {
-            $this->error('Please provide a name for the ' . $this->getComponentType() . '.');
+            $this->output->error('Please provide a name for the ' . $this->getComponentType() . '.');
             return;
         }
 
         if (!\preg_match('/^[A-Za-z][A-Za-z0-9_\- ]*$/', $name)) {
-            $this->error('Invalid name: use only letters, numbers, hyphens, underscores, and spaces.');
+            $this->output->error('Invalid name: use only letters, numbers, hyphens, underscores, and spaces.');
             return;
         }
 
@@ -81,46 +89,31 @@ abstract class AbstractMakeCommand
         $template = $this->getTemplate();
 
         if ($template === '') {
-            $this->error('Template not found for ' . $this->getComponentType() . '.');
+            $this->output->error('Template not found for ' . $this->getComponentType() . '.');
             return;
         }
 
         $content = $this->generator->generate($template, $replacements);
         $outputDir = $assocArgs['dir'] ?? '.';
         $className = $replacements['{{className}}'];
-        $filePath = \rtrim($outputDir, '/') . '/' . $className . '.php';
 
-        $realOutputDir = \realpath($outputDir);
+        $realOutputDir = $this->filesystem->realpath($outputDir);
         if ($realOutputDir === false) {
-            $this->error("Output directory does not exist: {$outputDir}");
+            $this->output->error("Output directory does not exist: {$outputDir}");
             return;
         }
 
         $filePath = $realOutputDir . '/' . $className . '.php';
 
-        if (\file_exists($filePath) && !isset($assocArgs['force'])) {
-            $this->error("File {$filePath} already exists. Use --force to overwrite.");
+        if ($this->filesystem->exists($filePath) && !isset($assocArgs['force'])) {
+            $this->output->error("File {$filePath} already exists. Use --force to overwrite.");
             return;
         }
 
         if ($this->generator->writeFile($filePath, $content)) {
-            $this->success("Created {$this->getComponentType()}: {$filePath}");
+            $this->output->success("Created {$this->getComponentType()}: {$filePath}");
         } else {
-            $this->error("Failed to write file: {$filePath}");
-        }
-    }
-
-    protected function success(string $message): void
-    {
-        if (\class_exists('WP_CLI')) {
-            \WP_CLI::success($message);
-        }
-    }
-
-    protected function error(string $message): void
-    {
-        if (\class_exists('WP_CLI')) {
-            \WP_CLI::error($message);
+            $this->output->error("Failed to write file: {$filePath}");
         }
     }
 }

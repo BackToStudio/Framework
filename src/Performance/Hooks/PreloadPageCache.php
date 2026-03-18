@@ -7,6 +7,7 @@ namespace BackTo\Framework\Performance\Hooks;
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
 use BackTo\Framework\Performance\Contracts\PageCacheInterface;
+use BackTo\Framework\Queue\Contracts\CronSchedulerInterface;
 
 /**
  * Preload the page cache in the background after content changes.
@@ -29,6 +30,7 @@ final class PreloadPageCache implements Hooks
 
     private readonly HookDispatcherInterface $hookDispatcher;
     private readonly PageCacheInterface $pageCache;
+    private readonly CronSchedulerInterface $cronScheduler;
 
     /** @var int Delay in seconds before the cron event fires */
     private readonly int $delay;
@@ -39,11 +41,13 @@ final class PreloadPageCache implements Hooks
     public function __construct(
         HookDispatcherInterface $hookDispatcher,
         PageCacheInterface $pageCache,
+        CronSchedulerInterface $cronScheduler,
         int $delay = 5,
         int $batchSize = 50
     ) {
         $this->hookDispatcher = $hookDispatcher;
         $this->pageCache = $pageCache;
+        $this->cronScheduler = $cronScheduler;
         $this->delay = $delay;
         $this->batchSize = $batchSize;
     }
@@ -85,13 +89,13 @@ final class PreloadPageCache implements Hooks
         }
 
         // Don't pile up: clear any pending preload for this post
-        \wp_clear_scheduled_hook(self::CRON_HOOK, [$postId]);
+        $this->cronScheduler->clear(self::CRON_HOOK, [$postId]);
 
         // Schedule in {delay} seconds to let the cache invalidation settle
-        \wp_schedule_single_event(time() + $this->delay, self::CRON_HOOK, [$postId]);
+        $this->cronScheduler->scheduleSingle(self::CRON_HOOK, time() + $this->delay, [$postId]);
 
         // Spawn cron immediately so it doesn't wait for the next page load
-        \spawn_cron();
+        $this->cronScheduler->spawn();
     }
 
     /**
@@ -118,9 +122,9 @@ final class PreloadPageCache implements Hooks
      */
     public function scheduleFullPreload(): void
     {
-        \wp_clear_scheduled_hook(self::CRON_FULL_HOOK);
-        \wp_schedule_single_event(time() + $this->delay, self::CRON_FULL_HOOK);
-        \spawn_cron();
+        $this->cronScheduler->clear(self::CRON_FULL_HOOK);
+        $this->cronScheduler->scheduleSingle(self::CRON_FULL_HOOK, time() + $this->delay);
+        $this->cronScheduler->spawn();
     }
 
     /**

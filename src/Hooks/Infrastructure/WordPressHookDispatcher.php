@@ -12,6 +12,7 @@ use function is_admin;
 use function register_activation_hook;
 use function register_deactivation_hook;
 use function remove_action;
+use function remove_filter;
 
 /**
  * WordPress adapter for the HookDispatcher port.
@@ -31,6 +32,11 @@ final class WordPressHookDispatcher implements HookDispatcherInterface
     public function removeAction(string $hookName, callable|string $callback, int $priority = 10): void
     {
         remove_action($hookName, $callback, $priority);
+    }
+
+    public function removeFilter(string $hookName, callable|string $callback, int $priority = 10): void
+    {
+        remove_filter($hookName, $callback, $priority);
     }
 
     public function isAdmin(): bool

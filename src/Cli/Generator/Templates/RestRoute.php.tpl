@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace {{namespace}};
 
 use BackTo\Framework\RestApi\Contracts\RestRouteInterface;
-use WP_REST_Request;
 use WP_REST_Response;
 
 class {{className}} implements RestRouteInterface
@@ -28,7 +27,7 @@ class {{className}} implements RestRouteInterface
         return ['GET'];
     }
 
-    public function handle(WP_REST_Request $request): WP_REST_Response
+    public function handle(mixed $request): mixed
     {
         return new WP_REST_Response(['message' => 'Hello from {{className}}'], 200);
     }

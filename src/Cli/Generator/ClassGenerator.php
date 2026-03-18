@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Cli\Generator;
 
+use BackTo\Framework\Cli\Contracts\FilesystemInterface;
+
 /**
  * Generates PHP class files from templates.
  *
@@ -11,6 +13,13 @@ namespace BackTo\Framework\Cli\Generator;
  */
 final class ClassGenerator
 {
+    private readonly FilesystemInterface $filesystem;
+
+    public function __construct(FilesystemInterface $filesystem)
+    {
+        $this->filesystem = $filesystem;
+    }
+
     /**
      * @param array<string, string> $replacements
      */
@@ -25,13 +34,7 @@ final class ClassGenerator
 
     public function writeFile(string $path, string $content): bool
     {
-        $dir = \dirname($path);
-
-        if (!\is_dir($dir)) {
-            \mkdir($dir, 0755, true);
-        }
-
-        return \file_put_contents($path, $content) !== false;
+        return $this->filesystem->writeFile($path, $content);
     }
 
     /**

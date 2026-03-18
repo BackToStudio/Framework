@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Queue\Tests;
 
+use BackTo\Framework\Cache\Contracts\TransientStoreInterface;
 use BackTo\Framework\Contracts\ActivationHooks;
 use BackTo\Framework\Contracts\DeactivationHooks;
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
+use BackTo\Framework\Queue\Contracts\CronSchedulerInterface;
 use BackTo\Framework\Queue\Contracts\JobInterface;
 use BackTo\Framework\Queue\Contracts\QueueRepositoryInterface;
 use BackTo\Framework\Queue\Factory\JobFactory;
@@ -22,18 +24,17 @@ class RegisterQueueTest extends TestCase
     private QueueWorker $worker;
     private QueueRegistry $registry;
     private HookDispatcherInterface $hookDispatcher;
+    private CronSchedulerInterface $cronScheduler;
+    private TransientStoreInterface $transientStore;
     private RegisterQueue $registerQueue;
-
-    public static function setUpBeforeClass(): void
-    {
-        require_once __DIR__ . '/wp_stubs.php';
-    }
 
     protected function setUp(): void
     {
         $this->repository = $this->createMock(QueueRepositoryInterface::class);
         $this->registry = new QueueRegistry();
         $this->hookDispatcher = $this->createMock(HookDispatcherInterface::class);
+        $this->cronScheduler = $this->createMock(CronSchedulerInterface::class);
+        $this->transientStore = $this->createMock(TransientStoreInterface::class);
 
         $this->worker = new QueueWorker(
             $this->repository,
@@ -45,7 +46,9 @@ class RegisterQueueTest extends TestCase
             $this->repository,
             $this->worker,
             $this->registry,
-            $this->hookDispatcher
+            $this->hookDispatcher,
+            $this->cronScheduler,
+            $this->transientStore,
         );
     }
 

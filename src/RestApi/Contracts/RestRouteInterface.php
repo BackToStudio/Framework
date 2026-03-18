@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace BackTo\Framework\RestApi\Contracts;
 
 use BackTo\Framework\Contracts\HookInterface;
-use WP_REST_Request;
-use WP_REST_Response;
 
 /**
  * Represents a REST API route to be registered.
@@ -17,10 +15,20 @@ interface RestRouteInterface extends HookInterface
 
     public function getRoute(): string;
 
-    
+    /**
+     * @return string[]
+     */
     public function getMethods(): array;
 
-    public function handle(WP_REST_Request $request): WP_REST_Response;
+    /**
+     * Handle the REST request and return a response array or object.
+     *
+     * The infrastructure adapter wraps WP_REST_Request/Response transparently.
+     *
+     * @param mixed $request The request object (WP_REST_Request at runtime)
+     * @return mixed The response (WP_REST_Response or array at runtime)
+     */
+    public function handle(mixed $request): mixed;
 
     public function getPermissionCallback(): ?callable;
 }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace BackTo\Framework\Cache\Strategy;
 
 use BackTo\Framework\Cache\Contracts\TransientCleanerInterface;
+use BackTo\Framework\Cache\Contracts\TransientStoreInterface;
 use DateInterval;
 
 /**
@@ -18,10 +19,15 @@ final class TransientCache extends AbstractCache
 {
     private readonly string $prefix;
     private readonly TransientCleanerInterface $transientCleaner;
+    private readonly TransientStoreInterface $transientStore;
 
-    public function __construct(TransientCleanerInterface $transientCleaner, string $prefix = 'btf_')
-    {
+    public function __construct(
+        TransientCleanerInterface $transientCleaner,
+        TransientStoreInterface $transientStore,
+        string $prefix = 'btf_',
+    ) {
         $this->transientCleaner = $transientCleaner;
+        $this->transientStore = $transientStore;
         $this->prefix = $prefix;
     }
 
@@ -29,7 +35,7 @@ final class TransientCache extends AbstractCache
     {
         $this->validateKey($key);
 
-        $value = \get_transient($this->prefixKey($key));
+        $value = $this->transientStore->get($this->prefixKey($key));
 
         if ($value === false) {
             return $default;
@@ -48,7 +54,7 @@ final class TransientCache extends AbstractCache
             return $this->delete($key);
         }
 
-        return \set_transient(
+        return $this->transientStore->set(
             $this->prefixKey($key),
             serialize($value),
             $seconds ?? 0
@@ -59,7 +65,7 @@ final class TransientCache extends AbstractCache
     {
         $this->validateKey($key);
 
-        return \delete_transient($this->prefixKey($key));
+        return $this->transientStore->delete($this->prefixKey($key));
     }
 
     public function clear(): bool
@@ -71,7 +77,7 @@ final class TransientCache extends AbstractCache
     {
         $this->validateKey($key);
 
-        return \get_transient($this->prefixKey($key)) !== false;
+        return $this->transientStore->get($this->prefixKey($key)) !== false;
     }
 
     /**

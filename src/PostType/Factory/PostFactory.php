@@ -6,12 +6,19 @@ namespace BackTo\Framework\PostType\Factory;
 
 use BackTo\Framework\PostType\Contracts\PostInterface;
 use BackTo\Framework\PostType\Entity\Post;
+use BackTo\Framework\Observability\Contracts\LoggerInterface;
 use DateTimeImmutable;
 use Exception;
 use WP_Post;
 
 class PostFactory
 {
+    private readonly LoggerInterface $logger;
+
+    public function __construct(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
+    }
 
     public function create(WP_Post $wpPost): PostInterface
     {
@@ -33,7 +40,7 @@ class PostFactory
             $publishedAt = new DateTimeImmutable($wpPost->post_date);
             $post->setPublishedAt($publishedAt);
         } catch (Exception $e) {
-            \error_log(\sprintf('[BackTo Framework] Invalid post dates for post %d: %s', $wpPost->ID, $e->getMessage()));
+            $this->logger->warning(\sprintf('Invalid post dates for post %d: %s', $wpPost->ID, $e->getMessage()));
         }
 
         return $post;

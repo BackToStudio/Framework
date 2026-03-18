@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Queue;
 
+use BackTo\Framework\Cache\Contracts\TransientStoreInterface;
 use BackTo\Framework\Contracts\ActivationHooks;
 use BackTo\Framework\Contracts\DeactivationHooks;
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
+use BackTo\Framework\Queue\Contracts\CronSchedulerInterface;
 use BackTo\Framework\Queue\Contracts\QueueRepositoryInterface;
 
 /**
@@ -30,17 +32,23 @@ final class RegisterQueue implements Hooks, ActivationHooks, DeactivationHooks
     private readonly QueueWorker $worker;
     private readonly QueueRegistry $registry;
     private readonly HookDispatcherInterface $hookDispatcher;
+    private readonly CronSchedulerInterface $cronScheduler;
+    private readonly TransientStoreInterface $transientStore;
 
     public function __construct(
         QueueRepositoryInterface $repository,
         QueueWorker $worker,
         QueueRegistry $registry,
-        HookDispatcherInterface $hookDispatcher
+        HookDispatcherInterface $hookDispatcher,
+        CronSchedulerInterface $cronScheduler,
+        TransientStoreInterface $transientStore,
     ) {
         $this->repository = $repository;
         $this->worker = $worker;
         $this->registry = $registry;
         $this->hookDispatcher = $hookDispatcher;
+        $this->cronScheduler = $cronScheduler;
+        $this->transientStore = $transientStore;
     }
 
     public function activate(): void
@@ -63,7 +71,7 @@ final class RegisterQueue implements Hooks, ActivationHooks, DeactivationHooks
     public function uninstall(): void
     {
         $this->repository->dropTable();
-        \delete_transient(self::LOCK_KEY);
+        $this->transientStore->delete(self::LOCK_KEY);
     }
 
     public function hooks(): void
@@ -99,16 +107,16 @@ final class RegisterQueue implements Hooks, ActivationHooks, DeactivationHooks
      */
     public function ensureCronScheduled(): void
     {
-        if (!\wp_next_scheduled(self::CRON_HOOK)) {
-            \wp_schedule_event(\time(), self::SCHEDULE_INTERVAL, self::CRON_HOOK);
+        if (!$this->cronScheduler->isScheduled(self::CRON_HOOK)) {
+            $this->cronScheduler->scheduleRecurring(self::CRON_HOOK, self::SCHEDULE_INTERVAL);
         }
 
-        if (!\wp_next_scheduled(self::RESCUE_HOOK)) {
-            \wp_schedule_event(\time(), 'hourly', self::RESCUE_HOOK);
+        if (!$this->cronScheduler->isScheduled(self::RESCUE_HOOK)) {
+            $this->cronScheduler->scheduleRecurring(self::RESCUE_HOOK, 'hourly');
         }
 
-        if (!\wp_next_scheduled(self::CLEANUP_HOOK)) {
-            \wp_schedule_event(\time(), 'daily', self::CLEANUP_HOOK);
+        if (!$this->cronScheduler->isScheduled(self::CLEANUP_HOOK)) {
+            $this->cronScheduler->scheduleRecurring(self::CLEANUP_HOOK, 'daily');
         }
     }
 
@@ -176,39 +184,39 @@ final class RegisterQueue implements Hooks, ActivationHooks, DeactivationHooks
 
     private function scheduleCronEvents(): void
     {
-        if (!\wp_next_scheduled(self::CRON_HOOK)) {
-            \wp_schedule_event(\time(), self::SCHEDULE_INTERVAL, self::CRON_HOOK);
+        if (!$this->cronScheduler->isScheduled(self::CRON_HOOK)) {
+            $this->cronScheduler->scheduleRecurring(self::CRON_HOOK, self::SCHEDULE_INTERVAL);
         }
 
-        if (!\wp_next_scheduled(self::RESCUE_HOOK)) {
-            \wp_schedule_event(\time(), 'hourly', self::RESCUE_HOOK);
+        if (!$this->cronScheduler->isScheduled(self::RESCUE_HOOK)) {
+            $this->cronScheduler->scheduleRecurring(self::RESCUE_HOOK, 'hourly');
         }
 
-        if (!\wp_next_scheduled(self::CLEANUP_HOOK)) {
-            \wp_schedule_event(\time(), 'daily', self::CLEANUP_HOOK);
+        if (!$this->cronScheduler->isScheduled(self::CLEANUP_HOOK)) {
+            $this->cronScheduler->scheduleRecurring(self::CLEANUP_HOOK, 'daily');
         }
     }
 
     private function unscheduleCronEvents(): void
     {
-        \wp_clear_scheduled_hook(self::CRON_HOOK);
-        \wp_clear_scheduled_hook(self::RESCUE_HOOK);
-        \wp_clear_scheduled_hook(self::CLEANUP_HOOK);
+        $this->cronScheduler->clear(self::CRON_HOOK);
+        $this->cronScheduler->clear(self::RESCUE_HOOK);
+        $this->cronScheduler->clear(self::CLEANUP_HOOK);
     }
 
     protected function acquireLock(): bool
     {
-        if (\get_transient(self::LOCK_KEY)) {
+        if ($this->transientStore->get(self::LOCK_KEY)) {
             return false;
         }
 
-        \set_transient(self::LOCK_KEY, \getmypid() ?: 1, self::LOCK_TIMEOUT);
+        $this->transientStore->set(self::LOCK_KEY, \getmypid() ?: 1, self::LOCK_TIMEOUT);
 
         return true;
     }
 
     protected function releaseLock(): void
     {
-        \delete_transient(self::LOCK_KEY);
+        $this->transientStore->delete(self::LOCK_KEY);
     }
 }

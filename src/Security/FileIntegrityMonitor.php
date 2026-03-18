@@ -7,6 +7,7 @@ namespace BackTo\Framework\Security;
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
 use BackTo\Framework\Observability\Contracts\LoggerInterface;
+use BackTo\Framework\Queue\Contracts\CronSchedulerInterface;
 use BackTo\Framework\Security\Contracts\FileIntegrityRepositoryInterface;
 use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
 
@@ -21,6 +22,7 @@ class FileIntegrityMonitor implements Hooks, SecurityRuleInterface
     private readonly HookDispatcherInterface $hookDispatcher;
     private readonly FileIntegrityRepositoryInterface $repository;
     private readonly LoggerInterface $logger;
+    private readonly CronSchedulerInterface $cronScheduler;
 
     /** @var string[] Relative paths from ABSPATH to monitor */
     private const CRITICAL_FILES = [
@@ -39,10 +41,12 @@ class FileIntegrityMonitor implements Hooks, SecurityRuleInterface
         HookDispatcherInterface $hookDispatcher,
         FileIntegrityRepositoryInterface $repository,
         LoggerInterface $logger,
+        CronSchedulerInterface $cronScheduler,
     ) {
         $this->hookDispatcher = $hookDispatcher;
         $this->repository = $repository;
         $this->logger = $logger;
+        $this->cronScheduler = $cronScheduler;
     }
 
     public function getName(): string
@@ -63,12 +67,8 @@ class FileIntegrityMonitor implements Hooks, SecurityRuleInterface
      */
     public function ensureScheduled(): void
     {
-        if (! function_exists('wp_next_scheduled') || ! function_exists('wp_schedule_event')) {
-            return;
-        }
-
-        if (! \wp_next_scheduled(self::CRON_HOOK)) {
-            \wp_schedule_event(time(), 'hourly', self::CRON_HOOK);
+        if (!$this->cronScheduler->isScheduled(self::CRON_HOOK)) {
+            $this->cronScheduler->scheduleRecurring(self::CRON_HOOK, 'hourly');
         }
     }
 

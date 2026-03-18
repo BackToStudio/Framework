@@ -6,7 +6,6 @@ namespace BackTo\Framework\Security\RestApi;
 
 use BackTo\Framework\RestApi\Contracts\RestRouteInterface;
 use BackTo\Framework\Security\Contracts\AuditLogRepositoryInterface;
-use WP_REST_Request;
 use WP_REST_Response;
 
 /**
@@ -39,7 +38,7 @@ final class SecurityAuditLogRoute implements RestRouteInterface
         return ['GET'];
     }
 
-    public function handle(WP_REST_Request $request): WP_REST_Response
+    public function handle(mixed $request): mixed
     {
         $filters = [];
 
