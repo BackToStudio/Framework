@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Performance;
 
+use BackTo\Framework\Contracts\RequestContextInterface;
+
 /**
  * Resolves the current request URL for page cache keying.
  *
@@ -12,18 +14,25 @@ namespace BackTo\Framework\Performance;
  */
 class RequestUrlResolver
 {
+    private readonly RequestContextInterface $requestContext;
+
+    public function __construct(RequestContextInterface $requestContext)
+    {
+        $this->requestContext = $requestContext;
+    }
+
     public function getCurrentUrl(): string
     {
-        $scheme = $this->isSSL() ? 'https' : 'http';
+        $scheme = $this->requestContext->isSecure() ? 'https' : 'http';
         $host = $this->getValidatedHost();
-        $uri = $_SERVER['REQUEST_URI'] ?? '/';
+        $uri = $this->requestContext->getRequestUri();
 
         return $scheme . '://' . $host . strtok($uri, '?');
     }
 
     private function getValidatedHost(): string
     {
-        $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+        $host = $this->requestContext->getHost();
 
         $siteHost = (string) parse_url($this->getSiteUrl(), PHP_URL_HOST);
 
@@ -32,11 +41,6 @@ class RequestUrlResolver
         }
 
         return $host;
-    }
-
-    protected function isSSL(): bool
-    {
-        return \is_ssl();
     }
 
     protected function getSiteUrl(): string

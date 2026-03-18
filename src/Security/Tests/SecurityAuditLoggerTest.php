@@ -6,6 +6,7 @@ namespace BackTo\Framework\Security\Tests;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
+use BackTo\Framework\Contracts\RequestContextInterface;
 use BackTo\Framework\Security\Contracts\AuditLogRepositoryInterface;
 use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
 use BackTo\Framework\Security\SecurityAuditLogger;
@@ -15,13 +16,20 @@ class SecurityAuditLoggerTest extends TestCase
 {
     private HookDispatcherInterface $dispatcher;
     private AuditLogRepositoryInterface $repository;
+    private RequestContextInterface $requestContext;
     private SecurityAuditLogger $logger;
 
     protected function setUp(): void
     {
         $this->dispatcher = $this->createMock(HookDispatcherInterface::class);
         $this->repository = $this->createMock(AuditLogRepositoryInterface::class);
-        $this->logger = new SecurityAuditLogger($this->dispatcher, $this->repository);
+        $this->requestContext = $this->createMock(RequestContextInterface::class);
+        $this->requestContext->method('getRemoteAddr')->willReturn('127.0.0.1');
+        $this->requestContext->method('server')->willReturn('');
+        $this->requestContext->method('getMethod')->willReturn('GET');
+        $this->requestContext->method('getUserAgent')->willReturn('');
+        $this->requestContext->method('post')->willReturn('');
+        $this->logger = new SecurityAuditLogger($this->dispatcher, $this->repository, $this->requestContext);
     }
 
     public function testImplementsRequiredInterfaces(): void

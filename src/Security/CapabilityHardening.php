@@ -6,6 +6,7 @@ namespace BackTo\Framework\Security;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
+use BackTo\Framework\Contracts\RequestContextInterface;
 use BackTo\Framework\Observability\Contracts\LoggerInterface;
 use BackTo\Framework\Security\Contracts\AuditLogRepositoryInterface;
 use BackTo\Framework\Security\Contracts\AuditLogSeverity;
@@ -26,6 +27,7 @@ class CapabilityHardening implements Hooks, SecurityRuleInterface
     private readonly HookDispatcherInterface $hookDispatcher;
     private readonly LoggerInterface $logger;
     private readonly AuditLogRepositoryInterface $auditLog;
+    private readonly RequestContextInterface $requestContext;
 
     /** @var string[] Roles that require elevated verification */
     private const PRIVILEGED_ROLES = [
@@ -57,10 +59,17 @@ class CapabilityHardening implements Hooks, SecurityRuleInterface
         HookDispatcherInterface $hookDispatcher,
         LoggerInterface $logger,
         AuditLogRepositoryInterface $auditLog,
+        RequestContextInterface $requestContext,
     ) {
         $this->hookDispatcher = $hookDispatcher;
         $this->logger = $logger;
         $this->auditLog = $auditLog;
+        $this->requestContext = $requestContext;
+    }
+
+    protected function getRequestContext(): RequestContextInterface
+    {
+        return $this->requestContext;
     }
 
     public function getName(): string

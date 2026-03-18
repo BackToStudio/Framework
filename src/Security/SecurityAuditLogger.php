@@ -6,6 +6,7 @@ namespace BackTo\Framework\Security;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
+use BackTo\Framework\Contracts\RequestContextInterface;
 use BackTo\Framework\Security\Contracts\AuditLogRepositoryInterface;
 use BackTo\Framework\Security\Contracts\AuditLogSeverity;
 use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
@@ -34,6 +35,7 @@ final class SecurityAuditLogger implements Hooks, SecurityRuleInterface
 
     private readonly HookDispatcherInterface $hookDispatcher;
     private readonly AuditLogRepositoryInterface $repository;
+    private readonly RequestContextInterface $requestContext;
 
     /** @var string[] Options considered security-critical */
     private const CRITICAL_OPTIONS = [
@@ -49,9 +51,16 @@ final class SecurityAuditLogger implements Hooks, SecurityRuleInterface
     public function __construct(
         HookDispatcherInterface $hookDispatcher,
         AuditLogRepositoryInterface $repository,
+        RequestContextInterface $requestContext,
     ) {
         $this->hookDispatcher = $hookDispatcher;
         $this->repository = $repository;
+        $this->requestContext = $requestContext;
+    }
+
+    protected function getRequestContext(): RequestContextInterface
+    {
+        return $this->requestContext;
     }
 
     public function getName(): string

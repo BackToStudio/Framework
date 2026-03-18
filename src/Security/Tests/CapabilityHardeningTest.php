@@ -6,6 +6,7 @@ namespace BackTo\Framework\Security\Tests;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
+use BackTo\Framework\Contracts\RequestContextInterface;
 use BackTo\Framework\Observability\Contracts\LoggerInterface;
 use BackTo\Framework\Security\CapabilityHardening;
 use BackTo\Framework\Security\Contracts\AuditLogRepositoryInterface;
@@ -45,6 +46,7 @@ class CapabilityHardeningTest extends TestCase
     private HookDispatcherInterface $dispatcher;
     private LoggerInterface $logger;
     private AuditLogRepositoryInterface $auditLog;
+    private RequestContextInterface $requestContext;
     private TestableCapabilityHardening $hardening;
 
     protected function setUp(): void
@@ -52,10 +54,15 @@ class CapabilityHardeningTest extends TestCase
         $this->dispatcher = $this->createMock(HookDispatcherInterface::class);
         $this->logger = $this->createMock(LoggerInterface::class);
         $this->auditLog = $this->createMock(AuditLogRepositoryInterface::class);
+        $this->requestContext = $this->createMock(RequestContextInterface::class);
+        $this->requestContext->method('getRemoteAddr')->willReturn('127.0.0.1');
+        $this->requestContext->method('server')->willReturn('');
+        $this->requestContext->method('getMethod')->willReturn('GET');
         $this->hardening = new TestableCapabilityHardening(
             $this->dispatcher,
             $this->logger,
             $this->auditLog,
+            $this->requestContext,
         );
     }
 

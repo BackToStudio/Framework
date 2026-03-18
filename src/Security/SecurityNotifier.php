@@ -6,6 +6,7 @@ namespace BackTo\Framework\Security;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
+use BackTo\Framework\Contracts\RequestContextInterface;
 use BackTo\Framework\Options\Contracts\OptionsRepositoryInterface;
 use BackTo\Framework\Security\Contracts\AuditLogSeverity;
 use BackTo\Framework\Security\Contracts\MailerInterface;
@@ -35,6 +36,7 @@ final class SecurityNotifier implements Hooks, SecurityRuleInterface, SecurityNo
     private readonly HookDispatcherInterface $hookDispatcher;
     private readonly MailerInterface $mailer;
     private readonly OptionsRepositoryInterface $options;
+    private readonly RequestContextInterface $requestContext;
     private readonly SecurityAlertFormatter $formatter;
 
     /** @var string[] */
@@ -61,12 +63,19 @@ final class SecurityNotifier implements Hooks, SecurityRuleInterface, SecurityNo
         HookDispatcherInterface $hookDispatcher,
         MailerInterface $mailer,
         OptionsRepositoryInterface $options,
+        RequestContextInterface $requestContext,
         ?SecurityAlertFormatter $formatter = null
     ) {
         $this->hookDispatcher = $hookDispatcher;
         $this->mailer = $mailer;
         $this->options = $options;
+        $this->requestContext = $requestContext;
         $this->formatter = $formatter ?? new SecurityAlertFormatter($options);
+    }
+
+    protected function getRequestContext(): RequestContextInterface
+    {
+        return $this->requestContext;
     }
 
     public function getName(): string

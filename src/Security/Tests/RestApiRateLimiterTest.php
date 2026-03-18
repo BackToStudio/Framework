@@ -6,6 +6,7 @@ namespace BackTo\Framework\Security\Tests;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
+use BackTo\Framework\Contracts\RequestContextInterface;
 use BackTo\Framework\Security\Contracts\RateLimiterRepositoryInterface;
 use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
 use BackTo\Framework\Security\RestApiRateLimiter;
@@ -54,13 +55,18 @@ class RestApiRateLimiterTest extends TestCase
 {
     private HookDispatcherInterface $dispatcher;
     private RateLimiterRepositoryInterface $repository;
+    private RequestContextInterface $requestContext;
     private TestableRestApiRateLimiter $limiter;
 
     protected function setUp(): void
     {
         $this->dispatcher = $this->createMock(HookDispatcherInterface::class);
         $this->repository = $this->createMock(RateLimiterRepositoryInterface::class);
-        $this->limiter = new TestableRestApiRateLimiter($this->dispatcher, $this->repository);
+        $this->requestContext = $this->createMock(RequestContextInterface::class);
+        $this->requestContext->method('getRemoteAddr')->willReturn('127.0.0.1');
+        $this->requestContext->method('server')->willReturn('');
+        $this->requestContext->method('getMethod')->willReturn('GET');
+        $this->limiter = new TestableRestApiRateLimiter($this->dispatcher, $this->repository, $this->requestContext);
     }
 
     public function testImplementsRequiredInterfaces(): void

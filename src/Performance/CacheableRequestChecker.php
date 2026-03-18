@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Performance;
 
+use BackTo\Framework\Contracts\RequestContextInterface;
+
 /**
  * Determines whether the current request is eligible for page caching.
  *
@@ -15,6 +17,8 @@ namespace BackTo\Framework\Performance;
  */
 class CacheableRequestChecker
 {
+    private readonly RequestContextInterface $requestContext;
+
     /** @var string[] */
     private readonly array $excludedPrefixes;
 
@@ -22,8 +26,10 @@ class CacheableRequestChecker
      * @param string[] $excludedPrefixes URL path prefixes to exclude from caching.
      */
     public function __construct(
+        RequestContextInterface $requestContext,
         array $excludedPrefixes = ['/wp-admin', '/wp-json', '/wp-login.php', '/wp-cron.php', '/xmlrpc.php']
     ) {
+        $this->requestContext = $requestContext;
         $this->excludedPrefixes = $excludedPrefixes;
     }
 
@@ -33,7 +39,7 @@ class CacheableRequestChecker
             return false;
         }
 
-        if ($this->getRequestMethod() !== 'GET') {
+        if ($this->requestContext->getMethod() !== 'GET') {
             return false;
         }
 
@@ -41,11 +47,11 @@ class CacheableRequestChecker
             return false;
         }
 
-        if (!empty($_GET)) {
+        if ($this->requestContext->hasQueryParams()) {
             return false;
         }
 
-        $requestUri = $_SERVER['REQUEST_URI'] ?? '/';
+        $requestUri = $this->requestContext->getRequestUri();
 
         foreach ($this->excludedPrefixes as $prefix) {
             if (str_starts_with($requestUri, $prefix)) {
@@ -59,11 +65,6 @@ class CacheableRequestChecker
     protected function isAdmin(): bool
     {
         return \is_admin();
-    }
-
-    protected function getRequestMethod(): string
-    {
-        return $_SERVER['REQUEST_METHOD'] ?? '';
     }
 
     protected function isUserLoggedIn(): bool

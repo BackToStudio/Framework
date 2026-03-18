@@ -6,6 +6,7 @@ namespace BackTo\Framework\Security;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
+use BackTo\Framework\Contracts\RequestContextInterface;
 use BackTo\Framework\Observability\Contracts\LoggerInterface;
 use BackTo\Framework\Security\Contracts\LoginLocationRepositoryInterface;
 use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
@@ -29,6 +30,7 @@ class LoginAnomalyDetector implements Hooks, SecurityRuleInterface
     private readonly HookDispatcherInterface $hookDispatcher;
     private readonly LoginLocationRepositoryInterface $repository;
     private readonly LoggerInterface $logger;
+    private readonly RequestContextInterface $requestContext;
 
     /** @var int Max seconds between logins from different countries to flag impossible travel */
     private const IMPOSSIBLE_TRAVEL_THRESHOLD = 3600; // 1 hour
@@ -37,10 +39,17 @@ class LoginAnomalyDetector implements Hooks, SecurityRuleInterface
         HookDispatcherInterface $hookDispatcher,
         LoginLocationRepositoryInterface $repository,
         LoggerInterface $logger,
+        RequestContextInterface $requestContext,
     ) {
         $this->hookDispatcher = $hookDispatcher;
         $this->repository = $repository;
         $this->logger = $logger;
+        $this->requestContext = $requestContext;
+    }
+
+    protected function getRequestContext(): RequestContextInterface
+    {
+        return $this->requestContext;
     }
 
     public function getName(): string
@@ -132,7 +141,7 @@ class LoginAnomalyDetector implements Hooks, SecurityRuleInterface
 
     protected function getUserAgent(): string
     {
-        return $_SERVER['HTTP_USER_AGENT'] ?? '';
+        return $this->requestContext->server('HTTP_USER_AGENT');
     }
 
     protected function getUserId(mixed $user): ?int
@@ -152,7 +161,7 @@ class LoginAnomalyDetector implements Hooks, SecurityRuleInterface
      */
     protected function getCountryFromIp(string $ip): string
     {
-        $remoteAddr = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
+        $remoteAddr = $this->requestContext->server('REMOTE_ADDR', '0.0.0.0');
         $trustedProxies = function_exists('apply_filters')
             ? \apply_filters('backto_trusted_proxies', [])
             : [];
@@ -161,12 +170,16 @@ class LoginAnomalyDetector implements Hooks, SecurityRuleInterface
 
         // Only trust CDN/proxy country headers when behind a trusted proxy
         if ($isTrustedProxy) {
-            if (isset($_SERVER['HTTP_CF_IPCOUNTRY'])) {
-                return strtoupper($_SERVER['HTTP_CF_IPCOUNTRY']);
+            $cfCountry = $this->requestContext->server('HTTP_CF_IPCOUNTRY');
+
+            if ($cfCountry !== '') {
+                return strtoupper($cfCountry);
             }
 
-            if (isset($_SERVER['HTTP_X_COUNTRY_CODE'])) {
-                return strtoupper($_SERVER['HTTP_X_COUNTRY_CODE']);
+            $xCountryCode = $this->requestContext->server('HTTP_X_COUNTRY_CODE');
+
+            if ($xCountryCode !== '') {
+                return strtoupper($xCountryCode);
             }
         }
 

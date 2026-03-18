@@ -6,16 +6,22 @@ namespace BackTo\Framework\Security;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
+use BackTo\Framework\Contracts\RequestContextInterface;
 use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
 
 final class SessionManager implements Hooks, SecurityRuleInterface
 {
     private readonly HookDispatcherInterface $hookDispatcher;
+    private readonly RequestContextInterface $requestContext;
     private readonly int $maxSessions;
 
-    public function __construct(HookDispatcherInterface $hookDispatcher, int $maxSessions = 1)
-    {
+    public function __construct(
+        HookDispatcherInterface $hookDispatcher,
+        RequestContextInterface $requestContext,
+        int $maxSessions = 1,
+    ) {
         $this->hookDispatcher = $hookDispatcher;
+        $this->requestContext = $requestContext;
         $this->maxSessions = $maxSessions;
     }
 
@@ -39,8 +45,8 @@ final class SessionManager implements Hooks, SecurityRuleInterface
      */
     public function attachSessionInfo(array $sessionInfo): array
     {
-        $sessionInfo['ip'] = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
-        $sessionInfo['ua'] = $_SERVER['HTTP_USER_AGENT'] ?? '';
+        $sessionInfo['ip'] = $this->requestContext->getRemoteAddr();
+        $sessionInfo['ua'] = $this->requestContext->getUserAgent();
         $sessionInfo['created'] = time();
 
         return $sessionInfo;

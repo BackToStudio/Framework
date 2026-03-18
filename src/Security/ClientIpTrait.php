@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Security;
 
+use BackTo\Framework\Contracts\RequestContextInterface;
+
 /**
  * Provides a shared getClientIp() implementation for security rules.
  *
@@ -11,43 +13,46 @@ namespace BackTo\Framework\Security;
  * the request comes from a trusted proxy IP. Falls back to REMOTE_ADDR.
  *
  * Configure trusted proxies via the 'backto_trusted_proxies' filter.
+ *
+ * Classes using this trait MUST provide a getRequestContext() method
+ * or have a $requestContext property.
  */
 trait ClientIpTrait
 {
     /** @var string[]|null */
     private static ?array $trustedProxies = null;
 
+    abstract protected function getRequestContext(): RequestContextInterface;
+
     protected function getClientIp(): string
     {
-        $remoteAddr = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
+        $request = $this->getRequestContext();
+        $remoteAddr = $request->getRemoteAddr();
 
         if (!$this->isFromTrustedProxy($remoteAddr)) {
             return $remoteAddr;
         }
 
         // CloudFlare
-        if (isset($_SERVER['HTTP_CF_CONNECTING_IP'])) {
-            $ip = $_SERVER['HTTP_CF_CONNECTING_IP'];
-            if (filter_var($ip, FILTER_VALIDATE_IP) !== false) {
-                return $ip;
-            }
+        $cfIp = $request->server('HTTP_CF_CONNECTING_IP');
+        if ($cfIp !== '' && filter_var($cfIp, FILTER_VALIDATE_IP) !== false) {
+            return $cfIp;
         }
 
         // Standard proxy header
-        if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+        $forwardedFor = $request->server('HTTP_X_FORWARDED_FOR');
+        if ($forwardedFor !== '') {
             // Take the first (leftmost) IP, which is the original client
-            $ips = array_map('trim', explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']));
+            $ips = array_map('trim', explode(',', $forwardedFor));
             $clientIp = $ips[0];
             if (filter_var($clientIp, FILTER_VALIDATE_IP) !== false) {
                 return $clientIp;
             }
         }
 
-        if (isset($_SERVER['HTTP_X_REAL_IP'])) {
-            $ip = $_SERVER['HTTP_X_REAL_IP'];
-            if (filter_var($ip, FILTER_VALIDATE_IP) !== false) {
-                return $ip;
-            }
+        $realIp = $request->server('HTTP_X_REAL_IP');
+        if ($realIp !== '' && filter_var($realIp, FILTER_VALIDATE_IP) !== false) {
+            return $realIp;
         }
 
         return $remoteAddr;
@@ -64,7 +69,7 @@ trait ClientIpTrait
         return in_array($remoteAddr, $trustedProxies, true);
     }
 
-    
+
     protected function getTrustedProxies(): array
     {
         if (self::$trustedProxies !== null) {

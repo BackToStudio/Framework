@@ -6,6 +6,7 @@ namespace BackTo\Framework\Security;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
+use BackTo\Framework\Contracts\RequestContextInterface;
 use BackTo\Framework\Observability\Contracts\LoggerInterface;
 use BackTo\Framework\Security\Contracts\LoginThrottleInterface;
 use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
@@ -26,15 +27,23 @@ class LoginHardening implements Hooks, SecurityRuleInterface
     private readonly HookDispatcherInterface $hookDispatcher;
     private readonly LoginThrottleInterface $loginThrottle;
     private readonly LoggerInterface $logger;
+    private readonly RequestContextInterface $requestContext;
 
     public function __construct(
         HookDispatcherInterface $hookDispatcher,
         LoginThrottleInterface $loginThrottle,
         LoggerInterface $logger,
+        RequestContextInterface $requestContext,
     ) {
         $this->hookDispatcher = $hookDispatcher;
         $this->loginThrottle = $loginThrottle;
         $this->logger = $logger;
+        $this->requestContext = $requestContext;
+    }
+
+    protected function getRequestContext(): RequestContextInterface
+    {
+        return $this->requestContext;
     }
 
     public function getName(): string
