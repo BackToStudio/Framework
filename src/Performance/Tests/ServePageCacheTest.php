@@ -5,21 +5,32 @@ declare(strict_types=1);
 namespace BackTo\Framework\Performance\Tests;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
+use BackTo\Framework\Performance\CacheableRequestChecker;
 use BackTo\Framework\Performance\Contracts\PageCacheInterface;
 use BackTo\Framework\Performance\Hooks\ServePageCache;
+use BackTo\Framework\Performance\RequestUrlResolver;
 use PHPUnit\Framework\TestCase;
 
 class ServePageCacheTest extends TestCase
 {
     private HookDispatcherInterface $hookDispatcher;
     private PageCacheInterface $pageCache;
+    private CacheableRequestChecker $requestChecker;
+    private RequestUrlResolver $urlResolver;
     private ServePageCache $cache;
 
     protected function setUp(): void
     {
         $this->hookDispatcher = $this->createMock(HookDispatcherInterface::class);
         $this->pageCache = $this->createMock(PageCacheInterface::class);
-        $this->cache = new ServePageCache($this->hookDispatcher, $this->pageCache);
+        $this->requestChecker = $this->createMock(CacheableRequestChecker::class);
+        $this->urlResolver = $this->createMock(RequestUrlResolver::class);
+        $this->cache = new ServePageCache(
+            $this->hookDispatcher,
+            $this->pageCache,
+            $this->requestChecker,
+            $this->urlResolver,
+        );
     }
 
     public function testHooksRegistersInitAndTemplateRedirect(): void
@@ -43,23 +54,13 @@ class ServePageCacheTest extends TestCase
 
     public function testCaptureOutputStoresHtmlInCache(): void
     {
-        // captureOutput calls getCurrentUrl() which needs is_ssl() and site_url()
-        // We define them if not available for this test
-        if (!function_exists('is_ssl')) {
-            eval('function is_ssl() { return false; }');
-        }
-        if (!function_exists('site_url')) {
-            eval('function site_url() { return "http://localhost"; }');
-        }
-
-        $_SERVER['REQUEST_METHOD'] = 'GET';
-        $_SERVER['HTTP_HOST'] = 'localhost';
-        $_SERVER['REQUEST_URI'] = '/test';
+        $this->urlResolver->method('getCurrentUrl')->willReturn('http://localhost/test');
 
         $html = '<html><body>Hello World</body></html>';
 
         $this->pageCache->expects($this->once())
-            ->method('put');
+            ->method('put')
+            ->with('http://localhost/test', $html, 3600);
 
         $result = $this->cache->captureOutput($html);
 
@@ -85,17 +86,5 @@ class ServePageCacheTest extends TestCase
         $result = $this->cache->captureOutput($html);
 
         $this->assertSame($html, $result);
-    }
-
-    public function testConstructorWithCustomTtlAndPrefixes(): void
-    {
-        $cache = new ServePageCache(
-            $this->hookDispatcher,
-            $this->pageCache,
-            7200,
-            ['/custom-admin']
-        );
-
-        $this->assertInstanceOf(ServePageCache::class, $cache);
     }
 }

@@ -10,42 +10,35 @@ use BackTo\Framework\Contracts\DeactivationHooks;
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
 use BackTo\Framework\Queue\Contracts\CronSchedulerInterface;
-use BackTo\Framework\Queue\Contracts\JobInterface;
 use BackTo\Framework\Queue\Contracts\QueueRepositoryInterface;
-use BackTo\Framework\Queue\Factory\JobFactory;
-use BackTo\Framework\Queue\QueueRegistry;
-use BackTo\Framework\Queue\QueueWorker;
+use BackTo\Framework\Queue\QueueMaintenance;
+use BackTo\Framework\Queue\QueueProcessor;
 use BackTo\Framework\Queue\RegisterQueue;
 use PHPUnit\Framework\TestCase;
 
 class RegisterQueueTest extends TestCase
 {
     private QueueRepositoryInterface $repository;
-    private QueueWorker $worker;
-    private QueueRegistry $registry;
     private HookDispatcherInterface $hookDispatcher;
     private CronSchedulerInterface $cronScheduler;
     private TransientStoreInterface $transientStore;
+    private QueueProcessor $processor;
+    private QueueMaintenance $maintenance;
     private RegisterQueue $registerQueue;
 
     protected function setUp(): void
     {
         $this->repository = $this->createMock(QueueRepositoryInterface::class);
-        $this->registry = new QueueRegistry();
         $this->hookDispatcher = $this->createMock(HookDispatcherInterface::class);
         $this->cronScheduler = $this->createMock(CronSchedulerInterface::class);
         $this->transientStore = $this->createMock(TransientStoreInterface::class);
-
-        $this->worker = new QueueWorker(
-            $this->repository,
-            $this->registry,
-            new JobFactory()
-        );
+        $this->processor = $this->createMock(QueueProcessor::class);
+        $this->maintenance = $this->createMock(QueueMaintenance::class);
 
         $this->registerQueue = new RegisterQueue(
             $this->repository,
-            $this->worker,
-            $this->registry,
+            $this->processor,
+            $this->maintenance,
             $this->hookDispatcher,
             $this->cronScheduler,
             $this->transientStore,
@@ -127,126 +120,5 @@ class RegisterQueueTest extends TestCase
 
         $this->assertSame(30, $schedules['every_minute']['interval']);
         $this->assertSame('Custom Every Minute', $schedules['every_minute']['display']);
-    }
-
-    public function testRescueStuckJobsDelegatesToRepository(): void
-    {
-        $this->repository->expects($this->once())
-            ->method('rescueStuck')
-            ->with(300);
-
-        $this->registerQueue->rescueStuckJobs();
-    }
-
-    public function testCleanupJobsDelegatesToRepository(): void
-    {
-        $this->repository->expects($this->once())
-            ->method('cleanup')
-            ->with(86400);
-
-        $this->repository->expects($this->once())
-            ->method('cleanupFailed')
-            ->with(604800);
-
-        $this->registerQueue->cleanupJobs();
-    }
-
-    public function testProcessAllGroupsDeduplicatesGroups(): void
-    {
-        $job1 = $this->createMock(JobInterface::class);
-        $job1->method('getKey')->willReturn('job_a');
-        $job1->method('getLabel')->willReturn('Job A');
-        $job1->method('getGroup')->willReturn('default');
-        $job1->method('getMaxRetries')->willReturn(3);
-
-        $job2 = $this->createMock(JobInterface::class);
-        $job2->method('getKey')->willReturn('job_b');
-        $job2->method('getLabel')->willReturn('Job B');
-        $job2->method('getGroup')->willReturn('default');
-        $job2->method('getMaxRetries')->willReturn(3);
-
-        $this->registry->add($job1);
-        $this->registry->add($job2);
-
-        $this->repository->method('getActiveGroups')->willReturn([]);
-
-        $processedGroups = [];
-
-        $this->repository->method('claimNextPending')
-            ->willReturnCallback(function (string $group) use (&$processedGroups) {
-                $processedGroups[] = $group;
-
-                return null;
-            });
-
-        $this->registerQueue->processAllGroups();
-
-        $this->assertCount(1, $processedGroups);
-        $this->assertSame(['default'], $processedGroups);
-    }
-
-    public function testProcessAllGroupsMergesDbGroups(): void
-    {
-        $emailJob = $this->createMock(JobInterface::class);
-        $emailJob->method('getKey')->willReturn('send_email');
-        $emailJob->method('getLabel')->willReturn('Send Email');
-        $emailJob->method('getGroup')->willReturn('emails');
-        $emailJob->method('getMaxRetries')->willReturn(3);
-
-        $this->registry->add($emailJob);
-
-        $this->repository->method('getActiveGroups')->willReturn(['emails', 'orphan_group']);
-
-        $processedGroups = [];
-
-        $this->repository->method('claimNextPending')
-            ->willReturnCallback(function (string $group) use (&$processedGroups) {
-                $processedGroups[] = $group;
-
-                return null;
-            });
-
-        $this->registerQueue->processAllGroups();
-
-        $this->assertContains('default', $processedGroups);
-        $this->assertContains('emails', $processedGroups);
-        $this->assertContains('orphan_group', $processedGroups);
-        $this->assertCount(3, $processedGroups);
-    }
-
-    public function testProcessAllGroupsProcessesMultipleGroups(): void
-    {
-        $emailJob = $this->createMock(JobInterface::class);
-        $emailJob->method('getKey')->willReturn('send_email');
-        $emailJob->method('getLabel')->willReturn('Send Email');
-        $emailJob->method('getGroup')->willReturn('emails');
-        $emailJob->method('getMaxRetries')->willReturn(3);
-
-        $mediaJob = $this->createMock(JobInterface::class);
-        $mediaJob->method('getKey')->willReturn('process_image');
-        $mediaJob->method('getLabel')->willReturn('Process Image');
-        $mediaJob->method('getGroup')->willReturn('media');
-        $mediaJob->method('getMaxRetries')->willReturn(5);
-
-        $this->registry->add($emailJob);
-        $this->registry->add($mediaJob);
-
-        $this->repository->method('getActiveGroups')->willReturn([]);
-
-        $processedGroups = [];
-
-        $this->repository->method('claimNextPending')
-            ->willReturnCallback(function (string $group) use (&$processedGroups) {
-                $processedGroups[] = $group;
-
-                return null;
-            });
-
-        $this->registerQueue->processAllGroups();
-
-        $this->assertContains('default', $processedGroups);
-        $this->assertContains('emails', $processedGroups);
-        $this->assertContains('media', $processedGroups);
-        $this->assertCount(3, $processedGroups);
     }
 }

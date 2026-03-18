@@ -6,7 +6,9 @@ namespace BackTo\Framework\Performance\Hooks;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
+use BackTo\Framework\Performance\CacheableRequestChecker;
 use BackTo\Framework\Performance\Contracts\PageCacheInterface;
+use BackTo\Framework\Performance\RequestUrlResolver;
 
 /**
  * Serve cached HTML pages and capture output for caching.
@@ -23,22 +25,22 @@ final class ServePageCache implements Hooks
 {
     private readonly HookDispatcherInterface $hookDispatcher;
     private readonly PageCacheInterface $pageCache;
+    private readonly CacheableRequestChecker $requestChecker;
+    private readonly RequestUrlResolver $urlResolver;
     private readonly int $ttl;
 
-    /** @var string[] URL path prefixes to exclude from caching */
-    private readonly array $excludedPrefixes;
-
-    
     public function __construct(
         HookDispatcherInterface $hookDispatcher,
         PageCacheInterface $pageCache,
+        CacheableRequestChecker $requestChecker,
+        RequestUrlResolver $urlResolver,
         int $ttl = 3600,
-        array $excludedPrefixes = ['/wp-admin', '/wp-json', '/wp-login.php', '/wp-cron.php', '/xmlrpc.php']
     ) {
         $this->hookDispatcher = $hookDispatcher;
         $this->pageCache = $pageCache;
+        $this->requestChecker = $requestChecker;
+        $this->urlResolver = $urlResolver;
         $this->ttl = $ttl;
-        $this->excludedPrefixes = $excludedPrefixes;
     }
 
     public function hooks(): void
@@ -52,11 +54,11 @@ final class ServePageCache implements Hooks
      */
     public function serveCachedPage(): void
     {
-        if (!$this->isCacheable()) {
+        if (!$this->requestChecker->isCacheable()) {
             return;
         }
 
-        $url = $this->getCurrentUrl();
+        $url = $this->urlResolver->getCurrentUrl();
         $html = $this->pageCache->get($url);
 
         if ($html === null) {
@@ -75,7 +77,7 @@ final class ServePageCache implements Hooks
      */
     public function startOutputBuffering(): void
     {
-        if (!$this->isCacheable()) {
+        if (!$this->requestChecker->isCacheable()) {
             return;
         }
 
@@ -92,61 +94,10 @@ final class ServePageCache implements Hooks
     public function captureOutput(string $html): string
     {
         if (strlen($html) > 0 && !str_contains($html, 'Fatal error')) {
-            $this->pageCache->put($this->getCurrentUrl(), $html, $this->ttl);
+            $this->pageCache->put($this->urlResolver->getCurrentUrl(), $html, $this->ttl);
             $html .= "\n<!-- X-Page-Cache: MISS -->";
         }
 
         return $html;
-    }
-
-    private function isCacheable(): bool
-    {
-        if (\is_admin()) {
-            return false;
-        }
-
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
-            return false;
-        }
-
-        if (\is_user_logged_in()) {
-            return false;
-        }
-
-        if (!empty($_GET)) {
-            return false;
-        }
-
-        $requestUri = $_SERVER['REQUEST_URI'] ?? '/';
-
-        foreach ($this->excludedPrefixes as $prefix) {
-            if (str_starts_with($requestUri, $prefix)) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    private function getCurrentUrl(): string
-    {
-        $scheme = \is_ssl() ? 'https' : 'http';
-        $host = $this->getValidatedHost();
-        $uri = $_SERVER['REQUEST_URI'] ?? '/';
-
-        return $scheme . '://' . $host . strtok($uri, '?');
-    }
-
-    private function getValidatedHost(): string
-    {
-        $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
-
-        $siteHost = (string) parse_url(\site_url(), PHP_URL_HOST);
-
-        if ($siteHost !== '' && $host !== $siteHost) {
-            return $siteHost;
-        }
-
-        return $host;
     }
 }
