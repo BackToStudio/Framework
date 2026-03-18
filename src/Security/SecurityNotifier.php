@@ -7,6 +7,7 @@ namespace BackTo\Framework\Security;
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
 use BackTo\Framework\Options\Contracts\OptionsRepositoryInterface;
+use BackTo\Framework\Security\Contracts\AuditLogSeverity;
 use BackTo\Framework\Security\Contracts\MailerInterface;
 use BackTo\Framework\Security\Contracts\SecurityNotifierInterface;
 use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
@@ -145,7 +146,7 @@ final class SecurityNotifier implements Hooks, SecurityRuleInterface, SecurityNo
             return;
         }
 
-        $this->notify('privileged_role_granted', 'critical', [
+        $this->notify('privileged_role_granted', AuditLogSeverity::Critical->value, [
             'user_id' => $userId,
             'new_role' => $newRole,
             'old_roles' => $oldRoles,
@@ -159,7 +160,7 @@ final class SecurityNotifier implements Hooks, SecurityRuleInterface, SecurityNo
         $this->failedLoginCounts[$ip] = ($this->failedLoginCounts[$ip] ?? 0) + 1;
 
         if ($this->failedLoginCounts[$ip] === $this->failedLoginThreshold) {
-            $this->notify('login_failed_threshold', 'warning', [
+            $this->notify('login_failed_threshold', AuditLogSeverity::Warning->value, [
                 'ip' => $ip,
                 'username' => $username,
                 'attempts' => $this->failedLoginCounts[$ip],

@@ -8,6 +8,7 @@ use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
 use BackTo\Framework\Observability\Contracts\LoggerInterface;
 use BackTo\Framework\Security\Contracts\AuditLogRepositoryInterface;
+use BackTo\Framework\Security\Contracts\AuditLogSeverity;
 use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
 
 /**
@@ -103,7 +104,7 @@ class CapabilityHardening implements Hooks, SecurityRuleInterface
                 'ip' => $this->getClientIp(),
             ]);
 
-            $this->auditLog->store('self_promotion_blocked', 'critical', [
+            $this->auditLog->store('self_promotion_blocked', AuditLogSeverity::Critical->value, [
                 'user_id' => $userId,
                 'attempted_role' => $newRole,
                 'ip' => $this->getClientIp(),
@@ -115,7 +116,7 @@ class CapabilityHardening implements Hooks, SecurityRuleInterface
         }
 
         // Log all promotions to privileged roles
-        $this->auditLog->store('privileged_role_granted', 'warning', [
+        $this->auditLog->store('privileged_role_granted', AuditLogSeverity::Warning->value, [
             'user_id' => $userId,
             'new_role' => $newRole,
             'old_roles' => $oldRoles,

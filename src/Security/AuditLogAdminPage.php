@@ -6,6 +6,7 @@ namespace BackTo\Framework\Security;
 
 use BackTo\Framework\Admin\Contracts\AdminPageInterface;
 use BackTo\Framework\Security\Contracts\AuditLogRepositoryInterface;
+use BackTo\Framework\Security\Contracts\AuditLogSeverity;
 
 /**
  * Admin page for viewing, filtering, and exporting the security audit log.
@@ -140,7 +141,8 @@ class AuditLogAdminPage implements AdminPageInterface
         echo '<label>Severity: <select name="severity">';
         echo '<option value="">All</option>';
 
-        foreach (['info', 'warning', 'critical'] as $sev) {
+        foreach (AuditLogSeverity::cases() as $sevEnum) {
+            $sev = $sevEnum->value;
             $selected = $severityValue === $sev ? ' selected' : '';
             echo '<option value="' . $sev . '"' . $selected . '>' . ucfirst($sev) . '</option>';
         }
@@ -171,9 +173,9 @@ class AuditLogAdminPage implements AdminPageInterface
             $severity = (string) ($event['severity'] ?? 'info');
             $context = $event['context'] ?? [];
 
-            $severityClass = match ($severity) {
-                'critical' => 'color:#dc3232;font-weight:bold',
-                'warning' => 'color:#dba617',
+            $severityClass = match (AuditLogSeverity::tryFrom($severity)) {
+                AuditLogSeverity::Critical => 'color:#dc3232;font-weight:bold',
+                AuditLogSeverity::Warning => 'color:#dba617',
                 default => 'color:#72aee6',
             };
 
@@ -254,7 +256,7 @@ class AuditLogAdminPage implements AdminPageInterface
         }
 
         $severity = (string) ($_GET['severity'] ?? '');
-        if ($severity !== '' && in_array($severity, ['info', 'warning', 'critical'], true)) {
+        if ($severity !== '' && AuditLogSeverity::tryFrom($severity) !== null) {
             $filters['severity'] = $severity;
         }
 

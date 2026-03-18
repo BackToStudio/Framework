@@ -7,6 +7,7 @@ namespace BackTo\Framework\Security;
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
 use BackTo\Framework\Security\Contracts\AuditLogRepositoryInterface;
+use BackTo\Framework\Security\Contracts\AuditLogSeverity;
 use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
 
 /**
@@ -73,7 +74,7 @@ final class SecurityAuditLogger implements Hooks, SecurityRuleInterface
 
     public function onLoginSuccess(string $username): void
     {
-        $this->repository->store('login_success', 'info', [
+        $this->repository->store('login_success', AuditLogSeverity::Info->value, [
             'username' => $username,
             'ip' => $this->getClientIp(),
         ]);
@@ -81,7 +82,7 @@ final class SecurityAuditLogger implements Hooks, SecurityRuleInterface
 
     public function onLoginFailed(string $username): void
     {
-        $this->repository->store('login_failed', 'warning', [
+        $this->repository->store('login_failed', AuditLogSeverity::Warning->value, [
             'username' => $username,
             'ip' => $this->getClientIp(),
         ]);
@@ -90,7 +91,7 @@ final class SecurityAuditLogger implements Hooks, SecurityRuleInterface
     
     public function onUserRoleChanged(int $userId, string $newRole, array $oldRoles): void
     {
-        $this->repository->store('user_role_changed', 'warning', [
+        $this->repository->store('user_role_changed', AuditLogSeverity::Warning->value, [
             'user_id' => $userId,
             'new_role' => $newRole,
             'old_roles' => $oldRoles,
@@ -104,7 +105,7 @@ final class SecurityAuditLogger implements Hooks, SecurityRuleInterface
             return;
         }
 
-        $this->repository->store('critical_option_changed', 'warning', [
+        $this->repository->store('critical_option_changed', AuditLogSeverity::Warning->value, [
             'option' => $option,
             'old_value' => $this->sanitizeValue($oldValue),
             'new_value' => $this->sanitizeValue($newValue),
@@ -114,7 +115,7 @@ final class SecurityAuditLogger implements Hooks, SecurityRuleInterface
 
     public function onPluginActivated(string $plugin): void
     {
-        $this->repository->store('plugin_activated', 'info', [
+        $this->repository->store('plugin_activated', AuditLogSeverity::Info->value, [
             'plugin' => $plugin,
             'ip' => $this->getClientIp(),
         ]);
@@ -122,7 +123,7 @@ final class SecurityAuditLogger implements Hooks, SecurityRuleInterface
 
     public function onPluginDeactivated(string $plugin): void
     {
-        $this->repository->store('plugin_deactivated', 'info', [
+        $this->repository->store('plugin_deactivated', AuditLogSeverity::Info->value, [
             'plugin' => $plugin,
             'ip' => $this->getClientIp(),
         ]);
@@ -130,7 +131,7 @@ final class SecurityAuditLogger implements Hooks, SecurityRuleInterface
 
     public function onThemeSwitched(string $newTheme): void
     {
-        $this->repository->store('theme_switched', 'info', [
+        $this->repository->store('theme_switched', AuditLogSeverity::Info->value, [
             'new_theme' => $newTheme,
             'ip' => $this->getClientIp(),
         ]);
@@ -138,7 +139,7 @@ final class SecurityAuditLogger implements Hooks, SecurityRuleInterface
 
     public function onUserCreated(int $userId): void
     {
-        $this->repository->store('user_created', 'info', [
+        $this->repository->store('user_created', AuditLogSeverity::Info->value, [
             'user_id' => $userId,
             'ip' => $this->getClientIp(),
         ]);
@@ -146,7 +147,7 @@ final class SecurityAuditLogger implements Hooks, SecurityRuleInterface
 
     public function onUserDeleted(int $userId): void
     {
-        $this->repository->store('user_deleted', 'warning', [
+        $this->repository->store('user_deleted', AuditLogSeverity::Warning->value, [
             'user_id' => $userId,
             'ip' => $this->getClientIp(),
         ]);

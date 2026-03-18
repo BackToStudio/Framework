@@ -67,6 +67,10 @@ final class WordPressScriptsAssets
      */
     public function getAsset(string $relativePath): array
     {
+        if (str_contains($relativePath, '..') || str_contains($relativePath, "\0")) {
+            throw new \InvalidArgumentException('Invalid asset path: directory traversal is not allowed.');
+        }
+
         $pathWithoutExtension = explode('.', $relativePath);
         array_pop($pathWithoutExtension);
 
