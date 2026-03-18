@@ -19,7 +19,7 @@ trait HasArrayOptions
 
     public function isInOptions(string $key): bool
     {
-        return array_key_exists($key, $this->options);
+        return in_array($key, $this->options, true);
     }
 
     protected function getValue(string $key): mixed
