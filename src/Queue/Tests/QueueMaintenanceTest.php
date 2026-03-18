@@ -4,18 +4,18 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Queue\Tests;
 
-use BackTo\Framework\Queue\Contracts\QueueRepositoryInterface;
+use BackTo\Framework\Queue\Contracts\QueueMaintenanceInterface;
 use BackTo\Framework\Queue\QueueMaintenance;
 use PHPUnit\Framework\TestCase;
 
 class QueueMaintenanceTest extends TestCase
 {
-    private QueueRepositoryInterface $repository;
+    private QueueMaintenanceInterface $repository;
     private QueueMaintenance $maintenance;
 
     protected function setUp(): void
     {
-        $this->repository = $this->createMock(QueueRepositoryInterface::class);
+        $this->repository = $this->createMock(QueueMaintenanceInterface::class);
         $this->maintenance = new QueueMaintenance($this->repository);
     }
 

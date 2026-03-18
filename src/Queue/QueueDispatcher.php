@@ -5,17 +5,17 @@ declare(strict_types=1);
 namespace BackTo\Framework\Queue;
 
 use BackTo\Framework\Queue\Contracts\QueueDispatcherInterface;
-use BackTo\Framework\Queue\Contracts\QueueRepositoryInterface;
+use BackTo\Framework\Queue\Contracts\QueueJobStorageInterface;
 use BackTo\Framework\Queue\Factory\JobFactory;
 
 final class QueueDispatcher implements QueueDispatcherInterface
 {
-    private readonly QueueRepositoryInterface $repository;
+    private readonly QueueJobStorageInterface $repository;
     private readonly QueueRegistry $registry;
     private readonly JobFactory $factory;
 
     public function __construct(
-        QueueRepositoryInterface $repository,
+        QueueJobStorageInterface $repository,
         QueueRegistry $registry,
         JobFactory $factory
     ) {

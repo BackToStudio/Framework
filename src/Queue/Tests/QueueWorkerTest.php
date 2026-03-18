@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace BackTo\Framework\Queue\Tests;
 
 use BackTo\Framework\Queue\Contracts\JobInterface;
-use BackTo\Framework\Queue\Contracts\QueueRepositoryInterface;
+use BackTo\Framework\Queue\Contracts\QueueJobStorageInterface;
 use BackTo\Framework\Queue\Entity\Job;
 use BackTo\Framework\Queue\Entity\JobStatus;
 use BackTo\Framework\Queue\Factory\JobFactory;
@@ -15,14 +15,14 @@ use PHPUnit\Framework\TestCase;
 
 class QueueWorkerTest extends TestCase
 {
-    private QueueRepositoryInterface $repository;
+    private QueueJobStorageInterface $repository;
     private QueueRegistry $registry;
     private QueueWorker $worker;
     private JobFactory $factory;
 
     protected function setUp(): void
     {
-        $this->repository = $this->createMock(QueueRepositoryInterface::class);
+        $this->repository = $this->createMock(QueueJobStorageInterface::class);
         $this->registry = new QueueRegistry();
         $this->factory = new JobFactory();
 

@@ -5,25 +5,13 @@ declare(strict_types=1);
 namespace BackTo\Framework\Security\Contracts;
 
 /**
- * Port interface for login attempt throttling.
+ * Composite port interface for login attempt throttling.
+ *
+ * Extends both segregated throttle interfaces for backward compatibility.
+ * Prefer depending on the narrowest interface your class actually needs:
+ * - IpLoginThrottleInterface: IP-based throttling only
+ * - AccountLoginThrottleInterface: account-based throttling only
  */
-interface LoginThrottleInterface
+interface LoginThrottleInterface extends IpLoginThrottleInterface, AccountLoginThrottleInterface
 {
-    public function recordFailedAttempt(string $ip): void;
-
-    public function getFailedAttempts(string $ip): int;
-
-    public function isLocked(string $ip): bool;
-
-    public function reset(string $ip): void;
-
-    public function getLockoutRemainingSeconds(string $ip): int;
-
-    public function recordFailedAccountAttempt(string $username): void;
-
-    public function isAccountLocked(string $username): bool;
-
-    public function getAccountLockoutRemainingSeconds(string $username): int;
-
-    public function resetAccount(string $username): void;
 }

@@ -16,13 +16,13 @@ class QueueProcessor
 
     private readonly QueueWorker $worker;
     private readonly QueueRegistry $registry;
-    private readonly Contracts\QueueRepositoryInterface $repository;
+    private readonly Contracts\QueueQueryInterface $repository;
     private readonly TransientStoreInterface $transientStore;
 
     public function __construct(
         QueueWorker $worker,
         QueueRegistry $registry,
-        Contracts\QueueRepositoryInterface $repository,
+        Contracts\QueueQueryInterface $repository,
         TransientStoreInterface $transientStore,
     ) {
         $this->worker = $worker;

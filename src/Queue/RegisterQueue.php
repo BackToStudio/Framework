@@ -10,7 +10,7 @@ use BackTo\Framework\Contracts\DeactivationHooks;
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
 use BackTo\Framework\Queue\Contracts\CronSchedulerInterface;
-use BackTo\Framework\Queue\Contracts\QueueRepositoryInterface;
+use BackTo\Framework\Queue\Contracts\QueueSchemaInterface;
 
 /**
  * Orchestrates the queue system lifecycle and cron-based processing.
@@ -27,7 +27,7 @@ final class RegisterQueue implements Hooks, ActivationHooks, DeactivationHooks
     private const SCHEDULE_INTERVAL = 'every_minute';
     private const LOCK_KEY = 'backto_queue_lock';
 
-    private readonly QueueRepositoryInterface $repository;
+    private readonly QueueSchemaInterface $repository;
     private readonly QueueProcessor $processor;
     private readonly QueueMaintenance $maintenance;
     private readonly HookDispatcherInterface $hookDispatcher;
@@ -35,7 +35,7 @@ final class RegisterQueue implements Hooks, ActivationHooks, DeactivationHooks
     private readonly TransientStoreInterface $transientStore;
 
     public function __construct(
-        QueueRepositoryInterface $repository,
+        QueueSchemaInterface $repository,
         QueueProcessor $processor,
         QueueMaintenance $maintenance,
         HookDispatcherInterface $hookDispatcher,

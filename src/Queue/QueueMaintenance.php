@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Queue;
 
-use BackTo\Framework\Queue\Contracts\QueueRepositoryInterface;
+use BackTo\Framework\Queue\Contracts\QueueMaintenanceInterface;
 
 /**
  * Handles queue maintenance tasks: rescuing stuck jobs and cleaning up old ones.
@@ -15,9 +15,9 @@ class QueueMaintenance
     private const COMPLETED_TTL = 86400;
     private const FAILED_TTL = 604800;
 
-    private readonly QueueRepositoryInterface $repository;
+    private readonly QueueMaintenanceInterface $repository;
 
-    public function __construct(QueueRepositoryInterface $repository)
+    public function __construct(QueueMaintenanceInterface $repository)
     {
         $this->repository = $repository;
     }
