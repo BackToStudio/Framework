@@ -6,7 +6,7 @@ Async job queue system with background processing via WP-Cron, configurable retr
 
 | Class | Role |
 |-------|------|
-| `Entity\Job` | Domain entity holding job state (key, payload, status, attempts) |
+| `Entity\Job` | Domain entity holding job state with invariant guards and domain methods |
 | `Entity\JobStatus` | Enum: Pending, Running, Completed, Failed, Cancelled |
 | `Factory\JobFactory` | Creates `Job` entities and hydrates from DB rows |
 | `QueueRegistry` | Collects registered job handlers |
@@ -18,6 +18,51 @@ Async job queue system with background processing via WP-Cron, configurable retr
 | `Contracts\QueueRepositoryInterface` | Port for job persistence |
 | `Contracts\QueueRegistryInterface` | Port for registry access |
 | `Infrastructure\WordPressQueueRepository` | WP adapter (custom `wp_backto_queue_jobs` table) |
+
+## Job entity
+
+### Invariant guards
+
+Setters reject invalid values with `\InvalidArgumentException`:
+
+| Setter | Guard |
+|--------|-------|
+| `setAttempts(int $n)` | `$n >= 0` |
+| `setMaxRetries(int $n)` | `$n >= 0` |
+| `setIntervalSeconds(int $n)` | `$n >= 0` |
+
+### Domain methods (state transitions)
+
+The `Job` entity implements a state machine. Transitions that violate the allowed flow throw `\LogicException`.
+
+| Method | From | To | Side effects |
+|--------|------|----|-------------|
+| `markAsRunning(string $claimToken)` | Pending, Failed | Running | Sets `claimedAt`, stores claim token |
+| `markAsCompleted()` | Running | Completed | Sets `completedAt`, clears claim token |
+| `markAsFailed(string $error)` | Running | Failed | Sets `lastError`, increments attempts, clears claim token |
+| `cancel()` | any except Completed | Cancelled | Clears claim token |
+| `reschedule(DateTimeImmutable $at)` | Completed, Failed | Pending | Sets `scheduledAt`, clears `completedAt` and `claimedAt` |
+| `incrementAttempts()` | any | — | `attempts++` |
+
+### Query methods
+
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `isReady()` | `bool` | Pending and scheduled time has passed (or no schedule) |
+| `canRetry()` | `bool` | `attempts < maxRetries` |
+| `isRecurring()` | `bool` | `intervalSeconds > 0` |
+
+### State diagram
+
+```
+Pending ──markAsRunning()──→ Running ──markAsCompleted()──→ Completed
+  ↑                            │                              │
+  │                    markAsFailed()                  reschedule()
+  │                            ↓                              │
+  └────reschedule()────── Failed ←─────────────────────────────┘
+
+Any (except Completed) ──cancel()──→ Cancelled
+```
 
 ## Contracts
 

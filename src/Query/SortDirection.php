@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace BackTo\Framework\PostType\Repository;
+namespace BackTo\Framework\Query;
 
 enum SortDirection: string
 {

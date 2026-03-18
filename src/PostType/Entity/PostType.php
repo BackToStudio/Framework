@@ -20,6 +20,12 @@ final class PostType implements PostTypeInterface
 
     public function setKey(string $key): PostTypeInterface
     {
+        if ($key !== '' && \strlen($key) > 20) {
+            throw new \InvalidArgumentException(
+                \sprintf('Post type key cannot exceed 20 characters, got %d.', \strlen($key))
+            );
+        }
+
         $this->key = $key;
 
         return $this;

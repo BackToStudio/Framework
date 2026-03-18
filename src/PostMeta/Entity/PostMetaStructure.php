@@ -5,11 +5,12 @@ declare(strict_types=1);
 namespace BackTo\Framework\PostMeta\Entity;
 
 use BackTo\Framework\PostMeta\Contracts\PostMetaStructureInterface;
+use BackTo\Framework\PostMeta\ValueObject\MetaKey;
 
 final class PostMetaStructure implements PostMetaStructureInterface
 {
     private string $objectType = 'post';
-    private string $metaKey = '';
+    private ?MetaKey $metaKey = null;
     /** @var array<string, mixed> */
     private array $args = [];
     private string $objectSubtype = '';
@@ -36,14 +37,17 @@ final class PostMetaStructure implements PostMetaStructureInterface
         return $this;
     }
 
-    public function getMetaKey(): string
+    public function getMetaKey(): MetaKey
     {
+        if ($this->metaKey === null) {
+            throw new \LogicException('MetaKey has not been set on this PostMetaStructure.');
+        }
         return $this->metaKey;
     }
 
-    public function setMetaKey(string $metaKey): PostMetaStructureInterface
+    public function setMetaKey(MetaKey|string $metaKey): PostMetaStructureInterface
     {
-        $this->metaKey = $metaKey;
+        $this->metaKey = $metaKey instanceof MetaKey ? $metaKey : new MetaKey($metaKey);
         return $this;
     }
 

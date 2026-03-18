@@ -6,6 +6,7 @@ namespace BackTo\Framework\PostType\Factory;
 
 use BackTo\Framework\PostType\Contracts\PostInterface;
 use BackTo\Framework\PostType\Entity\Post;
+use BackTo\Framework\PostType\Entity\PostStatus;
 use BackTo\Framework\Observability\Contracts\LoggerInterface;
 use DateTimeImmutable;
 use Exception;
@@ -26,7 +27,7 @@ class PostFactory
         $post->setId($wpPost->ID);
         $post->setTitle($wpPost->post_title);
         $post->setContent($wpPost->post_content);
-        $post->setStatus($wpPost->post_status);
+        $post->setStatus(PostStatus::tryFrom($wpPost->post_status) ?? PostStatus::Draft);
         $post->setSlug($wpPost->post_name);
         $post->setExcerpt($wpPost->post_excerpt);
         $post->setParentId($wpPost->post_parent);
@@ -46,7 +47,7 @@ class PostFactory
         return $post;
     }
 
-    
+
     public function createFromPosts(array $wpPosts): array
     {
         return array_map(

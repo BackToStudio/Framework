@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Taxonomy\Tests;
 
-use BackTo\Framework\PostType\Repository\MetaCompare;
-use BackTo\Framework\PostType\Repository\SortDirection;
+use BackTo\Framework\Query\MetaCompare;
+use BackTo\Framework\Query\SortDirection;
 use BackTo\Framework\Taxonomy\Factory\TermFactory;
 use BackTo\Framework\Taxonomy\Repository\TermQueryBuilder;
 use PHPUnit\Framework\TestCase;

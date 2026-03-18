@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\PostMeta\Contracts;
 
+use BackTo\Framework\PostMeta\ValueObject\MetaKey;
+
 interface PostMetaStructureInterface
 {
     public function getType(): string;
@@ -14,9 +16,9 @@ interface PostMetaStructureInterface
 
     public function setObjectType(string $objectType): PostMetaStructureInterface;
 
-    public function getMetaKey(): string;
+    public function getMetaKey(): MetaKey;
 
-    public function setMetaKey(string $label): PostMetaStructureInterface;
+    public function setMetaKey(MetaKey|string $metaKey): PostMetaStructureInterface;
 
     /**
      * @return array<string, mixed>

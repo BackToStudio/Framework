@@ -113,6 +113,10 @@ final class Job
 
     public function setAttempts(int $attempts): self
     {
+        if ($attempts < 0) {
+            throw new \InvalidArgumentException('Attempts cannot be negative.');
+        }
+
         $this->attempts = $attempts;
 
         return $this;
@@ -125,6 +129,10 @@ final class Job
 
     public function setMaxRetries(int $maxRetries): self
     {
+        if ($maxRetries < 0) {
+            throw new \InvalidArgumentException('Max retries cannot be negative.');
+        }
+
         $this->maxRetries = $maxRetries;
 
         return $this;
@@ -221,6 +229,10 @@ final class Job
 
     public function setIntervalSeconds(int $intervalSeconds): self
     {
+        if ($intervalSeconds < 0) {
+            throw new \InvalidArgumentException('Interval seconds cannot be negative.');
+        }
+
         $this->intervalSeconds = $intervalSeconds;
 
         return $this;
@@ -247,5 +259,86 @@ final class Job
     public function canRetry(): bool
     {
         return $this->attempts < $this->maxRetries;
+    }
+
+    public function incrementAttempts(): self
+    {
+        $this->attempts++;
+
+        return $this;
+    }
+
+    public function markAsRunning(string $claimToken): self
+    {
+        if ($this->status !== JobStatus::Pending && $this->status !== JobStatus::Failed) {
+            throw new \LogicException(
+                \sprintf('Cannot mark job as running from status "%s".', $this->status->value)
+            );
+        }
+
+        $this->status = JobStatus::Running;
+        $this->claimToken = $claimToken;
+        $this->claimedAt = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
+
+        return $this;
+    }
+
+    public function markAsCompleted(): self
+    {
+        if ($this->status !== JobStatus::Running) {
+            throw new \LogicException(
+                \sprintf('Cannot mark job as completed from status "%s".', $this->status->value)
+            );
+        }
+
+        $this->status = JobStatus::Completed;
+        $this->completedAt = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
+        $this->claimToken = '';
+
+        return $this;
+    }
+
+    public function markAsFailed(string $error): self
+    {
+        if ($this->status !== JobStatus::Running) {
+            throw new \LogicException(
+                \sprintf('Cannot mark job as failed from status "%s".', $this->status->value)
+            );
+        }
+
+        $this->status = JobStatus::Failed;
+        $this->lastError = $error;
+        $this->claimToken = '';
+        $this->incrementAttempts();
+
+        return $this;
+    }
+
+    public function cancel(): self
+    {
+        if ($this->status === JobStatus::Completed) {
+            throw new \LogicException('Cannot cancel a completed job.');
+        }
+
+        $this->status = JobStatus::Cancelled;
+        $this->claimToken = '';
+
+        return $this;
+    }
+
+    public function reschedule(\DateTimeImmutable $scheduledAt): self
+    {
+        if ($this->status !== JobStatus::Completed && $this->status !== JobStatus::Failed) {
+            throw new \LogicException(
+                \sprintf('Cannot reschedule job from status "%s".', $this->status->value)
+            );
+        }
+
+        $this->status = JobStatus::Pending;
+        $this->scheduledAt = $scheduledAt;
+        $this->completedAt = null;
+        $this->claimedAt = null;
+
+        return $this;
     }
 }

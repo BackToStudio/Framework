@@ -5,14 +5,15 @@ declare(strict_types=1);
 namespace BackTo\Framework\PostMeta\Entity;
 
 use BackTo\Framework\PostMeta\Contracts\PostMetaInterface;
-use BackTo\Framework\PostType\Contracts\PostInterface;
+use BackTo\Framework\PostMeta\ValueObject\MetaKey;
+use BackTo\Framework\PostMeta\Contracts\PostReferenceInterface;
 
 final class PostMeta implements PostMetaInterface
 {
     private int $id;
-    private PostInterface $post;
-    private int $postId;
-    private string $metaKey;
+    private ?PostReferenceInterface $post = null;
+    private int $postId = 0;
+    private MetaKey $metaKey;
     private mixed $metaValue;
 
     public function getId(): int
@@ -26,16 +27,24 @@ final class PostMeta implements PostMetaInterface
         return $this;
     }
 
-    public function getPost(): PostInterface
+    public function getPost(): PostReferenceInterface
     {
+        if ($this->post === null) {
+            throw new \LogicException('Post has not been set on this PostMeta.');
+        }
         return $this->post;
     }
 
-    public function setPost(PostInterface $post): PostMetaInterface
+    public function setPost(PostReferenceInterface $post): PostMetaInterface
     {
         $this->post = $post;
         $this->postId = $post->getId() ?? 0;
         return $this;
+    }
+
+    public function hasPost(): bool
+    {
+        return $this->post !== null;
     }
 
     public function getPostId(): int
@@ -45,18 +54,23 @@ final class PostMeta implements PostMetaInterface
 
     public function setPostId(int $postId): PostMetaInterface
     {
+        if ($postId < 0) {
+            throw new \InvalidArgumentException('Post ID cannot be negative.');
+        }
+
         $this->postId = $postId;
+        $this->post = null;
         return $this;
     }
 
-    public function getMetaKey(): string
+    public function getMetaKey(): MetaKey
     {
         return $this->metaKey;
     }
 
-    public function setMetaKey(string $metaKey): PostMetaInterface
+    public function setMetaKey(MetaKey|string $metaKey): PostMetaInterface
     {
-        $this->metaKey = $metaKey;
+        $this->metaKey = $metaKey instanceof MetaKey ? $metaKey : new MetaKey($metaKey);
         return $this;
     }
 

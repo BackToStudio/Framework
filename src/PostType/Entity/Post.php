@@ -21,7 +21,7 @@ final class Post implements PostInterface
 
     protected string $author = '';
 
-    protected string $status = '';
+    protected PostStatus $status = PostStatus::Draft;
 
     protected string $content = '';
     protected string $excerpt = '';
@@ -54,14 +54,16 @@ final class Post implements PostInterface
         return $this;
     }
 
-    public function getStatus(): string
+    public function getStatus(): PostStatus
     {
         return $this->status;
     }
 
-    public function setStatus(string $status): PostInterface
+    public function setStatus(PostStatus|string $status): PostInterface
     {
-        $this->status = $status;
+        $this->status = $status instanceof PostStatus
+            ? $status
+            : (PostStatus::tryFrom($status) ?? PostStatus::Draft);
         return $this;
     }
 

@@ -8,6 +8,7 @@ use BackTo\Framework\Compose\HasId;
 use BackTo\Framework\Compose\HasParentId;
 use BackTo\Framework\Compose\HasSlug;
 use BackTo\Framework\Compose\TextDomain;
+use BackTo\Framework\Compose\ValueObject\Slug;
 use BackTo\Framework\Contracts\IdInterface;
 use BackTo\Framework\Contracts\ParentIdInterface;
 use BackTo\Framework\Contracts\SlugInterface;
@@ -103,11 +104,12 @@ class TraitsTest extends TestCase
 
     // --- HasSlug ---
 
-    public function testSlugDefaultsToEmptyString(): void
+    public function testSlugDefaultsToEmptySlug(): void
     {
         $entity = new HasSlugConsumer();
 
-        $this->assertSame('', $entity->getSlug());
+        $this->assertInstanceOf(Slug::class, $entity->getSlug());
+        $this->assertTrue($entity->getSlug()->isEmpty());
     }
 
     public function testSetAndGetSlug(): void
@@ -115,7 +117,16 @@ class TraitsTest extends TestCase
         $entity = new HasSlugConsumer();
         $entity->setSlug('my-post-slug');
 
-        $this->assertSame('my-post-slug', $entity->getSlug());
+        $this->assertSame('my-post-slug', (string) $entity->getSlug());
+    }
+
+    public function testSetSlugWithValueObject(): void
+    {
+        $entity = new HasSlugConsumer();
+        $slug = new Slug('my-slug');
+        $entity->setSlug($slug);
+
+        $this->assertTrue($entity->getSlug()->equals($slug));
     }
 
     public function testSetSlugReturnsSelf(): void
@@ -131,7 +142,7 @@ class TraitsTest extends TestCase
         $entity = new HasSlugConsumer();
         $entity->setSlug('a-slug-with-dashes-and-123');
 
-        $this->assertSame('a-slug-with-dashes-and-123', $entity->getSlug());
+        $this->assertSame('a-slug-with-dashes-and-123', (string) $entity->getSlug());
     }
 
     public function testSlugWithUnicodeCharacters(): void
@@ -139,7 +150,7 @@ class TraitsTest extends TestCase
         $entity = new HasSlugConsumer();
         $entity->setSlug('mon-article-français');
 
-        $this->assertSame('mon-article-français', $entity->getSlug());
+        $this->assertSame('mon-article-français', (string) $entity->getSlug());
     }
 
     public function testSlugCanBeSetToEmptyString(): void
@@ -148,7 +159,7 @@ class TraitsTest extends TestCase
         $entity->setSlug('something');
         $entity->setSlug('');
 
-        $this->assertSame('', $entity->getSlug());
+        $this->assertTrue($entity->getSlug()->isEmpty());
     }
 
     // --- HasParentId ---
