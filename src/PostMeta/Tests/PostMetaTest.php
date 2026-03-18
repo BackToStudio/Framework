@@ -7,7 +7,7 @@ namespace BackTo\Framework\PostMeta\Tests;
 use BackTo\Framework\PostMeta\Contracts\PostMetaInterface;
 use BackTo\Framework\PostMeta\Entity\PostMeta;
 use BackTo\Framework\PostMeta\ValueObject\MetaKey;
-use BackTo\Framework\PostType\Contracts\PostInterface;
+use BackTo\Framework\PostMeta\Contracts\PostReferenceInterface;
 use PHPUnit\Framework\TestCase;
 
 class PostMetaTest extends TestCase
@@ -68,7 +68,7 @@ class PostMetaTest extends TestCase
 
     public function testSetPostSetsPostId(): void
     {
-        $post = $this->createMock(PostInterface::class);
+        $post = $this->createMock(PostReferenceInterface::class);
         $post->method('getId')->willReturn(99);
 
         $postMeta = new PostMeta();
@@ -92,7 +92,7 @@ class PostMetaTest extends TestCase
         $postMeta = new PostMeta();
         $this->assertFalse($postMeta->hasPost());
 
-        $post = $this->createMock(PostInterface::class);
+        $post = $this->createMock(PostReferenceInterface::class);
         $post->method('getId')->willReturn(1);
         $postMeta->setPost($post);
         $this->assertTrue($postMeta->hasPost());
@@ -100,7 +100,7 @@ class PostMetaTest extends TestCase
 
     public function testSetPostIdInvalidatesPostReference(): void
     {
-        $post = $this->createMock(PostInterface::class);
+        $post = $this->createMock(PostReferenceInterface::class);
         $post->method('getId')->willReturn(99);
 
         $postMeta = new PostMeta();

@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace BackTo\Framework\PostType\Tests;
 
 use BackTo\Framework\PostType\Factory\PostFactory;
-use BackTo\Framework\PostType\Repository\MetaCompare;
+use BackTo\Framework\Query\MetaCompare;
 use BackTo\Framework\PostType\Repository\PostQueryBuilder;
-use BackTo\Framework\PostType\Repository\SortDirection;
+use BackTo\Framework\Query\SortDirection;
 use PHPUnit\Framework\TestCase;
 
 class PostQueryBuilderTest extends TestCase

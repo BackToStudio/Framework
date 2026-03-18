@@ -8,9 +8,10 @@ use DateTimeInterface;
 use BackTo\Framework\Contracts\IdInterface;
 use BackTo\Framework\Contracts\ParentIdInterface;
 use BackTo\Framework\Contracts\SlugInterface;
+use BackTo\Framework\PostMeta\Contracts\PostReferenceInterface;
 use BackTo\Framework\PostType\Entity\PostStatus;
 
-interface PostInterface extends IdInterface, SlugInterface, ParentIdInterface
+interface PostInterface extends IdInterface, SlugInterface, ParentIdInterface, PostReferenceInterface
 {
 
 

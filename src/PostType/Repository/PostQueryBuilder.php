@@ -9,6 +9,8 @@ use BackTo\Framework\PostType\Contracts\PostInterface;
 use BackTo\Framework\PostType\Entity\PostStatus;
 use BackTo\Framework\PostType\Factory\PostFactory;
 use BackTo\Framework\PostType\Specification\PostSpecification;
+use BackTo\Framework\Query\MetaCompare;
+use BackTo\Framework\Query\SortDirection;
 
 use function get_posts;
 

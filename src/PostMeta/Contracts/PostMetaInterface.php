@@ -5,15 +5,15 @@ declare(strict_types=1);
 namespace BackTo\Framework\PostMeta\Contracts;
 
 use BackTo\Framework\PostMeta\ValueObject\MetaKey;
-use BackTo\Framework\PostType\Contracts\PostInterface;
+use BackTo\Framework\PostMeta\Contracts\PostReferenceInterface;
 
 interface PostMetaInterface
 {
 
-    public function getPost(): PostInterface;
+    public function getPost(): PostReferenceInterface;
 
 
-    public function setPost(PostInterface $post): PostMetaInterface;
+    public function setPost(PostReferenceInterface $post): PostMetaInterface;
 
 
     public function getPostId(): int;

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace BackTo\Framework\PostType\Specification;
 
 use BackTo\Framework\PostMeta\ValueObject\MetaKey;
-use BackTo\Framework\PostType\Repository\MetaCompare;
+use BackTo\Framework\Query\MetaCompare;
 use BackTo\Framework\PostType\Repository\PostQueryBuilder;
 
 final class PostsWithMeta implements PostSpecification

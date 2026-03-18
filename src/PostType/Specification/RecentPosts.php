@@ -6,7 +6,7 @@ namespace BackTo\Framework\PostType\Specification;
 
 use BackTo\Framework\PostType\Entity\PostStatus;
 use BackTo\Framework\PostType\Repository\PostQueryBuilder;
-use BackTo\Framework\PostType\Repository\SortDirection;
+use BackTo\Framework\Query\SortDirection;
 
 final class RecentPosts implements PostSpecification
 {
