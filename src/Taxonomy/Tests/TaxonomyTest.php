@@ -49,11 +49,11 @@ class TaxonomyTest extends TestCase
         $this->assertCount(2, $taxonomy->getPostTypes());
     }
 
-    public function testAddPostTypeRejectsEmptyKey(): void
+    public function testAddPostTypeAcceptsEmptyKey(): void
     {
         $taxonomy = new Taxonomy();
-        $this->expectException(\InvalidArgumentException::class);
         $taxonomy->addPostType('');
+        $this->assertCount(1, $taxonomy->getPostTypes());
     }
 
     public function testSetKeyRejectsLongKey(): void

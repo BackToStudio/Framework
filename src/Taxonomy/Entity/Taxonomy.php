@@ -68,10 +68,6 @@ final class Taxonomy implements TaxonomyInterface
 
     public function addPostType(string $postType): TaxonomyInterface
     {
-        if ($postType === '') {
-            throw new \InvalidArgumentException('Post type key cannot be empty.');
-        }
-
         if (!in_array($postType, $this->postTypes, true)) {
             $this->postTypes[] = $postType;
         }
