@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace BackTo\Framework\Performance\Tests;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
-use BackTo\Framework\Performance\Contracts\PageCacheInterface;
 use BackTo\Framework\Performance\Hooks\PreloadPageCache;
+use BackTo\Framework\Performance\PreloadExecutor;
+use BackTo\Framework\Performance\PreloadUrlCollector;
 use BackTo\Framework\Queue\Contracts\CronSchedulerInterface;
 use PHPUnit\Framework\TestCase;
 
@@ -14,15 +15,22 @@ class PreloadPageCacheTest extends TestCase
 {
     private PreloadPageCache $preloader;
     private HookDispatcherInterface $hookDispatcher;
-    private PageCacheInterface $pageCache;
+    private PreloadUrlCollector $urlCollector;
+    private PreloadExecutor $executor;
     private CronSchedulerInterface $cronScheduler;
 
     protected function setUp(): void
     {
         $this->hookDispatcher = $this->createMock(HookDispatcherInterface::class);
-        $this->pageCache = $this->createMock(PageCacheInterface::class);
+        $this->urlCollector = $this->createMock(PreloadUrlCollector::class);
+        $this->executor = $this->createMock(PreloadExecutor::class);
         $this->cronScheduler = $this->createMock(CronSchedulerInterface::class);
-        $this->preloader = new PreloadPageCache($this->hookDispatcher, $this->pageCache, $this->cronScheduler);
+        $this->preloader = new PreloadPageCache(
+            $this->hookDispatcher,
+            $this->urlCollector,
+            $this->executor,
+            $this->cronScheduler,
+        );
     }
 
     public function testHooksRegistersAllActions(): void
@@ -56,19 +64,12 @@ class PreloadPageCacheTest extends TestCase
 
     public function testScheduleOnPublishSkipsSameStatus(): void
     {
-        // When new and old status are the same, nothing should happen
         $post = new \stdClass();
         $post->ID = 42;
 
-        // We verify that schedulePostPreload is NOT called by checking
-        // that no WordPress functions are invoked. Since scheduleOnPublish
-        // returns early when $newStatus === $oldStatus, we just test it doesn't error.
-        // In a real WP env, we'd mock wp_clear_scheduled_hook etc.
-        if (!function_exists('get_post')) {
-            // Without WP, schedulePostPreload would fatal, so we test the early return
-            $this->preloader->scheduleOnPublish('publish', 'publish', $post);
-            $this->assertTrue(true); // No exception = pass
-        }
+        $this->cronScheduler->expects($this->never())->method('scheduleSingle');
+
+        $this->preloader->scheduleOnPublish('publish', 'publish', $post);
     }
 
     public function testScheduleOnPublishSkipsNonPublishTransitions(): void
@@ -76,21 +77,81 @@ class PreloadPageCacheTest extends TestCase
         $post = new \stdClass();
         $post->ID = 42;
 
-        // draft → pending: neither is 'publish', should return early
+        $this->cronScheduler->expects($this->never())->method('scheduleSingle');
+
         $this->preloader->scheduleOnPublish('pending', 'draft', $post);
-        $this->assertTrue(true);
+    }
+
+    public function testExecutePostPreloadDelegatesToCollectorAndExecutor(): void
+    {
+        $urls = ['https://example.com/post-1', 'https://example.com/'];
+
+        $this->urlCollector->expects($this->once())
+            ->method('getPostRelatedUrls')
+            ->with(42)
+            ->willReturn($urls);
+
+        $this->executor->expects($this->once())
+            ->method('preload')
+            ->with($urls);
+
+        $this->preloader->executePostPreload(42);
+    }
+
+    public function testExecuteFullPreloadDelegatesToCollectorAndExecutor(): void
+    {
+        $urls = ['https://example.com/', 'https://example.com/blog'];
+
+        $this->urlCollector->expects($this->once())
+            ->method('getSiteUrls')
+            ->willReturn($urls);
+
+        $this->executor->expects($this->once())
+            ->method('preload')
+            ->with($urls);
+
+        $this->preloader->executeFullPreload();
+    }
+
+    public function testScheduleFullPreloadClearsAndSchedules(): void
+    {
+        $this->cronScheduler->expects($this->once())
+            ->method('clear')
+            ->with(PreloadPageCache::CRON_FULL_HOOK);
+
+        $this->cronScheduler->expects($this->once())
+            ->method('scheduleSingle')
+            ->with(
+                PreloadPageCache::CRON_FULL_HOOK,
+                $this->greaterThan(time()),
+            );
+
+        $this->cronScheduler->expects($this->once())
+            ->method('spawn');
+
+        $this->preloader->scheduleFullPreload();
     }
 
     public function testConstructorDefaultValues(): void
     {
-        $preloader = new PreloadPageCache($this->hookDispatcher, $this->pageCache, $this->cronScheduler);
+        $preloader = new PreloadPageCache(
+            $this->hookDispatcher,
+            $this->urlCollector,
+            $this->executor,
+            $this->cronScheduler,
+        );
         $this->assertInstanceOf(PreloadPageCache::class, $preloader);
     }
 
-    public function testConstructorCustomValues(): void
+    public function testConstructorCustomDelay(): void
     {
-        $preloader = new PreloadPageCache($this->hookDispatcher, $this->pageCache, $this->cronScheduler, 10, 100);
+        $preloader = new PreloadPageCache(
+            $this->hookDispatcher,
+            $this->urlCollector,
+            $this->executor,
+            $this->cronScheduler,
+            10,
+        );
         $this->assertInstanceOf(PreloadPageCache::class, $preloader);
     }
-
 }
