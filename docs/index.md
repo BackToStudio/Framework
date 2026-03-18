@@ -51,4 +51,3 @@ Background, design decisions, and conceptual understanding.
 - [Vendor scoping with php-scoper](explanation/vendor-scoping.md)
 - [GDPR consent management design](explanation/gdpr-consent-design.md)
 - [Queue system design](explanation/queue-design.md)
-- [DDD analysis of the framework](explanation/ddd-analysis.md)
