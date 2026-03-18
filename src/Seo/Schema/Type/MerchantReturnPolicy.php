@@ -6,7 +6,7 @@ namespace BackTo\Framework\Seo\Schema\Type;
 
 use BackTo\Framework\Seo\Schema\SchemaType;
 
-class MerchantReturnPolicy extends SchemaType
+final class MerchantReturnPolicy extends SchemaType
 {
     public function __construct()
     {

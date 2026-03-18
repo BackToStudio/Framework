@@ -12,9 +12,9 @@ use BackTo\Framework\Contracts\Hooks;
  *
  * Removes the wp-embed script (~7 KB) and related discovery/REST endpoints.
  */
-class DisableEmbeds implements Hooks
+final class DisableEmbeds implements Hooks
 {
-    private HookDispatcherInterface $hookDispatcher;
+    private readonly HookDispatcherInterface $hookDispatcher;
 
     public function __construct(HookDispatcherInterface $hookDispatcher)
     {

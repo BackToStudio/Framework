@@ -9,19 +9,13 @@ namespace BackTo\Framework\Security\Contracts;
  */
 interface CorsManagerInterface
 {
-    /**
-     * @param string|string[] $origin
-     */
+    
     public function addAllowedOrigin(string|array $origin): self;
 
-    /**
-     * @param string|string[] $method
-     */
+    
     public function addAllowedMethod(string|array $method): self;
 
-    /**
-     * @param string|string[] $header
-     */
+    
     public function addAllowedHeader(string|array $header): self;
 
     public function setAllowCredentials(bool $allow): self;

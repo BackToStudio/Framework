@@ -9,7 +9,7 @@ use BackTo\Framework\Observability\Contracts\LoggerInterface;
 /**
  * No-op logger for production or testing.
  */
-class NullLogger implements LoggerInterface
+final class NullLogger implements LoggerInterface
 {
     /** @param array<string, mixed> $context */
     public function emergency(string $message, array $context = []): void

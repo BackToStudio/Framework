@@ -8,9 +8,9 @@ use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
 use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
 
-class UploadSecurity implements Hooks, SecurityRuleInterface
+final class UploadSecurity implements Hooks, SecurityRuleInterface
 {
-    private HookDispatcherInterface $hookDispatcher;
+    private readonly HookDispatcherInterface $hookDispatcher;
 
     /** @var array<string, string> */
     private const MAGIC_BYTES = [

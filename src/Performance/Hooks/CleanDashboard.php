@@ -11,7 +11,7 @@ use BackTo\Framework\Contracts\AdminHooks;
  *
  * Reduces admin AJAX requests and improves admin page load time.
  */
-class CleanDashboard implements AdminHooks
+final class CleanDashboard implements AdminHooks
 {
     public function hooks(): void
     {

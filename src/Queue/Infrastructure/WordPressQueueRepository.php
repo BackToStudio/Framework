@@ -12,10 +12,10 @@ use BackTo\Framework\Queue\Factory\JobFactory;
 /**
  * WordPress adapter for queue persistence using a custom database table.
  */
-class WordPressQueueRepository implements QueueRepositoryInterface
+final class WordPressQueueRepository implements QueueRepositoryInterface
 {
-    private JobFactory $factory;
-    private string $table;
+    private readonly JobFactory $factory;
+    private readonly string $table;
 
     public function __construct(JobFactory $factory)
     {
@@ -210,9 +210,7 @@ class WordPressQueueRepository implements QueueRepositoryInterface
         return $this->factory->fromRow($row);
     }
 
-    /**
-     * @return Job[]
-     */
+    
     public function findByStatus(JobStatus $status, int $limit = 20, int $offset = 0): array
     {
         global $wpdb;
@@ -322,9 +320,7 @@ class WordPressQueueRepository implements QueueRepositoryInterface
         return $count > 0;
     }
 
-    /**
-     * @return string[]
-     */
+    
     public function getActiveGroups(): array
     {
         global $wpdb;

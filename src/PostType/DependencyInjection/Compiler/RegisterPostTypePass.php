@@ -7,7 +7,7 @@ namespace BackTo\Framework\PostType\DependencyInjection\Compiler;
 use BackTo\Framework\Compose\DependencyInjection\Compiler\AbstractTaggedServiceCompilerPass;
 use BackTo\Framework\PostType\PostTypeRegistry;
 
-class RegisterPostTypePass extends AbstractTaggedServiceCompilerPass
+final class RegisterPostTypePass extends AbstractTaggedServiceCompilerPass
 {
     protected function getRegistryClass(): string
     {

@@ -11,8 +11,8 @@ final class ConsentCategory implements ConsentCategoryInterface
     public function __construct(
         private readonly string $key,
         private readonly string $label,
-        private readonly string $description = '',
-        private readonly bool $required = false,
+        private string $description = '',
+        private bool $required = false,
     ) {
     }
 

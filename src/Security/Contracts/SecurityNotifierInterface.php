@@ -14,13 +14,9 @@ interface SecurityNotifierInterface
      */
     public function notify(string $event, string $severity, array $context): void;
 
-    /**
-     * @param string[] $emails
-     */
+    
     public function setRecipients(array $emails): self;
 
-    /**
-     * @return string[]
-     */
+    
     public function getRecipients(): array;
 }

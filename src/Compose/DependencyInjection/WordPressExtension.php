@@ -93,7 +93,7 @@ use BackToVendor\Symfony\Component\DependencyInjection\Compiler\CompilerPassInte
 use BackToVendor\Symfony\Component\DependencyInjection\Compiler\ResolveInstanceofConditionalsPass;
 use BackToVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class WordPressExtension
+final class WordPressExtension
 {
     /**
      * Register autoconfiguration rules for WordPress interfaces.

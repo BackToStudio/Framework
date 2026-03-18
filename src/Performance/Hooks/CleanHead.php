@@ -13,9 +13,9 @@ use BackTo\Framework\Contracts\Hooks;
  * Cleans: RSD link, WLW manifest, shortlinks, REST API link,
  * adjacent post links, WP generator, feed links, and s.w.org DNS prefetch.
  */
-class CleanHead implements Hooks
+final class CleanHead implements Hooks
 {
-    private HookDispatcherInterface $hookDispatcher;
+    private readonly HookDispatcherInterface $hookDispatcher;
 
     public function __construct(HookDispatcherInterface $hookDispatcher)
     {

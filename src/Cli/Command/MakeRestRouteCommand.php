@@ -7,7 +7,7 @@ namespace BackTo\Framework\Cli\Command;
 /**
  * WP-CLI command: wp make:rest-route <name> [--namespace=<namespace>] [--dir=<dir>] [--route-namespace=<ns>] [--force]
  */
-class MakeRestRouteCommand extends AbstractMakeCommand
+final class MakeRestRouteCommand extends AbstractMakeCommand
 {
     protected function getTemplateName(): string
     {

@@ -16,7 +16,7 @@ use function remove_action;
 /**
  * WordPress adapter for the HookDispatcher port.
  */
-class WordPressHookDispatcher implements HookDispatcherInterface
+final class WordPressHookDispatcher implements HookDispatcherInterface
 {
     public function addAction(string $hookName, callable|string $callback, int $priority = 10, int $acceptedArgs = 1): void
     {

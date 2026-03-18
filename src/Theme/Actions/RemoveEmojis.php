@@ -9,7 +9,7 @@ use BackTo\Framework\Contracts\Hooks;
 use function remove_action;
 use function remove_filter;
 
-class RemoveEmojis implements Hooks
+final class RemoveEmojis implements Hooks
 {
 
     public function hooks(): void

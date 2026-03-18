@@ -6,7 +6,7 @@ namespace BackTo\Framework\Seo\Schema\Type;
 
 use BackTo\Framework\Seo\Schema\SchemaType;
 
-class SearchAction extends SchemaType
+final class SearchAction extends SchemaType
 {
     public function __construct()
     {

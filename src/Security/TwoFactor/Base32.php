@@ -9,7 +9,7 @@ namespace BackTo\Framework\Security\TwoFactor;
  *
  * @see https://datatracker.ietf.org/doc/html/rfc4648
  */
-class Base32
+final class Base32
 {
     private const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
 

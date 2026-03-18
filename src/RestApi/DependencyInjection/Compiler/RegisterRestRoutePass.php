@@ -7,7 +7,7 @@ namespace BackTo\Framework\RestApi\DependencyInjection\Compiler;
 use BackTo\Framework\Compose\DependencyInjection\Compiler\AbstractTaggedServiceCompilerPass;
 use BackTo\Framework\RestApi\RestRouteRegistry;
 
-class RegisterRestRoutePass extends AbstractTaggedServiceCompilerPass
+final class RegisterRestRoutePass extends AbstractTaggedServiceCompilerPass
 {
     protected function getRegistryClass(): string
     {

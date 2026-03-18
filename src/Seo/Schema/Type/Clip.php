@@ -6,7 +6,7 @@ namespace BackTo\Framework\Seo\Schema\Type;
 
 use BackTo\Framework\Seo\Schema\SchemaType;
 
-class Clip extends SchemaType
+final class Clip extends SchemaType
 {
     public function __construct()
     {

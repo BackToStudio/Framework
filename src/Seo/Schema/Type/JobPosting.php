@@ -6,7 +6,7 @@ namespace BackTo\Framework\Seo\Schema\Type;
 
 use BackTo\Framework\Seo\Schema\SchemaType;
 
-class JobPosting extends SchemaType
+final class JobPosting extends SchemaType
 {
     public function __construct()
     {

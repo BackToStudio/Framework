@@ -21,10 +21,10 @@ use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
  * Default policy: minor core updates and translations enabled,
  * major core / plugins / themes disabled to prevent untested changes.
  */
-class AutoUpdatePolicy implements Hooks, SecurityRuleInterface
+final class AutoUpdatePolicy implements Hooks, SecurityRuleInterface
 {
-    private HookDispatcherInterface $hookDispatcher;
-    private LoggerInterface $logger;
+    private readonly HookDispatcherInterface $hookDispatcher;
+    private readonly LoggerInterface $logger;
 
     private bool $majorCore = false;
     private bool $minorCore = true;
@@ -187,17 +187,13 @@ class AutoUpdatePolicy implements Hooks, SecurityRuleInterface
         return $this->translations;
     }
 
-    /**
-     * @return string[]
-     */
+    
     public function getAllowedPlugins(): array
     {
         return $this->allowedPlugins;
     }
 
-    /**
-     * @return string[]
-     */
+    
     public function getAllowedThemes(): array
     {
         return $this->allowedThemes;

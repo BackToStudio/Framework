@@ -7,7 +7,7 @@ namespace BackTo\Framework\Taxonomy;
 use BackTo\Framework\Contracts\RegistryInterface;
 use BackTo\Framework\Taxonomy\Contracts\TaxonomyInterface;
 
-class TaxonomyRegistry implements RegistryInterface
+final class TaxonomyRegistry implements RegistryInterface
 {
     /** @var TaxonomyInterface[] */
     private array $taxonomies = [];
@@ -19,9 +19,7 @@ class TaxonomyRegistry implements RegistryInterface
         return $this;
     }
 
-    /**
-     * @return TaxonomyInterface[]
-     */
+    
     public function getTaxonomies(): array
     {
         return $this->taxonomies;

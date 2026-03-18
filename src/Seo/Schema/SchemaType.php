@@ -11,7 +11,7 @@ namespace BackTo\Framework\Seo\Schema;
  */
 class SchemaType implements \JsonSerializable
 {
-    protected string $type;
+    protected readonly string $type;
 
     /** @var array<string, mixed> */
     protected array $properties = [];

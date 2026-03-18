@@ -16,8 +16,8 @@ use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
  */
 class SecurityHeadersConfigurator implements Hooks, SecurityRuleInterface
 {
-    private HookDispatcherInterface $hookDispatcher;
-    private string $environment;
+    private readonly HookDispatcherInterface $hookDispatcher;
+    private readonly string $environment;
 
     /** @var array<string, string> header name => value */
     private array $headers = [];

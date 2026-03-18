@@ -6,7 +6,7 @@ namespace BackTo\Framework\Seo\Schema\Type;
 
 use BackTo\Framework\Seo\Schema\SchemaType;
 
-class PostalAddress extends SchemaType
+final class PostalAddress extends SchemaType
 {
     public function __construct()
     {

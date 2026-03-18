@@ -13,7 +13,7 @@ use function update_user_meta;
 /**
  * WordPress adapter — stores 2FA settings in user meta.
  */
-class WordPressTwoFactorRepository implements TwoFactorRepositoryInterface
+final class WordPressTwoFactorRepository implements TwoFactorRepositoryInterface
 {
     private const META_ENABLED = '_backto_2fa_enabled';
     private const META_SECRET = '_backto_2fa_secret';
@@ -51,9 +51,7 @@ class WordPressTwoFactorRepository implements TwoFactorRepositoryInterface
         delete_user_meta($userId, self::META_SECRET);
     }
 
-    /**
-     * @return string[]
-     */
+    
     public function getBackupCodes(int $userId): array
     {
         $codes = get_user_meta($userId, self::META_BACKUP_CODES, true);
@@ -61,9 +59,7 @@ class WordPressTwoFactorRepository implements TwoFactorRepositoryInterface
         return is_array($codes) ? $codes : [];
     }
 
-    /**
-     * @param string[] $hashedCodes
-     */
+    
     public function setBackupCodes(int $userId, array $hashedCodes): void
     {
         update_user_meta($userId, self::META_BACKUP_CODES, $hashedCodes);

@@ -6,7 +6,7 @@ namespace BackTo\Framework\Seo\Schema\Type;
 
 use BackTo\Framework\Seo\Schema\SchemaType;
 
-class VideoObject extends SchemaType
+final class VideoObject extends SchemaType
 {
     public function __construct()
     {

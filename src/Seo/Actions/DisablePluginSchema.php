@@ -15,13 +15,13 @@ use BackTo\Framework\Seo\SeoManager;
  *
  * Can be disabled via config/seo.php: 'schema.disable_plugin_schema' => false
  */
-class DisablePluginSchema implements Hooks
+final class DisablePluginSchema implements Hooks
 {
-    private SeoManager $seoManager;
+    private readonly SeoManager $seoManager;
 
-    private SeoConfig $seoConfig;
+    private readonly SeoConfig $seoConfig;
 
-    private HookDispatcherInterface $hookDispatcher;
+    private readonly HookDispatcherInterface $hookDispatcher;
 
     public function __construct(SeoManager $seoManager, SeoConfig $seoConfig, HookDispatcherInterface $hookDispatcher)
     {

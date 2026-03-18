@@ -13,14 +13,10 @@ interface TaxonomyInterface
      */
     public function getArgs(): array;
 
-    /**
-     * @return string[]
-     */
+    
     public function getPostTypes(): array;
 
-    /**
-     * @param string[] $postTypes
-     */
+    
     public function setPostTypes(array $postTypes): TaxonomyInterface;
 
     /**

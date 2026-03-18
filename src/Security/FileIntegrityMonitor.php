@@ -18,9 +18,9 @@ use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
  */
 class FileIntegrityMonitor implements Hooks, SecurityRuleInterface
 {
-    private HookDispatcherInterface $hookDispatcher;
-    private FileIntegrityRepositoryInterface $repository;
-    private LoggerInterface $logger;
+    private readonly HookDispatcherInterface $hookDispatcher;
+    private readonly FileIntegrityRepositoryInterface $repository;
+    private readonly LoggerInterface $logger;
 
     /** @var string[] Relative paths from ABSPATH to monitor */
     private const CRITICAL_FILES = [

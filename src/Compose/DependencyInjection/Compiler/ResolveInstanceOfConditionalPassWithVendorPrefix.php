@@ -16,7 +16,7 @@ use BackToVendor\Symfony\Component\DependencyInjection\Definition;
  *
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class ResolveInstanceOfConditionalPassWithVendorPrefix implements CompilerPassInterface {
+final class ResolveInstanceOfConditionalPassWithVendorPrefix implements CompilerPassInterface {
 
     /**
      * {@inheritdoc}

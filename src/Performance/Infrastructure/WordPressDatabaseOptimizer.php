@@ -17,9 +17,9 @@ use BackTo\Framework\Performance\Contracts\DatabaseOptimizerInterface;
  * - Spam comments
  * - Orphaned post/comment/user metadata
  */
-class WordPressDatabaseOptimizer implements DatabaseOptimizerInterface
+final class WordPressDatabaseOptimizer implements DatabaseOptimizerInterface
 {
-    private int $revisionsLimit;
+    private readonly int $revisionsLimit;
 
     public function __construct(int $revisionsLimit = 5)
     {
@@ -48,10 +48,15 @@ class WordPressDatabaseOptimizer implements DatabaseOptimizerInterface
     {
         global $wpdb;
 
-        $tables = $wpdb->get_col("SHOW TABLES LIKE '{$wpdb->prefix}%'");
+        $tables = $wpdb->get_col(
+            $wpdb->prepare("SHOW TABLES LIKE %s", $wpdb->esc_like($wpdb->prefix) . '%')
+        );
         $count = 0;
 
         foreach ($tables as $table) {
+            if (preg_match('/^[a-zA-Z0-9_]+$/', $table) !== 1) {
+                continue;
+            }
             $wpdb->query("OPTIMIZE TABLE `{$table}`");
             $count++;
         }
@@ -59,9 +64,7 @@ class WordPressDatabaseOptimizer implements DatabaseOptimizerInterface
         return $count;
     }
 
-    /**
-     * @param \wpdb $wpdb
-     */
+    
     private function deleteExcessRevisions($wpdb): int
     {
         if ($this->revisionsLimit <= 0) {
@@ -93,15 +96,13 @@ class WordPressDatabaseOptimizer implements DatabaseOptimizerInterface
             return 0;
         }
 
-        $ids = implode(',', array_map('intval', $revisionIds));
-        $wpdb->query("DELETE FROM {$wpdb->posts} WHERE ID IN ({$ids})");
+        $placeholders = implode(',', array_fill(0, count($revisionIds), '%d'));
+        $wpdb->query($wpdb->prepare("DELETE FROM {$wpdb->posts} WHERE ID IN ({$placeholders})", ...$revisionIds));
 
         return count($revisionIds);
     }
 
-    /**
-     * @param \wpdb $wpdb
-     */
+    
     private function deleteAutoDrafts($wpdb): int
     {
         return (int) $wpdb->query(
@@ -109,9 +110,7 @@ class WordPressDatabaseOptimizer implements DatabaseOptimizerInterface
         );
     }
 
-    /**
-     * @param \wpdb $wpdb
-     */
+    
     private function deleteTrashedPosts($wpdb): int
     {
         return (int) $wpdb->query(
@@ -119,9 +118,7 @@ class WordPressDatabaseOptimizer implements DatabaseOptimizerInterface
         );
     }
 
-    /**
-     * @param \wpdb $wpdb
-     */
+    
     private function deleteSpamComments($wpdb): int
     {
         return (int) $wpdb->query(
@@ -129,9 +126,7 @@ class WordPressDatabaseOptimizer implements DatabaseOptimizerInterface
         );
     }
 
-    /**
-     * @param \wpdb $wpdb
-     */
+    
     private function deleteTrashedComments($wpdb): int
     {
         return (int) $wpdb->query(
@@ -139,9 +134,7 @@ class WordPressDatabaseOptimizer implements DatabaseOptimizerInterface
         );
     }
 
-    /**
-     * @param \wpdb $wpdb
-     */
+    
     private function deleteExpiredTransients($wpdb): int
     {
         return (int) $wpdb->query(
@@ -156,9 +149,7 @@ class WordPressDatabaseOptimizer implements DatabaseOptimizerInterface
         );
     }
 
-    /**
-     * @param \wpdb $wpdb
-     */
+    
     private function deleteOrphanedPostMeta($wpdb): int
     {
         return (int) $wpdb->query(
@@ -168,9 +159,7 @@ class WordPressDatabaseOptimizer implements DatabaseOptimizerInterface
         );
     }
 
-    /**
-     * @param \wpdb $wpdb
-     */
+    
     private function deleteOrphanedCommentMeta($wpdb): int
     {
         return (int) $wpdb->query(

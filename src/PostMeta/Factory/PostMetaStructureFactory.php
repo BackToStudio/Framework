@@ -7,7 +7,7 @@ namespace BackTo\Framework\PostMeta\Factory;
 use BackTo\Framework\PostMeta\Entity\PostMetaStructure;
 use BackTo\Framework\PostMeta\Contracts\PostMetaStructureInterface;
 
-class PostMetaStructureFactory
+final class PostMetaStructureFactory
 {
     /**
      * @param array<string, mixed> $args

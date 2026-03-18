@@ -20,7 +20,7 @@ use BackTo\Framework\Contracts\ModuleConfiguratorInterface;
  *             ->htaccess()->gzip(false);
  *     };
  */
-class PerformanceConfigurator implements ModuleConfiguratorInterface
+final class PerformanceConfigurator implements ModuleConfiguratorInterface
 {
     /** @var array<string, mixed> */
     private array $overrides = [];

@@ -13,7 +13,7 @@ use BackTo\Framework\Observability\DependencyInjection\Compiler\RegisterHealthCh
 use BackTo\Framework\Observability\Infrastructure\WordPressLogger;
 use BackToVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class ObservabilityExtension implements ExtensionInterface
+final class ObservabilityExtension implements ExtensionInterface
 {
     public function getBundle(): ?array
     {

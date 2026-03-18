@@ -8,11 +8,11 @@ use BackTo\Framework\Admin\Contracts\AdminPageRegistrarInterface;
 use BackTo\Framework\Contracts\AdminHooks;
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 
-class RegisterAdminPage implements AdminHooks
+final class RegisterAdminPage implements AdminHooks
 {
-    private AdminPageRegistry $registry;
-    private AdminPageRegistrarInterface $registrar;
-    private HookDispatcherInterface $hookDispatcher;
+    private readonly AdminPageRegistry $registry;
+    private readonly AdminPageRegistrarInterface $registrar;
+    private readonly HookDispatcherInterface $hookDispatcher;
 
     public function __construct(
         AdminPageRegistry $registry,

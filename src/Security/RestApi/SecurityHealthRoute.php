@@ -14,9 +14,9 @@ use WP_REST_Response;
  *
  * GET /backto/v1/security/health
  */
-class SecurityHealthRoute implements RestRouteInterface
+final class SecurityHealthRoute implements RestRouteInterface
 {
-    private SecurityHealthCheck $healthCheck;
+    private readonly SecurityHealthCheck $healthCheck;
 
     public function __construct(SecurityHealthCheck $healthCheck)
     {
@@ -33,9 +33,7 @@ class SecurityHealthRoute implements RestRouteInterface
         return '/security/health';
     }
 
-    /**
-     * @return string[]
-     */
+    
     public function getMethods(): array
     {
         return ['GET'];

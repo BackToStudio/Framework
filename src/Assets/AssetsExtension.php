@@ -9,7 +9,7 @@ use BackTo\Framework\Assets\Infrastructure\WordPressFileLocator;
 use BackTo\Framework\Contracts\ExtensionInterface;
 use BackToVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class AssetsExtension implements ExtensionInterface
+final class AssetsExtension implements ExtensionInterface
 {
     public function getBundle(): ?array
     {

@@ -9,7 +9,7 @@ use WP_Block_Type_Registry;
 
 use function register_block_type;
 
-class WordPressBlockRegistrar implements BlockRegistrarInterface
+final class WordPressBlockRegistrar implements BlockRegistrarInterface
 {
     /**
      * @param string $blockName

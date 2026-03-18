@@ -9,7 +9,7 @@ use BackTo\Framework\Seo\Contracts\SeoProviderInterface;
 /**
  * SEO provider for Yoast SEO (wordpress-seo).
  */
-class YoastProvider implements SeoProviderInterface
+final class YoastProvider implements SeoProviderInterface
 {
     private const PLUGIN_FILE = 'wordpress-seo/wp-seo.php';
     private const SOCIAL_OPTION = 'wpseo_social';

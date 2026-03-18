@@ -20,7 +20,7 @@ use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
  */
 class CookieHardening implements Hooks, SecurityRuleInterface
 {
-    private HookDispatcherInterface $hookDispatcher;
+    private readonly HookDispatcherInterface $hookDispatcher;
 
     private bool $secure = true;
     private bool $httpOnly = true;
@@ -216,9 +216,7 @@ class CookieHardening implements Hooks, SecurityRuleInterface
         ];
     }
 
-    /**
-     * @param array{lifetime: int, path: string, domain: string, secure: bool, httponly: bool, samesite: 'Strict'|'Lax'|'None'} $params
-     */
+    
     protected function setSessionCookieParams(array $params): void
     {
         session_set_cookie_params($params);

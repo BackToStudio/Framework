@@ -7,7 +7,7 @@ namespace BackTo\Framework\PostMeta\Entity;
 use BackTo\Framework\PostMeta\Contracts\PostMetaInterface;
 use BackTo\Framework\PostType\Contracts\PostInterface;
 
-class PostMeta implements PostMetaInterface
+final class PostMeta implements PostMetaInterface
 {
     private int $id;
     private PostInterface $post;

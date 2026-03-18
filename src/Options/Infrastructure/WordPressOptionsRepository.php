@@ -13,7 +13,7 @@ use function update_option;
 /**
  * WordPress adapter for the Options port.
  */
-class WordPressOptionsRepository implements OptionsRepositoryInterface
+final class WordPressOptionsRepository implements OptionsRepositoryInterface
 {
     public function get(string $key, mixed $default = null): mixed
     {

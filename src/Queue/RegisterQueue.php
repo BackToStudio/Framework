@@ -17,7 +17,7 @@ use BackTo\Framework\Queue\Contracts\QueueRepositoryInterface;
  * - Registers WP-Cron events to process, rescue, and cleanup jobs.
  * - Uses a transient-based lock to prevent concurrent cron execution.
  */
-class RegisterQueue implements Hooks, ActivationHooks, DeactivationHooks
+final class RegisterQueue implements Hooks, ActivationHooks, DeactivationHooks
 {
     private const CRON_HOOK = 'backto_queue_process';
     private const RESCUE_HOOK = 'backto_queue_rescue';
@@ -26,10 +26,10 @@ class RegisterQueue implements Hooks, ActivationHooks, DeactivationHooks
     private const LOCK_KEY = 'backto_queue_lock';
     private const LOCK_TIMEOUT = 300;
 
-    private QueueRepositoryInterface $repository;
-    private QueueWorker $worker;
-    private QueueRegistry $registry;
-    private HookDispatcherInterface $hookDispatcher;
+    private readonly QueueRepositoryInterface $repository;
+    private readonly QueueWorker $worker;
+    private readonly QueueRegistry $registry;
+    private readonly HookDispatcherInterface $hookDispatcher;
 
     public function __construct(
         QueueRepositoryInterface $repository,

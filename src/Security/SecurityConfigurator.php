@@ -19,7 +19,7 @@ use BackTo\Framework\Contracts\ModuleConfiguratorInterface;
  *             ->twoFactorIssuer('MonApp');
  *     };
  */
-class SecurityConfigurator implements ModuleConfiguratorInterface
+final class SecurityConfigurator implements ModuleConfiguratorInterface
 {
     /** @var array<string, mixed> */
     private array $overrides = [];

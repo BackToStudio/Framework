@@ -11,7 +11,7 @@ use BackTo\Framework\PostMeta\DependencyInjection\Compiler\RegisterPostMetaStruc
 use BackTo\Framework\PostMeta\Infrastructure\WordPressPostMetaRegistrar;
 use BackToVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class PostMetaExtension implements ExtensionInterface
+final class PostMetaExtension implements ExtensionInterface
 {
     public function getBundle(): ?array
     {

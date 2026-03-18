@@ -7,21 +7,24 @@ namespace BackTo\Framework\Observability\Contracts;
 /**
  * Value object representing the result of a health check.
  */
-class HealthCheckResult
+final class HealthCheckResult
 {
+    /** @deprecated Use HealthCheckStatus::Healthy instead */
     public const STATUS_HEALTHY = 'healthy';
+    /** @deprecated Use HealthCheckStatus::Degraded instead */
     public const STATUS_DEGRADED = 'degraded';
+    /** @deprecated Use HealthCheckStatus::Unhealthy instead */
     public const STATUS_UNHEALTHY = 'unhealthy';
 
-    private string $status;
-    private string $message;
+    private readonly HealthCheckStatus $status;
+    private readonly string $message;
     /** @var array<string, mixed> */
-    private array $metadata;
+    private readonly array $metadata;
 
     /**
      * @param array<string, mixed> $metadata
      */
-    private function __construct(string $status, string $message = '', array $metadata = [])
+    private function __construct(HealthCheckStatus $status, string $message = '', array $metadata = [])
     {
         $this->status = $status;
         $this->message = $message;
@@ -33,7 +36,7 @@ class HealthCheckResult
      */
     public static function healthy(string $message = '', array $metadata = []): self
     {
-        return new self(self::STATUS_HEALTHY, $message, $metadata);
+        return new self(HealthCheckStatus::Healthy, $message, $metadata);
     }
 
     /**
@@ -41,7 +44,7 @@ class HealthCheckResult
      */
     public static function degraded(string $message, array $metadata = []): self
     {
-        return new self(self::STATUS_DEGRADED, $message, $metadata);
+        return new self(HealthCheckStatus::Degraded, $message, $metadata);
     }
 
     /**
@@ -49,10 +52,15 @@ class HealthCheckResult
      */
     public static function unhealthy(string $message, array $metadata = []): self
     {
-        return new self(self::STATUS_UNHEALTHY, $message, $metadata);
+        return new self(HealthCheckStatus::Unhealthy, $message, $metadata);
     }
 
     public function getStatus(): string
+    {
+        return $this->status->value;
+    }
+
+    public function getHealthCheckStatus(): HealthCheckStatus
     {
         return $this->status;
     }
@@ -72,7 +80,7 @@ class HealthCheckResult
 
     public function isHealthy(): bool
     {
-        return $this->status === self::STATUS_HEALTHY;
+        return $this->status === HealthCheckStatus::Healthy;
     }
 
     /**
@@ -81,7 +89,7 @@ class HealthCheckResult
     public function toArray(): array
     {
         return [
-            'status' => $this->status,
+            'status' => $this->status->value,
             'message' => $this->message,
             'metadata' => $this->metadata,
         ];

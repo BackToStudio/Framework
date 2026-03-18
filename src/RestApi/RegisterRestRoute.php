@@ -10,9 +10,9 @@ use BackTo\Framework\RestApi\Contracts\RestRouteRegistrarInterface;
 
 class RegisterRestRoute implements Hooks
 {
-    private RestRouteRegistry $registry;
-    private RestRouteRegistrarInterface $registrar;
-    private HookDispatcherInterface $hookDispatcher;
+    private readonly RestRouteRegistry $registry;
+    private readonly RestRouteRegistrarInterface $registrar;
+    private readonly HookDispatcherInterface $hookDispatcher;
 
     public function __construct(
         RestRouteRegistry $registry,

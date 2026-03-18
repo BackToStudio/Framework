@@ -6,7 +6,7 @@ namespace BackTo\Framework\PostType\Entity;
 
 use BackTo\Framework\PostType\Contracts\PostTypeInterface;
 
-class PostType implements PostTypeInterface
+final class PostType implements PostTypeInterface
 {
     private string $key = '';
 

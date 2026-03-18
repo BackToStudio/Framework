@@ -12,9 +12,9 @@ use BackTo\Framework\PostType\Repository\SortDirection;
 use function get_post;
 use function get_posts;
 
-class PostRepository
+final class PostRepository
 {
-    protected PostFactory $factory;
+    protected readonly PostFactory $factory;
 
     public function __construct(PostFactory $factory)
     {

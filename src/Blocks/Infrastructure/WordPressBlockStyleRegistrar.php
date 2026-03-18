@@ -11,7 +11,7 @@ use function register_block_style;
 /**
  * WordPress adapter for block style registration.
  */
-class WordPressBlockStyleRegistrar implements BlockStyleRegistrarInterface
+final class WordPressBlockStyleRegistrar implements BlockStyleRegistrarInterface
 {
     /**
      * @param string $blockName

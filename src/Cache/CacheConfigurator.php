@@ -18,7 +18,7 @@ use BackTo\Framework\Contracts\ModuleConfiguratorInterface;
  *             ->enabled(false);
  *     };
  */
-class CacheConfigurator implements ModuleConfiguratorInterface
+final class CacheConfigurator implements ModuleConfiguratorInterface
 {
     /** @var array<string, mixed> */
     private array $overrides = [];

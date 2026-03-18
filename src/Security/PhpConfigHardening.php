@@ -188,9 +188,7 @@ class PhpConfigHardening implements SecurityRuleInterface
         return $missing;
     }
 
-    /**
-     * @return string[]
-     */
+    
     protected function getDisabledFunctions(): array
     {
         $disabled = $this->getIniValue('disable_functions');

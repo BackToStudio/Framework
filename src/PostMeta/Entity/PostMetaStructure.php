@@ -6,7 +6,7 @@ namespace BackTo\Framework\PostMeta\Entity;
 
 use BackTo\Framework\PostMeta\Contracts\PostMetaStructureInterface;
 
-class PostMetaStructure implements PostMetaStructureInterface
+final class PostMetaStructure implements PostMetaStructureInterface
 {
     private string $objectType = 'post';
     private string $metaKey = '';

@@ -11,12 +11,12 @@ use BackTo\Framework\Taxonomy\Factory\TermFactory;
 
 use function get_terms;
 
-class TermQueryBuilder
+final class TermQueryBuilder
 {
     /** @var array<string, mixed> */
     private array $args = [];
 
-    private TermFactory $factory;
+    private readonly TermFactory $factory;
 
     public function __construct(TermFactory $factory)
     {
@@ -29,9 +29,7 @@ class TermQueryBuilder
         return $this;
     }
 
-    /**
-     * @param string[] $taxonomies
-     */
+    
     public function taxonomies(array $taxonomies): self
     {
         $this->args['taxonomy'] = $taxonomies;
@@ -81,18 +79,14 @@ class TermQueryBuilder
         return $this;
     }
 
-    /**
-     * @param int[] $ids
-     */
+    
     public function whereIn(array $ids): self
     {
         $this->args['include'] = $ids;
         return $this;
     }
 
-    /**
-     * @param int[] $ids
-     */
+    
     public function whereNotIn(array $ids): self
     {
         $this->args['exclude'] = $ids;
@@ -134,9 +128,7 @@ class TermQueryBuilder
         return $this;
     }
 
-    /**
-     * @return TermInterface[]
-     */
+    
     public function get(): array
     {
         $defaults = [

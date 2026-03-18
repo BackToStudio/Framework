@@ -8,11 +8,11 @@ use BackTo\Framework\Queue\Contracts\QueueDispatcherInterface;
 use BackTo\Framework\Queue\Contracts\QueueRepositoryInterface;
 use BackTo\Framework\Queue\Factory\JobFactory;
 
-class QueueDispatcher implements QueueDispatcherInterface
+final class QueueDispatcher implements QueueDispatcherInterface
 {
-    private QueueRepositoryInterface $repository;
-    private QueueRegistry $registry;
-    private JobFactory $factory;
+    private readonly QueueRepositoryInterface $repository;
+    private readonly QueueRegistry $registry;
+    private readonly JobFactory $factory;
 
     public function __construct(
         QueueRepositoryInterface $repository,

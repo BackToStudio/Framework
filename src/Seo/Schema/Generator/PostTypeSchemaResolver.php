@@ -23,7 +23,7 @@ use BackTo\Framework\Seo\Schema\SchemaType;
  *
  * Each generator must implement a `generate(?int $postId): ?SchemaType` method.
  */
-class PostTypeSchemaResolver
+final class PostTypeSchemaResolver
 {
     /** @var array<string, object> */
     private array $generators;

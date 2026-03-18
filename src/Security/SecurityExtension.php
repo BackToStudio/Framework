@@ -38,7 +38,7 @@ use BackTo\Framework\Security\TwoFactor\Infrastructure\WordPressTwoFactorReposit
 use BackTo\Framework\Security\TwoFactor\TotpProvider;
 use BackToVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class SecurityExtension implements ExtensionInterface
+final class SecurityExtension implements ExtensionInterface
 {
     /**
      * @return array<int, array{dir: string, namespace: string, exclude: string}>

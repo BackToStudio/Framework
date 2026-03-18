@@ -23,9 +23,9 @@ class LoginHardening implements Hooks, SecurityRuleInterface
 {
     use ClientIpTrait;
 
-    private HookDispatcherInterface $hookDispatcher;
-    private LoginThrottleInterface $loginThrottle;
-    private LoggerInterface $logger;
+    private readonly HookDispatcherInterface $hookDispatcher;
+    private readonly LoginThrottleInterface $loginThrottle;
+    private readonly LoggerInterface $logger;
 
     public function __construct(
         HookDispatcherInterface $hookDispatcher,
@@ -121,9 +121,7 @@ class LoginHardening implements Hooks, SecurityRuleInterface
         ]);
     }
 
-    /**
-     * @return \WP_Error
-     */
+    
     protected function createLockoutError(int $remainingSeconds): mixed
     {
         return new \WP_Error(

@@ -6,6 +6,7 @@ namespace BackTo\Framework\Security;
 
 use BackTo\Framework\Admin\Contracts\AdminPageInterface;
 use BackTo\Framework\Security\Contracts\AuditLogRepositoryInterface;
+use BackTo\Framework\Security\Contracts\AuditLogSeverity;
 
 /**
  * Admin page for viewing, filtering, and exporting the security audit log.
@@ -16,16 +17,16 @@ class AuditLogAdminPage implements AdminPageInterface
 
     private const DEFAULT_PER_PAGE = 50;
     private const MENU_POSITION = 81;
-    private const EXPORT_LIMIT = 10000;
-    private const EXPORT_COOLDOWN_SECONDS = 60;
 
-    private AuditLogRepositoryInterface $repository;
+    private readonly AuditLogRepositoryInterface $repository;
+    private readonly AuditLogCsvExporter $csvExporter;
 
     private int $perPage = self::DEFAULT_PER_PAGE;
 
-    public function __construct(AuditLogRepositoryInterface $repository)
+    public function __construct(AuditLogRepositoryInterface $repository, ?AuditLogCsvExporter $csvExporter = null)
     {
         $this->repository = $repository;
+        $this->csvExporter = $csvExporter ?? new AuditLogCsvExporter($repository);
     }
 
     public function getPageTitle(): string
@@ -67,11 +68,11 @@ class AuditLogAdminPage implements AdminPageInterface
         if ($this->isExportRequest()) {
             if (! $this->verifyNonce('backto_audit_export', '_export_nonce')) {
                 $this->renderNotice('Security check failed. Please try again.');
-            } elseif (! $this->canExport()) {
+            } elseif (! $this->csvExporter->canExport()) {
                 $this->renderNotice('Please wait before exporting again.');
             } else {
-                $this->markExported();
-                $this->exportCsv($filters);
+                $this->csvExporter->markExported();
+                $this->csvExporter->export($filters);
 
                 return;
             }
@@ -140,7 +141,8 @@ class AuditLogAdminPage implements AdminPageInterface
         echo '<label>Severity: <select name="severity">';
         echo '<option value="">All</option>';
 
-        foreach (['info', 'warning', 'critical'] as $sev) {
+        foreach (AuditLogSeverity::cases() as $sevEnum) {
+            $sev = $sevEnum->value;
             $selected = $severityValue === $sev ? ' selected' : '';
             echo '<option value="' . $sev . '"' . $selected . '>' . ucfirst($sev) . '</option>';
         }
@@ -171,9 +173,9 @@ class AuditLogAdminPage implements AdminPageInterface
             $severity = (string) ($event['severity'] ?? 'info');
             $context = $event['context'] ?? [];
 
-            $severityClass = match ($severity) {
-                'critical' => 'color:#dc3232;font-weight:bold',
-                'warning' => 'color:#dba617',
+            $severityClass = match (AuditLogSeverity::tryFrom($severity)) {
+                AuditLogSeverity::Critical => 'color:#dc3232;font-weight:bold',
+                AuditLogSeverity::Warning => 'color:#dba617',
                 default => 'color:#72aee6',
             };
 
@@ -234,40 +236,7 @@ class AuditLogAdminPage implements AdminPageInterface
         echo '</div>';
     }
 
-    /**
-     * @param array<string, mixed> $filters
-     */
-    public function exportCsv(array $filters): void
-    {
-        $events = $this->repository->getEvents($filters, self::EXPORT_LIMIT, 0);
-
-        $this->sendCsvHeaders();
-
-        $output = $this->openOutputStream();
-
-        if ($output === false) {
-            return;
-        }
-
-        fputcsv($output, ['Timestamp', 'Event', 'Severity', 'Context']);
-
-        foreach ($events as $event) {
-            $timestamp = (int) ($event['timestamp'] ?? 0);
-            $context = $event['context'] ?? [];
-            $contextStr = is_array($context) ? (string) json_encode($context) : '';
-
-            fputcsv($output, [
-                gmdate('Y-m-d H:i:s', $timestamp),
-                (string) ($event['event'] ?? ''),
-                (string) ($event['severity'] ?? ''),
-                $contextStr,
-            ]);
-        }
-
-        fclose($output);
-    }
-
-    /**
+/**
      * @return array<string, mixed>
      */
     protected function getFiltersFromRequest(): array
@@ -287,7 +256,7 @@ class AuditLogAdminPage implements AdminPageInterface
         }
 
         $severity = (string) ($_GET['severity'] ?? '');
-        if ($severity !== '' && in_array($severity, ['info', 'warning', 'critical'], true)) {
+        if ($severity !== '' && AuditLogSeverity::tryFrom($severity) !== null) {
             $filters['severity'] = $severity;
         }
 
@@ -324,21 +293,7 @@ class AuditLogAdminPage implements AdminPageInterface
         echo '<div class="notice notice-success is-dismissible"><p>' . $this->escapeHtml($message) . '</p></div>';
     }
 
-    protected function sendCsvHeaders(): void
-    {
-        header('Content-Type: text/csv; charset=utf-8');
-        header('Content-Disposition: attachment; filename="audit-log-' . gmdate('Y-m-d') . '.csv"');
-    }
-
-    /**
-     * @return resource|false
-     */
-    protected function openOutputStream()
-    {
-        return fopen('php://output', 'w');
-    }
-
-    protected function verifyNonce(string $action, string $queryArg): bool
+protected function verifyNonce(string $action, string $queryArg): bool
     {
         $nonce = $_REQUEST[$queryArg] ?? '';
 
@@ -365,19 +320,4 @@ class AuditLogAdminPage implements AdminPageInterface
         }
     }
 
-    protected function canExport(): bool
-    {
-        if (!function_exists('get_transient')) {
-            return true;
-        }
-
-        return get_transient('backto_audit_export_lock') === false;
-    }
-
-    protected function markExported(): void
-    {
-        if (function_exists('set_transient')) {
-            set_transient('backto_audit_export_lock', '1', self::EXPORT_COOLDOWN_SECONDS);
-        }
-    }
 }

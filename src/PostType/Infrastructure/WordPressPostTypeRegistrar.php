@@ -13,7 +13,7 @@ use function register_post_type;
 /**
  * WordPress adapter for post type registration.
  */
-class WordPressPostTypeRegistrar implements PostTypeRegistrarInterface
+final class WordPressPostTypeRegistrar implements PostTypeRegistrarInterface
 {
     /**
      * @param string $key

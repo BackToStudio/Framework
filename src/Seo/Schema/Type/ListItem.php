@@ -6,7 +6,7 @@ namespace BackTo\Framework\Seo\Schema\Type;
 
 use BackTo\Framework\Seo\Schema\SchemaType;
 
-class ListItem extends SchemaType
+final class ListItem extends SchemaType
 {
     public function __construct()
     {

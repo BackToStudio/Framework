@@ -6,7 +6,7 @@ namespace BackTo\Framework\Seo\Schema\Type;
 
 use BackTo\Framework\Seo\Schema\SchemaType;
 
-class Review extends SchemaType
+final class Review extends SchemaType
 {
     public function __construct()
     {

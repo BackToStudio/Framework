@@ -9,7 +9,7 @@ use BackTo\Framework\Contracts\Hooks;
 use BackTo\Framework\Gdpr\Contracts\ConsentStorageInterface;
 use BackTo\Framework\Gdpr\Contracts\TrackingScriptInterface;
 
-class RegisterGdpr implements Hooks
+final class RegisterGdpr implements Hooks
 {
     public function __construct(
         private readonly ConsentCategoryRegistry $categoryRegistry,

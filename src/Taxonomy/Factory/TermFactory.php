@@ -26,11 +26,7 @@ class TermFactory
         return $term;
     }
 
-    /**
-     * @param WP_Term[] $wpTerms
-     *
-     * @return TermInterface[]
-     */
+    
     public function createFromTerms(array $wpTerms): array
     {
         return array_map(

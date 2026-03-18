@@ -12,7 +12,7 @@ use function wp_verify_nonce;
 /**
  * WordPress adapter for nonce management.
  */
-class WordPressNonceManager implements NonceManagerInterface
+final class WordPressNonceManager implements NonceManagerInterface
 {
     private const FIELD_NAME = '_backto_nonce';
 

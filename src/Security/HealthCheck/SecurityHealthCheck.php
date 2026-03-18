@@ -13,7 +13,7 @@ use BackTo\Framework\Security\SecurityRuleRegistry;
  */
 class SecurityHealthCheck implements HealthCheckInterface
 {
-    private SecurityRuleRegistry $ruleRegistry;
+    private readonly SecurityRuleRegistry $ruleRegistry;
 
     /** @var string[] */
     private const CRITICAL_RULES = [
@@ -75,10 +75,7 @@ class SecurityHealthCheck implements HealthCheckInterface
         return HealthCheckResult::degraded(implode('; ', $issues), $metadata);
     }
 
-    /**
-     * @param string[] $activeRules
-     * @return string[]
-     */
+    
     private function checkCriticalRules(array $activeRules): array
     {
         $missing = [];

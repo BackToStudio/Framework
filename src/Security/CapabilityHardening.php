@@ -8,6 +8,7 @@ use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
 use BackTo\Framework\Observability\Contracts\LoggerInterface;
 use BackTo\Framework\Security\Contracts\AuditLogRepositoryInterface;
+use BackTo\Framework\Security\Contracts\AuditLogSeverity;
 use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
 
 /**
@@ -22,9 +23,9 @@ class CapabilityHardening implements Hooks, SecurityRuleInterface
 {
     use ClientIpTrait;
 
-    private HookDispatcherInterface $hookDispatcher;
-    private LoggerInterface $logger;
-    private AuditLogRepositoryInterface $auditLog;
+    private readonly HookDispatcherInterface $hookDispatcher;
+    private readonly LoggerInterface $logger;
+    private readonly AuditLogRepositoryInterface $auditLog;
 
     /** @var string[] Roles that require elevated verification */
     private const PRIVILEGED_ROLES = [
@@ -103,7 +104,7 @@ class CapabilityHardening implements Hooks, SecurityRuleInterface
                 'ip' => $this->getClientIp(),
             ]);
 
-            $this->auditLog->store('self_promotion_blocked', 'critical', [
+            $this->auditLog->store('self_promotion_blocked', AuditLogSeverity::Critical->value, [
                 'user_id' => $userId,
                 'attempted_role' => $newRole,
                 'ip' => $this->getClientIp(),
@@ -115,7 +116,7 @@ class CapabilityHardening implements Hooks, SecurityRuleInterface
         }
 
         // Log all promotions to privileged roles
-        $this->auditLog->store('privileged_role_granted', 'warning', [
+        $this->auditLog->store('privileged_role_granted', AuditLogSeverity::Warning->value, [
             'user_id' => $userId,
             'new_role' => $newRole,
             'old_roles' => $oldRoles,
@@ -177,9 +178,7 @@ class CapabilityHardening implements Hooks, SecurityRuleInterface
         return false;
     }
 
-    /**
-     * @return string[]
-     */
+    
     public function getSensitiveCapabilities(): array
     {
         return self::SENSITIVE_CAPABILITIES;
@@ -194,9 +193,7 @@ class CapabilityHardening implements Hooks, SecurityRuleInterface
         return 0;
     }
 
-    /**
-     * @param string[] $oldRoles
-     */
+    
     protected function revertRole(int $userId, array $oldRoles): void
     {
         $role = $oldRoles[0] ?? 'subscriber';

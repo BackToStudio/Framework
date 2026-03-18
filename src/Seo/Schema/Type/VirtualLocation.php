@@ -6,7 +6,7 @@ namespace BackTo\Framework\Seo\Schema\Type;
 
 use BackTo\Framework\Seo\Schema\SchemaType;
 
-class VirtualLocation extends SchemaType
+final class VirtualLocation extends SchemaType
 {
     public function __construct()
     {

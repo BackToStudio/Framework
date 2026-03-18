@@ -10,7 +10,7 @@ use BackTo\Framework\Compose\HasParentId;
 use BackTo\Framework\Compose\HasSlug;
 use BackTo\Framework\PostType\Contracts\PostInterface;
 
-class Post implements PostInterface
+final class Post implements PostInterface
 {
 
     use HasId;

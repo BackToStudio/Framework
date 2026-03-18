@@ -22,19 +22,19 @@ use BackTo\Framework\Performance\Contracts\PageCacheInterface;
  * 3. WP-Cron fires the event, which fetches each URL via a non-blocking
  *    loopback HTTP request, triggering ServePageCache to store fresh HTML
  */
-class PreloadPageCache implements Hooks
+final class PreloadPageCache implements Hooks
 {
     public const CRON_HOOK = 'btf_preload_page_cache';
     public const CRON_FULL_HOOK = 'btf_preload_page_cache_full';
 
-    private HookDispatcherInterface $hookDispatcher;
-    private PageCacheInterface $pageCache;
+    private readonly HookDispatcherInterface $hookDispatcher;
+    private readonly PageCacheInterface $pageCache;
 
     /** @var int Delay in seconds before the cron event fires */
-    private int $delay;
+    private readonly int $delay;
 
     /** @var int Maximum URLs to preload per batch */
-    private int $batchSize;
+    private readonly int $batchSize;
 
     public function __construct(
         HookDispatcherInterface $hookDispatcher,
@@ -152,66 +152,104 @@ class PreloadPageCache implements Hooks
      */
     public function getPostRelatedUrls(int $postId): array
     {
+        $postType = \get_post_type($postId) ?: 'post';
+        $post = \get_post($postId);
+
+        return array_unique(array_filter(array_merge(
+            $this->collectPermalinkUrl($postId),
+            [\home_url('/')],
+            $this->collectBlogPageUrl(),
+            $this->collectPostTypeArchiveUrl($postType),
+            $this->collectTaxonomyUrls($postId, $postType),
+            $this->collectAuthorUrl($post),
+            $this->collectDateArchiveUrls($post),
+        )));
+    }
+
+    /** @return string[] */
+    private function collectPermalinkUrl(int $postId): array
+    {
+        $permalink = \get_permalink($postId);
+
+        return $permalink !== false ? [$permalink] : [];
+    }
+
+    /** @return string[] */
+    private function collectBlogPageUrl(): array
+    {
+        $blogPageId = (int) \get_option('page_for_posts');
+
+        if ($blogPageId <= 0) {
+            return [];
+        }
+
+        $blogUrl = \get_permalink($blogPageId);
+
+        return $blogUrl !== false ? [$blogUrl] : [];
+    }
+
+    /** @return string[] */
+    private function collectPostTypeArchiveUrl(string $postType): array
+    {
+        if ($postType === 'page') {
+            return [];
+        }
+
+        $archiveUrl = \get_post_type_archive_link($postType);
+
+        return $archiveUrl !== false ? [$archiveUrl] : [];
+    }
+
+    /** @return string[] */
+    private function collectTaxonomyUrls(int $postId, string $postType): array
+    {
+        $taxonomies = \get_object_taxonomies($postType, 'names');
+        $terms = \wp_get_post_terms($postId, $taxonomies);
+
+        if (!\is_array($terms)) {
+            return [];
+        }
+
         $urls = [];
 
-        // The post itself
-        $permalink = \get_permalink($postId);
-        if ($permalink !== false) {
-            $urls[] = $permalink;
-        }
+        foreach ($terms as $term) {
+            $termLink = \get_term_link($term);
 
-        // Homepage
-        $urls[] = \home_url('/');
-
-        // Blog page (if different from homepage)
-        $blogPageId = (int) \get_option('page_for_posts');
-        if ($blogPageId > 0) {
-            $blogUrl = \get_permalink($blogPageId);
-            if ($blogUrl !== false) {
-                $urls[] = $blogUrl;
+            if (\is_string($termLink)) {
+                $urls[] = $termLink;
             }
         }
 
-        // Post type archive
-        $postType = \get_post_type($postId);
-        if ($postType !== false && $postType !== 'page') {
-            $archiveUrl = \get_post_type_archive_link($postType);
-            if ($archiveUrl !== false) {
-                $urls[] = $archiveUrl;
-            }
+        return $urls;
+    }
+
+    /** @return string[] */
+    private function collectAuthorUrl(?\WP_Post $post): array
+    {
+        if (!$post instanceof \WP_Post) {
+            return [];
         }
 
-        // Taxonomy archives (categories, tags)
-        $taxonomies = \get_object_taxonomies($postType ?: 'post', 'names');
-        $terms = \wp_get_post_terms($postId, $taxonomies);
-        if (\is_array($terms)) {
-            foreach ($terms as $term) {
-                $termLink = \get_term_link($term);
-                if (\is_string($termLink)) {
-                    $urls[] = $termLink;
-                }
-            }
+        $authorUrl = \get_author_posts_url($post->post_author);
+
+        return $authorUrl !== false ? [$authorUrl] : [];
+    }
+
+    /** @return string[] */
+    private function collectDateArchiveUrls(?\WP_Post $post): array
+    {
+        if (!$post instanceof \WP_Post) {
+            return [];
         }
 
-        // Author archive
-        $post = \get_post($postId);
-        if ($post instanceof \WP_Post) {
-            $authorUrl = \get_author_posts_url($post->post_author);
-            if ($authorUrl !== false) {
-                $urls[] = $authorUrl;
-            }
-        }
+        $date = $post->post_date;
+        $year = date('Y', strtotime($date));
+        $month = date('m', strtotime($date));
 
-        // Date archives (year, month)
-        if ($post instanceof \WP_Post) {
-            $date = $post->post_date;
-            $year = date('Y', strtotime($date));
-            $month = date('m', strtotime($date));
-            $urls[] = \get_year_link((int) $year);
-            $urls[] = \get_month_link((int) $year, (int) $month);
-        }
-
-        return array_unique(array_filter($urls));
+        return [
+            \get_year_link((int) $year),
+            \get_month_link((int) $year, (int) $month),
+        ];
     }
 
     /**
@@ -221,19 +259,8 @@ class PreloadPageCache implements Hooks
      */
     public function getSiteUrls(): array
     {
-        $urls = [];
-
-        // Homepage
-        $urls[] = \home_url('/');
-
-        // Blog page
-        $blogPageId = (int) \get_option('page_for_posts');
-        if ($blogPageId > 0) {
-            $blogUrl = \get_permalink($blogPageId);
-            if ($blogUrl !== false) {
-                $urls[] = $blogUrl;
-            }
-        }
+        $urls = [\home_url('/')];
+        $urls = array_merge($urls, $this->collectBlogPageUrl());
 
         // Recent published posts
         $recentPosts = \get_posts([

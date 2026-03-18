@@ -11,11 +11,11 @@ use BackTo\Framework\Seo\SeoManager;
 /**
  * Add social links from the active SEO plugin to the Timber context.
  */
-class AddSocialLinksToTimberContext implements Hooks
+final class AddSocialLinksToTimberContext implements Hooks
 {
-    private SeoManager $seoManager;
+    private readonly SeoManager $seoManager;
 
-    private HookDispatcherInterface $hookDispatcher;
+    private readonly HookDispatcherInterface $hookDispatcher;
 
     public function __construct(SeoManager $seoManager, HookDispatcherInterface $hookDispatcher)
     {

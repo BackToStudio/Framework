@@ -6,7 +6,7 @@ namespace BackTo\Framework\Seo\Schema\Type;
 
 use BackTo\Framework\Seo\Schema\SchemaType;
 
-class Question extends SchemaType
+final class Question extends SchemaType
 {
     public function __construct()
     {
@@ -25,10 +25,7 @@ class Question extends SchemaType
         return $this->set('acceptedAnswer', $answer);
     }
 
-    /**
-     * @param SchemaType[] $answers
-     * @return $this
-     */
+    
     public function suggestedAnswer(array $answers): static
     {
         return $this->set('suggestedAnswer', $answers);

@@ -14,11 +14,11 @@ use BackTo\Framework\Observability\Contracts\PerformanceCollectorInterface;
  * Logs hook registrations and collects performance metrics.
  * Wraps the real HookDispatcher without modifying it.
  */
-class ObservableHookDispatcher implements HookDispatcherInterface
+final class ObservableHookDispatcher implements HookDispatcherInterface
 {
-    private HookDispatcherInterface $inner;
-    private LoggerInterface $logger;
-    private PerformanceCollectorInterface $collector;
+    private readonly HookDispatcherInterface $inner;
+    private readonly LoggerInterface $logger;
+    private readonly PerformanceCollectorInterface $collector;
 
     public function __construct(
         HookDispatcherInterface $inner,

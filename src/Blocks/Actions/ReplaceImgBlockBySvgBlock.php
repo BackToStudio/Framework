@@ -8,12 +8,12 @@ use BackTo\Framework\Assets\ReplaceImgTagBySvgTag;
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
 
-class ReplaceImgBlockBySvgBlock implements Hooks
+final class ReplaceImgBlockBySvgBlock implements Hooks
 {
 
-    private ReplaceImgTagBySvgTag $replaceImgTagBySvgTag;
+    private readonly ReplaceImgTagBySvgTag $replaceImgTagBySvgTag;
 
-    private HookDispatcherInterface $hookDispatcher;
+    private readonly HookDispatcherInterface $hookDispatcher;
 
     public function __construct(ReplaceImgTagBySvgTag $replaceImgTagBySvgTag, HookDispatcherInterface $hookDispatcher)
     {

@@ -15,10 +15,10 @@ use WP_REST_Response;
  *
  * GET /backto/v1/security/scan — returns file integrity + malware scan results
  */
-class SecurityScanRoute implements RestRouteInterface
+final class SecurityScanRoute implements RestRouteInterface
 {
-    private FileIntegrityMonitor $integrityMonitor;
-    private MalwareScanner $malwareScanner;
+    private readonly FileIntegrityMonitor $integrityMonitor;
+    private readonly MalwareScanner $malwareScanner;
 
     public function __construct(
         FileIntegrityMonitor $integrityMonitor,
@@ -38,9 +38,7 @@ class SecurityScanRoute implements RestRouteInterface
         return '/security/scan';
     }
 
-    /**
-     * @return string[]
-     */
+    
     public function getMethods(): array
     {
         return ['GET'];

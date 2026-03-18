@@ -12,21 +12,19 @@ use BackTo\Framework\Contracts\AdminHooks;
 use BackTo\Framework\Contracts\Hooks;
 use BackTo\Framework\Contracts\RegistryInterface;
 
-class HookRegistry implements RegistryInterface
+final class HookRegistry implements RegistryInterface
 {
     /** @var HookInterface[] */
     protected array $hooks = [];
     private ?string $pluginFile = null;
-    private HookDispatcherInterface $hookDispatcher;
+    private readonly HookDispatcherInterface $hookDispatcher;
 
     public function __construct(HookDispatcherInterface $hookDispatcher)
     {
         $this->hookDispatcher = $hookDispatcher;
     }
 
-    /**
-     * @return HookInterface[]
-     */
+    
     public function getHooks(): array
     {
         return $this->hooks;

@@ -13,9 +13,9 @@ use WP_Term;
 use function get_term;
 use function get_terms;
 
-class TermRepository
+final class TermRepository
 {
-    protected TermFactory $factory;
+    protected readonly TermFactory $factory;
 
     public function __construct(TermFactory $factory)
     {
@@ -63,9 +63,7 @@ class TermRepository
         return $this->factory->createFromTerms($wpTerms);
     }
 
-    /**
-     * @return TermInterface[]
-     */
+    
     public function findBy(string $taxonomy, ?string $orderBy = null, SortDirection $order = SortDirection::ASC, ?int $limit = null): array
     {
         return $this->query()

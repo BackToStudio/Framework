@@ -9,9 +9,7 @@ namespace BackTo\Framework\Security\Contracts;
  */
 interface ContentSecurityPolicyInterface
 {
-    /**
-     * @param string|string[] $value
-     */
+    
     public function addDirective(string $directive, string|array $value): self;
 
     /**

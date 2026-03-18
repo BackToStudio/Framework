@@ -11,11 +11,11 @@ use BackTo\Framework\Seo\Schema\SchemaManager;
 /**
  * Inject JSON-LD structured data into the <head> via wp_head.
  */
-class InjectSchemaInHead implements Hooks
+final class InjectSchemaInHead implements Hooks
 {
-    private SchemaManager $schemaManager;
+    private readonly SchemaManager $schemaManager;
 
-    private HookDispatcherInterface $hookDispatcher;
+    private readonly HookDispatcherInterface $hookDispatcher;
 
     public function __construct(SchemaManager $schemaManager, HookDispatcherInterface $hookDispatcher)
     {

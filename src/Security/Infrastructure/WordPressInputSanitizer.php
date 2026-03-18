@@ -18,7 +18,7 @@ use function wp_kses_post;
 /**
  * WordPress adapter for input sanitization.
  */
-class WordPressInputSanitizer implements InputSanitizerInterface
+final class WordPressInputSanitizer implements InputSanitizerInterface
 {
     public function sanitizeText(string $input): string
     {

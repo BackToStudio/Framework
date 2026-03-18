@@ -45,47 +45,76 @@ class BreadcrumbSchemaGenerator
         $items = [];
         $items[] = ['name' => \get_bloginfo('name'), 'url' => \home_url('/')];
 
-        if (\is_singular()) {
-            $post = \get_queried_object();
-
-            if (!$post instanceof \WP_Post) {
-                return $items;
-            }
-
-            if ($post->post_type === 'post') {
-                $this->addPostArchive($items);
-                $this->addPostCategories($items, $post);
-            } elseif ($post->post_type === 'page') {
-                $this->addPageAncestors($items, $post);
-            } else {
-                $this->addCustomPostTypeArchive($items, $post);
-            }
-
-            $items[] = ['name' => $post->post_title];
-        } elseif (\is_category() || \is_tag() || \is_tax()) {
-            $term = \get_queried_object();
-
-            if ($term instanceof \WP_Term) {
-                $this->addTermAncestors($items, $term);
-                $items[] = ['name' => $term->name];
-            }
-        } elseif (\is_post_type_archive()) {
-            $postType = \get_queried_object();
-
-            if ($postType instanceof \WP_Post_Type) {
-                $items[] = ['name' => $postType->labels->name];
-            }
-        } elseif (\is_author()) {
-            $author = \get_queried_object();
-
-            if ($author instanceof \WP_User) {
-                $items[] = ['name' => $author->display_name];
-            }
-        } elseif (\is_search()) {
-            $items[] = ['name' => \get_search_query()];
-        }
+        match (true) {
+            \is_singular() => $this->buildSingularItems($items),
+            \is_category(), \is_tag(), \is_tax() => $this->buildTaxonomyItems($items),
+            \is_post_type_archive() => $this->buildPostTypeArchiveItems($items),
+            \is_author() => $this->buildAuthorItems($items),
+            \is_search() => $items[] = ['name' => \get_search_query()],
+            default => null,
+        };
 
         return $items;
+    }
+
+    /**
+     * @param array<int, array{name: string, url?: string}> $items
+     */
+    private function buildSingularItems(array &$items): void
+    {
+        $post = \get_queried_object();
+
+        if (!$post instanceof \WP_Post) {
+            return;
+        }
+
+        if ($post->post_type === 'post') {
+            $this->addPostArchive($items);
+            $this->addPostCategories($items, $post);
+        } elseif ($post->post_type === 'page') {
+            $this->addPageAncestors($items, $post);
+        } else {
+            $this->addCustomPostTypeArchive($items, $post);
+        }
+
+        $items[] = ['name' => $post->post_title];
+    }
+
+    /**
+     * @param array<int, array{name: string, url?: string}> $items
+     */
+    private function buildTaxonomyItems(array &$items): void
+    {
+        $term = \get_queried_object();
+
+        if ($term instanceof \WP_Term) {
+            $this->addTermAncestors($items, $term);
+            $items[] = ['name' => $term->name];
+        }
+    }
+
+    /**
+     * @param array<int, array{name: string, url?: string}> $items
+     */
+    private function buildPostTypeArchiveItems(array &$items): void
+    {
+        $postType = \get_queried_object();
+
+        if ($postType instanceof \WP_Post_Type) {
+            $items[] = ['name' => $postType->labels->name];
+        }
+    }
+
+    /**
+     * @param array<int, array{name: string, url?: string}> $items
+     */
+    private function buildAuthorItems(array &$items): void
+    {
+        $author = \get_queried_object();
+
+        if ($author instanceof \WP_User) {
+            $items[] = ['name' => $author->display_name];
+        }
     }
 
     /**

@@ -7,7 +7,7 @@ namespace BackTo\Framework\Hooks\DependencyInjection\Compiler;
 use BackTo\Framework\Compose\DependencyInjection\Compiler\AbstractTaggedServiceCompilerPass;
 use BackTo\Framework\Hooks\HookRegistry;
 
-class RegisterHookPass extends AbstractTaggedServiceCompilerPass
+final class RegisterHookPass extends AbstractTaggedServiceCompilerPass
 {
     protected function getRegistryClass(): string
     {

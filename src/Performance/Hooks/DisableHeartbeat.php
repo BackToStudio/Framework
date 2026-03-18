@@ -13,11 +13,11 @@ use BackTo\Framework\Contracts\Hooks;
  * Disables Heartbeat on the front-end and reduces frequency in admin
  * to minimize AJAX requests and server load.
  */
-class DisableHeartbeat implements Hooks
+final class DisableHeartbeat implements Hooks
 {
-    private HookDispatcherInterface $hookDispatcher;
-    private bool $disableFrontend;
-    private int $adminInterval;
+    private readonly HookDispatcherInterface $hookDispatcher;
+    private readonly bool $disableFrontend;
+    private readonly int $adminInterval;
 
     public function __construct(
         HookDispatcherInterface $hookDispatcher,

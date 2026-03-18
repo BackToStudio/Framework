@@ -18,9 +18,9 @@ use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
  */
 class DatabaseHardening implements Hooks, SecurityRuleInterface
 {
-    private HookDispatcherInterface $hookDispatcher;
-    private LoggerInterface $logger;
-    private bool $debugMode;
+    private readonly HookDispatcherInterface $hookDispatcher;
+    private readonly LoggerInterface $logger;
+    private readonly bool $debugMode;
 
     /**
      * Single combined regex for all dangerous SQL patterns.

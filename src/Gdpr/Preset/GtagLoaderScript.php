@@ -10,7 +10,7 @@ final class GtagLoaderScript implements TrackingScriptInterface
 {
     public function __construct(
         private readonly string $trackingId,
-        private readonly string $categoryKey = 'analytics',
+        private string $categoryKey = 'analytics',
     ) {
     }
 

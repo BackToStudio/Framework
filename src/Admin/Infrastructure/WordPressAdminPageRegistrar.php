@@ -12,7 +12,7 @@ use function add_submenu_page;
 /**
  * WordPress adapter for admin page registration.
  */
-class WordPressAdminPageRegistrar implements AdminPageRegistrarInterface
+final class WordPressAdminPageRegistrar implements AdminPageRegistrarInterface
 {
     /**
      * @param array<string, mixed> $args

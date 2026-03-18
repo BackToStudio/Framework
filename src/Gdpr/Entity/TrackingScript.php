@@ -12,9 +12,9 @@ final class TrackingScript implements TrackingScriptInterface
         private readonly string $handle,
         private readonly string $categoryKey,
         private readonly string $source,
-        private readonly bool $inline = false,
-        private readonly string $location = 'head',
-        private readonly int $priority = 10,
+        private bool $inline = false,
+        private string $location = 'head',
+        private int $priority = 10,
     ) {
     }
 

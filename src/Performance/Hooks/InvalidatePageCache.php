@@ -14,10 +14,10 @@ use BackTo\Framework\Performance\Contracts\PageCacheInterface;
  * Listens to post save/delete, comment, and option update hooks to
  * flush the page cache and keep it in sync with the database.
  */
-class InvalidatePageCache implements Hooks
+final class InvalidatePageCache implements Hooks
 {
-    private HookDispatcherInterface $hookDispatcher;
-    private PageCacheInterface $pageCache;
+    private readonly HookDispatcherInterface $hookDispatcher;
+    private readonly PageCacheInterface $pageCache;
 
     public function __construct(HookDispatcherInterface $hookDispatcher, PageCacheInterface $pageCache)
     {
@@ -46,11 +46,7 @@ class InvalidatePageCache implements Hooks
         $this->invalidatePost($postId);
     }
 
-    /**
-     * @param string $newStatus
-     * @param string $oldStatus
-     * @param \WP_Post $post
-     */
+    
     public function onPostStatusChange(string $newStatus, string $oldStatus, $post): void
     {
         if ($newStatus === $oldStatus) {

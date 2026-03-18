@@ -16,19 +16,19 @@ use BackTo\Framework\Seo\Schema\SchemaManager;
  * Register default schemas (WebSite, Organization, post type schema, Breadcrumb)
  * and fire the 'framework/seo/schema' action for theme customization.
  */
-class RegisterDefaultSchemas implements Hooks
+final class RegisterDefaultSchemas implements Hooks
 {
-    private SchemaManager $schemaManager;
+    private readonly SchemaManager $schemaManager;
 
-    private HookDispatcherInterface $hookDispatcher;
+    private readonly HookDispatcherInterface $hookDispatcher;
 
-    private WebSiteSchemaGenerator $webSiteGenerator;
+    private readonly WebSiteSchemaGenerator $webSiteGenerator;
 
-    private OrganizationSchemaGenerator $organizationGenerator;
+    private readonly OrganizationSchemaGenerator $organizationGenerator;
 
-    private PostTypeSchemaResolver $postTypeResolver;
+    private readonly PostTypeSchemaResolver $postTypeResolver;
 
-    private BreadcrumbSchemaGenerator $breadcrumbGenerator;
+    private readonly BreadcrumbSchemaGenerator $breadcrumbGenerator;
 
     public function __construct(
         SchemaManager $schemaManager,

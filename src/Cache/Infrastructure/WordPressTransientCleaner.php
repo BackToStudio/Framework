@@ -9,7 +9,7 @@ use BackTo\Framework\Cache\Contracts\TransientCleanerInterface;
 /**
  * WordPress adapter for bulk-clearing transients via $wpdb.
  */
-class WordPressTransientCleaner implements TransientCleanerInterface
+final class WordPressTransientCleaner implements TransientCleanerInterface
 {
     public function clearByPrefix(string $prefix): bool
     {

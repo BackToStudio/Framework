@@ -13,7 +13,7 @@ use BackTo\Framework\Cli\Generator\ClassGenerator;
  */
 abstract class AbstractMakeCommand
 {
-    protected ClassGenerator $generator;
+    protected readonly ClassGenerator $generator;
 
     public function __construct()
     {

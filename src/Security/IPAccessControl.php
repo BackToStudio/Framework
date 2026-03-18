@@ -22,8 +22,8 @@ class IPAccessControl implements Hooks, SecurityRuleInterface, IPAccessControlIn
 {
     use ClientIpTrait;
 
-    private HookDispatcherInterface $hookDispatcher;
-    private LoggerInterface $logger;
+    private readonly HookDispatcherInterface $hookDispatcher;
+    private readonly LoggerInterface $logger;
 
     /** @var string[] */
     private array $whitelist = [];
@@ -84,17 +84,13 @@ class IPAccessControl implements Hooks, SecurityRuleInterface, IPAccessControlIn
         return $this->matchesAny($ip, $this->blacklist);
     }
 
-    /**
-     * @return string[]
-     */
+    
     public function getWhitelist(): array
     {
         return $this->whitelist;
     }
 
-    /**
-     * @return string[]
-     */
+    
     public function getBlacklist(): array
     {
         return $this->blacklist;
@@ -201,9 +197,7 @@ class IPAccessControl implements Hooks, SecurityRuleInterface, IPAccessControlIn
         $this->denyAccess();
     }
 
-    /**
-     * @param string[] $list
-     */
+    
     private function matchesAny(string $ip, array $list): bool
     {
         foreach ($list as $entry) {

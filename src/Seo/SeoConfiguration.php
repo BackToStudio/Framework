@@ -19,7 +19,7 @@ use BackToVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
  *             ->robotsDefault('noindex, nofollow');
  *     };
  */
-class SeoConfiguration
+final class SeoConfiguration
 {
     /**
      * @return array<string, mixed>

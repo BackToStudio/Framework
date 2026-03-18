@@ -6,7 +6,7 @@ namespace BackTo\Framework\Seo\Schema\Type;
 
 use BackTo\Framework\Seo\Schema\SchemaType;
 
-class MonetaryAmount extends SchemaType
+final class MonetaryAmount extends SchemaType
 {
     public function __construct()
     {

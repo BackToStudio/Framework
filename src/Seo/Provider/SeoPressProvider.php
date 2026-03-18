@@ -9,7 +9,7 @@ use BackTo\Framework\Seo\Contracts\SeoProviderInterface;
 /**
  * SEO provider for SEOPress.
  */
-class SeoPressProvider implements SeoProviderInterface
+final class SeoPressProvider implements SeoProviderInterface
 {
     private const PLUGIN_FILE = 'wp-seopress/seopress.php';
     private const SOCIAL_OPTION = 'seopress_social_option_name';

@@ -12,10 +12,10 @@ use BackTo\Framework\Contracts\Hooks;
  *
  * Prevents unbounded database growth from post revisions.
  */
-class LimitPostRevisions implements Hooks
+final class LimitPostRevisions implements Hooks
 {
-    private HookDispatcherInterface $hookDispatcher;
-    private int $maxRevisions;
+    private readonly HookDispatcherInterface $hookDispatcher;
+    private readonly int $maxRevisions;
 
     public function __construct(HookDispatcherInterface $hookDispatcher, int $maxRevisions = 5)
     {

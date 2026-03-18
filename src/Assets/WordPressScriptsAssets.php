@@ -13,10 +13,10 @@ use function wp_localize_script;
 use function wp_register_script;
 use function wp_register_style;
 
-class WordPressScriptsAssets
+final class WordPressScriptsAssets
 {
-    private string $assetDirectory;
-    private string $assetDirectoryUri;
+    private readonly string $assetDirectory;
+    private readonly string $assetDirectoryUri;
 
     public function __construct(string $assetDirectory, string $assetDirectoryUri)
     {
@@ -67,6 +67,10 @@ class WordPressScriptsAssets
      */
     public function getAsset(string $relativePath): array
     {
+        if (str_contains($relativePath, '..') || str_contains($relativePath, "\0")) {
+            throw new \InvalidArgumentException('Invalid asset path: directory traversal is not allowed.');
+        }
+
         $pathWithoutExtension = explode('.', $relativePath);
         array_pop($pathWithoutExtension);
 

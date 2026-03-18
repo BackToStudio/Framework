@@ -11,7 +11,7 @@ use function register_rest_route;
 /**
  * WordPress adapter for REST API route registration.
  */
-class WordPressRestRouteRegistrar implements RestRouteRegistrarInterface
+final class WordPressRestRouteRegistrar implements RestRouteRegistrarInterface
 {
     /**
      * @param array<string, mixed> $args

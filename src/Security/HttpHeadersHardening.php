@@ -17,9 +17,9 @@ use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
  *
  * Note: sendSecurityHeaders() guards against double-sending via headers_sent().
  */
-class HttpHeadersHardening implements Hooks, SecurityRuleInterface
+final class HttpHeadersHardening implements Hooks, SecurityRuleInterface
 {
-    private HookDispatcherInterface $hookDispatcher;
+    private readonly HookDispatcherInterface $hookDispatcher;
 
     public function __construct(HookDispatcherInterface $hookDispatcher)
     {

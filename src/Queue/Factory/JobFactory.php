@@ -8,7 +8,7 @@ use BackTo\Framework\Exception\FrameworkException;
 use BackTo\Framework\Queue\Entity\Job;
 use BackTo\Framework\Queue\Entity\JobStatus;
 
-class JobFactory
+final class JobFactory
 {
     private const MAX_KEY_LENGTH = 255;
     private const MAX_GROUP_LENGTH = 255;

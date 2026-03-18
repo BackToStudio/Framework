@@ -8,7 +8,7 @@ use BackTo\Framework\Contracts\RegistryInterface;
 use BackTo\Framework\Queue\Contracts\JobInterface;
 use BackTo\Framework\Queue\Contracts\QueueRegistryInterface;
 
-class QueueRegistry implements RegistryInterface, QueueRegistryInterface
+final class QueueRegistry implements RegistryInterface, QueueRegistryInterface
 {
     /** @var array<string, JobInterface> */
     private array $jobs = [];
@@ -20,9 +20,7 @@ class QueueRegistry implements RegistryInterface, QueueRegistryInterface
         return $this;
     }
 
-    /**
-     * @return JobInterface[]
-     */
+    
     public function getJobs(): array
     {
         return \array_values($this->jobs);

@@ -64,9 +64,7 @@ trait ClientIpTrait
         return in_array($remoteAddr, $trustedProxies, true);
     }
 
-    /**
-     * @return string[]
-     */
+    
     protected function getTrustedProxies(): array
     {
         if (self::$trustedProxies !== null) {

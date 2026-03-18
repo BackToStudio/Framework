@@ -7,7 +7,7 @@ namespace BackTo\Framework\Cli\Command;
 /**
  * WP-CLI command: wp make:post-type <name> [--namespace=<namespace>] [--dir=<dir>] [--force]
  */
-class MakePostTypeCommand extends AbstractMakeCommand
+final class MakePostTypeCommand extends AbstractMakeCommand
 {
     protected function getTemplateName(): string
     {

@@ -12,7 +12,7 @@ use function update_option;
 /**
  * WordPress adapter for file integrity baseline storage using options API.
  */
-class WordPressFileIntegrityRepository implements FileIntegrityRepositoryInterface
+final class WordPressFileIntegrityRepository implements FileIntegrityRepositoryInterface
 {
     private const BASELINE_OPTION = 'backto_file_integrity_baseline';
     private const TIMESTAMP_OPTION = 'backto_file_integrity_timestamp';

@@ -7,7 +7,7 @@ namespace BackTo\Framework\Blocks\DependencyInjection\Compiler;
 use BackTo\Framework\Blocks\BlockStyleRegistry;
 use BackTo\Framework\Compose\DependencyInjection\Compiler\AbstractTaggedServiceCompilerPass;
 
-class RegisterBlockStylePass extends AbstractTaggedServiceCompilerPass
+final class RegisterBlockStylePass extends AbstractTaggedServiceCompilerPass
 {
     protected function getRegistryClass(): string
     {

@@ -6,7 +6,7 @@ namespace BackTo\Framework\Seo\Schema\Type;
 
 use BackTo\Framework\Seo\Schema\SchemaType;
 
-class OfferShippingDetails extends SchemaType
+final class OfferShippingDetails extends SchemaType
 {
     public function __construct()
     {

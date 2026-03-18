@@ -12,18 +12,18 @@ use BackTo\Framework\Contracts\Hooks;
  *
  * Allows declarative configuration of resource hints via DI parameters.
  */
-class AddResourceHints implements Hooks
+final class AddResourceHints implements Hooks
 {
-    private HookDispatcherInterface $hookDispatcher;
+    private readonly HookDispatcherInterface $hookDispatcher;
 
     /** @var string[] Domains to preconnect to */
-    private array $preconnect;
+    private readonly array $preconnect;
 
     /** @var string[] Domains to DNS prefetch */
-    private array $dnsPrefetch;
+    private readonly array $dnsPrefetch;
 
     /** @var array<array{url: string, as: string, type?: string}> Resources to preload */
-    private array $preload;
+    private readonly array $preload;
 
     /**
      * @param string[] $preconnect

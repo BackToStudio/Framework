@@ -11,18 +11,12 @@ interface BlockStyleInterface
      */
     public function getProperties(): array;
 
-    /**
-     * @return string
-     */
+    
     public function getLabel(): string;
 
-    /**
-     * @return string
-     */
+    
     public function getStyleName(): string;
 
-    /**
-     * @return string[]
-     */
+    
     public function getBlocks(): array;
 }

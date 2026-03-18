@@ -13,7 +13,7 @@ use function taxonomy_exists;
 /**
  * WordPress adapter for taxonomy registration.
  */
-class WordPressTaxonomyRegistrar implements TaxonomyRegistrarInterface
+final class WordPressTaxonomyRegistrar implements TaxonomyRegistrarInterface
 {
     /**
      * @param string $key

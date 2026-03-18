@@ -7,6 +7,7 @@ namespace BackTo\Framework\Security;
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
 use BackTo\Framework\Options\Contracts\OptionsRepositoryInterface;
+use BackTo\Framework\Security\Contracts\AuditLogSeverity;
 use BackTo\Framework\Security\Contracts\MailerInterface;
 use BackTo\Framework\Security\Contracts\SecurityNotifierInterface;
 use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
@@ -27,13 +28,13 @@ use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
  * - set_user_role (15): After CapabilityHardening (5) and SecurityAuditLogger (10)
  * - wp_login_failed (10): Standard priority for login failure counting
  */
-class SecurityNotifier implements Hooks, SecurityRuleInterface, SecurityNotifierInterface
+final class SecurityNotifier implements Hooks, SecurityRuleInterface, SecurityNotifierInterface
 {
     use ClientIpTrait;
 
-    private HookDispatcherInterface $hookDispatcher;
-    private MailerInterface $mailer;
-    private OptionsRepositoryInterface $options;
+    private readonly HookDispatcherInterface $hookDispatcher;
+    private readonly MailerInterface $mailer;
+    private readonly OptionsRepositoryInterface $options;
 
     /** @var string[] */
     private array $recipients = [];
@@ -99,9 +100,7 @@ class SecurityNotifier implements Hooks, SecurityRuleInterface, SecurityNotifier
         }
     }
 
-    /**
-     * @param string[] $emails
-     */
+    
     public function setRecipients(array $emails): self
     {
         $this->recipients = $emails;
@@ -109,9 +108,7 @@ class SecurityNotifier implements Hooks, SecurityRuleInterface, SecurityNotifier
         return $this;
     }
 
-    /**
-     * @return string[]
-     */
+    
     public function getRecipients(): array
     {
         return $this->recipients;
@@ -138,9 +135,7 @@ class SecurityNotifier implements Hooks, SecurityRuleInterface, SecurityNotifier
         $this->notify($event, $severity, $context);
     }
 
-    /**
-     * @param string[] $oldRoles
-     */
+    
     public function onRoleChange(int $userId, string $newRole, array $oldRoles): void
     {
         if ($newRole !== 'administrator') {
@@ -151,7 +146,7 @@ class SecurityNotifier implements Hooks, SecurityRuleInterface, SecurityNotifier
             return;
         }
 
-        $this->notify('privileged_role_granted', 'critical', [
+        $this->notify('privileged_role_granted', AuditLogSeverity::Critical->value, [
             'user_id' => $userId,
             'new_role' => $newRole,
             'old_roles' => $oldRoles,
@@ -165,7 +160,7 @@ class SecurityNotifier implements Hooks, SecurityRuleInterface, SecurityNotifier
         $this->failedLoginCounts[$ip] = ($this->failedLoginCounts[$ip] ?? 0) + 1;
 
         if ($this->failedLoginCounts[$ip] === $this->failedLoginThreshold) {
-            $this->notify('login_failed_threshold', 'warning', [
+            $this->notify('login_failed_threshold', AuditLogSeverity::Warning->value, [
                 'ip' => $ip,
                 'username' => $username,
                 'attempts' => $this->failedLoginCounts[$ip],
@@ -173,9 +168,7 @@ class SecurityNotifier implements Hooks, SecurityRuleInterface, SecurityNotifier
         }
     }
 
-    /**
-     * @return string[]
-     */
+    
     public function getCriticalEvents(): array
     {
         return self::CRITICAL_EVENTS;
@@ -213,9 +206,7 @@ class SecurityNotifier implements Hooks, SecurityRuleInterface, SecurityNotifier
         return implode("\n", $lines);
     }
 
-    /**
-     * @return string[]
-     */
+    
     protected function resolveRecipients(): array
     {
         if ($this->recipients !== []) {

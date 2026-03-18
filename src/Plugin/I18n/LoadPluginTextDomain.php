@@ -7,7 +7,7 @@ namespace BackTo\Framework\Plugin\I18n;
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
 
-class LoadPluginTextDomain implements Hooks
+final class LoadPluginTextDomain implements Hooks
 {
 
     /**

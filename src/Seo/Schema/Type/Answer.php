@@ -6,7 +6,7 @@ namespace BackTo\Framework\Seo\Schema\Type;
 
 use BackTo\Framework\Seo\Schema\SchemaType;
 
-class Answer extends SchemaType
+final class Answer extends SchemaType
 {
     public function __construct()
     {

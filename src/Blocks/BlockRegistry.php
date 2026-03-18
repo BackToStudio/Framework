@@ -7,7 +7,7 @@ namespace BackTo\Framework\Blocks;
 use BackTo\Framework\Contracts\BlockInterface;
 use BackTo\Framework\Contracts\RegistryInterface;
 
-class BlockRegistry implements RegistryInterface
+final class BlockRegistry implements RegistryInterface
 {
     /** @var BlockInterface[] */
     private array $blocks = [];
@@ -19,9 +19,7 @@ class BlockRegistry implements RegistryInterface
         return $this;
     }
 
-    /**
-     * @return BlockInterface[]
-     */
+    
     public function getBlocks(): array
     {
         return $this->blocks;

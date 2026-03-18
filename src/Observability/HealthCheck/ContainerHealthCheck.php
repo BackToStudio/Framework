@@ -10,9 +10,9 @@ use BackTo\Framework\Observability\Contracts\HealthCheckResult;
 /**
  * Verifies that the DI container is compiled and functional.
  */
-class ContainerHealthCheck implements HealthCheckInterface
+final class ContainerHealthCheck implements HealthCheckInterface
 {
-    private string $buildDir;
+    private readonly string $buildDir;
 
     public function __construct(string $buildDir)
     {

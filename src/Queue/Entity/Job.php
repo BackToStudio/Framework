@@ -7,7 +7,7 @@ namespace BackTo\Framework\Queue\Entity;
 /**
  * Represents a queued job instance with its state and metadata.
  */
-class Job
+final class Job
 {
     private int $id = 0;
     private string $key = '';

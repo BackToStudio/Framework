@@ -50,6 +50,9 @@
         <testsuite name="options">
             <directory>src/Options/Tests</directory>
         </testsuite>
+        <testsuite name="plugin">
+            <directory>src/Plugin/Tests</directory>
+        </testsuite>
         <testsuite name="theme">
             <directory>src/Theme/Tests</directory>
         </testsuite>

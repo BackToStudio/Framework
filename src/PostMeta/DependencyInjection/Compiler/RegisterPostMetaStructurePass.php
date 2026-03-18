@@ -7,7 +7,7 @@ namespace BackTo\Framework\PostMeta\DependencyInjection\Compiler;
 use BackTo\Framework\Compose\DependencyInjection\Compiler\AbstractTaggedServiceCompilerPass;
 use BackTo\Framework\PostMeta\PostMetaStructureRegistry;
 
-class RegisterPostMetaStructurePass extends AbstractTaggedServiceCompilerPass
+final class RegisterPostMetaStructurePass extends AbstractTaggedServiceCompilerPass
 {
     protected function getRegistryClass(): string
     {

@@ -9,6 +9,6 @@ namespace BackTo\Framework\Cache\Contracts;
  *
  * Exception thrown when an invalid cache key is provided.
  */
-class InvalidArgumentException extends \InvalidArgumentException
+final class InvalidArgumentException extends \InvalidArgumentException
 {
 }

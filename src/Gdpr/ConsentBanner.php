@@ -7,7 +7,7 @@ namespace BackTo\Framework\Gdpr;
 use BackTo\Framework\Gdpr\Contracts\ConsentCategoryInterface;
 use BackTo\Framework\Gdpr\Contracts\ConsentStorageInterface;
 
-class ConsentBanner
+final class ConsentBanner
 {
     public function __construct(
         private readonly ConsentCategoryRegistry $categoryRegistry,
@@ -152,9 +152,7 @@ class ConsentBanner
         HTML;
     }
 
-    /**
-     * @param ConsentCategoryInterface[] $categories
-     */
+    
     private function renderCheckboxes(array $categories): string
     {
         $html = '';

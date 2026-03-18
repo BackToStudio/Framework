@@ -15,7 +15,7 @@ use BackTo\Framework\Seo\SeoManager;
  */
 class OrganizationSchemaGenerator
 {
-    private SeoManager $seoManager;
+    private readonly SeoManager $seoManager;
 
     public function __construct(SeoManager $seoManager)
     {
@@ -50,9 +50,7 @@ class OrganizationSchemaGenerator
         return $org;
     }
 
-    /**
-     * @return string[]
-     */
+    
     private function buildSameAs(): array
     {
         if (!$this->seoManager->hasProvider()) {
