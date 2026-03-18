@@ -100,4 +100,32 @@ class WordPressPageCacheTest extends TestCase
         $this->assertStringContainsString('A', $a);
         $this->assertStringContainsString('B', $b);
     }
+
+    public function testCorruptedMetaCleansUpOrphanedFiles(): void
+    {
+        $url = 'https://example.com/corrupted';
+        $this->cache->put($url, '<html>content</html>', 3600);
+
+        // Corrupt the meta file
+        $metaFile = $this->cacheDir . '/' . md5($url) . '.meta';
+        $htmlFile = $this->cacheDir . '/' . md5($url) . '.html';
+        file_put_contents($metaFile, 'corrupted data that is not serializable');
+
+        // get() should return null AND clean up orphaned files
+        $this->assertNull($this->cache->get($url));
+        $this->assertFileDoesNotExist($htmlFile);
+        $this->assertFileDoesNotExist($metaFile);
+    }
+
+    public function testMissingMetaWithExistingHtmlReturnsNull(): void
+    {
+        $url = 'https://example.com/no-meta';
+        $this->cache->put($url, '<html>content</html>', 3600);
+
+        // Delete only the meta file
+        $metaFile = $this->cacheDir . '/' . md5($url) . '.meta';
+        unlink($metaFile);
+
+        $this->assertNull($this->cache->get($url));
+    }
 }

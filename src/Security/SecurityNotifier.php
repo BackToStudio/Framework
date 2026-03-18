@@ -6,6 +6,7 @@ namespace BackTo\Framework\Security;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
+use BackTo\Framework\Contracts\RequestContextInterface;
 use BackTo\Framework\Options\Contracts\OptionsRepositoryInterface;
 use BackTo\Framework\Security\Contracts\AuditLogSeverity;
 use BackTo\Framework\Security\Contracts\MailerInterface;
@@ -35,6 +36,8 @@ final class SecurityNotifier implements Hooks, SecurityRuleInterface, SecurityNo
     private readonly HookDispatcherInterface $hookDispatcher;
     private readonly MailerInterface $mailer;
     private readonly OptionsRepositoryInterface $options;
+    private readonly RequestContextInterface $requestContext;
+    private readonly SecurityAlertFormatter $formatter;
 
     /** @var string[] */
     private array $recipients = [];
@@ -59,11 +62,20 @@ final class SecurityNotifier implements Hooks, SecurityRuleInterface, SecurityNo
     public function __construct(
         HookDispatcherInterface $hookDispatcher,
         MailerInterface $mailer,
-        OptionsRepositoryInterface $options
+        OptionsRepositoryInterface $options,
+        RequestContextInterface $requestContext,
+        ?SecurityAlertFormatter $formatter = null
     ) {
         $this->hookDispatcher = $hookDispatcher;
         $this->mailer = $mailer;
         $this->options = $options;
+        $this->requestContext = $requestContext;
+        $this->formatter = $formatter ?? new SecurityAlertFormatter($options);
+    }
+
+    protected function getRequestContext(): RequestContextInterface
+    {
+        return $this->requestContext;
     }
 
     public function getName(): string
@@ -176,11 +188,7 @@ final class SecurityNotifier implements Hooks, SecurityRuleInterface, SecurityNo
 
     public function buildSubject(string $event, string $severity): string
     {
-        $siteName = $this->getSiteName();
-        $label = strtoupper($severity);
-        $eventLabel = str_replace('_', ' ', $event);
-
-        return sprintf('[%s] %s - %s', $label, $siteName, ucfirst($eventLabel));
+        return $this->formatter->buildSubject($event, $severity);
     }
 
     /**
@@ -188,22 +196,7 @@ final class SecurityNotifier implements Hooks, SecurityRuleInterface, SecurityNo
      */
     public function buildBody(string $event, string $severity, array $context): string
     {
-        $lines = [];
-        $lines[] = 'Security Alert: ' . str_replace('_', ' ', $event);
-        $lines[] = 'Severity: ' . strtoupper($severity);
-        $lines[] = 'Time: ' . gmdate('Y-m-d H:i:s') . ' UTC';
-        $lines[] = '';
-
-        foreach ($context as $key => $value) {
-            $displayValue = is_array($value) ? implode(', ', array_map('strval', $value)) : (string) $value;
-            $lines[] = ucfirst(str_replace('_', ' ', $key)) . ': ' . $displayValue;
-        }
-
-        $lines[] = '';
-        $lines[] = '---';
-        $lines[] = 'This is an automated security notification from BackTo Framework.';
-
-        return implode("\n", $lines);
+        return $this->formatter->buildBody($event, $severity, $context);
     }
 
     
@@ -221,11 +214,6 @@ final class SecurityNotifier implements Hooks, SecurityRuleInterface, SecurityNo
     protected function getAdminEmail(): string
     {
         return (string) $this->options->get('admin_email', '');
-    }
-
-    protected function getSiteName(): string
-    {
-        return (string) $this->options->get('blogname', 'WordPress');
     }
 
     protected function sendEmail(string $to, string $subject, string $body): bool

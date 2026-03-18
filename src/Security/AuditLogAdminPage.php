@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace BackTo\Framework\Security;
 
 use BackTo\Framework\Admin\Contracts\AdminPageInterface;
+use BackTo\Framework\Contracts\RequestContextInterface;
 use BackTo\Framework\Security\Contracts\AuditLogRepositoryInterface;
 use BackTo\Framework\Security\Contracts\AuditLogSeverity;
 
@@ -19,13 +20,15 @@ class AuditLogAdminPage implements AdminPageInterface
     private const MENU_POSITION = 81;
 
     private readonly AuditLogRepositoryInterface $repository;
+    private readonly RequestContextInterface $requestContext;
     private readonly AuditLogCsvExporter $csvExporter;
 
     private int $perPage = self::DEFAULT_PER_PAGE;
 
-    public function __construct(AuditLogRepositoryInterface $repository, ?AuditLogCsvExporter $csvExporter = null)
+    public function __construct(AuditLogRepositoryInterface $repository, RequestContextInterface $requestContext, ?AuditLogCsvExporter $csvExporter = null)
     {
         $this->repository = $repository;
+        $this->requestContext = $requestContext;
         $this->csvExporter = $csvExporter ?? new AuditLogCsvExporter($repository);
     }
 
@@ -250,12 +253,12 @@ class AuditLogAdminPage implements AdminPageInterface
             'self_promotion_blocked', 'privileged_role_granted',
         ];
 
-        $event = (string) ($_GET['event'] ?? '');
+        $event = (string) ($this->requestContext->query('event') ?? '');
         if ($event !== '' && in_array($event, $allowedEvents, true)) {
             $filters['event'] = $event;
         }
 
-        $severity = (string) ($_GET['severity'] ?? '');
+        $severity = (string) ($this->requestContext->query('severity') ?? '');
         if ($severity !== '' && AuditLogSeverity::tryFrom($severity) !== null) {
             $filters['severity'] = $severity;
         }
@@ -265,22 +268,22 @@ class AuditLogAdminPage implements AdminPageInterface
 
     protected function getCurrentPage(): int
     {
-        return max(1, (int) ($_GET['paged'] ?? 1));
+        return max(1, (int) ($this->requestContext->query('paged') ?? 1));
     }
 
     protected function isExportRequest(): bool
     {
-        return ($_GET['action'] ?? '') === 'export';
+        return ($this->requestContext->query('action') ?? '') === 'export';
     }
 
     protected function isPurgeRequest(): bool
     {
-        return ($_POST['action'] ?? '') === 'purge';
+        return ($this->requestContext->post('action') ?? '') === 'purge';
     }
 
     protected function getPurgeDays(): int
     {
-        return max(1, (int) ($_POST['days'] ?? 90));
+        return max(1, (int) ($this->requestContext->post('days') ?? 90));
     }
 
     protected function buildPageUrl(int $page): string
@@ -295,7 +298,7 @@ class AuditLogAdminPage implements AdminPageInterface
 
 protected function verifyNonce(string $action, string $queryArg): bool
     {
-        $nonce = $_REQUEST[$queryArg] ?? '';
+        $nonce = $this->requestContext->input($queryArg) ?? '';
 
         if (! is_string($nonce) || $nonce === '') {
             return false;

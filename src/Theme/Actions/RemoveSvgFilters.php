@@ -4,16 +4,21 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Theme\Actions;
 
+use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
-
-use function remove_action;
 
 final class RemoveSvgFilters implements Hooks
 {
+    private readonly HookDispatcherInterface $hookDispatcher;
+
+    public function __construct(HookDispatcherInterface $hookDispatcher)
+    {
+        $this->hookDispatcher = $hookDispatcher;
+    }
 
     public function hooks(): void
     {
-        remove_action('wp_body_open', 'wp_global_styles_render_svg_filters');
-        remove_action('wp_body_open', 'gutenberg_global_styles_render_svg_filters');
+        $this->hookDispatcher->removeAction('wp_body_open', 'wp_global_styles_render_svg_filters');
+        $this->hookDispatcher->removeAction('wp_body_open', 'gutenberg_global_styles_render_svg_filters');
     }
 }

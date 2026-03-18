@@ -4,87 +4,73 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Plugin\Tests;
 
-require_once __DIR__ . '/wp_stubs.php';
-
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
+use BackTo\Framework\Plugin\Contracts\TextDomainLoaderInterface;
 use BackTo\Framework\Plugin\I18n\LoadMuPluginTextDomain;
 use PHPUnit\Framework\TestCase;
 
 class LoadMuPluginTextDomainTest extends TestCase
 {
+    private HookDispatcherInterface $dispatcher;
+    private TextDomainLoaderInterface $textDomainLoader;
+    private array $loadCalls;
+
     protected function setUp(): void
     {
-        $GLOBALS['_load_muplugin_textdomain_calls'] = [];
-    }
-
-    protected function tearDown(): void
-    {
-        unset($GLOBALS['_load_muplugin_textdomain_calls']);
+        $this->loadCalls = [];
+        $this->dispatcher = $this->createMock(HookDispatcherInterface::class);
+        $this->textDomainLoader = $this->createMock(TextDomainLoaderInterface::class);
+        $this->textDomainLoader->method('loadMuPluginTextDomain')
+            ->willReturnCallback(function (string $domain, string $path) {
+                $this->loadCalls[] = ['domain' => $domain, 'path' => $path];
+            });
     }
 
     public function testImplementsHooksInterface(): void
     {
-        $dispatcher = $this->createMock(HookDispatcherInterface::class);
-        $loader = new LoadMuPluginTextDomain('/path/to/mu-plugin', 'my-plugin', $dispatcher);
+        $loader = new LoadMuPluginTextDomain('/path/to/mu-plugin', 'my-plugin', $this->dispatcher, $this->textDomainLoader);
 
         $this->assertInstanceOf(Hooks::class, $loader);
     }
 
     public function testHooksRegistersInitAction(): void
     {
-        $dispatcher = $this->createMock(HookDispatcherInterface::class);
-        $dispatcher->expects($this->once())
+        $this->dispatcher->expects($this->once())
             ->method('addAction')
             ->with('init', $this->anything());
 
-        $loader = new LoadMuPluginTextDomain('/path/to/mu-plugin', 'my-plugin', $dispatcher);
+        $loader = new LoadMuPluginTextDomain('/path/to/mu-plugin', 'my-plugin', $this->dispatcher, $this->textDomainLoader);
         $loader->hooks();
     }
 
     public function testLoadTranslationsPassesCorrectDomain(): void
     {
-        $dispatcher = $this->createMock(HookDispatcherInterface::class);
-        $loader = new LoadMuPluginTextDomain('/var/www/wp-content/mu-plugins/my-plugin', 'my-mu-plugin', $dispatcher);
+        $loader = new LoadMuPluginTextDomain('/var/www/wp-content/mu-plugins/my-plugin', 'my-mu-plugin', $this->dispatcher, $this->textDomainLoader);
 
         $loader->loadTranslations();
 
-        $this->assertCount(1, $GLOBALS['_load_muplugin_textdomain_calls']);
-        $this->assertSame('my-mu-plugin', $GLOBALS['_load_muplugin_textdomain_calls'][0]['domain']);
+        $this->assertCount(1, $this->loadCalls);
+        $this->assertSame('my-mu-plugin', $this->loadCalls[0]['domain']);
     }
 
     public function testLoadTranslationsBuildsCorrectPath(): void
     {
-        $dispatcher = $this->createMock(HookDispatcherInterface::class);
-        $loader = new LoadMuPluginTextDomain('/var/www/wp-content/mu-plugins/my-plugin', 'my-plugin', $dispatcher);
+        $loader = new LoadMuPluginTextDomain('/var/www/wp-content/mu-plugins/my-plugin', 'my-plugin', $this->dispatcher, $this->textDomainLoader);
 
         $loader->loadTranslations();
 
-        // MU plugin uses basename() + DIRECTORY_SEPARATOR + 'languages'
         $expectedPath = 'my-plugin' . DIRECTORY_SEPARATOR . 'languages';
-        $this->assertSame($expectedPath, $GLOBALS['_load_muplugin_textdomain_calls'][0]['path']);
-    }
-
-    public function testMuPluginDoesNotPassDeprecatedParam(): void
-    {
-        $dispatcher = $this->createMock(HookDispatcherInterface::class);
-        $loader = new LoadMuPluginTextDomain('/path', 'domain', $dispatcher);
-
-        $loader->loadTranslations();
-
-        // load_muplugin_textdomain only has 2 params (no deprecated param unlike load_plugin_textdomain)
-        $call = $GLOBALS['_load_muplugin_textdomain_calls'][0];
-        $this->assertArrayNotHasKey('deprecated', $call);
+        $this->assertSame($expectedPath, $this->loadCalls[0]['path']);
     }
 
     public function testLoadTranslationsWithNestedPath(): void
     {
-        $dispatcher = $this->createMock(HookDispatcherInterface::class);
-        $loader = new LoadMuPluginTextDomain('/deeply/nested/mu-plugins/custom', 'custom', $dispatcher);
+        $loader = new LoadMuPluginTextDomain('/deeply/nested/mu-plugins/custom', 'custom', $this->dispatcher, $this->textDomainLoader);
 
         $loader->loadTranslations();
 
         $expectedPath = 'custom' . DIRECTORY_SEPARATOR . 'languages';
-        $this->assertSame($expectedPath, $GLOBALS['_load_muplugin_textdomain_calls'][0]['path']);
+        $this->assertSame($expectedPath, $this->loadCalls[0]['path']);
     }
 }

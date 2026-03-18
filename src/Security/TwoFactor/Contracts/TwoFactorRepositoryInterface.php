@@ -5,29 +5,17 @@ declare(strict_types=1);
 namespace BackTo\Framework\Security\TwoFactor\Contracts;
 
 /**
- * Port interface for persisting 2FA user settings.
+ * Composite port interface for persisting 2FA user settings.
+ *
+ * Extends all segregated 2FA interfaces for backward compatibility.
+ * Prefer depending on the narrowest interface your class actually needs:
+ * - TwoFactorStateInterface: enable/disable state
+ * - TwoFactorSecretInterface: TOTP secret storage
+ * - TwoFactorBackupCodeInterface: backup code storage
  */
-interface TwoFactorRepositoryInterface
+interface TwoFactorRepositoryInterface extends
+    TwoFactorStateInterface,
+    TwoFactorSecretInterface,
+    TwoFactorBackupCodeInterface
 {
-    public function isEnabled(int $userId): bool;
-
-    public function enable(int $userId): void;
-
-    public function disable(int $userId): void;
-
-    public function getSecret(int $userId): ?string;
-
-    public function setSecret(int $userId, string $secret): void;
-
-    public function deleteSecret(int $userId): void;
-
-    /**
-     * @return string[] Hashed backup codes.
-     */
-    public function getBackupCodes(int $userId): array;
-
-    
-    public function setBackupCodes(int $userId, array $hashedCodes): void;
-
-    public function deleteBackupCodes(int $userId): void;
 }

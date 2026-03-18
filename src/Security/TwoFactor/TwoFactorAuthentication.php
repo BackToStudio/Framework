@@ -6,6 +6,7 @@ namespace BackTo\Framework\Security\TwoFactor;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
+use BackTo\Framework\Contracts\RequestContextInterface;
 use BackTo\Framework\Observability\Contracts\LoggerInterface;
 use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
 use BackTo\Framework\Security\TwoFactor\Contracts\BackupCodeManagerInterface;
@@ -28,6 +29,7 @@ class TwoFactorAuthentication implements Hooks, SecurityRuleInterface
     private readonly TotpProviderInterface $totpProvider;
     private readonly BackupCodeManagerInterface $backupCodeManager;
     private readonly LoggerInterface $logger;
+    private readonly RequestContextInterface $requestContext;
     private readonly string $issuer;
 
     public function __construct(
@@ -36,6 +38,7 @@ class TwoFactorAuthentication implements Hooks, SecurityRuleInterface
         TotpProviderInterface $totpProvider,
         BackupCodeManagerInterface $backupCodeManager,
         LoggerInterface $logger,
+        RequestContextInterface $requestContext,
         string $issuer = 'WordPress',
     ) {
         $this->hookDispatcher = $hookDispatcher;
@@ -43,6 +46,7 @@ class TwoFactorAuthentication implements Hooks, SecurityRuleInterface
         $this->totpProvider = $totpProvider;
         $this->backupCodeManager = $backupCodeManager;
         $this->logger = $logger;
+        $this->requestContext = $requestContext;
         $this->issuer = $issuer;
     }
 
@@ -233,7 +237,7 @@ class TwoFactorAuthentication implements Hooks, SecurityRuleInterface
 
     protected function getTwoFactorCode(): ?string
     {
-        $code = $_POST['backto_2fa_code'] ?? null;
+        $code = $this->requestContext->post('backto_2fa_code');
 
         if (!is_string($code) || trim($code) === '') {
             return null;

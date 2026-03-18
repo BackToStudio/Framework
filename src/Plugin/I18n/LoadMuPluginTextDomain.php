@@ -6,36 +6,28 @@ namespace BackTo\Framework\Plugin\I18n;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
+use BackTo\Framework\Plugin\Contracts\TextDomainLoaderInterface;
 
 final class LoadMuPluginTextDomain implements Hooks
 {
-
-    /**
-     * @var string
-     */
-    protected $pluginDirectory;
-
-    /**
-     * @var string
-     */
-    protected $pluginTextDomain;
-
-    /**
-     * @var HookDispatcherInterface
-     */
-    private $hookDispatcher;
+    private readonly string $pluginDirectory;
+    private readonly string $pluginTextDomain;
+    private readonly HookDispatcherInterface $hookDispatcher;
+    private readonly TextDomainLoaderInterface $textDomainLoader;
 
     /**
      * Params are auto-injected by Dependency Injection.
-     *
-     * @param string $pluginDirectory
-     * @param string $pluginTextDomain
      */
-    public function __construct(string $pluginDirectory, string $pluginTextDomain, HookDispatcherInterface $hookDispatcher)
-    {
+    public function __construct(
+        string $pluginDirectory,
+        string $pluginTextDomain,
+        HookDispatcherInterface $hookDispatcher,
+        TextDomainLoaderInterface $textDomainLoader,
+    ) {
         $this->pluginDirectory = $pluginDirectory;
         $this->pluginTextDomain = $pluginTextDomain;
         $this->hookDispatcher = $hookDispatcher;
+        $this->textDomainLoader = $textDomainLoader;
     }
 
     public function hooks(): void
@@ -48,7 +40,7 @@ final class LoadMuPluginTextDomain implements Hooks
      */
     public function loadTranslations(): void
     {
-        \load_muplugin_textdomain(
+        $this->textDomainLoader->loadMuPluginTextDomain(
             $this->pluginTextDomain,
             basename($this->pluginDirectory) . DIRECTORY_SEPARATOR . 'languages'
         );

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace BackTo\Framework\Queue\Tests;
 
 use BackTo\Framework\Queue\Contracts\JobInterface;
-use BackTo\Framework\Queue\Contracts\QueueRepositoryInterface;
+use BackTo\Framework\Queue\Contracts\QueueJobStorageInterface;
 use BackTo\Framework\Queue\Entity\Job;
 use BackTo\Framework\Queue\Factory\JobFactory;
 use BackTo\Framework\Queue\QueueDispatcher;
@@ -14,14 +14,14 @@ use PHPUnit\Framework\TestCase;
 
 class QueueDispatcherTest extends TestCase
 {
-    private QueueRepositoryInterface $repository;
+    private QueueJobStorageInterface $repository;
     private QueueRegistry $registry;
     private JobFactory $factory;
     private QueueDispatcher $dispatcher;
 
     protected function setUp(): void
     {
-        $this->repository = $this->createMock(QueueRepositoryInterface::class);
+        $this->repository = $this->createMock(QueueJobStorageInterface::class);
         $this->registry = new QueueRegistry();
         $this->factory = new JobFactory();
 
@@ -197,5 +197,26 @@ class QueueDispatcherTest extends TestCase
             ->willReturn(1);
 
         $this->dispatcher->dispatch('send_email', $payload);
+    }
+
+    public function testDispatchUniqueThrowsOnNonSerializablePayload(): void
+    {
+        // NAN is not JSON-serializable and will cause json_encode to fail.
+        $payload = ['value' => \NAN];
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessageMatches('/not JSON-serializable/');
+
+        $this->dispatcher->dispatchUnique('bad_job', $payload);
+    }
+
+    public function testDispatchUniqueThrowsWithJobKeyInMessage(): void
+    {
+        $payload = ['value' => \INF];
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessageMatches("/Cannot dispatch unique job 'inf_job'/");
+
+        $this->dispatcher->dispatchUnique('inf_job', $payload);
     }
 }

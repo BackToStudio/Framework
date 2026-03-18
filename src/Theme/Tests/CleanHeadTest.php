@@ -4,37 +4,38 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Theme\Tests;
 
-require_once __DIR__ . '/wp_stubs.php';
-
+use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
 use BackTo\Framework\Theme\Actions\CleanHead;
 use PHPUnit\Framework\TestCase;
 
 class CleanHeadTest extends TestCase
 {
+    private HookDispatcherInterface $hookDispatcher;
+    private array $removedActions;
+
     protected function setUp(): void
     {
-        $GLOBALS['_removed_actions'] = [];
-    }
-
-    protected function tearDown(): void
-    {
-        unset($GLOBALS['_removed_actions']);
+        $this->removedActions = [];
+        $this->hookDispatcher = $this->createMock(HookDispatcherInterface::class);
+        $this->hookDispatcher->method('removeAction')
+            ->willReturnCallback(function (string $tag, $callback, int $priority = 10) {
+                $this->removedActions[] = ['tag' => $tag, 'callback' => $callback, 'priority' => $priority];
+            });
     }
 
     public function testImplementsHooksInterface(): void
     {
-        $this->assertInstanceOf(Hooks::class, new CleanHead());
+        $this->assertInstanceOf(Hooks::class, new CleanHead($this->hookDispatcher));
     }
 
     public function testRemovesAllExpectedWpHeadActions(): void
     {
-        $action = new CleanHead();
+        $action = new CleanHead($this->hookDispatcher);
         $action->hooks();
 
-        $tags = array_column($GLOBALS['_removed_actions'], 'tag');
+        $tags = array_column($this->removedActions, 'tag');
 
-        // All removals target wp_head
         foreach ($tags as $tag) {
             $this->assertSame('wp_head', $tag);
         }
@@ -42,57 +43,56 @@ class CleanHeadTest extends TestCase
 
     public function testRemovesExactly8Actions(): void
     {
-        $action = new CleanHead();
+        $action = new CleanHead($this->hookDispatcher);
         $action->hooks();
 
-        $this->assertCount(8, $GLOBALS['_removed_actions']);
+        $this->assertCount(8, $this->removedActions);
     }
 
     public function testRemovesFeedLinksExtra(): void
     {
-        $action = new CleanHead();
+        $action = new CleanHead($this->hookDispatcher);
         $action->hooks();
 
-        $callbacks = array_column($GLOBALS['_removed_actions'], 'callback');
+        $callbacks = array_column($this->removedActions, 'callback');
         $this->assertContains('feed_links_extra', $callbacks);
     }
 
     public function testRemovesFeedLinks(): void
     {
-        $action = new CleanHead();
+        $action = new CleanHead($this->hookDispatcher);
         $action->hooks();
 
-        $callbacks = array_column($GLOBALS['_removed_actions'], 'callback');
+        $callbacks = array_column($this->removedActions, 'callback');
         $this->assertContains('feed_links', $callbacks);
     }
 
     public function testRemovesRsdLink(): void
     {
-        $action = new CleanHead();
+        $action = new CleanHead($this->hookDispatcher);
         $action->hooks();
 
-        $callbacks = array_column($GLOBALS['_removed_actions'], 'callback');
+        $callbacks = array_column($this->removedActions, 'callback');
         $this->assertContains('rsd_link', $callbacks);
     }
 
     public function testRemovesWlwManifestLink(): void
     {
-        $action = new CleanHead();
+        $action = new CleanHead($this->hookDispatcher);
         $action->hooks();
 
-        $callbacks = array_column($GLOBALS['_removed_actions'], 'callback');
+        $callbacks = array_column($this->removedActions, 'callback');
         $this->assertContains('wlwmanifest_link', $callbacks);
     }
 
     public function testRespectsPriorityForFeedLinks(): void
     {
-        $action = new CleanHead();
+        $action = new CleanHead($this->hookDispatcher);
         $action->hooks();
 
-        // feed_links_extra has priority 3, feed_links has priority 2
         $feedLinksExtra = null;
         $feedLinks = null;
-        foreach ($GLOBALS['_removed_actions'] as $removed) {
+        foreach ($this->removedActions as $removed) {
             if ($removed['callback'] === 'feed_links_extra') {
                 $feedLinksExtra = $removed;
             }
@@ -109,11 +109,10 @@ class CleanHeadTest extends TestCase
 
     public function testCanBeCalledMultipleTimesWithoutError(): void
     {
-        $action = new CleanHead();
+        $action = new CleanHead($this->hookDispatcher);
         $action->hooks();
         $action->hooks();
 
-        // Should have 16 removals (2x8), no errors
-        $this->assertCount(16, $GLOBALS['_removed_actions']);
+        $this->assertCount(16, $this->removedActions);
     }
 }

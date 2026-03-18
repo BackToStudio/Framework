@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace BackTo\Framework\Queue\Tests;
 
 use BackTo\Framework\Queue\Contracts\JobInterface;
-use BackTo\Framework\Queue\Contracts\QueueRepositoryInterface;
+use BackTo\Framework\Queue\Contracts\QueueJobStorageInterface;
 use BackTo\Framework\Queue\Entity\Job;
 use BackTo\Framework\Queue\Entity\JobStatus;
 use BackTo\Framework\Queue\Factory\JobFactory;
@@ -15,14 +15,14 @@ use PHPUnit\Framework\TestCase;
 
 class QueueWorkerTest extends TestCase
 {
-    private QueueRepositoryInterface $repository;
+    private QueueJobStorageInterface $repository;
     private QueueRegistry $registry;
     private QueueWorker $worker;
     private JobFactory $factory;
 
     protected function setUp(): void
     {
-        $this->repository = $this->createMock(QueueRepositoryInterface::class);
+        $this->repository = $this->createMock(QueueJobStorageInterface::class);
         $this->registry = new QueueRegistry();
         $this->factory = new JobFactory();
 
@@ -354,6 +354,61 @@ class QueueWorkerTest extends TestCase
         $this->repository->method('find')->with(99)->willReturn(null);
         // Should not call release since we can't find the job.
         $this->repository->expects($this->never())->method('release');
+
+        $this->worker->processQueue();
+    }
+
+    public function testRecurringJobIsRescheduledBeforeMarkingComplete(): void
+    {
+        $handler = $this->createMock(JobInterface::class);
+        $handler->method('getKey')->willReturn('recurring_job');
+        $handler->method('getLabel')->willReturn('Recurring Job');
+        $handler->method('getGroup')->willReturn('default');
+        $handler->method('getMaxRetries')->willReturn(3);
+
+        $this->registry->add($handler);
+
+        $job = new Job();
+        $job->setId(1)
+            ->setKey('recurring_job')
+            ->setGroup('default')
+            ->setStatus(JobStatus::Running)
+            ->setMaxRetries(3)
+            ->setIntervalSeconds(600);
+
+        $this->repository->method('claimNextPending')
+            ->willReturnOnConsecutiveCalls($job, null);
+
+        // Verify enqueue (reschedule) is called BEFORE markCompleted
+        // by making enqueue fail and checking markCompleted is NOT called.
+        $this->repository->expects($this->once())
+            ->method('enqueue')
+            ->willThrowException(new \RuntimeException('DB write failed'));
+
+        $this->repository->expects($this->never())->method('markCompleted');
+
+        $this->expectException(\RuntimeException::class);
+        $this->worker->processQueue();
+    }
+
+    public function testNonRecurringJobCompletesNormally(): void
+    {
+        $handler = $this->createMock(JobInterface::class);
+        $handler->method('getKey')->willReturn('simple_job');
+        $handler->method('getLabel')->willReturn('Simple Job');
+        $handler->method('getGroup')->willReturn('default');
+        $handler->method('getMaxRetries')->willReturn(3);
+
+        $this->registry->add($handler);
+
+        $job = new Job();
+        $job->setId(1)->setKey('simple_job')->setStatus(JobStatus::Running)->setIntervalSeconds(0);
+
+        $this->repository->method('claimNextPending')
+            ->willReturnOnConsecutiveCalls($job, null);
+
+        $this->repository->expects($this->once())->method('markCompleted')->with(1);
+        $this->repository->expects($this->never())->method('enqueue');
 
         $this->worker->processQueue();
     }

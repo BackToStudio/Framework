@@ -6,6 +6,8 @@ namespace BackTo\Framework\Security;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
+use BackTo\Framework\Contracts\RequestContextInterface;
+use BackTo\Framework\Contracts\ResponseEmitterInterface;
 use BackTo\Framework\Security\Contracts\CorsManagerInterface;
 use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
 
@@ -22,6 +24,8 @@ use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
 class CorsManager implements Hooks, SecurityRuleInterface, CorsManagerInterface
 {
     private readonly HookDispatcherInterface $hookDispatcher;
+    private readonly RequestContextInterface $requestContext;
+    private readonly ResponseEmitterInterface $responseEmitter;
 
     /** @var string[] */
     private array $allowedOrigins = [];
@@ -38,9 +42,14 @@ class CorsManager implements Hooks, SecurityRuleInterface, CorsManagerInterface
 
     private int $maxAge = self::DEFAULT_MAX_AGE;
 
-    public function __construct(HookDispatcherInterface $hookDispatcher)
-    {
+    public function __construct(
+        HookDispatcherInterface $hookDispatcher,
+        RequestContextInterface $requestContext,
+        ResponseEmitterInterface $responseEmitter,
+    ) {
         $this->hookDispatcher = $hookDispatcher;
+        $this->requestContext = $requestContext;
+        $this->responseEmitter = $responseEmitter;
     }
 
     public function getName(): string
@@ -221,35 +230,30 @@ class CorsManager implements Hooks, SecurityRuleInterface, CorsManagerInterface
 
     protected function sendHeaders(string $origin): void
     {
-        if ($this->headersSent()) {
+        if ($this->responseEmitter->headersSent()) {
             return;
         }
 
         $headers = $this->buildHeaders($origin);
 
         foreach ($headers as $name => $value) {
-            header($name . ': ' . $value);
+            $this->responseEmitter->sendHeader($name . ': ' . $value);
         }
     }
 
     protected function getRequestOrigin(): string
     {
-        return $_SERVER['HTTP_ORIGIN'] ?? '';
+        return $this->requestContext->server('HTTP_ORIGIN');
     }
 
     protected function isPreflightRequest(): bool
     {
-        return ($_SERVER['REQUEST_METHOD'] ?? '') === 'OPTIONS';
-    }
-
-    protected function headersSent(): bool
-    {
-        return headers_sent();
+        return $this->requestContext->getMethod() === 'OPTIONS';
     }
 
     protected function exitPreflight(): void
     {
-        http_response_code(200);
-        exit;
+        $this->responseEmitter->setStatusCode(200);
+        $this->responseEmitter->terminate();
     }
 }

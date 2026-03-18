@@ -44,6 +44,9 @@ final class WordPressPageCache implements PageCacheInterface
         $meta = $this->readMeta($metaFile);
 
         if ($meta === null) {
+            // Corrupted or unreadable meta — clean up orphaned files.
+            $this->invalidate($url);
+
             return null;
         }
 

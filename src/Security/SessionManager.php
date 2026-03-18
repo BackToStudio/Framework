@@ -6,16 +6,22 @@ namespace BackTo\Framework\Security;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
+use BackTo\Framework\Contracts\RequestContextInterface;
 use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
 
 final class SessionManager implements Hooks, SecurityRuleInterface
 {
     private readonly HookDispatcherInterface $hookDispatcher;
+    private readonly RequestContextInterface $requestContext;
     private readonly int $maxSessions;
 
-    public function __construct(HookDispatcherInterface $hookDispatcher, int $maxSessions = 1)
-    {
+    public function __construct(
+        HookDispatcherInterface $hookDispatcher,
+        RequestContextInterface $requestContext,
+        int $maxSessions = 1,
+    ) {
         $this->hookDispatcher = $hookDispatcher;
+        $this->requestContext = $requestContext;
         $this->maxSessions = $maxSessions;
     }
 
@@ -39,8 +45,8 @@ final class SessionManager implements Hooks, SecurityRuleInterface
      */
     public function attachSessionInfo(array $sessionInfo): array
     {
-        $sessionInfo['ip'] = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
-        $sessionInfo['ua'] = $_SERVER['HTTP_USER_AGENT'] ?? '';
+        $sessionInfo['ip'] = $this->requestContext->getRemoteAddr();
+        $sessionInfo['ua'] = $this->requestContext->getUserAgent();
         $sessionInfo['created'] = time();
 
         return $sessionInfo;
@@ -55,11 +61,24 @@ final class SessionManager implements Hooks, SecurityRuleInterface
             return;
         }
 
-        $this->destroyExcessSessions((int) $user->ID);
+        $userId = (int) $user->ID;
+
+        if ($userId <= 0) {
+            return;
+        }
+
+        $this->destroyExcessSessions($userId);
     }
 
     /**
      * Limit the number of concurrent sessions per user.
+     */
+    /**
+     * Limit the number of concurrent sessions per user.
+     *
+     * Re-fetches sessions after destruction to mitigate race conditions
+     * where new sessions are created between get_all() and destroy().
+     * Limited to 2 passes to avoid infinite loops.
      */
     protected function destroyExcessSessions(int $userId): void
     {
@@ -69,26 +88,29 @@ final class SessionManager implements Hooks, SecurityRuleInterface
             return;
         }
 
-        $sessions = $manager->get_all();
+        // Two passes maximum to handle concurrent session creation.
+        for ($pass = 0; $pass < 2; $pass++) {
+            $sessions = $manager->get_all();
 
-        if (count($sessions) <= $this->maxSessions) {
-            return;
-        }
-
-        // Sort sessions by login time (oldest first)
-        uasort($sessions, static function (array $a, array $b): int {
-            return ($a['login'] ?? 0) <=> ($b['login'] ?? 0);
-        });
-
-        $tokensToDestroy = count($sessions) - $this->maxSessions;
-        $destroyed = 0;
-
-        foreach (array_keys($sessions) as $token) {
-            if ($destroyed >= $tokensToDestroy) {
-                break;
+            if (count($sessions) <= $this->maxSessions) {
+                return;
             }
-            $manager->destroy($token);
-            $destroyed++;
+
+            // Sort sessions by login time (oldest first)
+            uasort($sessions, static function (array $a, array $b): int {
+                return ($a['login'] ?? 0) <=> ($b['login'] ?? 0);
+            });
+
+            $tokensToDestroy = count($sessions) - $this->maxSessions;
+            $destroyed = 0;
+
+            foreach (array_keys($sessions) as $token) {
+                if ($destroyed >= $tokensToDestroy) {
+                    break;
+                }
+                $manager->destroy($token);
+                $destroyed++;
+            }
         }
     }
 

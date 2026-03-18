@@ -6,6 +6,7 @@ namespace BackTo\Framework\Security;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
+use BackTo\Framework\Contracts\RequestContextInterface;
 use BackTo\Framework\Security\Contracts\RateLimiterRepositoryInterface;
 use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
 
@@ -21,6 +22,7 @@ class RestApiRateLimiter implements Hooks, SecurityRuleInterface
 
     private readonly HookDispatcherInterface $hookDispatcher;
     private readonly RateLimiterRepositoryInterface $repository;
+    private readonly RequestContextInterface $requestContext;
 
     private const DEFAULT_RATE_LIMIT = 60;
     private const DEFAULT_RATE_WINDOW = 60;
@@ -34,9 +36,16 @@ class RestApiRateLimiter implements Hooks, SecurityRuleInterface
     public function __construct(
         HookDispatcherInterface $hookDispatcher,
         RateLimiterRepositoryInterface $repository,
+        RequestContextInterface $requestContext,
     ) {
         $this->hookDispatcher = $hookDispatcher;
         $this->repository = $repository;
+        $this->requestContext = $requestContext;
+    }
+
+    protected function getRequestContext(): RequestContextInterface
+    {
+        return $this->requestContext;
     }
 
     public function getName(): string

@@ -6,6 +6,8 @@ namespace BackTo\Framework\Security\Tests;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
+use BackTo\Framework\Contracts\RequestContextInterface;
+use BackTo\Framework\Contracts\ResponseEmitterInterface;
 use BackTo\Framework\Security\Contracts\CorsManagerInterface;
 use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
 use BackTo\Framework\Security\CorsManager;
@@ -59,12 +61,16 @@ class TestableCorsManager extends CorsManager
 class CorsManagerTest extends TestCase
 {
     private HookDispatcherInterface $dispatcher;
+    private RequestContextInterface $requestContext;
+    private ResponseEmitterInterface $responseEmitter;
     private TestableCorsManager $cors;
 
     protected function setUp(): void
     {
         $this->dispatcher = $this->createMock(HookDispatcherInterface::class);
-        $this->cors = new TestableCorsManager($this->dispatcher);
+        $this->requestContext = $this->createMock(RequestContextInterface::class);
+        $this->responseEmitter = $this->createMock(ResponseEmitterInterface::class);
+        $this->cors = new TestableCorsManager($this->dispatcher, $this->requestContext, $this->responseEmitter);
     }
 
     public function testImplementsRequiredInterfaces(): void
@@ -255,5 +261,34 @@ class CorsManagerTest extends TestCase
             ->setMaxAge(7200);
 
         $this->assertSame($this->cors, $result);
+    }
+
+    public function testWildcardOriginWithCredentialsThrows(): void
+    {
+        $this->cors->addAllowedOrigin('*');
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessageMatches('/credentials.*wildcard/is');
+
+        $this->cors->setAllowCredentials(true);
+    }
+
+    public function testCredentialsWithWildcardOriginThrows(): void
+    {
+        $this->cors->setAllowCredentials(true);
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessageMatches('/wildcard.*origin.*credentials/is');
+
+        $this->cors->addAllowedOrigin('*');
+    }
+
+    public function testBuildHeadersRejectsCrlfInOrigin(): void
+    {
+        $this->cors->addAllowedOrigin('*');
+
+        $headers = $this->cors->buildHeaders("https://evil.com\r\nX-Injected: true");
+
+        $this->assertSame([], $headers);
     }
 }

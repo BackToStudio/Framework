@@ -6,6 +6,7 @@ namespace BackTo\Framework\Security;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
+use BackTo\Framework\Contracts\ResponseEmitterInterface;
 use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
 
 /**
@@ -15,15 +16,19 @@ use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
  * - send_headers (10): Standard priority for page requests
  * - rest_api_init (10): Ensures headers are also sent for REST API requests
  *
- * Note: sendSecurityHeaders() guards against double-sending via headers_sent().
+ * Note: sendSecurityHeaders() guards against double-sending via headersSent().
  */
 final class HttpHeadersHardening implements Hooks, SecurityRuleInterface
 {
     private readonly HookDispatcherInterface $hookDispatcher;
+    private readonly ResponseEmitterInterface $responseEmitter;
 
-    public function __construct(HookDispatcherInterface $hookDispatcher)
-    {
+    public function __construct(
+        HookDispatcherInterface $hookDispatcher,
+        ResponseEmitterInterface $responseEmitter,
+    ) {
         $this->hookDispatcher = $hookDispatcher;
+        $this->responseEmitter = $responseEmitter;
     }
 
     public function getName(): string
@@ -39,15 +44,15 @@ final class HttpHeadersHardening implements Hooks, SecurityRuleInterface
 
     public function sendSecurityHeaders(): void
     {
-        if (headers_sent()) {
+        if ($this->responseEmitter->headersSent()) {
             return;
         }
 
-        header('X-Content-Type-Options: nosniff');
-        header('X-Frame-Options: SAMEORIGIN');
-        header('Referrer-Policy: strict-origin-when-cross-origin');
-        header('Permissions-Policy: camera=(), microphone=(), geolocation=()');
-        header('Strict-Transport-Security: max-age=31536000; includeSubDomains; preload');
-        header_remove('X-Powered-By');
+        $this->responseEmitter->sendHeader('X-Content-Type-Options: nosniff');
+        $this->responseEmitter->sendHeader('X-Frame-Options: SAMEORIGIN');
+        $this->responseEmitter->sendHeader('Referrer-Policy: strict-origin-when-cross-origin');
+        $this->responseEmitter->sendHeader('Permissions-Policy: camera=(), microphone=(), geolocation=()');
+        $this->responseEmitter->sendHeader('Strict-Transport-Security: max-age=31536000; includeSubDomains; preload');
+        $this->responseEmitter->removeHeader('X-Powered-By');
     }
 }

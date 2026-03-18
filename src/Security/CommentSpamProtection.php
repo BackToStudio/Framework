@@ -6,6 +6,7 @@ namespace BackTo\Framework\Security;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
+use BackTo\Framework\Contracts\RequestContextInterface;
 use BackTo\Framework\Observability\Contracts\LoggerInterface;
 use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
 
@@ -24,6 +25,7 @@ class CommentSpamProtection implements Hooks, SecurityRuleInterface
 
     private readonly HookDispatcherInterface $hookDispatcher;
     private readonly LoggerInterface $logger;
+    private readonly RequestContextInterface $requestContext;
 
     private int $maxLinksAllowed = 2;
     private string $honeypotFieldName = 'website_url_confirm';
@@ -43,9 +45,16 @@ class CommentSpamProtection implements Hooks, SecurityRuleInterface
     public function __construct(
         HookDispatcherInterface $hookDispatcher,
         LoggerInterface $logger,
+        RequestContextInterface $requestContext,
     ) {
         $this->hookDispatcher = $hookDispatcher;
         $this->logger = $logger;
+        $this->requestContext = $requestContext;
+    }
+
+    protected function getRequestContext(): RequestContextInterface
+    {
+        return $this->requestContext;
     }
 
     public function getName(): string
@@ -166,7 +175,9 @@ class CommentSpamProtection implements Hooks, SecurityRuleInterface
 
     protected function isHoneypotFilled(): bool
     {
-        return isset($_POST[$this->honeypotFieldName]) && $_POST[$this->honeypotFieldName] !== '';
+        $value = $this->requestContext->post($this->honeypotFieldName);
+
+        return $value !== '';
     }
 
     protected function isValidReferer(): bool
@@ -185,7 +196,7 @@ class CommentSpamProtection implements Hooks, SecurityRuleInterface
 
     protected function getReferer(): string
     {
-        return $_SERVER['HTTP_REFERER'] ?? '';
+        return $this->requestContext->server('HTTP_REFERER');
     }
 
     protected function getSiteHost(): string

@@ -8,6 +8,7 @@ use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
 use BackTo\Framework\Exception\FrameworkException;
 use BackTo\Framework\Exception\InvalidTaxonomyException;
+use BackTo\Framework\Observability\Contracts\LoggerInterface;
 use BackTo\Framework\Taxonomy\Contracts\TaxonomyRegistrarInterface;
 
 final class RegisterTaxonomy implements Hooks
@@ -16,17 +17,20 @@ final class RegisterTaxonomy implements Hooks
     private readonly TaxonomyFactory $factory;
     private readonly TaxonomyRegistrarInterface $registrar;
     private readonly HookDispatcherInterface $hookDispatcher;
+    private readonly LoggerInterface $logger;
 
     public function __construct(
         TaxonomyRegistry $taxonomyRegistry,
         TaxonomyFactory $taxonomyFactory,
         TaxonomyRegistrarInterface $registrar,
-        HookDispatcherInterface $hookDispatcher
+        HookDispatcherInterface $hookDispatcher,
+        LoggerInterface $logger,
     ) {
         $this->registry = $taxonomyRegistry;
         $this->factory = $taxonomyFactory;
         $this->registrar = $registrar;
         $this->hookDispatcher = $hookDispatcher;
+        $this->logger = $logger;
     }
 
     public function hooks(): void
@@ -40,14 +44,14 @@ final class RegisterTaxonomy implements Hooks
     {
         foreach ($this->registry->getTaxonomies() as $taxonomy) {
             if ($this->registrar->exists($taxonomy->getKey())) {
-                return;
+                continue;
             }
 
             try {
                 $newTaxonomy = $this->factory->createTaxonomy($taxonomy->getKey(), $taxonomy->getPostTypes(), $taxonomy->getArgs());
                 $this->registrar->register($newTaxonomy->getKey(), $newTaxonomy->getPostTypes(), $newTaxonomy->getArgs());
             } catch (FrameworkException $exception) {
-                \error_log($exception->getMessage());
+                $this->logger->error($exception->getMessage());
             }
         }
     }

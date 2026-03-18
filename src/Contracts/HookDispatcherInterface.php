@@ -18,6 +18,8 @@ interface HookDispatcherInterface
 
     public function removeAction(string $hookName, callable|string $callback, int $priority = 10): void;
 
+    public function removeFilter(string $hookName, callable|string $callback, int $priority = 10): void;
+
     /**
      * Check if the current request is for an admin page.
      */

@@ -7,6 +7,7 @@ namespace BackTo\Framework\Security\Tests;
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
 use BackTo\Framework\Observability\Contracts\LoggerInterface;
+use BackTo\Framework\Queue\Contracts\CronSchedulerInterface;
 use BackTo\Framework\Security\Contracts\FileIntegrityRepositoryInterface;
 use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
 use BackTo\Framework\Security\FileIntegrityMonitor;
@@ -59,6 +60,7 @@ class FileIntegrityMonitorTest extends TestCase
     private HookDispatcherInterface $dispatcher;
     private FileIntegrityRepositoryInterface $repository;
     private LoggerInterface $logger;
+    private CronSchedulerInterface $cronScheduler;
     private TestableFileIntegrityMonitor $monitor;
 
     protected function setUp(): void
@@ -66,11 +68,13 @@ class FileIntegrityMonitorTest extends TestCase
         $this->dispatcher = $this->createMock(HookDispatcherInterface::class);
         $this->repository = $this->createMock(FileIntegrityRepositoryInterface::class);
         $this->logger = $this->createMock(LoggerInterface::class);
+        $this->cronScheduler = $this->createMock(CronSchedulerInterface::class);
 
         $this->monitor = new TestableFileIntegrityMonitor(
             $this->dispatcher,
             $this->repository,
             $this->logger,
+            $this->cronScheduler,
         );
     }
 

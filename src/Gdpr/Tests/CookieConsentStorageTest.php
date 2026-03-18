@@ -83,4 +83,30 @@ class CookieConsentStorageTest extends TestCase
         $storage = new CookieConsentStorage();
         $this->assertSame([], $storage->getConsent());
     }
+
+    public function testGetConsentRejectsOversizedCookie(): void
+    {
+        // Simulate a maliciously large cookie (> 4KB limit)
+        $_COOKIE['gdpr_consent'] = str_repeat('x', 5000);
+
+        $storage = new CookieConsentStorage();
+        $this->assertSame([], $storage->getConsent());
+    }
+
+    public function testGetConsentAcceptsCookieWithinSizeLimit(): void
+    {
+        $_COOKIE['gdpr_consent'] = json_encode(['analytics' => true]);
+
+        $storage = new CookieConsentStorage();
+        $consent = $storage->getConsent();
+        $this->assertTrue($consent['analytics']);
+    }
+
+    public function testHasConsentReturnsFalseForOversizedCookie(): void
+    {
+        $_COOKIE['gdpr_consent'] = str_repeat('x', 5000);
+
+        $storage = new CookieConsentStorage();
+        $this->assertFalse($storage->hasConsent('analytics'));
+    }
 }

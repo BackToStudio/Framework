@@ -6,11 +6,13 @@ namespace BackTo\Framework\Security;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
+use BackTo\Framework\Contracts\RequestContextInterface;
 use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
 
 final class PasswordPolicy implements Hooks, SecurityRuleInterface
 {
     private readonly HookDispatcherInterface $hookDispatcher;
+    private readonly RequestContextInterface $requestContext;
     private readonly int $minLength;
     private readonly bool $requireUppercase;
     private readonly bool $requireNumber;
@@ -18,12 +20,14 @@ final class PasswordPolicy implements Hooks, SecurityRuleInterface
 
     public function __construct(
         HookDispatcherInterface $hookDispatcher,
+        RequestContextInterface $requestContext,
         int $minLength = 12,
         bool $requireUppercase = true,
         bool $requireNumber = true,
         bool $requireSpecialChar = true,
     ) {
         $this->hookDispatcher = $hookDispatcher;
+        $this->requestContext = $requestContext;
         $this->minLength = $minLength;
         $this->requireUppercase = $requireUppercase;
         $this->requireNumber = $requireNumber;
@@ -116,7 +120,7 @@ final class PasswordPolicy implements Hooks, SecurityRuleInterface
 
     protected function getRegistrationPassword(): string
     {
-        $password = $_POST['pass1'] ?? '';
+        $password = $this->requestContext->post('pass1') ?? '';
 
         if (!is_string($password)) {
             return '';

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace BackTo\Framework\Gdpr\Tests;
 
 use BackTo\Framework\Gdpr\ConsentBanner;
+use BackTo\Framework\Gdpr\ConsentBannerRenderer;
 use BackTo\Framework\Gdpr\ConsentCategoryRegistry;
 use BackTo\Framework\Gdpr\Contracts\ConsentStorageInterface;
 use BackTo\Framework\Gdpr\Entity\ConsentCategory;
@@ -21,7 +22,11 @@ class ConsentBannerTest extends TestCase
     {
         $this->categoryRegistry = new ConsentCategoryRegistry();
         $this->consentStorage = $this->createMock(ConsentStorageInterface::class);
-        $this->banner = new ConsentBanner($this->categoryRegistry, $this->consentStorage);
+        $this->banner = new ConsentBanner(
+            $this->categoryRegistry,
+            $this->consentStorage,
+            new ConsentBannerRenderer(),
+        );
     }
 
     public function testRenderReturnsEmptyStringWithNoCategories(): void

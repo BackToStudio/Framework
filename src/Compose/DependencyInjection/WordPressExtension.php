@@ -6,6 +6,10 @@ namespace BackTo\Framework\Compose\DependencyInjection;
 
 use BackTo\Framework\Admin\Contracts\AdminPageInterface;
 use BackTo\Framework\Admin\Contracts\AdminPageRegistrarInterface;
+use BackTo\Framework\Admin\Contracts\CapabilityManagerInterface;
+use BackTo\Framework\Admin\Infrastructure\WordPressCapabilityManager;
+use BackTo\Framework\Cache\Contracts\TransientStoreInterface;
+use BackTo\Framework\Cache\Infrastructure\WordPressTransientStore;
 use BackTo\Framework\Observability\Contracts\ErrorHandlerInterface;
 use BackTo\Framework\Performance\Contracts\DatabaseOptimizerInterface;
 use BackTo\Framework\Performance\Contracts\HtmlOptimizerInterface;
@@ -24,6 +28,8 @@ use BackTo\Framework\Security\Contracts\FileIntegrityRepositoryInterface;
 use BackTo\Framework\Security\Contracts\InputSanitizerInterface;
 use BackTo\Framework\Security\Contracts\IPAccessControlInterface;
 use BackTo\Framework\Security\Contracts\LoginLocationRepositoryInterface;
+use BackTo\Framework\Security\Contracts\AccountLoginThrottleInterface;
+use BackTo\Framework\Security\Contracts\IpLoginThrottleInterface;
 use BackTo\Framework\Security\Contracts\LoginThrottleInterface;
 use BackTo\Framework\Security\Contracts\NonceManagerInterface;
 use BackTo\Framework\Security\Contracts\OutputEscaperInterface;
@@ -48,7 +54,10 @@ use BackTo\Framework\Security\Infrastructure\WordPressOutputEscaper;
 use BackTo\Framework\Security\TwoFactor\BackupCodeManager;
 use BackTo\Framework\Security\TwoFactor\Contracts\BackupCodeManagerInterface;
 use BackTo\Framework\Security\TwoFactor\Contracts\TotpProviderInterface;
+use BackTo\Framework\Security\TwoFactor\Contracts\TwoFactorBackupCodeInterface;
 use BackTo\Framework\Security\TwoFactor\Contracts\TwoFactorRepositoryInterface;
+use BackTo\Framework\Security\TwoFactor\Contracts\TwoFactorSecretInterface;
+use BackTo\Framework\Security\TwoFactor\Contracts\TwoFactorStateInterface;
 use BackTo\Framework\Security\TwoFactor\Infrastructure\WordPressTwoFactorRepository;
 use BackTo\Framework\Security\TwoFactor\TotpProvider;
 use BackTo\Framework\Observability\ErrorHandler;
@@ -77,10 +86,14 @@ use BackTo\Framework\PostMeta\Contracts\PostMetaRegistrarInterface;
 use BackTo\Framework\PostMeta\Contracts\PostMetaStructureInterface;
 use BackTo\Framework\PostMeta\DependencyInjection\Compiler\RegisterPostMetaStructurePass;
 use BackTo\Framework\PostMeta\Infrastructure\WordPressPostMetaRegistrar;
+use BackTo\Framework\Plugin\Contracts\TextDomainLoaderInterface;
+use BackTo\Framework\Plugin\Infrastructure\WordPressTextDomainLoader;
 use BackTo\Framework\PostType\Contracts\PostTypeInterface;
 use BackTo\Framework\PostType\Contracts\PostTypeRegistrarInterface;
 use BackTo\Framework\PostType\DependencyInjection\Compiler\RegisterPostTypePass;
 use BackTo\Framework\PostType\Infrastructure\WordPressPostTypeRegistrar;
+use BackTo\Framework\Queue\Contracts\CronSchedulerInterface;
+use BackTo\Framework\Queue\Infrastructure\WordPressCronScheduler;
 use BackTo\Framework\RestApi\Contracts\RestRouteInterface;
 use BackTo\Framework\RestApi\Contracts\RestRouteRegistrarInterface;
 use BackTo\Framework\RestApi\DependencyInjection\Compiler\RegisterRestRoutePass;
@@ -205,6 +218,8 @@ final class WordPressExtension
 
         $containerBuilder->register(LoginThrottleInterface::class, WordPressLoginThrottle::class);
         $containerBuilder->setAlias(WordPressLoginThrottle::class, LoginThrottleInterface::class);
+        $containerBuilder->setAlias(IpLoginThrottleInterface::class, LoginThrottleInterface::class);
+        $containerBuilder->setAlias(AccountLoginThrottleInterface::class, LoginThrottleInterface::class);
 
         $containerBuilder->register(ContentSecurityPolicyInterface::class, ContentSecurityPolicyManager::class)
             ->setAutowired(true);
@@ -218,6 +233,9 @@ final class WordPressExtension
 
         $containerBuilder->register(TwoFactorRepositoryInterface::class, WordPressTwoFactorRepository::class);
         $containerBuilder->setAlias(WordPressTwoFactorRepository::class, TwoFactorRepositoryInterface::class);
+        $containerBuilder->setAlias(TwoFactorStateInterface::class, TwoFactorRepositoryInterface::class);
+        $containerBuilder->setAlias(TwoFactorSecretInterface::class, TwoFactorRepositoryInterface::class);
+        $containerBuilder->setAlias(TwoFactorBackupCodeInterface::class, TwoFactorRepositoryInterface::class);
 
         $containerBuilder->register(BackupCodeManagerInterface::class, BackupCodeManager::class);
         $containerBuilder->setAlias(BackupCodeManager::class, BackupCodeManagerInterface::class);
@@ -260,6 +278,18 @@ final class WordPressExtension
         $containerBuilder->register(PageCacheInterface::class, WordPressPageCache::class)
             ->setAutowired(true);
         $containerBuilder->setAlias(WordPressPageCache::class, PageCacheInterface::class);
+
+        $containerBuilder->register(TransientStoreInterface::class, WordPressTransientStore::class);
+        $containerBuilder->setAlias(WordPressTransientStore::class, TransientStoreInterface::class);
+
+        $containerBuilder->register(CronSchedulerInterface::class, WordPressCronScheduler::class);
+        $containerBuilder->setAlias(WordPressCronScheduler::class, CronSchedulerInterface::class);
+
+        $containerBuilder->register(CapabilityManagerInterface::class, WordPressCapabilityManager::class);
+        $containerBuilder->setAlias(WordPressCapabilityManager::class, CapabilityManagerInterface::class);
+
+        $containerBuilder->register(TextDomainLoaderInterface::class, WordPressTextDomainLoader::class);
+        $containerBuilder->setAlias(WordPressTextDomainLoader::class, TextDomainLoaderInterface::class);
     }
 
     /**

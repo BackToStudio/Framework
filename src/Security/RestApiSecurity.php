@@ -6,11 +6,13 @@ namespace BackTo\Framework\Security;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
+use BackTo\Framework\Contracts\RequestContextInterface;
 use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
 
 class RestApiSecurity implements Hooks, SecurityRuleInterface
 {
     private readonly HookDispatcherInterface $hookDispatcher;
+    private readonly RequestContextInterface $requestContext;
 
     /** @var string[] */
     private readonly array $additionalPublicPatterns;
@@ -18,9 +20,10 @@ class RestApiSecurity implements Hooks, SecurityRuleInterface
     /**
      * @param string[] $additionalPublicPatterns Extra regex patterns for public routes.
      */
-    public function __construct(HookDispatcherInterface $hookDispatcher, array $additionalPublicPatterns = [])
+    public function __construct(HookDispatcherInterface $hookDispatcher, RequestContextInterface $requestContext, array $additionalPublicPatterns = [])
     {
         $this->hookDispatcher = $hookDispatcher;
+        $this->requestContext = $requestContext;
         $this->additionalPublicPatterns = $additionalPublicPatterns;
     }
 
@@ -91,7 +94,7 @@ class RestApiSecurity implements Hooks, SecurityRuleInterface
 
     protected function isPublicRoute(): bool
     {
-        $route = $_SERVER['REQUEST_URI'] ?? '';
+        $route = $this->requestContext->getRequestUri();
 
         // Extract REST route from URI
         $restPrefix = rest_get_url_prefix();

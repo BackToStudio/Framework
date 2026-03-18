@@ -55,6 +55,11 @@ final class ObservableHookDispatcher implements HookDispatcherInterface
         $this->inner->removeAction($hookName, $callback, $priority);
     }
 
+    public function removeFilter(string $hookName, callable|string $callback, int $priority = 10): void
+    {
+        $this->inner->removeFilter($hookName, $callback, $priority);
+    }
+
     public function isAdmin(): bool
     {
         return $this->inner->isAdmin();

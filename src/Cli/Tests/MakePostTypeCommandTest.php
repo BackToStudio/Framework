@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace BackTo\Framework\Cli\Tests;
 
 use BackTo\Framework\Cli\Command\MakePostTypeCommand;
+use BackTo\Framework\Cli\Infrastructure\NativeFilesystem;
+use BackTo\Framework\Cli\Infrastructure\WpCliOutput;
 use PHPUnit\Framework\TestCase;
 
 class MakePostTypeCommandTest extends TestCase
@@ -14,7 +16,7 @@ class MakePostTypeCommandTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->command = new MakePostTypeCommand();
+        $this->command = new MakePostTypeCommand(new NativeFilesystem(), new WpCliOutput());
         $this->outputDir = \sys_get_temp_dir() . '/backto_cli_test_' . \uniqid();
         \mkdir($this->outputDir, 0755, true);
     }

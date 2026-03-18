@@ -6,6 +6,7 @@ namespace BackTo\Framework\Security;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
+use BackTo\Framework\Contracts\RequestContextInterface;
 use BackTo\Framework\Observability\Contracts\LoggerInterface;
 use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
 
@@ -25,15 +26,23 @@ class AdminUrlObfuscation implements Hooks, SecurityRuleInterface
 
     private readonly HookDispatcherInterface $hookDispatcher;
     private readonly LoggerInterface $logger;
+    private readonly RequestContextInterface $requestContext;
 
     private string $loginSlug = '';
 
     public function __construct(
         HookDispatcherInterface $hookDispatcher,
         LoggerInterface $logger,
+        RequestContextInterface $requestContext,
     ) {
         $this->hookDispatcher = $hookDispatcher;
         $this->logger = $logger;
+        $this->requestContext = $requestContext;
+    }
+
+    protected function getRequestContext(): RequestContextInterface
+    {
+        return $this->requestContext;
     }
 
     public function getName(): string
@@ -145,7 +154,7 @@ class AdminUrlObfuscation implements Hooks, SecurityRuleInterface
 
     protected function getRequestUri(): string
     {
-        return $_SERVER['REQUEST_URI'] ?? '';
+        return $this->requestContext->server('REQUEST_URI');
     }
 
     protected function isLoggedIn(): bool

@@ -6,6 +6,7 @@ namespace BackTo\Framework\Security\Tests;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
+use BackTo\Framework\Contracts\RequestContextInterface;
 use BackTo\Framework\Observability\Contracts\LoggerInterface;
 use BackTo\Framework\Security\Contracts\LoginLocationRepositoryInterface;
 use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
@@ -68,6 +69,7 @@ class LoginAnomalyDetectorTest extends TestCase
     private HookDispatcherInterface $dispatcher;
     private LoginLocationRepositoryInterface $repository;
     private LoggerInterface $logger;
+    private RequestContextInterface $requestContext;
     private TestableLoginAnomalyDetector $detector;
 
     protected function setUp(): void
@@ -75,11 +77,16 @@ class LoginAnomalyDetectorTest extends TestCase
         $this->dispatcher = $this->createMock(HookDispatcherInterface::class);
         $this->repository = $this->createMock(LoginLocationRepositoryInterface::class);
         $this->logger = $this->createMock(LoggerInterface::class);
+        $this->requestContext = $this->createMock(RequestContextInterface::class);
+        $this->requestContext->method('getRemoteAddr')->willReturn('127.0.0.1');
+        $this->requestContext->method('server')->willReturn('');
+        $this->requestContext->method('getMethod')->willReturn('GET');
 
         $this->detector = new TestableLoginAnomalyDetector(
             $this->dispatcher,
             $this->repository,
             $this->logger,
+            $this->requestContext,
         );
     }
 

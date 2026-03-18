@@ -6,15 +6,18 @@ namespace BackTo\Framework\Security;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
+use BackTo\Framework\Contracts\RequestContextInterface;
 use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
 
 class DisableUserEnumeration implements Hooks, SecurityRuleInterface
 {
     private readonly HookDispatcherInterface $hookDispatcher;
+    private readonly RequestContextInterface $requestContext;
 
-    public function __construct(HookDispatcherInterface $hookDispatcher)
+    public function __construct(HookDispatcherInterface $hookDispatcher, RequestContextInterface $requestContext)
     {
         $this->hookDispatcher = $hookDispatcher;
+        $this->requestContext = $requestContext;
     }
 
     public function getName(): string
@@ -34,7 +37,7 @@ class DisableUserEnumeration implements Hooks, SecurityRuleInterface
             return;
         }
 
-        if (isset($_GET['author']) || isset($_GET['author_name'])) {
+        if ($this->requestContext->query('author') !== '' || $this->requestContext->query('author_name') !== '') {
             wp_safe_redirect(home_url(), 301);
             exit;
         }

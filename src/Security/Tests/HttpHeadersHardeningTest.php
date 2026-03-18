@@ -6,6 +6,7 @@ namespace BackTo\Framework\Security\Tests;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
+use BackTo\Framework\Contracts\ResponseEmitterInterface;
 use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
 use BackTo\Framework\Security\HttpHeadersHardening;
 use PHPUnit\Framework\TestCase;
@@ -15,7 +16,8 @@ class HttpHeadersHardeningTest extends TestCase
     public function testImplementsRequiredInterfaces(): void
     {
         $dispatcher = $this->createMock(HookDispatcherInterface::class);
-        $hardening = new HttpHeadersHardening($dispatcher);
+        $responseEmitter = $this->createMock(ResponseEmitterInterface::class);
+        $hardening = new HttpHeadersHardening($dispatcher, $responseEmitter);
 
         $this->assertInstanceOf(Hooks::class, $hardening);
         $this->assertInstanceOf(SecurityRuleInterface::class, $hardening);
@@ -24,7 +26,8 @@ class HttpHeadersHardeningTest extends TestCase
     public function testGetName(): void
     {
         $dispatcher = $this->createMock(HookDispatcherInterface::class);
-        $hardening = new HttpHeadersHardening($dispatcher);
+        $responseEmitter = $this->createMock(ResponseEmitterInterface::class);
+        $hardening = new HttpHeadersHardening($dispatcher, $responseEmitter);
 
         $this->assertSame('http_headers_hardening', $hardening->getName());
     }
@@ -32,6 +35,7 @@ class HttpHeadersHardeningTest extends TestCase
     public function testHooksRegistersActions(): void
     {
         $dispatcher = $this->createMock(HookDispatcherInterface::class);
+        $responseEmitter = $this->createMock(ResponseEmitterInterface::class);
 
         $dispatcher->expects($this->exactly(2))
             ->method('addAction')
@@ -39,7 +43,7 @@ class HttpHeadersHardeningTest extends TestCase
                 $this->assertContains($hook, ['send_headers', 'rest_api_init']);
             });
 
-        $hardening = new HttpHeadersHardening($dispatcher);
+        $hardening = new HttpHeadersHardening($dispatcher, $responseEmitter);
         $hardening->hooks();
     }
 }

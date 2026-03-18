@@ -87,13 +87,19 @@ final class PostQueryBuilder
     
     public function whereIn(array $ids): self
     {
-        $this->args['post__in'] = $ids;
+        // WordPress returns all posts when post__in is empty.
+        // Force no results by using an impossible ID.
+        $this->args['post__in'] = $ids === [] ? [0] : $ids;
         return $this;
     }
 
-    
+
     public function whereNotIn(array $ids): self
     {
+        if ($ids === []) {
+            return $this;
+        }
+
         $this->args['post__not_in'] = $ids;
         return $this;
     }

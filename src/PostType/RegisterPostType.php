@@ -8,6 +8,7 @@ use BackTo\Framework\Contracts\ActivationHooks;
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
 use BackTo\Framework\Exception\FrameworkException;
+use BackTo\Framework\Observability\Contracts\LoggerInterface;
 use BackTo\Framework\PostType\Contracts\PostTypeRegistrarInterface;
 
 final class RegisterPostType implements Hooks, ActivationHooks
@@ -16,17 +17,20 @@ final class RegisterPostType implements Hooks, ActivationHooks
     private readonly PostTypeFactory $factory;
     private readonly PostTypeRegistrarInterface $registrar;
     private readonly HookDispatcherInterface $hookDispatcher;
+    private readonly LoggerInterface $logger;
 
     public function __construct(
         PostTypeRegistry $postTypeRegistry,
         PostTypeFactory $postTypeFactory,
         PostTypeRegistrarInterface $registrar,
-        HookDispatcherInterface $hookDispatcher
+        HookDispatcherInterface $hookDispatcher,
+        LoggerInterface $logger,
     ) {
         $this->registry = $postTypeRegistry;
         $this->factory = $postTypeFactory;
         $this->registrar = $registrar;
         $this->hookDispatcher = $hookDispatcher;
+        $this->logger = $logger;
     }
 
     public function activate(): void
@@ -52,7 +56,7 @@ final class RegisterPostType implements Hooks, ActivationHooks
                 $newPostType = $this->factory->createPostType($postType->getKey(), $postType->getArgs());
                 $this->registrar->register($newPostType->getKey(), $newPostType->getArgs());
             } catch (FrameworkException $exception) {
-                \error_log($exception->getMessage());
+                $this->logger->error($exception->getMessage());
             }
         }
     }
@@ -66,7 +70,7 @@ final class RegisterPostType implements Hooks, ActivationHooks
             $newPostType = $this->factory->createPostType($name, $args);
             $this->registry->add($newPostType);
         } catch (FrameworkException $e) {
-            \error_log($e->getMessage());
+            $this->logger->error($e->getMessage());
         }
 
         return $this;

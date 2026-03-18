@@ -7,7 +7,11 @@ namespace BackTo\Framework\Queue;
 use BackTo\Framework\Contracts\ExtensionInterface;
 use BackTo\Framework\Queue\Contracts\JobInterface;
 use BackTo\Framework\Queue\Contracts\QueueDispatcherInterface;
+use BackTo\Framework\Queue\Contracts\QueueJobStorageInterface;
+use BackTo\Framework\Queue\Contracts\QueueMaintenanceInterface;
+use BackTo\Framework\Queue\Contracts\QueueQueryInterface;
 use BackTo\Framework\Queue\Contracts\QueueRepositoryInterface;
+use BackTo\Framework\Queue\Contracts\QueueSchemaInterface;
 use BackTo\Framework\Queue\DependencyInjection\Compiler\RegisterQueuePass;
 use BackTo\Framework\Queue\Infrastructure\WordPressQueueRepository;
 use BackToVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -33,6 +37,10 @@ final class QueueExtension implements ExtensionInterface
         $containerBuilder->register(QueueRepositoryInterface::class, WordPressQueueRepository::class)
             ->setAutowired(true);
         $containerBuilder->setAlias(WordPressQueueRepository::class, QueueRepositoryInterface::class);
+        $containerBuilder->setAlias(QueueJobStorageInterface::class, QueueRepositoryInterface::class);
+        $containerBuilder->setAlias(QueueQueryInterface::class, QueueRepositoryInterface::class);
+        $containerBuilder->setAlias(QueueMaintenanceInterface::class, QueueRepositoryInterface::class);
+        $containerBuilder->setAlias(QueueSchemaInterface::class, QueueRepositoryInterface::class);
 
         $containerBuilder->register(QueueDispatcherInterface::class, QueueDispatcher::class)
             ->setAutowired(true);

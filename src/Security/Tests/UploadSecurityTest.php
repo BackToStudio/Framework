@@ -196,4 +196,64 @@ class UploadSecurityTest extends TestCase
 
         unlink($tmpFile);
     }
+
+    public function testValidateMagicBytesRejectsEmptyFile(): void
+    {
+        $tmpFile = tempnam(sys_get_temp_dir(), 'test_');
+        file_put_contents($tmpFile, '');
+
+        $this->assertFalse($this->rule->validateMagicBytes($tmpFile, 'photo.jpg'));
+        $this->assertFalse($this->rule->validateMagicBytes($tmpFile, 'image.png'));
+        $this->assertFalse($this->rule->validateMagicBytes($tmpFile, 'doc.pdf'));
+
+        unlink($tmpFile);
+    }
+
+    public function testIsSvgSafeBlocksScriptInCdata(): void
+    {
+        $tmpFile = tempnam(sys_get_temp_dir(), 'test_');
+        $svg = '<?xml version="1.0"?><svg xmlns="http://www.w3.org/2000/svg">'
+             . '<![CDATA[<script>alert("xss")</script>]]></svg>';
+        file_put_contents($tmpFile, $svg);
+
+        $this->assertFalse($this->rule->isSvgSafe($tmpFile));
+
+        unlink($tmpFile);
+    }
+
+    public function testIsSvgSafeBlocksEventHandlerInCdata(): void
+    {
+        $tmpFile = tempnam(sys_get_temp_dir(), 'test_');
+        $svg = '<?xml version="1.0"?><svg xmlns="http://www.w3.org/2000/svg">'
+             . '<![CDATA[<div onload="alert(1)">]]></svg>';
+        file_put_contents($tmpFile, $svg);
+
+        $this->assertFalse($this->rule->isSvgSafe($tmpFile));
+
+        unlink($tmpFile);
+    }
+
+    public function testIsSvgSafeBlocksJavascriptUriInCdata(): void
+    {
+        $tmpFile = tempnam(sys_get_temp_dir(), 'test_');
+        $svg = '<?xml version="1.0"?><svg xmlns="http://www.w3.org/2000/svg">'
+             . '<![CDATA[<a href="javascript:alert(1)">click</a>]]></svg>';
+        file_put_contents($tmpFile, $svg);
+
+        $this->assertFalse($this->rule->isSvgSafe($tmpFile));
+
+        unlink($tmpFile);
+    }
+
+    public function testIsSvgSafeAllowsSafeSvg(): void
+    {
+        $tmpFile = tempnam(sys_get_temp_dir(), 'test_');
+        $svg = '<?xml version="1.0"?><svg xmlns="http://www.w3.org/2000/svg">'
+             . '<rect width="100" height="100" fill="red"/></svg>';
+        file_put_contents($tmpFile, $svg);
+
+        $this->assertTrue($this->rule->isSvgSafe($tmpFile));
+
+        unlink($tmpFile);
+    }
 }

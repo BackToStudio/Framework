@@ -6,6 +6,7 @@ namespace BackTo\Framework\Security;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
+use BackTo\Framework\Contracts\RequestContextInterface;
 use BackTo\Framework\Observability\Contracts\LoggerInterface;
 use BackTo\Framework\Security\Contracts\IPAccessControlInterface;
 use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
@@ -24,6 +25,7 @@ class IPAccessControl implements Hooks, SecurityRuleInterface, IPAccessControlIn
 
     private readonly HookDispatcherInterface $hookDispatcher;
     private readonly LoggerInterface $logger;
+    private readonly RequestContextInterface $requestContext;
 
     /** @var string[] */
     private array $whitelist = [];
@@ -34,9 +36,16 @@ class IPAccessControl implements Hooks, SecurityRuleInterface, IPAccessControlIn
     public function __construct(
         HookDispatcherInterface $hookDispatcher,
         LoggerInterface $logger,
+        RequestContextInterface $requestContext,
     ) {
         $this->hookDispatcher = $hookDispatcher;
         $this->logger = $logger;
+        $this->requestContext = $requestContext;
+    }
+
+    protected function getRequestContext(): RequestContextInterface
+    {
+        return $this->requestContext;
     }
 
     public function getName(): string
@@ -116,6 +125,15 @@ class IPAccessControl implements Hooks, SecurityRuleInterface, IPAccessControlIn
         }
 
         [$subnet, $bits] = explode('/', $cidr, 2);
+
+        if (! ctype_digit($bits)) {
+            $this->logger->warning('Invalid CIDR notation: non-numeric prefix length', [
+                'cidr' => $cidr,
+            ]);
+
+            return false;
+        }
+
         $bits = (int) $bits;
 
         if (str_contains($ip, ':') || str_contains($subnet, ':')) {

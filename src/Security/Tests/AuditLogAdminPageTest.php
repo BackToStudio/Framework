@@ -7,6 +7,7 @@ namespace BackTo\Framework\Security\Tests;
 use BackTo\Framework\Admin\Contracts\AdminPageInterface;
 use BackTo\Framework\Security\AuditLogAdminPage;
 use BackTo\Framework\Security\AuditLogCsvExporter;
+use BackTo\Framework\Contracts\RequestContextInterface;
 use BackTo\Framework\Security\Contracts\AuditLogRepositoryInterface;
 use PHPUnit\Framework\TestCase;
 
@@ -91,12 +92,14 @@ class TestableAuditLogAdminPage extends AuditLogAdminPage
 class AuditLogAdminPageTest extends TestCase
 {
     private AuditLogRepositoryInterface $repository;
+    private RequestContextInterface $requestContext;
     private TestableAuditLogAdminPage $page;
 
     protected function setUp(): void
     {
         $this->repository = $this->createMock(AuditLogRepositoryInterface::class);
-        $this->page = new TestableAuditLogAdminPage($this->repository);
+        $this->requestContext = $this->createMock(RequestContextInterface::class);
+        $this->page = new TestableAuditLogAdminPage($this->repository, $this->requestContext);
     }
 
     public function testImplementsAdminPageInterface(): void

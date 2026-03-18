@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace BackTo\Framework\Cli\Tests;
 
 use BackTo\Framework\Cli\Command\MakeTaxonomyCommand;
+use BackTo\Framework\Cli\Infrastructure\NativeFilesystem;
+use BackTo\Framework\Cli\Infrastructure\WpCliOutput;
 use PHPUnit\Framework\TestCase;
 
 class MakeTaxonomyCommandTest extends TestCase
@@ -14,7 +16,7 @@ class MakeTaxonomyCommandTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->command = new MakeTaxonomyCommand();
+        $this->command = new MakeTaxonomyCommand(new NativeFilesystem(), new WpCliOutput());
         $this->outputDir = \sys_get_temp_dir() . '/backto_cli_test_' . \uniqid();
         \mkdir($this->outputDir, 0755, true);
     }

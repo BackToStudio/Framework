@@ -4,33 +4,37 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Admin;
 
+use BackTo\Framework\Admin\Contracts\AdminPageRegistrarInterface;
 use BackTo\Framework\Contracts\AdminHooks;
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 
-use function add_menu_page;
+final class AddReusableBlockMenu implements AdminHooks
+{
+    private readonly HookDispatcherInterface $hookDispatcher;
+    private readonly AdminPageRegistrarInterface $registrar;
 
-final class AddReusableBlockMenu implements AdminHooks {
+    public function __construct(
+        HookDispatcherInterface $hookDispatcher,
+        AdminPageRegistrarInterface $registrar,
+    ) {
+        $this->hookDispatcher = $hookDispatcher;
+        $this->registrar = $registrar;
+    }
 
-	private readonly HookDispatcherInterface $hookDispatcher;
+    public function hooks(): void
+    {
+        $this->hookDispatcher->addAction('admin_menu', [$this, 'addReusableBlockMenu']);
+    }
 
-	public function __construct(HookDispatcherInterface $hookDispatcher)
-	{
-		$this->hookDispatcher = $hookDispatcher;
-	}
-
-	public function hooks(): void {
-		$this->hookDispatcher->addAction( 'admin_menu', [ $this, 'addReusableBlockMenu'] );
-	}
-
-	function addReusableBlockMenu(): void {
-		add_menu_page(
-			__( 'Reusable Blocks', 'gutenberg' ),
-			__( 'Reusable Blocks', 'gutenberg' ),
-			'manage_options',
-			'edit.php?post_type=wp_block',
-			'',
-			'dashicons-block-default',
-			30
-		);
-	}
+    public function addReusableBlockMenu(): void
+    {
+        $this->registrar->registerMenuPage([
+            'page_title' => __('Reusable Blocks', 'gutenberg'),
+            'menu_title' => __('Reusable Blocks', 'gutenberg'),
+            'capability' => 'manage_options',
+            'menu_slug' => 'edit.php?post_type=wp_block',
+            'icon_url' => 'dashicons-block-default',
+            'position' => 30,
+        ]);
+    }
 }

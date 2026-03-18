@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Cli\Tests;
 
+use BackTo\Framework\Cli\Contracts\FilesystemInterface;
 use BackTo\Framework\Cli\Generator\ClassGenerator;
+use BackTo\Framework\Cli\Infrastructure\NativeFilesystem;
 use PHPUnit\Framework\TestCase;
 
 class ClassGeneratorTest extends TestCase
@@ -13,7 +15,7 @@ class ClassGeneratorTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->generator = new ClassGenerator();
+        $this->generator = new ClassGenerator(new NativeFilesystem());
     }
 
     public function testGenerateReplacesPlaceholders(): void

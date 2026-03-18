@@ -6,6 +6,7 @@ namespace BackTo\Framework\Security\Tests;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
+use BackTo\Framework\Contracts\RequestContextInterface;
 use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
 use BackTo\Framework\Security\SessionManager;
 use PHPUnit\Framework\TestCase;
@@ -13,12 +14,14 @@ use PHPUnit\Framework\TestCase;
 class SessionManagerTest extends TestCase
 {
     private HookDispatcherInterface $dispatcher;
+    private RequestContextInterface $requestContext;
     private SessionManager $rule;
 
     protected function setUp(): void
     {
         $this->dispatcher = $this->createMock(HookDispatcherInterface::class);
-        $this->rule = new SessionManager($this->dispatcher);
+        $this->requestContext = $this->createMock(RequestContextInterface::class);
+        $this->rule = new SessionManager($this->dispatcher, $this->requestContext);
     }
 
     public function testImplementsRequiredInterfaces(): void
@@ -49,8 +52,8 @@ class SessionManagerTest extends TestCase
 
     public function testAttachSessionInfo(): void
     {
-        $_SERVER['REMOTE_ADDR'] = '192.168.1.1';
-        $_SERVER['HTTP_USER_AGENT'] = 'TestBrowser/1.0';
+        $this->requestContext->method('getRemoteAddr')->willReturn('192.168.1.1');
+        $this->requestContext->method('getUserAgent')->willReturn('TestBrowser/1.0');
 
         $info = $this->rule->attachSessionInfo([]);
 
@@ -75,7 +78,7 @@ class SessionManagerTest extends TestCase
 
     public function testCustomMaxSessions(): void
     {
-        $rule = new SessionManager($this->dispatcher, 3);
+        $rule = new SessionManager($this->dispatcher, $this->requestContext, 3);
         $this->assertSame(3, $rule->getMaxSessions());
     }
 
@@ -91,5 +94,29 @@ class SessionManagerTest extends TestCase
         $user = new \stdClass();
         $this->rule->enforceConcurrentSessionLimit('admin', $user);
         $this->assertTrue(true); // No exception
+    }
+
+    public function testEnforceConcurrentSessionLimitSkipsZeroId(): void
+    {
+        $user = new \stdClass();
+        $user->ID = 0;
+        $this->rule->enforceConcurrentSessionLimit('admin', $user);
+        $this->assertTrue(true); // No exception — zero ID is invalid
+    }
+
+    public function testEnforceConcurrentSessionLimitSkipsNegativeId(): void
+    {
+        $user = new \stdClass();
+        $user->ID = -1;
+        $this->rule->enforceConcurrentSessionLimit('admin', $user);
+        $this->assertTrue(true); // No exception — negative ID is invalid
+    }
+
+    public function testEnforceConcurrentSessionLimitSkipsNullId(): void
+    {
+        $user = new \stdClass();
+        $user->ID = null;
+        $this->rule->enforceConcurrentSessionLimit('admin', $user);
+        $this->assertTrue(true); // ID cast to int = 0, should be skipped
     }
 }

@@ -6,7 +6,7 @@ namespace BackTo\Framework\Seo\Tests;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Seo\Hooks\RegisterDefaultSchemas;
-use BackTo\Framework\Seo\Schema\Generator\BreadcrumbSchemaGenerator;
+use BackTo\Framework\Seo\Contracts\BreadcrumbSchemaGeneratorInterface;
 use BackTo\Framework\Seo\Schema\Generator\OrganizationSchemaGenerator;
 use BackTo\Framework\Seo\Schema\Generator\PostTypeSchemaResolver;
 use BackTo\Framework\Seo\Schema\Generator\WebSiteSchemaGenerator;
@@ -29,7 +29,7 @@ class RegisterDefaultSchemasTest extends TestCase
             $this->createMock(WebSiteSchemaGenerator::class),
             $this->createMock(OrganizationSchemaGenerator::class),
             new PostTypeSchemaResolver(),
-            $this->createMock(BreadcrumbSchemaGenerator::class),
+            $this->createMock(BreadcrumbSchemaGeneratorInterface::class),
         );
 
         $hook->hooks();
@@ -47,7 +47,7 @@ class RegisterDefaultSchemasTest extends TestCase
         $orgGen->expects($this->once())->method('generate')
             ->willReturn(new SchemaType('Organization'));
 
-        $breadcrumbGen = $this->createMock(BreadcrumbSchemaGenerator::class);
+        $breadcrumbGen = $this->createMock(BreadcrumbSchemaGeneratorInterface::class);
         $breadcrumbGen->method('generate')->willReturn(null);
 
         $hook = new RegisterDefaultSchemas(
@@ -76,7 +76,7 @@ class RegisterDefaultSchemasTest extends TestCase
         $orgGen = $this->createMock(OrganizationSchemaGenerator::class);
         $orgGen->method('generate')->willReturn(new SchemaType('Organization'));
 
-        $breadcrumbGen = $this->createMock(BreadcrumbSchemaGenerator::class);
+        $breadcrumbGen = $this->createMock(BreadcrumbSchemaGeneratorInterface::class);
         $breadcrumbGen->method('generate')->willReturn(new SchemaType('BreadcrumbList'));
 
         $hook = new RegisterDefaultSchemas(
@@ -104,7 +104,7 @@ class RegisterDefaultSchemasTest extends TestCase
         $orgGen = $this->createMock(OrganizationSchemaGenerator::class);
         $orgGen->method('generate')->willReturn(new SchemaType('Organization'));
 
-        $breadcrumbGen = $this->createMock(BreadcrumbSchemaGenerator::class);
+        $breadcrumbGen = $this->createMock(BreadcrumbSchemaGeneratorInterface::class);
         $breadcrumbGen->method('generate')->willReturn(null);
 
         $hook = new RegisterDefaultSchemas(

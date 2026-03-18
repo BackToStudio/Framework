@@ -7,6 +7,7 @@ namespace BackTo\Framework\Security\Tests;
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
 use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
+use BackTo\Framework\Contracts\RequestContextInterface;
 use BackTo\Framework\Security\RestApiSecurity;
 use PHPUnit\Framework\TestCase;
 
@@ -60,17 +61,19 @@ class TestableRestApiSecurity extends RestApiSecurity
 class RestApiSecurityTest extends TestCase
 {
     private HookDispatcherInterface $dispatcher;
+    private RequestContextInterface $requestContext;
     private TestableRestApiSecurity $rule;
 
     protected function setUp(): void
     {
         $this->dispatcher = $this->createMock(HookDispatcherInterface::class);
-        $this->rule = new TestableRestApiSecurity($this->dispatcher);
+        $this->requestContext = $this->createMock(RequestContextInterface::class);
+        $this->rule = new TestableRestApiSecurity($this->dispatcher, $this->requestContext);
     }
 
     public function testConstructorAcceptsAdditionalPublicPatterns(): void
     {
-        $rule = new RestApiSecurity($this->dispatcher, ['#^/custom/#']);
+        $rule = new RestApiSecurity($this->dispatcher, $this->requestContext, ['#^/custom/#']);
         $this->assertInstanceOf(RestApiSecurity::class, $rule);
     }
 

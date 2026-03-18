@@ -5,17 +5,17 @@ declare(strict_types=1);
 namespace BackTo\Framework\Queue;
 
 use BackTo\Framework\Queue\Contracts\QueueDispatcherInterface;
-use BackTo\Framework\Queue\Contracts\QueueRepositoryInterface;
+use BackTo\Framework\Queue\Contracts\QueueJobStorageInterface;
 use BackTo\Framework\Queue\Factory\JobFactory;
 
 final class QueueDispatcher implements QueueDispatcherInterface
 {
-    private readonly QueueRepositoryInterface $repository;
+    private readonly QueueJobStorageInterface $repository;
     private readonly QueueRegistry $registry;
     private readonly JobFactory $factory;
 
     public function __construct(
-        QueueRepositoryInterface $repository,
+        QueueJobStorageInterface $repository,
         QueueRegistry $registry,
         JobFactory $factory
     ) {
@@ -36,7 +36,16 @@ final class QueueDispatcher implements QueueDispatcherInterface
 
     public function dispatchUnique(string $jobKey, array $payload = [], int $delay = 0, string $group = 'default'): ?int
     {
-        $payloadJson = \json_encode($payload, \JSON_THROW_ON_ERROR);
+        try {
+            $payloadJson = \json_encode($payload, \JSON_THROW_ON_ERROR);
+        } catch (\JsonException $e) {
+            throw new \InvalidArgumentException(
+                "Cannot dispatch unique job '{$jobKey}': payload is not JSON-serializable. {$e->getMessage()}",
+                0,
+                $e
+            );
+        }
+
         $payloadHash = \md5($payloadJson);
 
         if ($this->repository->hasPendingDuplicate($jobKey, $payloadHash)) {

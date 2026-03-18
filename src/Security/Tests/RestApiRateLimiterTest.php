@@ -6,6 +6,7 @@ namespace BackTo\Framework\Security\Tests;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
+use BackTo\Framework\Contracts\RequestContextInterface;
 use BackTo\Framework\Security\Contracts\RateLimiterRepositoryInterface;
 use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
 use BackTo\Framework\Security\RestApiRateLimiter;
@@ -54,13 +55,18 @@ class RestApiRateLimiterTest extends TestCase
 {
     private HookDispatcherInterface $dispatcher;
     private RateLimiterRepositoryInterface $repository;
+    private RequestContextInterface $requestContext;
     private TestableRestApiRateLimiter $limiter;
 
     protected function setUp(): void
     {
         $this->dispatcher = $this->createMock(HookDispatcherInterface::class);
         $this->repository = $this->createMock(RateLimiterRepositoryInterface::class);
-        $this->limiter = new TestableRestApiRateLimiter($this->dispatcher, $this->repository);
+        $this->requestContext = $this->createMock(RequestContextInterface::class);
+        $this->requestContext->method('getRemoteAddr')->willReturn('127.0.0.1');
+        $this->requestContext->method('server')->willReturn('');
+        $this->requestContext->method('getMethod')->willReturn('GET');
+        $this->limiter = new TestableRestApiRateLimiter($this->dispatcher, $this->repository, $this->requestContext);
     }
 
     public function testImplementsRequiredInterfaces(): void
@@ -182,5 +188,37 @@ class RestApiRateLimiterTest extends TestCase
             ->setRouteLimit('/test', 10, 60);
 
         $this->assertSame($this->limiter, $result);
+    }
+
+    public function testZeroLimitBlocksAllRequests(): void
+    {
+        $this->limiter->setDefaultLimit(0);
+
+        // Even 1 hit exceeds limit of 0
+        $this->repository->method('increment')->willReturn(1);
+
+        $result = $this->limiter->checkRateLimit(null, null, '/wp/v2/posts');
+
+        $this->assertIsArray($result);
+        $this->assertSame(429, $result['status']);
+    }
+
+    public function testZeroWindowRouteLimit(): void
+    {
+        $this->limiter->setRouteLimit('/wp/v2/fast', 100, 0);
+
+        $config = $this->limiter->getRouteConfig('/wp/v2/fast');
+        $this->assertSame(0, $config['window']);
+    }
+
+    public function testLargeHitCountOverLimit(): void
+    {
+        // Simulate extremely high hit count
+        $this->repository->method('increment')->willReturn(999999);
+
+        $result = $this->limiter->checkRateLimit(null, null, '/wp/v2/posts');
+
+        $this->assertIsArray($result);
+        $this->assertSame(429, $result['status']);
     }
 }

@@ -6,7 +6,7 @@ namespace BackTo\Framework\Seo\Hooks;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
-use BackTo\Framework\Seo\Schema\Generator\BreadcrumbSchemaGenerator;
+use BackTo\Framework\Seo\Contracts\BreadcrumbSchemaGeneratorInterface;
 use BackTo\Framework\Seo\Schema\Generator\OrganizationSchemaGenerator;
 use BackTo\Framework\Seo\Schema\Generator\PostTypeSchemaResolver;
 use BackTo\Framework\Seo\Schema\Generator\WebSiteSchemaGenerator;
@@ -28,7 +28,7 @@ final class RegisterDefaultSchemas implements Hooks
 
     private readonly PostTypeSchemaResolver $postTypeResolver;
 
-    private readonly BreadcrumbSchemaGenerator $breadcrumbGenerator;
+    private readonly BreadcrumbSchemaGeneratorInterface $breadcrumbGenerator;
 
     public function __construct(
         SchemaManager $schemaManager,
@@ -36,7 +36,7 @@ final class RegisterDefaultSchemas implements Hooks
         WebSiteSchemaGenerator $webSiteGenerator,
         OrganizationSchemaGenerator $organizationGenerator,
         PostTypeSchemaResolver $postTypeResolver,
-        BreadcrumbSchemaGenerator $breadcrumbGenerator,
+        BreadcrumbSchemaGeneratorInterface $breadcrumbGenerator,
     ) {
         $this->schemaManager = $schemaManager;
         $this->hookDispatcher = $hookDispatcher;
