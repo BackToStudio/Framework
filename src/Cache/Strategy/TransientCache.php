@@ -82,13 +82,18 @@ final class TransientCache extends AbstractCache
 
     /**
      * Prefix and truncate key to respect WordPress transient name limit (172 chars).
+     *
+     * Long keys are hashed using SHA-256 (truncated to 64 hex chars) instead of
+     * MD5 to reduce collision risk. The original key length is prepended as an
+     * additional differentiator.
      */
     private function prefixKey(string $key): string
     {
         $prefixed = $this->prefix . $key;
 
         if (strlen($prefixed) > 172) {
-            $prefixed = $this->prefix . md5($key);
+            $hash = hash('sha256', $key);
+            $prefixed = $this->prefix . strlen($key) . '_' . $hash;
         }
 
         return $prefixed;

@@ -24,6 +24,11 @@ final class WordPressCronScheduler implements CronSchedulerInterface
 
     public function scheduleRecurring(string $hook, string $recurrence, int $timestamp = 0): void
     {
+        // Guard against duplicate scheduling — skip if already registered.
+        if ($this->isScheduled($hook)) {
+            return;
+        }
+
         wp_schedule_event($timestamp ?: time(), $recurrence, $hook);
     }
 

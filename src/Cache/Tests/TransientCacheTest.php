@@ -81,4 +81,58 @@ class TransientCacheTest extends TestCase
             'backslash' => ['foo\\bar'],
         ];
     }
+
+    public function testLongKeysAreHashedWithSha256(): void
+    {
+        $longKey = str_repeat('a', 200);
+
+        // The store should receive a hashed key, not the raw key
+        $this->store->expects($this->once())
+            ->method('get')
+            ->with($this->callback(function (string $key) use ($longKey): bool {
+                // Should contain SHA-256 hash (64 hex chars) instead of raw key
+                $hash = hash('sha256', $longKey);
+
+                return str_contains($key, $hash)
+                    && strlen($key) <= 172;
+            }))
+            ->willReturn(false);
+
+        $cache = new TransientCache($this->cleaner, $this->store);
+        $cache->get($longKey);
+    }
+
+    public function testDifferentLongKeysProduceDifferentPrefixedKeys(): void
+    {
+        $keyA = str_repeat('a', 200);
+        $keyB = str_repeat('b', 200);
+
+        $receivedKeys = [];
+
+        $this->store->expects($this->exactly(2))
+            ->method('get')
+            ->willReturnCallback(function (string $key) use (&$receivedKeys) {
+                $receivedKeys[] = $key;
+
+                return false;
+            });
+
+        $cache = new TransientCache($this->cleaner, $this->store);
+        $cache->get($keyA);
+        $cache->get($keyB);
+
+        $this->assertCount(2, $receivedKeys);
+        $this->assertNotSame($receivedKeys[0], $receivedKeys[1]);
+    }
+
+    public function testShortKeysAreNotHashed(): void
+    {
+        $this->store->expects($this->once())
+            ->method('get')
+            ->with('btf_short_key')
+            ->willReturn(false);
+
+        $cache = new TransientCache($this->cleaner, $this->store);
+        $cache->get('short_key');
+    }
 }

@@ -92,4 +92,28 @@ class SessionManagerTest extends TestCase
         $this->rule->enforceConcurrentSessionLimit('admin', $user);
         $this->assertTrue(true); // No exception
     }
+
+    public function testEnforceConcurrentSessionLimitSkipsZeroId(): void
+    {
+        $user = new \stdClass();
+        $user->ID = 0;
+        $this->rule->enforceConcurrentSessionLimit('admin', $user);
+        $this->assertTrue(true); // No exception — zero ID is invalid
+    }
+
+    public function testEnforceConcurrentSessionLimitSkipsNegativeId(): void
+    {
+        $user = new \stdClass();
+        $user->ID = -1;
+        $this->rule->enforceConcurrentSessionLimit('admin', $user);
+        $this->assertTrue(true); // No exception — negative ID is invalid
+    }
+
+    public function testEnforceConcurrentSessionLimitSkipsNullId(): void
+    {
+        $user = new \stdClass();
+        $user->ID = null;
+        $this->rule->enforceConcurrentSessionLimit('admin', $user);
+        $this->assertTrue(true); // ID cast to int = 0, should be skipped
+    }
 }

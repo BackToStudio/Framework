@@ -55,11 +55,24 @@ final class SessionManager implements Hooks, SecurityRuleInterface
             return;
         }
 
-        $this->destroyExcessSessions((int) $user->ID);
+        $userId = (int) $user->ID;
+
+        if ($userId <= 0) {
+            return;
+        }
+
+        $this->destroyExcessSessions($userId);
     }
 
     /**
      * Limit the number of concurrent sessions per user.
+     */
+    /**
+     * Limit the number of concurrent sessions per user.
+     *
+     * Re-fetches sessions after destruction to mitigate race conditions
+     * where new sessions are created between get_all() and destroy().
+     * Limited to 2 passes to avoid infinite loops.
      */
     protected function destroyExcessSessions(int $userId): void
     {
@@ -69,26 +82,29 @@ final class SessionManager implements Hooks, SecurityRuleInterface
             return;
         }
 
-        $sessions = $manager->get_all();
+        // Two passes maximum to handle concurrent session creation.
+        for ($pass = 0; $pass < 2; $pass++) {
+            $sessions = $manager->get_all();
 
-        if (count($sessions) <= $this->maxSessions) {
-            return;
-        }
-
-        // Sort sessions by login time (oldest first)
-        uasort($sessions, static function (array $a, array $b): int {
-            return ($a['login'] ?? 0) <=> ($b['login'] ?? 0);
-        });
-
-        $tokensToDestroy = count($sessions) - $this->maxSessions;
-        $destroyed = 0;
-
-        foreach (array_keys($sessions) as $token) {
-            if ($destroyed >= $tokensToDestroy) {
-                break;
+            if (count($sessions) <= $this->maxSessions) {
+                return;
             }
-            $manager->destroy($token);
-            $destroyed++;
+
+            // Sort sessions by login time (oldest first)
+            uasort($sessions, static function (array $a, array $b): int {
+                return ($a['login'] ?? 0) <=> ($b['login'] ?? 0);
+            });
+
+            $tokensToDestroy = count($sessions) - $this->maxSessions;
+            $destroyed = 0;
+
+            foreach (array_keys($sessions) as $token) {
+                if ($destroyed >= $tokensToDestroy) {
+                    break;
+                }
+                $manager->destroy($token);
+                $destroyed++;
+            }
         }
     }
 
