@@ -27,6 +27,17 @@ use BackToVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
 interface ExtensionInterface
 {
     /**
+     * Return all bundle configurations for service auto-discovery.
+     *
+     * Most extensions have a single bundle; the default implementation
+     * in {@see AbstractExtension} wraps {@see getBundle()} in an array.
+     * Override this method to register multiple bundles (e.g., Security + TwoFactor).
+     *
+     * @return array<int, array{dir: string, namespace: string, exclude: string}>
+     */
+    public function getBundles(): array;
+
+    /**
      * Return the bundle configuration for service auto-discovery.
      *
      * @return array{dir: string, namespace: string, exclude: string}|null

@@ -6,12 +6,14 @@ namespace BackTo\Framework\Security;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
+use BackTo\Framework\Contracts\ResponseEmitterInterface;
 use BackTo\Framework\Security\Contracts\ContentSecurityPolicyInterface;
 use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
 
 final class ContentSecurityPolicyManager implements Hooks, SecurityRuleInterface, ContentSecurityPolicyInterface
 {
     private readonly HookDispatcherInterface $hookDispatcher;
+    private readonly ResponseEmitterInterface $responseEmitter;
     private readonly bool $reportOnly;
     private string $nonce = '';
 
@@ -31,9 +33,10 @@ final class ContentSecurityPolicyManager implements Hooks, SecurityRuleInterface
         'form-action' => ["'self'"],
     ];
 
-    public function __construct(HookDispatcherInterface $hookDispatcher, bool $reportOnly = false)
+    public function __construct(HookDispatcherInterface $hookDispatcher, ResponseEmitterInterface $responseEmitter, bool $reportOnly = false)
     {
         $this->hookDispatcher = $hookDispatcher;
+        $this->responseEmitter = $responseEmitter;
         $this->reportOnly = $reportOnly;
         $this->directives = self::DEFAULT_DIRECTIVES;
     }
@@ -111,7 +114,7 @@ final class ContentSecurityPolicyManager implements Hooks, SecurityRuleInterface
 
     public function sendCspHeader(): void
     {
-        if (headers_sent()) {
+        if ($this->responseEmitter->headersSent()) {
             return;
         }
 
@@ -121,7 +124,7 @@ final class ContentSecurityPolicyManager implements Hooks, SecurityRuleInterface
             ? 'Content-Security-Policy-Report-Only'
             : 'Content-Security-Policy';
 
-        header($headerName . ': ' . $this->buildHeaderValue());
+        $this->responseEmitter->sendHeader($headerName . ': ' . $this->buildHeaderValue());
     }
 
     public function addNonceToScripts(string $tag, string $handle): string

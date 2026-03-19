@@ -21,7 +21,9 @@ use BackTo\Framework\Observability\Contracts\HealthCheckInterface;
 use BackTo\Framework\Observability\Contracts\LoggerInterface;
 use BackTo\Framework\Observability\Contracts\PerformanceCollectorInterface;
 use BackTo\Framework\Observability\DependencyInjection\Compiler\RegisterHealthCheckPass;
+use BackTo\Framework\Security\ClientIpResolver;
 use BackTo\Framework\Security\Contracts\AuditLogRepositoryInterface;
+use BackTo\Framework\Security\Contracts\ClientIpResolverInterface;
 use BackTo\Framework\Security\Contracts\ContentSecurityPolicyInterface;
 use BackTo\Framework\Security\Contracts\CorsManagerInterface;
 use BackTo\Framework\Security\Contracts\FileIntegrityRepositoryInterface;
@@ -239,6 +241,10 @@ final class WordPressExtension
 
         $containerBuilder->register(BackupCodeManagerInterface::class, BackupCodeManager::class);
         $containerBuilder->setAlias(BackupCodeManager::class, BackupCodeManagerInterface::class);
+
+        $containerBuilder->register(ClientIpResolverInterface::class, ClientIpResolver::class)
+            ->setAutowired(true);
+        $containerBuilder->setAlias(ClientIpResolver::class, ClientIpResolverInterface::class);
 
         $containerBuilder->register(AuditLogRepositoryInterface::class, WordPressAuditLogRepository::class);
         $containerBuilder->setAlias(WordPressAuditLogRepository::class, AuditLogRepositoryInterface::class);

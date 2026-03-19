@@ -6,9 +6,9 @@ namespace BackTo\Framework\Security;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
-use BackTo\Framework\Contracts\RequestContextInterface;
 use BackTo\Framework\Security\Contracts\AuditLogRepositoryInterface;
 use BackTo\Framework\Security\Contracts\AuditLogSeverity;
+use BackTo\Framework\Security\Contracts\ClientIpResolverInterface;
 use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
 
 /**
@@ -31,11 +31,9 @@ use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
  */
 final class SecurityAuditLogger implements Hooks, SecurityRuleInterface
 {
-    use ClientIpTrait;
-
     private readonly HookDispatcherInterface $hookDispatcher;
     private readonly AuditLogRepositoryInterface $repository;
-    private readonly RequestContextInterface $requestContext;
+    private readonly ClientIpResolverInterface $ipResolver;
 
     /** @var string[] Options considered security-critical */
     private const CRITICAL_OPTIONS = [
@@ -51,16 +49,11 @@ final class SecurityAuditLogger implements Hooks, SecurityRuleInterface
     public function __construct(
         HookDispatcherInterface $hookDispatcher,
         AuditLogRepositoryInterface $repository,
-        RequestContextInterface $requestContext,
+        ClientIpResolverInterface $ipResolver,
     ) {
         $this->hookDispatcher = $hookDispatcher;
         $this->repository = $repository;
-        $this->requestContext = $requestContext;
-    }
-
-    protected function getRequestContext(): RequestContextInterface
-    {
-        return $this->requestContext;
+        $this->ipResolver = $ipResolver;
     }
 
     public function getName(): string
@@ -85,7 +78,7 @@ final class SecurityAuditLogger implements Hooks, SecurityRuleInterface
     {
         $this->repository->store('login_success', AuditLogSeverity::Info->value, [
             'username' => $username,
-            'ip' => $this->getClientIp(),
+            'ip' => $this->ipResolver->getClientIp(),
         ]);
     }
 
@@ -93,7 +86,7 @@ final class SecurityAuditLogger implements Hooks, SecurityRuleInterface
     {
         $this->repository->store('login_failed', AuditLogSeverity::Warning->value, [
             'username' => $username,
-            'ip' => $this->getClientIp(),
+            'ip' => $this->ipResolver->getClientIp(),
         ]);
     }
 
@@ -104,7 +97,7 @@ final class SecurityAuditLogger implements Hooks, SecurityRuleInterface
             'user_id' => $userId,
             'new_role' => $newRole,
             'old_roles' => $oldRoles,
-            'changed_by_ip' => $this->getClientIp(),
+            'changed_by_ip' => $this->ipResolver->getClientIp(),
         ]);
     }
 
@@ -118,7 +111,7 @@ final class SecurityAuditLogger implements Hooks, SecurityRuleInterface
             'option' => $option,
             'old_value' => $this->sanitizeValue($oldValue),
             'new_value' => $this->sanitizeValue($newValue),
-            'ip' => $this->getClientIp(),
+            'ip' => $this->ipResolver->getClientIp(),
         ]);
     }
 
@@ -126,7 +119,7 @@ final class SecurityAuditLogger implements Hooks, SecurityRuleInterface
     {
         $this->repository->store('plugin_activated', AuditLogSeverity::Info->value, [
             'plugin' => $plugin,
-            'ip' => $this->getClientIp(),
+            'ip' => $this->ipResolver->getClientIp(),
         ]);
     }
 
@@ -134,7 +127,7 @@ final class SecurityAuditLogger implements Hooks, SecurityRuleInterface
     {
         $this->repository->store('plugin_deactivated', AuditLogSeverity::Info->value, [
             'plugin' => $plugin,
-            'ip' => $this->getClientIp(),
+            'ip' => $this->ipResolver->getClientIp(),
         ]);
     }
 
@@ -142,7 +135,7 @@ final class SecurityAuditLogger implements Hooks, SecurityRuleInterface
     {
         $this->repository->store('theme_switched', AuditLogSeverity::Info->value, [
             'new_theme' => $newTheme,
-            'ip' => $this->getClientIp(),
+            'ip' => $this->ipResolver->getClientIp(),
         ]);
     }
 
@@ -150,7 +143,7 @@ final class SecurityAuditLogger implements Hooks, SecurityRuleInterface
     {
         $this->repository->store('user_created', AuditLogSeverity::Info->value, [
             'user_id' => $userId,
-            'ip' => $this->getClientIp(),
+            'ip' => $this->ipResolver->getClientIp(),
         ]);
     }
 
@@ -158,7 +151,7 @@ final class SecurityAuditLogger implements Hooks, SecurityRuleInterface
     {
         $this->repository->store('user_deleted', AuditLogSeverity::Warning->value, [
             'user_id' => $userId,
-            'ip' => $this->getClientIp(),
+            'ip' => $this->ipResolver->getClientIp(),
         ]);
     }
 

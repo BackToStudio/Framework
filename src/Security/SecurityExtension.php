@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Security;
 
-use BackTo\Framework\Contracts\ExtensionInterface;
+use BackTo\Framework\Compose\AbstractExtension;
 use BackTo\Framework\Security\Contracts\AuditLogRepositoryInterface;
 use BackTo\Framework\Security\Contracts\ContentSecurityPolicyInterface;
 use BackTo\Framework\Security\Contracts\CorsManagerInterface;
@@ -43,7 +43,7 @@ use BackTo\Framework\Security\TwoFactor\Infrastructure\WordPressTwoFactorReposit
 use BackTo\Framework\Security\TwoFactor\TotpProvider;
 use BackToVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
 
-final class SecurityExtension implements ExtensionInterface
+final class SecurityExtension extends AbstractExtension
 {
     /**
      * @return array<int, array{dir: string, namespace: string, exclude: string}>

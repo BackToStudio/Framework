@@ -6,10 +6,10 @@ namespace BackTo\Framework\Assets;
 
 use BackTo\Framework\Assets\Contracts\FileLocatorInterface;
 use BackTo\Framework\Assets\Infrastructure\WordPressFileLocator;
-use BackTo\Framework\Contracts\ExtensionInterface;
+use BackTo\Framework\Compose\AbstractExtension;
 use BackToVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
 
-final class AssetsExtension implements ExtensionInterface
+final class AssetsExtension extends AbstractExtension
 {
     public function getBundle(): ?array
     {

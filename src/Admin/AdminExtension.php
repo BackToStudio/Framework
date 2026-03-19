@@ -8,10 +8,10 @@ use BackTo\Framework\Admin\Contracts\AdminPageInterface;
 use BackTo\Framework\Admin\Contracts\AdminPageRegistrarInterface;
 use BackTo\Framework\Admin\DependencyInjection\Compiler\RegisterAdminPagePass;
 use BackTo\Framework\Admin\Infrastructure\WordPressAdminPageRegistrar;
-use BackTo\Framework\Contracts\ExtensionInterface;
+use BackTo\Framework\Compose\AbstractExtension;
 use BackToVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
 
-final class AdminExtension implements ExtensionInterface
+final class AdminExtension extends AbstractExtension
 {
     public function getBundle(): ?array
     {

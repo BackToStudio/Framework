@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Taxonomy;
 
-use BackTo\Framework\Contracts\ExtensionInterface;
+use BackTo\Framework\Compose\AbstractExtension;
 use BackTo\Framework\Taxonomy\Contracts\TaxonomyInterface;
 use BackTo\Framework\Taxonomy\Contracts\TaxonomyRegistrarInterface;
 use BackTo\Framework\Taxonomy\DependencyInjection\Compiler\RegisterTaxonomyPass;
 use BackTo\Framework\Taxonomy\Infrastructure\WordPressTaxonomyRegistrar;
 use BackToVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
 
-final class TaxonomyExtension implements ExtensionInterface
+final class TaxonomyExtension extends AbstractExtension
 {
     public function getBundle(): ?array
     {

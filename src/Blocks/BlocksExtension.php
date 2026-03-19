@@ -6,14 +6,14 @@ namespace BackTo\Framework\Blocks;
 
 use BackTo\Framework\Contracts\BlockInterface;
 use BackTo\Framework\Contracts\BlockStyleInterface;
-use BackTo\Framework\Contracts\ExtensionInterface;
+use BackTo\Framework\Compose\AbstractExtension;
 use BackTo\Framework\Blocks\Contracts\BlockStyleRegistrarInterface;
 use BackTo\Framework\Blocks\DependencyInjection\Compiler\RegisterBlockPass;
 use BackTo\Framework\Blocks\DependencyInjection\Compiler\RegisterBlockStylePass;
 use BackTo\Framework\Blocks\Infrastructure\WordPressBlockStyleRegistrar;
 use BackToVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
 
-final class BlocksExtension implements ExtensionInterface
+final class BlocksExtension extends AbstractExtension
 {
     public function getBundle(): ?array
     {

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Queue;
 
-use BackTo\Framework\Contracts\ExtensionInterface;
+use BackTo\Framework\Compose\AbstractExtension;
 use BackTo\Framework\Queue\Contracts\JobInterface;
 use BackTo\Framework\Queue\Contracts\QueueDispatcherInterface;
 use BackTo\Framework\Queue\Contracts\QueueJobStorageInterface;
@@ -16,7 +16,7 @@ use BackTo\Framework\Queue\DependencyInjection\Compiler\RegisterQueuePass;
 use BackTo\Framework\Queue\Infrastructure\WordPressQueueRepository;
 use BackToVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
 
-final class QueueExtension implements ExtensionInterface
+final class QueueExtension extends AbstractExtension
 {
     public function getBundle(): ?array
     {

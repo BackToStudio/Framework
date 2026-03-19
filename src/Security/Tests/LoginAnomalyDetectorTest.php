@@ -8,6 +8,7 @@ use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
 use BackTo\Framework\Contracts\RequestContextInterface;
 use BackTo\Framework\Observability\Contracts\LoggerInterface;
+use BackTo\Framework\Security\Contracts\ClientIpResolverInterface;
 use BackTo\Framework\Security\Contracts\LoginLocationRepositoryInterface;
 use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
 use BackTo\Framework\Security\LoginAnomalyDetector;
@@ -70,6 +71,7 @@ class LoginAnomalyDetectorTest extends TestCase
     private LoginLocationRepositoryInterface $repository;
     private LoggerInterface $logger;
     private RequestContextInterface $requestContext;
+    private ClientIpResolverInterface $ipResolver;
     private TestableLoginAnomalyDetector $detector;
 
     protected function setUp(): void
@@ -81,12 +83,15 @@ class LoginAnomalyDetectorTest extends TestCase
         $this->requestContext->method('getRemoteAddr')->willReturn('127.0.0.1');
         $this->requestContext->method('server')->willReturn('');
         $this->requestContext->method('getMethod')->willReturn('GET');
+        $this->ipResolver = $this->createMock(ClientIpResolverInterface::class);
+        $this->ipResolver->method('getClientIp')->willReturn('127.0.0.1');
 
         $this->detector = new TestableLoginAnomalyDetector(
             $this->dispatcher,
             $this->repository,
             $this->logger,
             $this->requestContext,
+            $this->ipResolver,
         );
     }
 

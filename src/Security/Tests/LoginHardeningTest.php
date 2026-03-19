@@ -6,8 +6,8 @@ namespace BackTo\Framework\Security\Tests;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
-use BackTo\Framework\Contracts\RequestContextInterface;
 use BackTo\Framework\Observability\Contracts\LoggerInterface;
+use BackTo\Framework\Security\Contracts\ClientIpResolverInterface;
 use BackTo\Framework\Security\Contracts\LoginThrottleInterface;
 use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
 use BackTo\Framework\Security\LoginHardening;
@@ -42,7 +42,7 @@ class LoginHardeningTest extends TestCase
     private HookDispatcherInterface $dispatcher;
     private LoginThrottleInterface $throttle;
     private LoggerInterface $logger;
-    private RequestContextInterface $requestContext;
+    private ClientIpResolverInterface $ipResolver;
     private TestableLoginHardening $rule;
 
     protected function setUp(): void
@@ -50,13 +50,9 @@ class LoginHardeningTest extends TestCase
         $this->dispatcher = $this->createMock(HookDispatcherInterface::class);
         $this->throttle = $this->createMock(LoginThrottleInterface::class);
         $this->logger = $this->createMock(LoggerInterface::class);
-        $this->requestContext = $this->createMock(RequestContextInterface::class);
-        $this->requestContext->method('getRemoteAddr')->willReturn('127.0.0.1');
-        $this->requestContext->method('server')->willReturn('');
-        $this->requestContext->method('getMethod')->willReturn('GET');
-        $this->requestContext->method('getUserAgent')->willReturn('');
-        $this->requestContext->method('post')->willReturn('');
-        $this->rule = new TestableLoginHardening($this->dispatcher, $this->throttle, $this->logger, $this->requestContext);
+        $this->ipResolver = $this->createMock(ClientIpResolverInterface::class);
+        $this->ipResolver->method('getClientIp')->willReturn('127.0.0.1');
+        $this->rule = new TestableLoginHardening($this->dispatcher, $this->throttle, $this->logger, $this->ipResolver);
     }
 
     public function testImplementsRequiredInterfaces(): void

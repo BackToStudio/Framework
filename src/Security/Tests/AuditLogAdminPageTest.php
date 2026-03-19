@@ -7,6 +7,7 @@ namespace BackTo\Framework\Security\Tests;
 use BackTo\Framework\Admin\Contracts\AdminPageInterface;
 use BackTo\Framework\Security\AuditLogAdminPage;
 use BackTo\Framework\Security\AuditLogCsvExporter;
+use BackTo\Framework\Security\AuditLog\AuditLogRenderer;
 use BackTo\Framework\Contracts\RequestContextInterface;
 use BackTo\Framework\Security\Contracts\AuditLogRepositoryInterface;
 use PHPUnit\Framework\TestCase;
@@ -73,19 +74,9 @@ class TestableAuditLogAdminPage extends AuditLogAdminPage
         return $this->purgeDays;
     }
 
-    protected function renderNotice(string $message): void
-    {
-        echo '<div class="notice">' . htmlspecialchars($message, ENT_QUOTES, 'UTF-8') . '</div>';
-    }
-
     protected function verifyNonce(string $action, string $queryArg): bool
     {
         return true;
-    }
-
-    protected function renderNonceField(string $action, string $name): void
-    {
-        // No-op in tests
     }
 }
 
@@ -93,13 +84,15 @@ class AuditLogAdminPageTest extends TestCase
 {
     private AuditLogRepositoryInterface $repository;
     private RequestContextInterface $requestContext;
+    private AuditLogRenderer $renderer;
     private TestableAuditLogAdminPage $page;
 
     protected function setUp(): void
     {
         $this->repository = $this->createMock(AuditLogRepositoryInterface::class);
         $this->requestContext = $this->createMock(RequestContextInterface::class);
-        $this->page = new TestableAuditLogAdminPage($this->repository, $this->requestContext);
+        $this->renderer = new AuditLogRenderer();
+        $this->page = new TestableAuditLogAdminPage($this->repository, $this->requestContext, null, $this->renderer);
     }
 
     public function testImplementsAdminPageInterface(): void
@@ -149,7 +142,7 @@ class AuditLogAdminPageTest extends TestCase
         ];
 
         ob_start();
-        $this->page->renderPage($events, [], 1);
+        $this->renderer->renderPage($events, [], 1, 50);
         $output = ob_get_clean();
 
         $this->assertStringContainsString('Security Audit Log', $output);
@@ -161,7 +154,7 @@ class AuditLogAdminPageTest extends TestCase
     public function testRenderPageShowsEmptyMessage(): void
     {
         ob_start();
-        $this->page->renderPage([], [], 1);
+        $this->renderer->renderPage([], [], 1, 50);
         $output = ob_get_clean();
 
         $this->assertStringContainsString('No events found', $output);
@@ -170,7 +163,7 @@ class AuditLogAdminPageTest extends TestCase
     public function testRenderFilterForm(): void
     {
         ob_start();
-        $this->page->renderFilterForm(['event' => 'login_failed']);
+        $this->renderer->renderFilterForm(['event' => 'login_failed']);
         $output = ob_get_clean();
 
         $this->assertStringContainsString('<form', $output);
@@ -181,7 +174,7 @@ class AuditLogAdminPageTest extends TestCase
     public function testRenderActions(): void
     {
         ob_start();
-        $this->page->renderActions();
+        $this->renderer->renderActions();
         $output = ob_get_clean();
 
         $this->assertStringContainsString('Export CSV', $output);
@@ -244,7 +237,7 @@ class AuditLogAdminPageTest extends TestCase
         ];
 
         ob_start();
-        $this->page->renderTable($events);
+        $this->renderer->renderTable($events);
         $output = ob_get_clean();
 
         $this->assertStringContainsString('#dc3232', $output); // critical

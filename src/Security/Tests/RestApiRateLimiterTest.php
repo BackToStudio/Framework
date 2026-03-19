@@ -6,7 +6,8 @@ namespace BackTo\Framework\Security\Tests;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
-use BackTo\Framework\Contracts\RequestContextInterface;
+use BackTo\Framework\Contracts\ResponseEmitterInterface;
+use BackTo\Framework\Security\Contracts\ClientIpResolverInterface;
 use BackTo\Framework\Security\Contracts\RateLimiterRepositoryInterface;
 use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
 use BackTo\Framework\Security\RestApiRateLimiter;
@@ -14,8 +15,6 @@ use PHPUnit\Framework\TestCase;
 
 class TestableRestApiRateLimiter extends RestApiRateLimiter
 {
-    private string $clientIp = '1.2.3.4';
-
     protected function getRequestRoute(mixed $request): string
     {
         if (is_string($request)) {
@@ -23,26 +22,6 @@ class TestableRestApiRateLimiter extends RestApiRateLimiter
         }
 
         return parent::getRequestRoute($request);
-    }
-
-    protected function getClientIp(): string
-    {
-        return $this->clientIp;
-    }
-
-    public function setClientIp(string $ip): void
-    {
-        $this->clientIp = $ip;
-    }
-
-    protected function sendRateLimitHeaders(int $limit, int $hits, string $key): void
-    {
-        // Don't send real headers in tests
-    }
-
-    protected function headersSent(): bool
-    {
-        return true;
     }
 
     protected function buildRateLimitResponse(string $key, int $limit): mixed
@@ -55,18 +34,19 @@ class RestApiRateLimiterTest extends TestCase
 {
     private HookDispatcherInterface $dispatcher;
     private RateLimiterRepositoryInterface $repository;
-    private RequestContextInterface $requestContext;
+    private ResponseEmitterInterface $responseEmitter;
+    private ClientIpResolverInterface $ipResolver;
     private TestableRestApiRateLimiter $limiter;
 
     protected function setUp(): void
     {
         $this->dispatcher = $this->createMock(HookDispatcherInterface::class);
         $this->repository = $this->createMock(RateLimiterRepositoryInterface::class);
-        $this->requestContext = $this->createMock(RequestContextInterface::class);
-        $this->requestContext->method('getRemoteAddr')->willReturn('127.0.0.1');
-        $this->requestContext->method('server')->willReturn('');
-        $this->requestContext->method('getMethod')->willReturn('GET');
-        $this->limiter = new TestableRestApiRateLimiter($this->dispatcher, $this->repository, $this->requestContext);
+        $this->responseEmitter = $this->createMock(ResponseEmitterInterface::class);
+        $this->responseEmitter->method('headersSent')->willReturn(false);
+        $this->ipResolver = $this->createMock(ClientIpResolverInterface::class);
+        $this->ipResolver->method('getClientIp')->willReturn('1.2.3.4');
+        $this->limiter = new TestableRestApiRateLimiter($this->dispatcher, $this->repository, $this->responseEmitter, $this->ipResolver);
     }
 
     public function testImplementsRequiredInterfaces(): void

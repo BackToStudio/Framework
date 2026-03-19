@@ -9,6 +9,7 @@ use BackTo\Framework\Contracts\Hooks;
 use BackTo\Framework\Contracts\RequestContextInterface;
 use BackTo\Framework\Observability\Contracts\LoggerInterface;
 use BackTo\Framework\Security\CommentSpamProtection;
+use BackTo\Framework\Security\Contracts\ClientIpResolverInterface;
 use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
 use PHPUnit\Framework\TestCase;
 
@@ -78,6 +79,7 @@ class CommentSpamProtectionTest extends TestCase
     private HookDispatcherInterface $dispatcher;
     private LoggerInterface $logger;
     private RequestContextInterface $requestContext;
+    private ClientIpResolverInterface $ipResolver;
     private TestableCommentSpamProtection $protection;
 
     protected function setUp(): void
@@ -90,7 +92,9 @@ class CommentSpamProtectionTest extends TestCase
         $this->requestContext->method('getMethod')->willReturn('GET');
         $this->requestContext->method('getUserAgent')->willReturn('');
         $this->requestContext->method('post')->willReturn('');
-        $this->protection = new TestableCommentSpamProtection($this->dispatcher, $this->logger, $this->requestContext);
+        $this->ipResolver = $this->createMock(ClientIpResolverInterface::class);
+        $this->ipResolver->method('getClientIp')->willReturn('127.0.0.1');
+        $this->protection = new TestableCommentSpamProtection($this->dispatcher, $this->logger, $this->requestContext, $this->ipResolver);
     }
 
     public function testImplementsRequiredInterfaces(): void

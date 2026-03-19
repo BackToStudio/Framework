@@ -6,6 +6,7 @@ namespace BackTo\Framework\Security;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
+use BackTo\Framework\Contracts\ResponseEmitterInterface;
 use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
 
 /**
@@ -17,6 +18,7 @@ use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
 class SecurityHeadersConfigurator implements Hooks, SecurityRuleInterface
 {
     private readonly HookDispatcherInterface $hookDispatcher;
+    private readonly ResponseEmitterInterface $responseEmitter;
     private readonly string $environment;
 
     /** @var array<string, string> header name => value */
@@ -47,9 +49,11 @@ class SecurityHeadersConfigurator implements Hooks, SecurityRuleInterface
 
     public function __construct(
         HookDispatcherInterface $hookDispatcher,
+        ResponseEmitterInterface $responseEmitter,
         string $environment = 'production',
     ) {
         $this->hookDispatcher = $hookDispatcher;
+        $this->responseEmitter = $responseEmitter;
         $this->environment = $environment;
         $this->headers = self::ENVIRONMENT_PRESETS[$environment] ?? self::ENVIRONMENT_PRESETS['production'];
     }
@@ -145,15 +149,16 @@ class SecurityHeadersConfigurator implements Hooks, SecurityRuleInterface
 
     public function sendHeaders(): void
     {
-        if ($this->headersSent()) {
+        if ($this->responseEmitter->headersSent()) {
             return;
         }
 
         foreach ($this->headers as $name => $value) {
-            header($name . ': ' . $value);
+            $this->responseEmitter->sendHeader($name . ': ' . $value);
         }
 
-        $this->removeServerHeaders();
+        $this->responseEmitter->removeHeader('X-Powered-By');
+        $this->responseEmitter->removeHeader('Server');
     }
 
     /**
@@ -162,16 +167,5 @@ class SecurityHeadersConfigurator implements Hooks, SecurityRuleInterface
     public static function getAvailablePresets(): array
     {
         return self::ENVIRONMENT_PRESETS;
-    }
-
-    protected function headersSent(): bool
-    {
-        return headers_sent();
-    }
-
-    protected function removeServerHeaders(): void
-    {
-        header_remove('X-Powered-By');
-        header_remove('Server');
     }
 }

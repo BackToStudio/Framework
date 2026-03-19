@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\RestApi;
 
-use BackTo\Framework\Contracts\ExtensionInterface;
+use BackTo\Framework\Compose\AbstractExtension;
 use BackTo\Framework\RestApi\Contracts\RestRouteInterface;
 use BackTo\Framework\RestApi\Contracts\RestRouteRegistrarInterface;
 use BackTo\Framework\RestApi\DependencyInjection\Compiler\RegisterRestRoutePass;
 use BackTo\Framework\RestApi\Infrastructure\WordPressRestRouteRegistrar;
 use BackToVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
 
-final class RestApiExtension implements ExtensionInterface
+final class RestApiExtension extends AbstractExtension
 {
     public function getBundle(): ?array
     {

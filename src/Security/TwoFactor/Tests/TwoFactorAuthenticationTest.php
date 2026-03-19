@@ -112,7 +112,6 @@ class TwoFactorAuthenticationTest extends TestCase
             $this->backupCodeManager,
             $this->logger,
             $this->requestContext,
-            'TestApp',
         );
     }
 
@@ -125,11 +124,6 @@ class TwoFactorAuthenticationTest extends TestCase
     public function testGetName(): void
     {
         $this->assertSame('two_factor_authentication', $this->rule->getName());
-    }
-
-    public function testGetIssuer(): void
-    {
-        $this->assertSame('TestApp', $this->rule->getIssuer());
     }
 
     public function testHooksRegistersFilter(): void
@@ -232,93 +226,4 @@ class TwoFactorAuthenticationTest extends TestCase
         $this->assertSame('two_factor_invalid', $this->rule->getLastErrorCode());
     }
 
-    // --- Setup tests ---
-
-    public function testSetup(): void
-    {
-        $this->totpProvider->method('generateSecret')->willReturn('NEWSECRET');
-        $this->totpProvider->method('getProvisioningUri')
-            ->with('NEWSECRET', 'user@test.com', 'TestApp')
-            ->willReturn('otpauth://totp/TestApp:user@test.com?secret=NEWSECRET');
-
-        $this->backupCodeManager->method('generate')->willReturn(['1111-2222', '3333-4444']);
-        $this->backupCodeManager->method('hash')->willReturnCallback(fn ($c) => 'hashed_' . $c);
-
-        $this->repository->expects($this->once())->method('setSecret')->with(42, 'NEWSECRET');
-        $this->repository->expects($this->once())->method('setBackupCodes')
-            ->with(42, ['hashed_1111-2222', 'hashed_3333-4444']);
-
-        $result = $this->rule->setup(42, 'user@test.com');
-
-        $this->assertSame('NEWSECRET', $result['secret']);
-        $this->assertStringStartsWith('otpauth://', $result['provisioning_uri']);
-        $this->assertCount(2, $result['backup_codes']);
-    }
-
-    public function testConfirmSetupSuccess(): void
-    {
-        $this->repository->method('getSecret')->with(42)->willReturn('SECRET');
-        $this->totpProvider->method('verifyCode')->with('SECRET', '123456')->willReturn(true);
-
-        $this->repository->expects($this->once())->method('enable')->with(42);
-        $this->logger->expects($this->once())->method('info');
-
-        $this->assertTrue($this->rule->confirmSetup(42, '123456'));
-    }
-
-    public function testConfirmSetupFailure(): void
-    {
-        $this->repository->method('getSecret')->with(42)->willReturn('SECRET');
-        $this->totpProvider->method('verifyCode')->willReturn(false);
-
-        $this->repository->expects($this->never())->method('enable');
-
-        $this->assertFalse($this->rule->confirmSetup(42, '000000'));
-    }
-
-    public function testConfirmSetupNoSecret(): void
-    {
-        $this->repository->method('getSecret')->with(42)->willReturn(null);
-
-        $this->assertFalse($this->rule->confirmSetup(42, '123456'));
-    }
-
-    // --- Disable tests ---
-
-    public function testDisableForUser(): void
-    {
-        $this->repository->expects($this->once())->method('disable')->with(42);
-        $this->repository->expects($this->once())->method('deleteSecret')->with(42);
-        $this->repository->expects($this->once())->method('deleteBackupCodes')->with(42);
-        $this->logger->expects($this->once())->method('info');
-
-        $this->rule->disableForUser(42);
-    }
-
-    // --- Backup code regeneration ---
-
-    public function testRegenerateBackupCodes(): void
-    {
-        $this->backupCodeManager->method('generate')->willReturn(['aaaa-bbbb', 'cccc-dddd']);
-        $this->backupCodeManager->method('hash')->willReturnCallback(fn ($c) => 'h_' . $c);
-
-        $this->repository->expects($this->once())
-            ->method('setBackupCodes')
-            ->with(42, ['h_aaaa-bbbb', 'h_cccc-dddd']);
-
-        $codes = $this->rule->regenerateBackupCodes(42);
-
-        $this->assertSame(['aaaa-bbbb', 'cccc-dddd'], $codes);
-    }
-
-    // --- Status ---
-
-    public function testIsEnabledForUser(): void
-    {
-        $this->repository->method('isEnabled')
-            ->willReturnCallback(fn (int $id): bool => $id === 42);
-
-        $this->assertTrue($this->rule->isEnabledForUser(42));
-        $this->assertFalse($this->rule->isEnabledForUser(99));
-    }
 }

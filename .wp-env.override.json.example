@@ -1,0 +1,12 @@
+{
+	"$schema": "https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/schemas/json/wp-env.json",
+	"config": {
+		"WP_DEBUG": true,
+		"WP_DEBUG_LOG": true,
+		"SCRIPT_DEBUG": true
+	},
+	"mappings": {
+		"wp-content/mu-plugins/backto-framework": ".",
+		"wp-content/mu-plugins/setup-security.php": "./tests/e2e/fixtures/setup-security.php"
+	}
+}

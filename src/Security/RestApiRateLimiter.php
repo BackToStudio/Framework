@@ -6,7 +6,8 @@ namespace BackTo\Framework\Security;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
-use BackTo\Framework\Contracts\RequestContextInterface;
+use BackTo\Framework\Contracts\ResponseEmitterInterface;
+use BackTo\Framework\Security\Contracts\ClientIpResolverInterface;
 use BackTo\Framework\Security\Contracts\RateLimiterRepositoryInterface;
 use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
 
@@ -18,11 +19,10 @@ use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
  */
 class RestApiRateLimiter implements Hooks, SecurityRuleInterface
 {
-    use ClientIpTrait;
-
     private readonly HookDispatcherInterface $hookDispatcher;
     private readonly RateLimiterRepositoryInterface $repository;
-    private readonly RequestContextInterface $requestContext;
+    private readonly ResponseEmitterInterface $responseEmitter;
+    private readonly ClientIpResolverInterface $ipResolver;
 
     private const DEFAULT_RATE_LIMIT = 60;
     private const DEFAULT_RATE_WINDOW = 60;
@@ -36,16 +36,13 @@ class RestApiRateLimiter implements Hooks, SecurityRuleInterface
     public function __construct(
         HookDispatcherInterface $hookDispatcher,
         RateLimiterRepositoryInterface $repository,
-        RequestContextInterface $requestContext,
+        ResponseEmitterInterface $responseEmitter,
+        ClientIpResolverInterface $ipResolver,
     ) {
         $this->hookDispatcher = $hookDispatcher;
         $this->repository = $repository;
-        $this->requestContext = $requestContext;
-    }
-
-    protected function getRequestContext(): RequestContextInterface
-    {
-        return $this->requestContext;
+        $this->responseEmitter = $responseEmitter;
+        $this->ipResolver = $ipResolver;
     }
 
     public function getName(): string
@@ -100,7 +97,7 @@ class RestApiRateLimiter implements Hooks, SecurityRuleInterface
         }
 
         $route = $this->getRequestRoute($request);
-        $ip = $this->getClientIp();
+        $ip = $this->ipResolver->getClientIp();
         $config = $this->getRouteConfig($route);
 
         $key = $this->buildKey($ip, $route);
@@ -166,27 +163,22 @@ class RestApiRateLimiter implements Hooks, SecurityRuleInterface
 
     protected function sendRateLimitHeaders(int $limit, int $hits, string $key): void
     {
-        if ($this->headersSent()) {
+        if ($this->responseEmitter->headersSent()) {
             return;
         }
 
         $remaining = max(0, $limit - $hits);
-        header('X-RateLimit-Limit: ' . $limit);
-        header('X-RateLimit-Remaining: ' . $remaining);
+        $this->responseEmitter->sendHeader('X-RateLimit-Limit: ' . $limit);
+        $this->responseEmitter->sendHeader('X-RateLimit-Remaining: ' . $remaining);
     }
 
-    protected function headersSent(): bool
-    {
-        return headers_sent();
-    }
 
-    
     protected function buildRateLimitResponse(string $key, int $limit): mixed
     {
         $retryAfter = $this->repository->getTtl($key);
 
-        if (! $this->headersSent()) {
-            header('Retry-After: ' . $retryAfter);
+        if (! $this->responseEmitter->headersSent()) {
+            $this->responseEmitter->sendHeader('Retry-After: ' . $retryAfter);
         }
 
         return new \WP_Error(
