@@ -8,6 +8,7 @@ use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
 use BackTo\Framework\Contracts\RequestContextInterface;
 use BackTo\Framework\Observability\Contracts\LoggerInterface;
+use BackTo\Framework\Security\Contracts\ClientIpResolverInterface;
 use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
 
 /**
@@ -22,11 +23,10 @@ use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
  */
 class AdminUrlObfuscation implements Hooks, SecurityRuleInterface
 {
-    use ClientIpTrait;
-
     private readonly HookDispatcherInterface $hookDispatcher;
     private readonly LoggerInterface $logger;
     private readonly RequestContextInterface $requestContext;
+    private readonly ClientIpResolverInterface $ipResolver;
 
     private string $loginSlug = '';
 
@@ -34,15 +34,12 @@ class AdminUrlObfuscation implements Hooks, SecurityRuleInterface
         HookDispatcherInterface $hookDispatcher,
         LoggerInterface $logger,
         RequestContextInterface $requestContext,
+        ClientIpResolverInterface $ipResolver,
     ) {
         $this->hookDispatcher = $hookDispatcher;
         $this->logger = $logger;
         $this->requestContext = $requestContext;
-    }
-
-    protected function getRequestContext(): RequestContextInterface
-    {
-        return $this->requestContext;
+        $this->ipResolver = $ipResolver;
     }
 
     public function getName(): string
@@ -101,7 +98,7 @@ class AdminUrlObfuscation implements Hooks, SecurityRuleInterface
 
         if ($this->isDefaultLoginRequest($requestUri)) {
             $this->logger->warning('Blocked direct wp-login.php access', [
-                'ip' => $this->getClientIp(),
+                'ip' => $this->ipResolver->getClientIp(),
                 'uri' => $requestUri,
             ]);
 

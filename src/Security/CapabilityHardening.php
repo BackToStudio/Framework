@@ -6,10 +6,10 @@ namespace BackTo\Framework\Security;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
-use BackTo\Framework\Contracts\RequestContextInterface;
 use BackTo\Framework\Observability\Contracts\LoggerInterface;
 use BackTo\Framework\Security\Contracts\AuditLogRepositoryInterface;
 use BackTo\Framework\Security\Contracts\AuditLogSeverity;
+use BackTo\Framework\Security\Contracts\ClientIpResolverInterface;
 use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
 
 /**
@@ -22,12 +22,10 @@ use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
  */
 class CapabilityHardening implements Hooks, SecurityRuleInterface
 {
-    use ClientIpTrait;
-
     private readonly HookDispatcherInterface $hookDispatcher;
     private readonly LoggerInterface $logger;
     private readonly AuditLogRepositoryInterface $auditLog;
-    private readonly RequestContextInterface $requestContext;
+    private readonly ClientIpResolverInterface $ipResolver;
 
     /** @var string[] Roles that require elevated verification */
     private const PRIVILEGED_ROLES = [
@@ -59,17 +57,12 @@ class CapabilityHardening implements Hooks, SecurityRuleInterface
         HookDispatcherInterface $hookDispatcher,
         LoggerInterface $logger,
         AuditLogRepositoryInterface $auditLog,
-        RequestContextInterface $requestContext,
+        ClientIpResolverInterface $ipResolver,
     ) {
         $this->hookDispatcher = $hookDispatcher;
         $this->logger = $logger;
         $this->auditLog = $auditLog;
-        $this->requestContext = $requestContext;
-    }
-
-    protected function getRequestContext(): RequestContextInterface
-    {
-        return $this->requestContext;
+        $this->ipResolver = $ipResolver;
     }
 
     public function getName(): string
@@ -110,13 +103,13 @@ class CapabilityHardening implements Hooks, SecurityRuleInterface
             $this->logger->warning('Blocked self-promotion to privileged role', [
                 'user_id' => $userId,
                 'attempted_role' => $newRole,
-                'ip' => $this->getClientIp(),
+                'ip' => $this->ipResolver->getClientIp(),
             ]);
 
             $this->auditLog->store('self_promotion_blocked', AuditLogSeverity::Critical->value, [
                 'user_id' => $userId,
                 'attempted_role' => $newRole,
-                'ip' => $this->getClientIp(),
+                'ip' => $this->ipResolver->getClientIp(),
             ]);
 
             $this->revertRole($userId, $oldRoles);
@@ -130,7 +123,7 @@ class CapabilityHardening implements Hooks, SecurityRuleInterface
             'new_role' => $newRole,
             'old_roles' => $oldRoles,
             'granted_by' => $currentUserId,
-            'ip' => $this->getClientIp(),
+            'ip' => $this->ipResolver->getClientIp(),
         ]);
     }
 

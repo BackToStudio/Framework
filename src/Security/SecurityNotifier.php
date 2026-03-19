@@ -6,9 +6,9 @@ namespace BackTo\Framework\Security;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
-use BackTo\Framework\Contracts\RequestContextInterface;
 use BackTo\Framework\Options\Contracts\OptionsRepositoryInterface;
 use BackTo\Framework\Security\Contracts\AuditLogSeverity;
+use BackTo\Framework\Security\Contracts\ClientIpResolverInterface;
 use BackTo\Framework\Security\Contracts\MailerInterface;
 use BackTo\Framework\Security\Contracts\SecurityNotifierInterface;
 use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
@@ -31,19 +31,17 @@ use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
  */
 final class SecurityNotifier implements Hooks, SecurityRuleInterface, SecurityNotifierInterface
 {
-    use ClientIpTrait;
-
     private readonly HookDispatcherInterface $hookDispatcher;
     private readonly MailerInterface $mailer;
     private readonly OptionsRepositoryInterface $options;
-    private readonly RequestContextInterface $requestContext;
+    private readonly ClientIpResolverInterface $ipResolver;
     private readonly SecurityAlertFormatter $formatter;
 
     /** @var string[] */
     private array $recipients = [];
 
-    /** @var string[] Events that trigger email notifications */
-    private const CRITICAL_EVENTS = [
+    /** @var string[] Default events that trigger email notifications */
+    private const DEFAULT_CRITICAL_EVENTS = [
         'login_anomaly',
         'self_promotion_blocked',
         'file_integrity_failure',
@@ -54,28 +52,31 @@ final class SecurityNotifier implements Hooks, SecurityRuleInterface, SecurityNo
         'login_failed_threshold',
     ];
 
+    /** @var string[] */
+    private array $criticalEvents;
+
     private int $failedLoginThreshold = 10;
 
     /** @var array<string, int> IP => failed count for current request cycle */
     private array $failedLoginCounts = [];
 
+    /**
+     * @param string[] $criticalEvents Override the default list of events that trigger notifications.
+     */
     public function __construct(
         HookDispatcherInterface $hookDispatcher,
         MailerInterface $mailer,
         OptionsRepositoryInterface $options,
-        RequestContextInterface $requestContext,
-        ?SecurityAlertFormatter $formatter = null
+        ClientIpResolverInterface $ipResolver,
+        ?SecurityAlertFormatter $formatter = null,
+        array $criticalEvents = [],
     ) {
         $this->hookDispatcher = $hookDispatcher;
         $this->mailer = $mailer;
         $this->options = $options;
-        $this->requestContext = $requestContext;
+        $this->ipResolver = $ipResolver;
         $this->formatter = $formatter ?? new SecurityAlertFormatter($options);
-    }
-
-    protected function getRequestContext(): RequestContextInterface
-    {
-        return $this->requestContext;
+        $this->criticalEvents = $criticalEvents !== [] ? $criticalEvents : self::DEFAULT_CRITICAL_EVENTS;
     }
 
     public function getName(): string
@@ -140,7 +141,7 @@ final class SecurityNotifier implements Hooks, SecurityRuleInterface, SecurityNo
      */
     public function onSecurityEvent(string $event, string $severity, array $context): void
     {
-        if (! in_array($event, self::CRITICAL_EVENTS, true)) {
+        if (! in_array($event, $this->criticalEvents, true)) {
             return;
         }
 
@@ -162,13 +163,13 @@ final class SecurityNotifier implements Hooks, SecurityRuleInterface, SecurityNo
             'user_id' => $userId,
             'new_role' => $newRole,
             'old_roles' => $oldRoles,
-            'ip' => $this->getClientIp(),
+            'ip' => $this->ipResolver->getClientIp(),
         ]);
     }
 
     public function onLoginFailed(string $username): void
     {
-        $ip = $this->getClientIp();
+        $ip = $this->ipResolver->getClientIp();
         $this->failedLoginCounts[$ip] = ($this->failedLoginCounts[$ip] ?? 0) + 1;
 
         if ($this->failedLoginCounts[$ip] === $this->failedLoginThreshold) {
@@ -181,9 +182,21 @@ final class SecurityNotifier implements Hooks, SecurityRuleInterface, SecurityNo
     }
 
     
+    public function addCriticalEvent(string $event): self
+    {
+        if (! in_array($event, $this->criticalEvents, true)) {
+            $this->criticalEvents[] = $event;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return string[]
+     */
     public function getCriticalEvents(): array
     {
-        return self::CRITICAL_EVENTS;
+        return $this->criticalEvents;
     }
 
     public function buildSubject(string $event, string $severity): string

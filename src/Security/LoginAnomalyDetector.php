@@ -8,6 +8,7 @@ use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
 use BackTo\Framework\Contracts\RequestContextInterface;
 use BackTo\Framework\Observability\Contracts\LoggerInterface;
+use BackTo\Framework\Security\Contracts\ClientIpResolverInterface;
 use BackTo\Framework\Security\Contracts\LoginLocationRepositoryInterface;
 use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
 
@@ -25,12 +26,11 @@ use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
  */
 class LoginAnomalyDetector implements Hooks, SecurityRuleInterface
 {
-    use ClientIpTrait;
-
     private readonly HookDispatcherInterface $hookDispatcher;
     private readonly LoginLocationRepositoryInterface $repository;
     private readonly LoggerInterface $logger;
     private readonly RequestContextInterface $requestContext;
+    private readonly ClientIpResolverInterface $ipResolver;
 
     /** @var int Max seconds between logins from different countries to flag impossible travel */
     private const IMPOSSIBLE_TRAVEL_THRESHOLD = 3600; // 1 hour
@@ -40,16 +40,13 @@ class LoginAnomalyDetector implements Hooks, SecurityRuleInterface
         LoginLocationRepositoryInterface $repository,
         LoggerInterface $logger,
         RequestContextInterface $requestContext,
+        ClientIpResolverInterface $ipResolver,
     ) {
         $this->hookDispatcher = $hookDispatcher;
         $this->repository = $repository;
         $this->logger = $logger;
         $this->requestContext = $requestContext;
-    }
-
-    protected function getRequestContext(): RequestContextInterface
-    {
-        return $this->requestContext;
+        $this->ipResolver = $ipResolver;
     }
 
     public function getName(): string
@@ -70,7 +67,7 @@ class LoginAnomalyDetector implements Hooks, SecurityRuleInterface
             return;
         }
 
-        $ip = $this->getClientIp();
+        $ip = $this->ipResolver->getClientIp();
         $country = $this->getCountryFromIp($ip);
         $userAgent = $this->getUserAgent();
 

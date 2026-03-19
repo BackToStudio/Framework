@@ -6,8 +6,8 @@ namespace BackTo\Framework\Security;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
-use BackTo\Framework\Contracts\RequestContextInterface;
 use BackTo\Framework\Observability\Contracts\LoggerInterface;
+use BackTo\Framework\Security\Contracts\ClientIpResolverInterface;
 use BackTo\Framework\Security\Contracts\LoginThrottleInterface;
 use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
 
@@ -22,28 +22,21 @@ use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
  */
 class LoginHardening implements Hooks, SecurityRuleInterface
 {
-    use ClientIpTrait;
-
     private readonly HookDispatcherInterface $hookDispatcher;
     private readonly LoginThrottleInterface $loginThrottle;
     private readonly LoggerInterface $logger;
-    private readonly RequestContextInterface $requestContext;
+    private readonly ClientIpResolverInterface $ipResolver;
 
     public function __construct(
         HookDispatcherInterface $hookDispatcher,
         LoginThrottleInterface $loginThrottle,
         LoggerInterface $logger,
-        RequestContextInterface $requestContext,
+        ClientIpResolverInterface $ipResolver,
     ) {
         $this->hookDispatcher = $hookDispatcher;
         $this->loginThrottle = $loginThrottle;
         $this->logger = $logger;
-        $this->requestContext = $requestContext;
-    }
-
-    protected function getRequestContext(): RequestContextInterface
-    {
-        return $this->requestContext;
+        $this->ipResolver = $ipResolver;
     }
 
     public function getName(): string
@@ -70,7 +63,7 @@ class LoginHardening implements Hooks, SecurityRuleInterface
             return $user;
         }
 
-        $ip = $this->getClientIp();
+        $ip = $this->ipResolver->getClientIp();
 
         if ($this->loginThrottle->isLocked($ip)) {
             $remaining = $this->loginThrottle->getLockoutRemainingSeconds($ip);
@@ -106,7 +99,7 @@ class LoginHardening implements Hooks, SecurityRuleInterface
 
     public function onLoginFailed(string $username): void
     {
-        $ip = $this->getClientIp();
+        $ip = $this->ipResolver->getClientIp();
 
         $this->loginThrottle->recordFailedAttempt($ip);
         $this->loginThrottle->recordFailedAccountAttempt($username);
@@ -120,7 +113,7 @@ class LoginHardening implements Hooks, SecurityRuleInterface
 
     public function onLoginSuccess(string $username): void
     {
-        $ip = $this->getClientIp();
+        $ip = $this->ipResolver->getClientIp();
         $this->loginThrottle->reset($ip);
         $this->loginThrottle->resetAccount($username);
 

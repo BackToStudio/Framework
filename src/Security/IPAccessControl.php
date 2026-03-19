@@ -6,8 +6,8 @@ namespace BackTo\Framework\Security;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
-use BackTo\Framework\Contracts\RequestContextInterface;
 use BackTo\Framework\Observability\Contracts\LoggerInterface;
+use BackTo\Framework\Security\Contracts\ClientIpResolverInterface;
 use BackTo\Framework\Security\Contracts\IPAccessControlInterface;
 use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
 
@@ -21,11 +21,9 @@ use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
  */
 class IPAccessControl implements Hooks, SecurityRuleInterface, IPAccessControlInterface
 {
-    use ClientIpTrait;
-
     private readonly HookDispatcherInterface $hookDispatcher;
     private readonly LoggerInterface $logger;
-    private readonly RequestContextInterface $requestContext;
+    private readonly ClientIpResolverInterface $ipResolver;
 
     /** @var string[] */
     private array $whitelist = [];
@@ -36,16 +34,11 @@ class IPAccessControl implements Hooks, SecurityRuleInterface, IPAccessControlIn
     public function __construct(
         HookDispatcherInterface $hookDispatcher,
         LoggerInterface $logger,
-        RequestContextInterface $requestContext,
+        ClientIpResolverInterface $ipResolver,
     ) {
         $this->hookDispatcher = $hookDispatcher;
         $this->logger = $logger;
-        $this->requestContext = $requestContext;
-    }
-
-    protected function getRequestContext(): RequestContextInterface
-    {
-        return $this->requestContext;
+        $this->ipResolver = $ipResolver;
     }
 
     public function getName(): string
@@ -201,7 +194,7 @@ class IPAccessControl implements Hooks, SecurityRuleInterface, IPAccessControlIn
             return;
         }
 
-        $ip = $this->getClientIp();
+        $ip = $this->ipResolver->getClientIp();
 
         if ($this->isAllowed($ip)) {
             return;

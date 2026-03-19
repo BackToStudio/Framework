@@ -8,6 +8,7 @@ use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
 use BackTo\Framework\Contracts\RequestContextInterface;
 use BackTo\Framework\Observability\Contracts\LoggerInterface;
+use BackTo\Framework\Security\Contracts\ClientIpResolverInterface;
 use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
 
 /**
@@ -20,12 +21,12 @@ use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
  */
 class CommentSpamProtection implements Hooks, SecurityRuleInterface
 {
-    use ClientIpTrait;
     use HtmlEscapeTrait;
 
     private readonly HookDispatcherInterface $hookDispatcher;
     private readonly LoggerInterface $logger;
     private readonly RequestContextInterface $requestContext;
+    private readonly ClientIpResolverInterface $ipResolver;
 
     private int $maxLinksAllowed = 2;
     private string $honeypotFieldName = 'website_url_confirm';
@@ -46,15 +47,12 @@ class CommentSpamProtection implements Hooks, SecurityRuleInterface
         HookDispatcherInterface $hookDispatcher,
         LoggerInterface $logger,
         RequestContextInterface $requestContext,
+        ClientIpResolverInterface $ipResolver,
     ) {
         $this->hookDispatcher = $hookDispatcher;
         $this->logger = $logger;
         $this->requestContext = $requestContext;
-    }
-
-    protected function getRequestContext(): RequestContextInterface
-    {
-        return $this->requestContext;
+        $this->ipResolver = $ipResolver;
     }
 
     public function getName(): string
@@ -102,14 +100,14 @@ class CommentSpamProtection implements Hooks, SecurityRuleInterface
 
         if ($this->isHoneypotFilled()) {
             $this->logger->warning('Comment spam: honeypot filled', [
-                'ip' => $this->getClientIp(),
+                'ip' => $this->ipResolver->getClientIp(),
             ]);
             $this->denyComment('Spam detected.');
         }
 
         if (! $this->isValidReferer()) {
             $this->logger->warning('Comment spam: invalid referer', [
-                'ip' => $this->getClientIp(),
+                'ip' => $this->ipResolver->getClientIp(),
                 'referer' => $this->getReferer(),
             ]);
             $this->denyComment('Invalid submission origin.');
@@ -117,7 +115,7 @@ class CommentSpamProtection implements Hooks, SecurityRuleInterface
 
         if ($this->hasExcessiveLinks($content)) {
             $this->logger->warning('Comment spam: excessive links', [
-                'ip' => $this->getClientIp(),
+                'ip' => $this->ipResolver->getClientIp(),
                 'link_count' => $this->countLinks($content),
             ]);
             $this->denyComment('Too many links in comment.');
@@ -127,7 +125,7 @@ class CommentSpamProtection implements Hooks, SecurityRuleInterface
 
         if ($spamPatterns !== []) {
             $this->logger->warning('Comment spam: dangerous patterns', [
-                'ip' => $this->getClientIp(),
+                'ip' => $this->ipResolver->getClientIp(),
                 'patterns' => $spamPatterns,
             ]);
             $this->denyComment('Comment contains disallowed content.');
