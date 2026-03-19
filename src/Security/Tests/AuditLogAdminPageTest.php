@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace BackTo\Framework\Security\Tests;
 
 use BackTo\Framework\Admin\Contracts\AdminPageInterface;
+use BackTo\Framework\Contracts\NonceManagerInterface;
 use BackTo\Framework\Security\AuditLogAdminPage;
 use BackTo\Framework\Security\AuditLogCsvExporter;
 use BackTo\Framework\Security\AuditLog\AuditLogRenderer;
@@ -84,6 +85,7 @@ class AuditLogAdminPageTest extends TestCase
 {
     private AuditLogRepositoryInterface $repository;
     private RequestContextInterface $requestContext;
+    private NonceManagerInterface $nonceManager;
     private AuditLogRenderer $renderer;
     private TestableAuditLogAdminPage $page;
 
@@ -91,8 +93,15 @@ class AuditLogAdminPageTest extends TestCase
     {
         $this->repository = $this->createMock(AuditLogRepositoryInterface::class);
         $this->requestContext = $this->createMock(RequestContextInterface::class);
-        $this->renderer = new AuditLogRenderer();
-        $this->page = new TestableAuditLogAdminPage($this->repository, $this->requestContext, null, $this->renderer);
+        $this->nonceManager = $this->createMock(NonceManagerInterface::class);
+        $this->renderer = new AuditLogRenderer($this->nonceManager);
+        $this->page = new TestableAuditLogAdminPage(
+            $this->repository,
+            $this->requestContext,
+            $this->nonceManager,
+            null,
+            $this->renderer,
+        );
     }
 
     public function testImplementsAdminPageInterface(): void
@@ -173,12 +182,15 @@ class AuditLogAdminPageTest extends TestCase
 
     public function testRenderActions(): void
     {
+        $this->nonceManager->method('createNonce')->willReturn('test-nonce');
+
         ob_start();
         $this->renderer->renderActions();
         $output = ob_get_clean();
 
         $this->assertStringContainsString('Export CSV', $output);
         $this->assertStringContainsString('Purge', $output);
+        $this->assertStringContainsString('test-nonce', $output);
     }
 
     public function testRenderCallsRepositoryWithFilters(): void
@@ -264,5 +276,27 @@ class AuditLogAdminPageTest extends TestCase
 
         $this->assertStringContainsString('Timestamp', $output);
         $this->assertStringContainsString('login_success', $output);
+    }
+
+    public function testVerifyNonceUsesNonceManager(): void
+    {
+        $this->nonceManager->method('verifyNonce')
+            ->with('valid-nonce', 'test_action')
+            ->willReturn(true);
+
+        $this->requestContext->method('input')
+            ->with('_nonce')
+            ->willReturn('valid-nonce');
+
+        $page = new AuditLogAdminPage(
+            $this->repository,
+            $this->requestContext,
+            $this->nonceManager,
+        );
+
+        $reflection = new \ReflectionMethod($page, 'verifyNonce');
+        $result = $reflection->invoke($page, 'test_action', '_nonce');
+
+        $this->assertTrue($result);
     }
 }

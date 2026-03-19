@@ -10,6 +10,7 @@ use BackTo\Framework\Contracts\EscaperInterface;
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\HookInterface;
 use BackTo\Framework\Contracts\HttpClientInterface;
+use BackTo\Framework\Contracts\NonceManagerInterface;
 use BackTo\Framework\Contracts\QueryContextInterface;
 use BackTo\Framework\Contracts\ScriptManagerInterface;
 use BackTo\Framework\Contracts\SiteContextInterface;
@@ -20,6 +21,7 @@ use BackTo\Framework\Hooks\Infrastructure\WordPressContentQuery;
 use BackTo\Framework\Hooks\Infrastructure\WordPressEscaper;
 use BackTo\Framework\Hooks\Infrastructure\WordPressHookDispatcher;
 use BackTo\Framework\Hooks\Infrastructure\WordPressHttpClient;
+use BackTo\Framework\Hooks\Infrastructure\WordPressNonceManager;
 use BackTo\Framework\Hooks\Infrastructure\WordPressQueryContext;
 use BackTo\Framework\Hooks\Infrastructure\WordPressScriptManager;
 use BackTo\Framework\Hooks\Infrastructure\WordPressSiteContext;
@@ -67,6 +69,9 @@ final class HooksExtension extends AbstractExtension
 
         $containerBuilder->register(ScriptManagerInterface::class, WordPressScriptManager::class);
         $containerBuilder->setAlias(WordPressScriptManager::class, ScriptManagerInterface::class);
+
+        $containerBuilder->register(NonceManagerInterface::class, WordPressNonceManager::class);
+        $containerBuilder->setAlias(WordPressNonceManager::class, NonceManagerInterface::class);
 
         $containerBuilder->setAlias(HookRegistryInterface::class, HookRegistry::class)
             ->setPublic(true);

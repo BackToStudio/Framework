@@ -39,6 +39,11 @@ final class WordPressHookDispatcher implements HookDispatcherInterface
         remove_filter($hookName, $callback, $priority);
     }
 
+    public function doAction(string $hookName, mixed ...$args): void
+    {
+        \do_action($hookName, ...$args);
+    }
+
     public function isAdmin(): bool
     {
         return is_admin();

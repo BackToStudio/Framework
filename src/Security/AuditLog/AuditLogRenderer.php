@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Security\AuditLog;
 
+use BackTo\Framework\Contracts\NonceManagerInterface;
 use BackTo\Framework\Security\Contracts\AuditLogSeverity;
 use BackTo\Framework\Security\HtmlEscapeTrait;
 
@@ -17,6 +18,16 @@ use BackTo\Framework\Security\HtmlEscapeTrait;
 final class AuditLogRenderer
 {
     use HtmlEscapeTrait;
+
+    private readonly NonceManagerInterface $nonceManager;
+
+    public function __construct(?NonceManagerInterface $nonceManager = null)
+    {
+        $this->nonceManager = $nonceManager ?? new class implements NonceManagerInterface {
+            public function createNonce(string $action): string { return ''; }
+            public function verifyNonce(string $nonce, string $action): bool { return false; }
+        };
+    }
 
     /**
      * @param array<int, array<string, mixed>> $events
@@ -166,8 +177,10 @@ final class AuditLogRenderer
 
     private function renderNonceField(string $action, string $name): void
     {
-        if (function_exists('wp_create_nonce')) {
-            echo '<input type="hidden" name="' . $this->escapeAttr($name) . '" value="' . $this->escapeAttr(wp_create_nonce($action)) . '" />';
+        $nonce = $this->nonceManager->createNonce($action);
+
+        if ($nonce !== '') {
+            echo '<input type="hidden" name="' . $this->escapeAttr($name) . '" value="' . $this->escapeAttr($nonce) . '" />';
         }
     }
 

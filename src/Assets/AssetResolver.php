@@ -6,14 +6,12 @@ namespace BackTo\Framework\Assets;
 
 use BackTo\Framework\Exception\AssetBuildNotFoundException;
 
-use function file_exists;
-use function wp_enqueue_script;
-use function wp_enqueue_style;
-use function wp_localize_script;
-use function wp_register_script;
-use function wp_register_style;
-
-final class WordPressScriptsAssets
+/**
+ * Resolves asset metadata (dependencies, version, URI) from the build folder.
+ *
+ * Pure domain logic — no WordPress dependency.
+ */
+class AssetResolver
 {
     private readonly string $assetDirectory;
     private readonly string $assetDirectoryUri;
@@ -22,42 +20,6 @@ final class WordPressScriptsAssets
     {
         $this->assetDirectory = $assetDirectory;
         $this->assetDirectoryUri = $assetDirectoryUri;
-    }
-
-    public function registerStyle(string $handle, string $relativePath, string $media = 'all'): void
-    {
-        $asset = $this->getAsset($relativePath);
-
-        wp_register_style($handle, $asset['uri'], $asset['dependencies'], $asset['version'], $media);
-    }
-
-    public function enqueueStyle(string $handle, string $relativePath, string $media = 'all'): void
-    {
-        $asset = $this->getAsset($relativePath);
-
-        wp_enqueue_style($handle, $asset['uri'], $asset['dependencies'], $asset['version'], $media);
-    }
-
-    public function registerScript(string $handle, string $relativePath, bool $inFooter = true): void
-    {
-        $asset = $this->getAsset($relativePath);
-
-        wp_register_script($handle, $asset['uri'], $asset['dependencies'], $asset['version'], $inFooter);
-    }
-
-    public function enqueueScript(string $handle, string $relativePath, bool $inFooter = true): void
-    {
-        $asset = $this->getAsset($relativePath);
-
-        wp_enqueue_script($handle, $asset['uri'], $asset['dependencies'], $asset['version'], $inFooter);
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    public function localizeScript(string $handle, string $objectName, array $data): void
-    {
-        wp_localize_script($handle, $objectName, $data);
     }
 
     /**

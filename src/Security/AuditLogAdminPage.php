@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace BackTo\Framework\Security;
 
 use BackTo\Framework\Admin\Contracts\AdminPageInterface;
+use BackTo\Framework\Contracts\NonceManagerInterface;
 use BackTo\Framework\Contracts\RequestContextInterface;
 use BackTo\Framework\Security\AuditLog\AuditLogRenderer;
 use BackTo\Framework\Security\Contracts\AuditLogRepositoryInterface;
@@ -23,6 +24,7 @@ class AuditLogAdminPage implements AdminPageInterface
 
     private readonly AuditLogRepositoryInterface $repository;
     private readonly RequestContextInterface $requestContext;
+    private readonly NonceManagerInterface $nonceManager;
     private readonly AuditLogCsvExporter $csvExporter;
     private readonly AuditLogRenderer $renderer;
 
@@ -31,13 +33,15 @@ class AuditLogAdminPage implements AdminPageInterface
     public function __construct(
         AuditLogRepositoryInterface $repository,
         RequestContextInterface $requestContext,
+        NonceManagerInterface $nonceManager,
         ?AuditLogCsvExporter $csvExporter = null,
         ?AuditLogRenderer $renderer = null,
     ) {
         $this->repository = $repository;
         $this->requestContext = $requestContext;
+        $this->nonceManager = $nonceManager;
         $this->csvExporter = $csvExporter ?? new AuditLogCsvExporter($repository);
-        $this->renderer = $renderer ?? new AuditLogRenderer();
+        $this->renderer = $renderer ?? new AuditLogRenderer($nonceManager);
     }
 
     public function getPageTitle(): string
@@ -159,15 +163,6 @@ class AuditLogAdminPage implements AdminPageInterface
             return false;
         }
 
-        return $this->wpVerifyNonce($nonce, $action);
-    }
-
-    protected function wpVerifyNonce(string $nonce, string $action): bool
-    {
-        if (function_exists('wp_verify_nonce')) {
-            return wp_verify_nonce($nonce, $action) !== false;
-        }
-
-        return false;
+        return $this->nonceManager->verifyNonce($nonce, $action);
     }
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Security;
 
+use BackTo\Framework\Cache\Contracts\TransientStoreInterface;
 use BackTo\Framework\Security\Contracts\AuditLogRepositoryInterface;
 
 /**
@@ -15,10 +16,14 @@ class AuditLogCsvExporter
     private const EXPORT_COOLDOWN_SECONDS = 60;
 
     private readonly AuditLogRepositoryInterface $repository;
+    private readonly ?TransientStoreInterface $transientStore;
 
-    public function __construct(AuditLogRepositoryInterface $repository)
-    {
+    public function __construct(
+        AuditLogRepositoryInterface $repository,
+        ?TransientStoreInterface $transientStore = null,
+    ) {
         $this->repository = $repository;
+        $this->transientStore = $transientStore;
     }
 
     /**
@@ -56,18 +61,16 @@ class AuditLogCsvExporter
 
     public function canExport(): bool
     {
-        if (!function_exists('get_transient')) {
+        if ($this->transientStore === null) {
             return true;
         }
 
-        return get_transient('backto_audit_export_lock') === false;
+        return $this->transientStore->get('backto_audit_export_lock') === false;
     }
 
     public function markExported(): void
     {
-        if (function_exists('set_transient')) {
-            set_transient('backto_audit_export_lock', '1', self::EXPORT_COOLDOWN_SECONDS);
-        }
+        $this->transientStore?->set('backto_audit_export_lock', '1', self::EXPORT_COOLDOWN_SECONDS);
     }
 
     protected function sendCsvHeaders(): void

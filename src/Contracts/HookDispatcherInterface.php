@@ -21,6 +21,11 @@ interface HookDispatcherInterface
     public function removeFilter(string $hookName, callable|string $callback, int $priority = 10): void;
 
     /**
+     * Execute an action hook.
+     */
+    public function doAction(string $hookName, mixed ...$args): void;
+
+    /**
      * Check if the current request is for an admin page.
      */
     public function isAdmin(): bool;

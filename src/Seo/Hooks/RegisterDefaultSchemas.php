@@ -76,9 +76,7 @@ final class RegisterDefaultSchemas implements Hooks
          *
          * @param SchemaManager $schemaManager The schema manager instance.
          */
-        if (\function_exists('do_action')) {
-            \do_action('framework/seo/schema', $this->schemaManager);
-        }
+        $this->hookDispatcher->doAction('framework/seo/schema', $this->schemaManager);
     }
 
     private function registerPostTypeSchema(): void
