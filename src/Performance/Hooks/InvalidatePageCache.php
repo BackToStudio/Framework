@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Performance\Hooks;
 
+use BackTo\Framework\Contracts\ContentQueryInterface;
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
 use BackTo\Framework\Performance\Contracts\PageCacheInterface;
@@ -18,11 +19,16 @@ final class InvalidatePageCache implements Hooks
 {
     private readonly HookDispatcherInterface $hookDispatcher;
     private readonly PageCacheInterface $pageCache;
+    private readonly ContentQueryInterface $contentQuery;
 
-    public function __construct(HookDispatcherInterface $hookDispatcher, PageCacheInterface $pageCache)
-    {
+    public function __construct(
+        HookDispatcherInterface $hookDispatcher,
+        PageCacheInterface $pageCache,
+        ContentQueryInterface $contentQuery,
+    ) {
         $this->hookDispatcher = $hookDispatcher;
         $this->pageCache = $pageCache;
+        $this->contentQuery = $contentQuery;
     }
 
     public function hooks(): void
@@ -46,7 +52,7 @@ final class InvalidatePageCache implements Hooks
         $this->invalidatePost($postId);
     }
 
-    
+
     public function onPostStatusChange(string $newStatus, string $oldStatus, $post): void
     {
         if ($newStatus === $oldStatus) {
@@ -63,9 +69,9 @@ final class InvalidatePageCache implements Hooks
 
     public function onCommentChange(int $commentId): void
     {
-        $comment = \get_comment($commentId);
+        $comment = $this->contentQuery->getComment($commentId);
 
-        if ($comment instanceof \WP_Comment) {
+        if ($comment !== null) {
             $this->invalidatePost((int) $comment->comment_post_ID);
         }
     }
@@ -77,7 +83,7 @@ final class InvalidatePageCache implements Hooks
 
     private function invalidatePost(int $postId): void
     {
-        $permalink = \get_permalink($postId);
+        $permalink = $this->contentQuery->getPermalink($postId);
 
         if ($permalink !== false) {
             $this->pageCache->invalidate($permalink);

@@ -6,6 +6,7 @@ namespace BackTo\Framework\Performance\Hooks;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
+use BackTo\Framework\Contracts\ScriptManagerInterface;
 
 /**
  * Control the WordPress Heartbeat API.
@@ -16,15 +17,18 @@ use BackTo\Framework\Contracts\Hooks;
 final class DisableHeartbeat implements Hooks
 {
     private readonly HookDispatcherInterface $hookDispatcher;
+    private readonly ScriptManagerInterface $scriptManager;
     private readonly bool $disableFrontend;
     private readonly int $adminInterval;
 
     public function __construct(
         HookDispatcherInterface $hookDispatcher,
+        ScriptManagerInterface $scriptManager,
         bool $disableFrontend = true,
         int $adminInterval = 60
     ) {
         $this->hookDispatcher = $hookDispatcher;
+        $this->scriptManager = $scriptManager;
         $this->disableFrontend = $disableFrontend;
         $this->adminInterval = $adminInterval;
     }
@@ -41,7 +45,7 @@ final class DisableHeartbeat implements Hooks
     public function deregisterHeartbeatOnFrontend(): void
     {
         if (!$this->hookDispatcher->isAdmin()) {
-            \wp_deregister_script('heartbeat');
+            $this->scriptManager->deregisterScript('heartbeat');
         }
     }
 

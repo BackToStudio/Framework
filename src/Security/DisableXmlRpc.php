@@ -42,7 +42,7 @@ final class DisableXmlRpc implements Hooks, SecurityRuleInterface
 
     public function removePingbackLink(): void
     {
-        remove_action('wp_head', 'rsd_link');
-        remove_action('wp_head', 'wlwmanifest_link');
+        $this->hookDispatcher->removeAction('wp_head', 'rsd_link');
+        $this->hookDispatcher->removeAction('wp_head', 'wlwmanifest_link');
     }
 }

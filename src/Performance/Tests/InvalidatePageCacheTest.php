@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Performance\Tests;
 
+use BackTo\Framework\Contracts\ContentQueryInterface;
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Performance\Contracts\PageCacheInterface;
 use BackTo\Framework\Performance\Hooks\InvalidatePageCache;
@@ -13,13 +14,19 @@ class InvalidatePageCacheTest extends TestCase
 {
     private HookDispatcherInterface $hookDispatcher;
     private PageCacheInterface $pageCache;
+    private ContentQueryInterface $contentQuery;
     private InvalidatePageCache $invalidator;
 
     protected function setUp(): void
     {
         $this->hookDispatcher = $this->createMock(HookDispatcherInterface::class);
         $this->pageCache = $this->createMock(PageCacheInterface::class);
-        $this->invalidator = new InvalidatePageCache($this->hookDispatcher, $this->pageCache);
+        $this->contentQuery = $this->createMock(ContentQueryInterface::class);
+        $this->invalidator = new InvalidatePageCache(
+            $this->hookDispatcher,
+            $this->pageCache,
+            $this->contentQuery,
+        );
     }
 
     public function testHooksRegistersAllActions(): void
@@ -54,19 +61,46 @@ class InvalidatePageCacheTest extends TestCase
         $this->invalidator->onPostStatusChange('publish', 'publish', $post);
     }
 
-    public function testOnPostStatusChangeCallsInvalidatePostOnDifferentStatus(): void
+    public function testOnPostSavedInvalidatesPermalink(): void
     {
-        // We can't call the full method without WP's get_permalink(),
-        // but we can verify non-publish transitions don't flush all
-        $post = new \stdClass();
-        $post->ID = 1;
+        $this->contentQuery->method('getPermalink')
+            ->with(42)
+            ->willReturn('https://example.com/my-post');
 
-        $this->pageCache->expects($this->never())->method('flush');
+        $this->pageCache->expects($this->once())
+            ->method('invalidate')
+            ->with('https://example.com/my-post');
 
-        // draft -> pending: neither is publish, so it invalidates the post only
-        // But invalidatePost calls get_permalink which needs WP, so we test
-        // that same-status returns early (tested above) and flush works (tested below)
-        $this->assertTrue(true);
+        $this->invalidator->onPostSaved(42);
+    }
+
+    public function testOnCommentChangeInvalidatesPost(): void
+    {
+        $comment = new \stdClass();
+        $comment->comment_post_ID = '42';
+
+        $this->contentQuery->method('getComment')
+            ->with(99)
+            ->willReturn($comment);
+
+        $this->contentQuery->method('getPermalink')
+            ->with(42)
+            ->willReturn('https://example.com/my-post');
+
+        $this->pageCache->expects($this->once())
+            ->method('invalidate')
+            ->with('https://example.com/my-post');
+
+        $this->invalidator->onCommentChange(99);
+    }
+
+    public function testOnCommentChangeSkipsNullComment(): void
+    {
+        $this->contentQuery->method('getComment')->willReturn(null);
+
+        $this->pageCache->expects($this->never())->method('invalidate');
+
+        $this->invalidator->onCommentChange(99);
     }
 
     public function testFlushAllDelegatesToPageCache(): void
@@ -74,5 +108,18 @@ class InvalidatePageCacheTest extends TestCase
         $this->pageCache->expects($this->once())->method('flush');
 
         $this->invalidator->flushAll();
+    }
+
+    public function testOnPostStatusChangeFlushesOnPublish(): void
+    {
+        $post = new \stdClass();
+        $post->ID = 1;
+
+        $this->contentQuery->method('getPermalink')->willReturn('https://example.com/post');
+
+        $this->pageCache->expects($this->once())->method('invalidate');
+        $this->pageCache->expects($this->once())->method('flush');
+
+        $this->invalidator->onPostStatusChange('publish', 'draft', $post);
     }
 }

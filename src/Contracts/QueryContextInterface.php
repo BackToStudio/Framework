@@ -17,4 +17,9 @@ interface QueryContextInterface
     public function isSearch(): bool;
 
     public function isSingular(): bool;
+
+    /**
+     * Get the currently queried object (equivalent to get_queried_object()).
+     */
+    public function getQueriedObject(): ?object;
 }

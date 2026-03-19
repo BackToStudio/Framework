@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Seo\Schema\Generator;
 
+use BackTo\Framework\Contracts\ContentQueryInterface;
+use BackTo\Framework\Contracts\SiteContextInterface;
 use BackTo\Framework\Seo\Schema;
 use BackTo\Framework\Seo\Schema\SchemaType;
 
@@ -14,11 +16,20 @@ use BackTo\Framework\Seo\Schema\SchemaType;
  */
 final class ArticleSchemaGenerator
 {
+    private readonly ContentQueryInterface $contentQuery;
+    private readonly SiteContextInterface $siteContext;
+
+    public function __construct(ContentQueryInterface $contentQuery, SiteContextInterface $siteContext)
+    {
+        $this->contentQuery = $contentQuery;
+        $this->siteContext = $siteContext;
+    }
+
     public function generate(?int $postId = null): ?SchemaType
     {
-        $post = \get_post($postId);
+        $post = $this->contentQuery->getPost($postId);
 
-        if (!$post instanceof \WP_Post) {
+        if ($post === null) {
             return null;
         }
 
@@ -26,33 +37,33 @@ final class ArticleSchemaGenerator
             return null;
         }
 
-        $siteUrl = \home_url('/');
-        $permalink = \get_permalink($post);
+        $siteUrl = $this->siteContext->getHomeUrl() . '/';
+        $permalink = $this->contentQuery->getPermalink($post->ID);
 
         $article = Schema::article()
             ->id($permalink . '#article')
             ->headline($post->post_title)
             ->url($permalink)
-            ->datePublished(\get_the_date('c', $post))
-            ->dateModified(\get_the_modified_date('c', $post))
+            ->datePublished($this->contentQuery->getTheDate('c', $post))
+            ->dateModified($this->contentQuery->getTheModifiedDate('c', $post))
             ->set('isPartOf', Schema::ref($siteUrl . '#website'))
-            ->publisher(Schema::ref($siteUrl . '#organization'));
+            ->set('publisher', Schema::ref($siteUrl . '#organization'));
 
-        $author = \get_userdata($post->post_author);
+        $author = $this->contentQuery->getUserdata($post->post_author);
 
         if ($author !== false) {
             $article->author(Schema::person()->name($author->display_name));
         }
 
-        $thumbnailUrl = \get_the_post_thumbnail_url($post, 'full');
+        $thumbnailUrl = $this->contentQuery->getThePostThumbnailUrl($post, 'full');
 
-        if (\is_string($thumbnailUrl) && $thumbnailUrl !== '') {
+        if (is_string($thumbnailUrl) && $thumbnailUrl !== '') {
             $article->image($thumbnailUrl);
         }
 
-        $description = \get_the_excerpt($post);
+        $description = $this->contentQuery->getTheExcerpt($post);
 
-        if (\is_string($description) && $description !== '') {
+        if ($description !== '') {
             $article->description($description);
         }
 

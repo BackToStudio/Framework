@@ -5,21 +5,24 @@ declare(strict_types=1);
 namespace BackTo\Framework\Performance\Tests;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
+use BackTo\Framework\Contracts\ScriptManagerInterface;
 use BackTo\Framework\Performance\Hooks\DisableHeartbeat;
 use PHPUnit\Framework\TestCase;
 
 class DisableHeartbeatTest extends TestCase
 {
     private HookDispatcherInterface $hookDispatcher;
+    private ScriptManagerInterface $scriptManager;
 
     protected function setUp(): void
     {
         $this->hookDispatcher = $this->createMock(HookDispatcherInterface::class);
+        $this->scriptManager = $this->createMock(ScriptManagerInterface::class);
     }
 
     public function testHooksRegistersDeregisterAndFilterByDefault(): void
     {
-        $heartbeat = new DisableHeartbeat($this->hookDispatcher);
+        $heartbeat = new DisableHeartbeat($this->hookDispatcher, $this->scriptManager);
 
         $this->hookDispatcher->expects($this->once())
             ->method('addAction')
@@ -34,7 +37,7 @@ class DisableHeartbeatTest extends TestCase
 
     public function testHooksSkipsDeregisterWhenFrontendDisableIsFalse(): void
     {
-        $heartbeat = new DisableHeartbeat($this->hookDispatcher, false);
+        $heartbeat = new DisableHeartbeat($this->hookDispatcher, $this->scriptManager, false);
 
         $this->hookDispatcher->expects($this->never())
             ->method('addAction');
@@ -45,9 +48,29 @@ class DisableHeartbeatTest extends TestCase
         $heartbeat->hooks();
     }
 
+    public function testDeregisterHeartbeatOnFrontendCallsScriptManager(): void
+    {
+        $this->hookDispatcher->method('isAdmin')->willReturn(false);
+        $this->scriptManager->expects($this->once())
+            ->method('deregisterScript')
+            ->with('heartbeat');
+
+        $heartbeat = new DisableHeartbeat($this->hookDispatcher, $this->scriptManager);
+        $heartbeat->deregisterHeartbeatOnFrontend();
+    }
+
+    public function testDeregisterHeartbeatSkipsOnAdmin(): void
+    {
+        $this->hookDispatcher->method('isAdmin')->willReturn(true);
+        $this->scriptManager->expects($this->never())->method('deregisterScript');
+
+        $heartbeat = new DisableHeartbeat($this->hookDispatcher, $this->scriptManager);
+        $heartbeat->deregisterHeartbeatOnFrontend();
+    }
+
     public function testSetAdminIntervalSetsCustomInterval(): void
     {
-        $heartbeat = new DisableHeartbeat($this->hookDispatcher, true, 120);
+        $heartbeat = new DisableHeartbeat($this->hookDispatcher, $this->scriptManager, true, 120);
 
         $result = $heartbeat->setAdminInterval(['interval' => 15, 'minimalInterval' => 0]);
 
@@ -57,7 +80,7 @@ class DisableHeartbeatTest extends TestCase
 
     public function testSetAdminIntervalUsesDefaultInterval(): void
     {
-        $heartbeat = new DisableHeartbeat($this->hookDispatcher);
+        $heartbeat = new DisableHeartbeat($this->hookDispatcher, $this->scriptManager);
 
         $result = $heartbeat->setAdminInterval([]);
 

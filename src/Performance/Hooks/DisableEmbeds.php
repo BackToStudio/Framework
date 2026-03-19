@@ -6,6 +6,7 @@ namespace BackTo\Framework\Performance\Hooks;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
+use BackTo\Framework\Contracts\ScriptManagerInterface;
 
 /**
  * Disable WordPress oEmbed functionality.
@@ -15,10 +16,12 @@ use BackTo\Framework\Contracts\Hooks;
 final class DisableEmbeds implements Hooks
 {
     private readonly HookDispatcherInterface $hookDispatcher;
+    private readonly ScriptManagerInterface $scriptManager;
 
-    public function __construct(HookDispatcherInterface $hookDispatcher)
+    public function __construct(HookDispatcherInterface $hookDispatcher, ScriptManagerInterface $scriptManager)
     {
         $this->hookDispatcher = $hookDispatcher;
+        $this->scriptManager = $scriptManager;
     }
 
     public function hooks(): void
@@ -32,7 +35,7 @@ final class DisableEmbeds implements Hooks
 
     public function deregisterEmbedScript(): void
     {
-        \wp_deregister_script('wp-embed');
+        $this->scriptManager->deregisterScript('wp-embed');
     }
 
     /**

@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Performance;
 
+use BackTo\Framework\Contracts\ContentQueryInterface;
+use BackTo\Framework\Contracts\SiteContextInterface;
+
 /**
  * Collects URLs that need to be preloaded for cache warming.
  *
@@ -12,9 +15,18 @@ namespace BackTo\Framework\Performance;
  */
 class PreloadUrlCollector
 {
+    private readonly ContentQueryInterface $contentQuery;
+    private readonly SiteContextInterface $siteContext;
+    private readonly int $batchSize;
+
     public function __construct(
-        private readonly int $batchSize = 50,
+        ContentQueryInterface $contentQuery,
+        SiteContextInterface $siteContext,
+        int $batchSize = 50,
     ) {
+        $this->contentQuery = $contentQuery;
+        $this->siteContext = $siteContext;
+        $this->batchSize = $batchSize;
     }
 
     /**
@@ -24,12 +36,12 @@ class PreloadUrlCollector
      */
     public function getPostRelatedUrls(int $postId): array
     {
-        $postType = \get_post_type($postId) ?: 'post';
-        $post = \get_post($postId);
+        $postType = $this->contentQuery->getPostType($postId) ?: 'post';
+        $post = $this->contentQuery->getPost($postId);
 
         return array_unique(array_filter(array_merge(
             $this->collectPermalinkUrl($postId),
-            [\home_url('/')],
+            [$this->siteContext->getHomeUrl() . '/'],
             $this->collectBlogPageUrl(),
             $this->collectPostTypeArchiveUrl($postType),
             $this->collectTaxonomyUrls($postId, $postType),
@@ -45,11 +57,11 @@ class PreloadUrlCollector
      */
     public function getSiteUrls(): array
     {
-        $urls = [\home_url('/')];
+        $urls = [$this->siteContext->getHomeUrl() . '/'];
         $urls = array_merge($urls, $this->collectBlogPageUrl());
 
         // Recent published posts
-        $recentPosts = \get_posts([
+        $recentPosts = $this->contentQuery->getPosts([
             'numberposts'      => $this->batchSize,
             'post_type'        => 'post',
             'post_status'      => 'publish',
@@ -59,11 +71,11 @@ class PreloadUrlCollector
         ]);
 
         foreach ($recentPosts as $post) {
-            $urls[] = \get_permalink($post->ID);
+            $urls[] = $this->contentQuery->getPermalink($post->ID);
         }
 
         // Published pages
-        $pages = \get_posts([
+        $pages = $this->contentQuery->getPosts([
             'numberposts'      => $this->batchSize,
             'post_type'        => 'page',
             'post_status'      => 'publish',
@@ -73,23 +85,19 @@ class PreloadUrlCollector
         ]);
 
         foreach ($pages as $page) {
-            $urls[] = \get_permalink($page->ID);
+            $urls[] = $this->contentQuery->getPermalink($page->ID);
         }
 
         // Category archives
-        $categories = \get_categories(['hide_empty' => true, 'number' => 20]);
-        if (\is_array($categories)) {
-            foreach ($categories as $cat) {
-                $urls[] = \get_category_link($cat->term_id);
-            }
+        $categories = $this->contentQuery->getCategories(['hide_empty' => true, 'number' => 20]);
+        foreach ($categories as $cat) {
+            $urls[] = $this->contentQuery->getCategoryLink($cat->term_id);
         }
 
         // Tag archives (top tags)
-        $tags = \get_tags(['hide_empty' => true, 'number' => 20, 'orderby' => 'count', 'order' => 'DESC']);
-        if (\is_array($tags)) {
-            foreach ($tags as $tag) {
-                $urls[] = \get_tag_link($tag->term_id);
-            }
+        $tags = $this->contentQuery->getTags(['hide_empty' => true, 'number' => 20, 'orderby' => 'count', 'order' => 'DESC']);
+        foreach ($tags as $tag) {
+            $urls[] = $this->contentQuery->getTagLink($tag->term_id);
         }
 
         $urls = array_unique(array_filter($urls));
@@ -101,7 +109,7 @@ class PreloadUrlCollector
     /** @return string[] */
     private function collectPermalinkUrl(int $postId): array
     {
-        $permalink = \get_permalink($postId);
+        $permalink = $this->contentQuery->getPermalink($postId);
 
         return $permalink !== false ? [$permalink] : [];
     }
@@ -109,13 +117,13 @@ class PreloadUrlCollector
     /** @return string[] */
     private function collectBlogPageUrl(): array
     {
-        $blogPageId = (int) \get_option('page_for_posts');
+        $blogPageId = (int) $this->contentQuery->getOption('page_for_posts');
 
         if ($blogPageId <= 0) {
             return [];
         }
 
-        $blogUrl = \get_permalink($blogPageId);
+        $blogUrl = $this->contentQuery->getPermalink($blogPageId);
 
         return $blogUrl !== false ? [$blogUrl] : [];
     }
@@ -127,7 +135,7 @@ class PreloadUrlCollector
             return [];
         }
 
-        $archiveUrl = \get_post_type_archive_link($postType);
+        $archiveUrl = $this->contentQuery->getPostTypeArchiveLink($postType);
 
         return $archiveUrl !== false ? [$archiveUrl] : [];
     }
@@ -135,19 +143,19 @@ class PreloadUrlCollector
     /** @return string[] */
     private function collectTaxonomyUrls(int $postId, string $postType): array
     {
-        $taxonomies = \get_object_taxonomies($postType, 'names');
-        $terms = \wp_get_post_terms($postId, $taxonomies);
+        $taxonomies = $this->contentQuery->getObjectTaxonomies($postType);
+        $terms = $this->contentQuery->getPostTerms($postId, $taxonomies);
 
-        if (!\is_array($terms)) {
+        if ($terms === false) {
             return [];
         }
 
         $urls = [];
 
         foreach ($terms as $term) {
-            $termLink = \get_term_link($term);
+            $termLink = $this->contentQuery->getTermLink($term);
 
-            if (\is_string($termLink)) {
+            if ($termLink !== false) {
                 $urls[] = $termLink;
             }
         }
@@ -156,21 +164,21 @@ class PreloadUrlCollector
     }
 
     /** @return string[] */
-    private function collectAuthorUrl(?\WP_Post $post): array
+    private function collectAuthorUrl(?object $post): array
     {
-        if (!$post instanceof \WP_Post) {
+        if ($post === null) {
             return [];
         }
 
-        $authorUrl = \get_author_posts_url($post->post_author);
+        $authorUrl = $this->contentQuery->getAuthorPostsUrl($post->post_author);
 
-        return $authorUrl !== false ? [$authorUrl] : [];
+        return $authorUrl !== '' ? [$authorUrl] : [];
     }
 
     /** @return string[] */
-    private function collectDateArchiveUrls(?\WP_Post $post): array
+    private function collectDateArchiveUrls(?object $post): array
     {
-        if (!$post instanceof \WP_Post) {
+        if ($post === null) {
             return [];
         }
 
@@ -179,8 +187,8 @@ class PreloadUrlCollector
         $month = date('m', strtotime($date));
 
         return [
-            \get_year_link((int) $year),
-            \get_month_link((int) $year, (int) $month),
+            $this->contentQuery->getYearLink((int) $year),
+            $this->contentQuery->getMonthLink((int) $year, (int) $month),
         ];
     }
 }

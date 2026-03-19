@@ -34,4 +34,21 @@ final class WordPressSiteContext implements SiteContextInterface
 
         return $value;
     }
+
+    public function getBlogInfo(string $show): string
+    {
+        return function_exists('get_bloginfo') ? \get_bloginfo($show) : '';
+    }
+
+    public function getThemeMod(string $name, mixed $default = false): mixed
+    {
+        return function_exists('get_theme_mod') ? \get_theme_mod($name, $default) : $default;
+    }
+
+    public function getAttachmentImageUrl(int $attachmentId, string $size = 'thumbnail'): string|false
+    {
+        return function_exists('wp_get_attachment_image_url')
+            ? \wp_get_attachment_image_url($attachmentId, $size)
+            : false;
+    }
 }

@@ -62,6 +62,6 @@ final class HideWordPressVersion implements Hooks, SecurityRuleInterface
 
     public function removeHeadMeta(): void
     {
-        remove_action('wp_head', 'wp_generator');
+        $this->hookDispatcher->removeAction('wp_head', 'wp_generator');
     }
 }

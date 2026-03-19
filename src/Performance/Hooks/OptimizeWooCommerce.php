@@ -6,6 +6,7 @@ namespace BackTo\Framework\Performance\Hooks;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
+use BackTo\Framework\Contracts\ScriptManagerInterface;
 
 /**
  * Disable WooCommerce scripts and styles on non-WooCommerce pages.
@@ -16,10 +17,12 @@ use BackTo\Framework\Contracts\Hooks;
 final class OptimizeWooCommerce implements Hooks
 {
     private readonly HookDispatcherInterface $hookDispatcher;
+    private readonly ScriptManagerInterface $scriptManager;
 
-    public function __construct(HookDispatcherInterface $hookDispatcher)
+    public function __construct(HookDispatcherInterface $hookDispatcher, ScriptManagerInterface $scriptManager)
     {
         $this->hookDispatcher = $hookDispatcher;
+        $this->scriptManager = $scriptManager;
     }
 
     public function hooks(): void
@@ -37,14 +40,14 @@ final class OptimizeWooCommerce implements Hooks
             return;
         }
 
-        \wp_dequeue_style('woocommerce-general');
-        \wp_dequeue_style('woocommerce-layout');
-        \wp_dequeue_style('woocommerce-smallscreen');
-        \wp_dequeue_style('wc-blocks-style');
+        $this->scriptManager->dequeueStyle('woocommerce-general');
+        $this->scriptManager->dequeueStyle('woocommerce-layout');
+        $this->scriptManager->dequeueStyle('woocommerce-smallscreen');
+        $this->scriptManager->dequeueStyle('wc-blocks-style');
 
-        \wp_dequeue_script('wc-cart-fragments');
-        \wp_dequeue_script('woocommerce');
-        \wp_dequeue_script('wc-add-to-cart');
+        $this->scriptManager->dequeueScript('wc-cart-fragments');
+        $this->scriptManager->dequeueScript('woocommerce');
+        $this->scriptManager->dequeueScript('wc-add-to-cart');
     }
 
     private function isWooCommercePage(): bool

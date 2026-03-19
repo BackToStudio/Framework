@@ -22,4 +22,9 @@ class WordPressQueryContext implements QueryContextInterface
     {
         return function_exists('is_singular') && \is_singular();
     }
+
+    public function getQueriedObject(): ?object
+    {
+        return function_exists('get_queried_object') ? \get_queried_object() : null;
+    }
 }

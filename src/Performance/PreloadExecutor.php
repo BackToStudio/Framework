@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Performance;
 
+use BackTo\Framework\Contracts\HttpClientInterface;
 use BackTo\Framework\Performance\Contracts\PageCacheInterface;
 
 /**
@@ -14,9 +15,15 @@ use BackTo\Framework\Performance\Contracts\PageCacheInterface;
  */
 class PreloadExecutor
 {
+    private readonly PageCacheInterface $pageCache;
+    private readonly HttpClientInterface $httpClient;
+
     public function __construct(
-        private readonly PageCacheInterface $pageCache,
+        PageCacheInterface $pageCache,
+        HttpClientInterface $httpClient,
     ) {
+        $this->pageCache = $pageCache;
+        $this->httpClient = $httpClient;
     }
 
     /**
@@ -31,7 +38,7 @@ class PreloadExecutor
                 continue;
             }
 
-            \wp_remote_get($url, [
+            $this->httpClient->get($url, [
                 'timeout'   => 30,
                 'blocking'  => false,
                 'sslverify' => true,

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Performance\Tests;
 
+use BackTo\Framework\Contracts\HttpClientInterface;
 use BackTo\Framework\Performance\Contracts\PageCacheInterface;
 use BackTo\Framework\Performance\PreloadExecutor;
 use PHPUnit\Framework\TestCase;
@@ -11,17 +12,18 @@ use PHPUnit\Framework\TestCase;
 class PreloadExecutorTest extends TestCase
 {
     private PageCacheInterface $pageCache;
+    private HttpClientInterface $httpClient;
     private PreloadExecutor $executor;
 
     protected function setUp(): void
     {
         $this->pageCache = $this->createMock(PageCacheInterface::class);
-        $this->executor = new PreloadExecutor($this->pageCache);
+        $this->httpClient = $this->createMock(HttpClientInterface::class);
+        $this->executor = new PreloadExecutor($this->pageCache, $this->httpClient);
     }
 
     public function testPreloadSkipsAllCachedUrls(): void
     {
-        // When all URLs are cached, wp_remote_get is never called
         $this->pageCache->expects($this->exactly(2))
             ->method('get')
             ->willReturnMap([
@@ -29,13 +31,30 @@ class PreloadExecutorTest extends TestCase
                 ['https://example.com/about', '<html>about</html>'],
             ]);
 
+        $this->httpClient->expects($this->never())->method('get');
+
         $this->executor->preload(['https://example.com/', 'https://example.com/about']);
     }
 
     public function testPreloadHandlesEmptyArray(): void
     {
         $this->pageCache->expects($this->never())->method('get');
+        $this->httpClient->expects($this->never())->method('get');
 
         $this->executor->preload([]);
+    }
+
+    public function testPreloadSendsRequestForUncachedUrls(): void
+    {
+        $this->pageCache->method('get')->willReturn(null);
+
+        $this->httpClient->expects($this->exactly(2))
+            ->method('get')
+            ->willReturnCallback(function (string $url, array $args) {
+                $this->assertArrayHasKey('timeout', $args);
+                $this->assertFalse($args['blocking']);
+            });
+
+        $this->executor->preload(['https://example.com/', 'https://example.com/about']);
     }
 }

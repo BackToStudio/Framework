@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Performance\Hooks;
 
+use BackTo\Framework\Contracts\EscaperInterface;
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
 
@@ -15,6 +16,7 @@ use BackTo\Framework\Contracts\Hooks;
 final class AddResourceHints implements Hooks
 {
     private readonly HookDispatcherInterface $hookDispatcher;
+    private readonly EscaperInterface $escaper;
 
     /** @var string[] Domains to preconnect to */
     private readonly array $preconnect;
@@ -32,11 +34,13 @@ final class AddResourceHints implements Hooks
      */
     public function __construct(
         HookDispatcherInterface $hookDispatcher,
+        EscaperInterface $escaper,
         array $preconnect = [],
         array $dnsPrefetch = [],
         array $preload = []
     ) {
         $this->hookDispatcher = $hookDispatcher;
+        $this->escaper = $escaper;
         $this->preconnect = $preconnect;
         $this->dnsPrefetch = $dnsPrefetch;
         $this->preload = $preload;
@@ -80,9 +84,9 @@ final class AddResourceHints implements Hooks
     public function addPreloadLinks(): void
     {
         foreach ($this->preload as $resource) {
-            $url = \esc_url($resource['url']);
-            $as = \esc_attr($resource['as']);
-            $type = isset($resource['type']) ? ' type="' . \esc_attr($resource['type']) . '"' : '';
+            $url = $this->escaper->escUrl($resource['url']);
+            $as = $this->escaper->escAttr($resource['as']);
+            $type = isset($resource['type']) ? ' type="' . $this->escaper->escAttr($resource['type']) . '"' : '';
             $crossorigin = in_array($resource['as'], ['font', 'fetch'], true) ? ' crossorigin' : '';
 
             echo '<link rel="preload" href="' . $url . '" as="' . $as . '"' . $type . $crossorigin . '>' . "\n";

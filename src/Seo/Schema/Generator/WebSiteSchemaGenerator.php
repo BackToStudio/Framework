@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Seo\Schema\Generator;
 
+use BackTo\Framework\Contracts\SiteContextInterface;
 use BackTo\Framework\Seo\Schema;
 use BackTo\Framework\Seo\Schema\SchemaType;
 
@@ -15,16 +16,23 @@ use BackTo\Framework\Seo\Schema\SchemaType;
  */
 class WebSiteSchemaGenerator
 {
+    private readonly SiteContextInterface $siteContext;
+
+    public function __construct(SiteContextInterface $siteContext)
+    {
+        $this->siteContext = $siteContext;
+    }
+
     public function generate(): SchemaType
     {
-        $siteUrl = \home_url('/');
+        $siteUrl = $this->siteContext->getHomeUrl() . '/';
 
         return Schema::webSite()
             ->id($siteUrl . '#website')
-            ->name(\get_bloginfo('name'))
+            ->name($this->siteContext->getBlogInfo('name'))
             ->url($siteUrl)
-            ->description(\get_bloginfo('description'))
-            ->publisher(Schema::ref($siteUrl . '#organization'))
+            ->description($this->siteContext->getBlogInfo('description'))
+            ->set('publisher', Schema::ref($siteUrl . '#organization'))
             ->potentialAction(
                 Schema::searchAction()
                     ->target($siteUrl . '?s={search_term_string}')

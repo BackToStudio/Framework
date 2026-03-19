@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Performance\Tests;
 
+use BackTo\Framework\Contracts\EscaperInterface;
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Performance\Hooks\AddResourceHints;
 use PHPUnit\Framework\TestCase;
@@ -11,15 +12,19 @@ use PHPUnit\Framework\TestCase;
 class AddResourceHintsTest extends TestCase
 {
     private HookDispatcherInterface $hookDispatcher;
+    private EscaperInterface $escaper;
 
     protected function setUp(): void
     {
         $this->hookDispatcher = $this->createMock(HookDispatcherInterface::class);
+        $this->escaper = $this->createMock(EscaperInterface::class);
+        $this->escaper->method('escUrl')->willReturnArgument(0);
+        $this->escaper->method('escAttr')->willReturnArgument(0);
     }
 
     public function testHooksRegistersFilterOnly(): void
     {
-        $hints = new AddResourceHints($this->hookDispatcher, ['https://fonts.gstatic.com']);
+        $hints = new AddResourceHints($this->hookDispatcher, $this->escaper, ['https://fonts.gstatic.com']);
 
         $this->hookDispatcher->expects($this->once())
             ->method('addFilter')
@@ -34,7 +39,7 @@ class AddResourceHintsTest extends TestCase
     public function testHooksRegistersPreloadActionWhenPreloadResourcesProvided(): void
     {
         $preload = [['url' => '/style.css', 'as' => 'style']];
-        $hints = new AddResourceHints($this->hookDispatcher, [], [], $preload);
+        $hints = new AddResourceHints($this->hookDispatcher, $this->escaper, [], [], $preload);
 
         $this->hookDispatcher->expects($this->once())
             ->method('addFilter');
@@ -50,6 +55,7 @@ class AddResourceHintsTest extends TestCase
     {
         $hints = new AddResourceHints(
             $this->hookDispatcher,
+            $this->escaper,
             ['https://fonts.gstatic.com', 'https://cdn.example.com'],
         );
 
@@ -62,6 +68,7 @@ class AddResourceHintsTest extends TestCase
     {
         $hints = new AddResourceHints(
             $this->hookDispatcher,
+            $this->escaper,
             [],
             ['https://analytics.example.com'],
         );
@@ -75,6 +82,7 @@ class AddResourceHintsTest extends TestCase
     {
         $hints = new AddResourceHints(
             $this->hookDispatcher,
+            $this->escaper,
             ['https://new.example.com'],
         );
 
@@ -87,6 +95,7 @@ class AddResourceHintsTest extends TestCase
     {
         $hints = new AddResourceHints(
             $this->hookDispatcher,
+            $this->escaper,
             ['https://fonts.gstatic.com'],
             ['https://analytics.example.com'],
         );
@@ -98,15 +107,11 @@ class AddResourceHintsTest extends TestCase
 
     public function testAddPreloadLinksOutputsLinkTags(): void
     {
-        if (!function_exists('esc_url')) {
-            function_exists('esc_url') || eval('namespace { function esc_url($u) { return $u; } function esc_attr($a) { return $a; } }');
-        }
-
         $preload = [
             ['url' => 'https://example.com/font.woff2', 'as' => 'font', 'type' => 'font/woff2'],
             ['url' => 'https://example.com/style.css', 'as' => 'style'],
         ];
-        $hints = new AddResourceHints($this->hookDispatcher, [], [], $preload);
+        $hints = new AddResourceHints($this->hookDispatcher, $this->escaper, [], [], $preload);
 
         ob_start();
         $hints->addPreloadLinks();

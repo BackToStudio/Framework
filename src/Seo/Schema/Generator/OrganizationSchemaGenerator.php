@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Seo\Schema\Generator;
 
+use BackTo\Framework\Contracts\SiteContextInterface;
 use BackTo\Framework\Seo\Schema;
 use BackTo\Framework\Seo\Schema\SchemaType;
 use BackTo\Framework\Seo\SeoManager;
@@ -16,27 +17,29 @@ use BackTo\Framework\Seo\SeoManager;
 class OrganizationSchemaGenerator
 {
     private readonly SeoManager $seoManager;
+    private readonly SiteContextInterface $siteContext;
 
-    public function __construct(SeoManager $seoManager)
+    public function __construct(SeoManager $seoManager, SiteContextInterface $siteContext)
     {
         $this->seoManager = $seoManager;
+        $this->siteContext = $siteContext;
     }
 
     public function generate(): SchemaType
     {
-        $siteUrl = \home_url('/');
+        $siteUrl = $this->siteContext->getHomeUrl() . '/';
 
         $org = Schema::organization()
             ->id($siteUrl . '#organization')
-            ->name(\get_bloginfo('name'))
+            ->name($this->siteContext->getBlogInfo('name'))
             ->url($siteUrl);
 
-        $customLogoId = \get_theme_mod('custom_logo');
+        $customLogoId = $this->siteContext->getThemeMod('custom_logo');
 
         if ($customLogoId) {
-            $logoUrl = \wp_get_attachment_image_url($customLogoId, 'full');
+            $logoUrl = $this->siteContext->getAttachmentImageUrl((int) $customLogoId, 'full');
 
-            if (\is_string($logoUrl) && $logoUrl !== '') {
+            if (is_string($logoUrl) && $logoUrl !== '') {
                 $org->logo($logoUrl);
             }
         }
@@ -50,7 +53,7 @@ class OrganizationSchemaGenerator
         return $org;
     }
 
-    
+
     private function buildSameAs(): array
     {
         if (!$this->seoManager->hasProvider()) {
@@ -59,6 +62,6 @@ class OrganizationSchemaGenerator
 
         $links = $this->seoManager->getSocialLinks();
 
-        return array_values(array_filter($links, fn (?string $url): bool => \is_string($url) && $url !== ''));
+        return array_values(array_filter($links, fn (?string $url): bool => is_string($url) && $url !== ''));
     }
 }

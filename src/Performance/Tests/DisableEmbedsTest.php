@@ -5,29 +5,47 @@ declare(strict_types=1);
 namespace BackTo\Framework\Performance\Tests;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
+use BackTo\Framework\Contracts\ScriptManagerInterface;
 use BackTo\Framework\Performance\Hooks\DisableEmbeds;
 use PHPUnit\Framework\TestCase;
 
 class DisableEmbedsTest extends TestCase
 {
+    private HookDispatcherInterface $hookDispatcher;
+    private ScriptManagerInterface $scriptManager;
+
+    protected function setUp(): void
+    {
+        $this->hookDispatcher = $this->createMock(HookDispatcherInterface::class);
+        $this->scriptManager = $this->createMock(ScriptManagerInterface::class);
+    }
+
     public function testHooksAreRegistered(): void
     {
-        $dispatcher = $this->createMock(HookDispatcherInterface::class);
-        $dispatcher->expects($this->exactly(2))
+        $this->hookDispatcher->expects($this->exactly(2))
             ->method('removeAction');
-        $dispatcher->expects($this->once())
+        $this->hookDispatcher->expects($this->once())
             ->method('addAction');
-        $dispatcher->expects($this->exactly(2))
+        $this->hookDispatcher->expects($this->exactly(2))
             ->method('addFilter');
 
-        $hook = new DisableEmbeds($dispatcher);
+        $hook = new DisableEmbeds($this->hookDispatcher, $this->scriptManager);
         $hook->hooks();
+    }
+
+    public function testDeregisterEmbedScriptCallsScriptManager(): void
+    {
+        $this->scriptManager->expects($this->once())
+            ->method('deregisterScript')
+            ->with('wp-embed');
+
+        $hook = new DisableEmbeds($this->hookDispatcher, $this->scriptManager);
+        $hook->deregisterEmbedScript();
     }
 
     public function testRemoveEmbedRewriteRules(): void
     {
-        $dispatcher = $this->createMock(HookDispatcherInterface::class);
-        $hook = new DisableEmbeds($dispatcher);
+        $hook = new DisableEmbeds($this->hookDispatcher, $this->scriptManager);
 
         $rules = [
             'some-rule' => 'index.php?p=$matches[1]',

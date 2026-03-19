@@ -35,4 +35,19 @@ interface SiteContextInterface
      * @return mixed The filtered value.
      */
     public function applyFilters(string $hookName, mixed $value, mixed ...$args): mixed;
+
+    /**
+     * Get site information (equivalent to get_bloginfo()).
+     */
+    public function getBlogInfo(string $show): string;
+
+    /**
+     * Get a theme modification value (equivalent to get_theme_mod()).
+     */
+    public function getThemeMod(string $name, mixed $default = false): mixed;
+
+    /**
+     * Get an attachment image URL (equivalent to wp_get_attachment_image_url()).
+     */
+    public function getAttachmentImageUrl(int $attachmentId, string $size = 'thumbnail'): string|false;
 }

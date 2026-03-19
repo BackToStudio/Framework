@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace BackTo\Framework\Seo\Tests;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
+use BackTo\Framework\Contracts\QueryContextInterface;
 use BackTo\Framework\Seo\Hooks\RegisterDefaultSchemas;
 use BackTo\Framework\Seo\Contracts\BreadcrumbSchemaGeneratorInterface;
 use BackTo\Framework\Seo\Schema\Generator\OrganizationSchemaGenerator;
@@ -16,23 +17,49 @@ use PHPUnit\Framework\TestCase;
 
 class RegisterDefaultSchemasTest extends TestCase
 {
+    private HookDispatcherInterface $hookDispatcher;
+    private QueryContextInterface $queryContext;
+
+    protected function setUp(): void
+    {
+        $this->hookDispatcher = $this->createMock(HookDispatcherInterface::class);
+        $this->queryContext = $this->createMock(QueryContextInterface::class);
+        $this->queryContext->method('isSingular')->willReturn(false);
+    }
+
+    private function createHook(
+        ?SchemaManager $manager = null,
+        ?WebSiteSchemaGenerator $webSiteGen = null,
+        ?OrganizationSchemaGenerator $orgGen = null,
+        ?BreadcrumbSchemaGeneratorInterface $breadcrumbGen = null,
+    ): RegisterDefaultSchemas {
+        $webSiteGen ??= $this->createMock(WebSiteSchemaGenerator::class);
+        $webSiteGen->method('generate')->willReturn(new SchemaType('WebSite'));
+
+        $orgGen ??= $this->createMock(OrganizationSchemaGenerator::class);
+        $orgGen->method('generate')->willReturn(new SchemaType('Organization'));
+
+        $breadcrumbGen ??= $this->createMock(BreadcrumbSchemaGeneratorInterface::class);
+        $breadcrumbGen->method('generate')->willReturn(null);
+
+        return new RegisterDefaultSchemas(
+            $manager ?? new SchemaManager(),
+            $this->hookDispatcher,
+            $this->queryContext,
+            $webSiteGen,
+            $orgGen,
+            new PostTypeSchemaResolver(),
+            $breadcrumbGen,
+        );
+    }
+
     public function testRegistersOnWpHook(): void
     {
-        $dispatcher = $this->createMock(HookDispatcherInterface::class);
-        $dispatcher->expects($this->once())
+        $this->hookDispatcher->expects($this->once())
             ->method('addAction')
             ->with('wp', $this->anything());
 
-        $hook = new RegisterDefaultSchemas(
-            new SchemaManager(),
-            $dispatcher,
-            $this->createMock(WebSiteSchemaGenerator::class),
-            $this->createMock(OrganizationSchemaGenerator::class),
-            new PostTypeSchemaResolver(),
-            $this->createMock(BreadcrumbSchemaGeneratorInterface::class),
-        );
-
-        $hook->hooks();
+        $this->createHook()->hooks();
     }
 
     public function testRegistersWebSiteAndOrganizationAlways(): void
@@ -47,18 +74,7 @@ class RegisterDefaultSchemasTest extends TestCase
         $orgGen->expects($this->once())->method('generate')
             ->willReturn(new SchemaType('Organization'));
 
-        $breadcrumbGen = $this->createMock(BreadcrumbSchemaGeneratorInterface::class);
-        $breadcrumbGen->method('generate')->willReturn(null);
-
-        $hook = new RegisterDefaultSchemas(
-            $manager,
-            $this->createMock(HookDispatcherInterface::class),
-            $webSiteGen,
-            $orgGen,
-            new PostTypeSchemaResolver(),
-            $breadcrumbGen,
-        );
-
+        $hook = $this->createHook($manager, $webSiteGen, $orgGen);
         $hook->register();
 
         $this->assertCount(2, $manager->getSchemas());
@@ -70,24 +86,10 @@ class RegisterDefaultSchemasTest extends TestCase
     {
         $manager = new SchemaManager();
 
-        $webSiteGen = $this->createMock(WebSiteSchemaGenerator::class);
-        $webSiteGen->method('generate')->willReturn(new SchemaType('WebSite'));
-
-        $orgGen = $this->createMock(OrganizationSchemaGenerator::class);
-        $orgGen->method('generate')->willReturn(new SchemaType('Organization'));
-
         $breadcrumbGen = $this->createMock(BreadcrumbSchemaGeneratorInterface::class);
         $breadcrumbGen->method('generate')->willReturn(new SchemaType('BreadcrumbList'));
 
-        $hook = new RegisterDefaultSchemas(
-            $manager,
-            $this->createMock(HookDispatcherInterface::class),
-            $webSiteGen,
-            $orgGen,
-            new PostTypeSchemaResolver(),
-            $breadcrumbGen,
-        );
-
+        $hook = $this->createHook($manager, breadcrumbGen: $breadcrumbGen);
         $hook->register();
 
         $this->assertCount(3, $manager->getSchemas());
@@ -98,24 +100,7 @@ class RegisterDefaultSchemasTest extends TestCase
     {
         $manager = new SchemaManager();
 
-        $webSiteGen = $this->createMock(WebSiteSchemaGenerator::class);
-        $webSiteGen->method('generate')->willReturn(new SchemaType('WebSite'));
-
-        $orgGen = $this->createMock(OrganizationSchemaGenerator::class);
-        $orgGen->method('generate')->willReturn(new SchemaType('Organization'));
-
-        $breadcrumbGen = $this->createMock(BreadcrumbSchemaGeneratorInterface::class);
-        $breadcrumbGen->method('generate')->willReturn(null);
-
-        $hook = new RegisterDefaultSchemas(
-            $manager,
-            $this->createMock(HookDispatcherInterface::class),
-            $webSiteGen,
-            $orgGen,
-            new PostTypeSchemaResolver(),
-            $breadcrumbGen,
-        );
-
+        $hook = $this->createHook($manager);
         $hook->register();
 
         $this->assertCount(2, $manager->getSchemas());

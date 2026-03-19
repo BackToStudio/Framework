@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace BackTo\Framework\Performance\Hooks;
 
 use BackTo\Framework\Contracts\AdminHooks;
+use BackTo\Framework\Contracts\HookDispatcherInterface;
 
 /**
  * Remove unnecessary dashboard widgets and meta boxes.
@@ -13,9 +14,16 @@ use BackTo\Framework\Contracts\AdminHooks;
  */
 final class CleanDashboard implements AdminHooks
 {
+    private readonly HookDispatcherInterface $hookDispatcher;
+
+    public function __construct(HookDispatcherInterface $hookDispatcher)
+    {
+        $this->hookDispatcher = $hookDispatcher;
+    }
+
     public function hooks(): void
     {
-        \add_action('wp_dashboard_setup', [$this, 'removeDashboardWidgets']);
+        $this->hookDispatcher->addAction('wp_dashboard_setup', [$this, 'removeDashboardWidgets']);
     }
 
     public function removeDashboardWidgets(): void
@@ -26,6 +34,6 @@ final class CleanDashboard implements AdminHooks
         \remove_meta_box('dashboard_secondary', 'dashboard', 'side');
         \remove_meta_box('dashboard_quick_press', 'dashboard', 'side');
         \remove_meta_box('dashboard_recent_drafts', 'dashboard', 'side');
-        \remove_action('welcome_panel', 'wp_welcome_panel');
+        $this->hookDispatcher->removeAction('welcome_panel', 'wp_welcome_panel');
     }
 }

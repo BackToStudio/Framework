@@ -6,6 +6,7 @@ namespace BackTo\Framework\Seo\Hooks;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
+use BackTo\Framework\Contracts\QueryContextInterface;
 use BackTo\Framework\Seo\Contracts\BreadcrumbSchemaGeneratorInterface;
 use BackTo\Framework\Seo\Schema\Generator\OrganizationSchemaGenerator;
 use BackTo\Framework\Seo\Schema\Generator\PostTypeSchemaResolver;
@@ -19,20 +20,17 @@ use BackTo\Framework\Seo\Schema\SchemaManager;
 final class RegisterDefaultSchemas implements Hooks
 {
     private readonly SchemaManager $schemaManager;
-
     private readonly HookDispatcherInterface $hookDispatcher;
-
+    private readonly QueryContextInterface $queryContext;
     private readonly WebSiteSchemaGenerator $webSiteGenerator;
-
     private readonly OrganizationSchemaGenerator $organizationGenerator;
-
     private readonly PostTypeSchemaResolver $postTypeResolver;
-
     private readonly BreadcrumbSchemaGeneratorInterface $breadcrumbGenerator;
 
     public function __construct(
         SchemaManager $schemaManager,
         HookDispatcherInterface $hookDispatcher,
+        QueryContextInterface $queryContext,
         WebSiteSchemaGenerator $webSiteGenerator,
         OrganizationSchemaGenerator $organizationGenerator,
         PostTypeSchemaResolver $postTypeResolver,
@@ -40,6 +38,7 @@ final class RegisterDefaultSchemas implements Hooks
     ) {
         $this->schemaManager = $schemaManager;
         $this->hookDispatcher = $hookDispatcher;
+        $this->queryContext = $queryContext;
         $this->webSiteGenerator = $webSiteGenerator;
         $this->organizationGenerator = $organizationGenerator;
         $this->postTypeResolver = $postTypeResolver;
@@ -84,11 +83,11 @@ final class RegisterDefaultSchemas implements Hooks
 
     private function registerPostTypeSchema(): void
     {
-        if (!\function_exists('is_singular') || !\is_singular()) {
+        if (!$this->queryContext->isSingular()) {
             return;
         }
 
-        $post = \function_exists('get_queried_object') ? \get_queried_object() : null;
+        $post = $this->queryContext->getQueriedObject();
 
         if (!$post instanceof \WP_Post) {
             return;
