@@ -9,6 +9,7 @@ use BackTo\Framework\Contracts\Hooks;
 use BackTo\Framework\Contracts\RequestContextInterface;
 use BackTo\Framework\Observability\Contracts\LoggerInterface;
 use BackTo\Framework\Security\AdminUrlObfuscation;
+use BackTo\Framework\Security\Contracts\ClientIpResolverInterface;
 use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
 use PHPUnit\Framework\TestCase;
 
@@ -66,6 +67,7 @@ class AdminUrlObfuscationTest extends TestCase
     private HookDispatcherInterface $dispatcher;
     private LoggerInterface $logger;
     private RequestContextInterface $requestContext;
+    private ClientIpResolverInterface $ipResolver;
     private TestableAdminUrlObfuscation $obfuscation;
 
     protected function setUp(): void
@@ -76,7 +78,9 @@ class AdminUrlObfuscationTest extends TestCase
         $this->requestContext->method('getRemoteAddr')->willReturn('127.0.0.1');
         $this->requestContext->method('server')->willReturn('');
         $this->requestContext->method('getMethod')->willReturn('GET');
-        $this->obfuscation = new TestableAdminUrlObfuscation($this->dispatcher, $this->logger, $this->requestContext);
+        $this->ipResolver = $this->createMock(ClientIpResolverInterface::class);
+        $this->ipResolver->method('getClientIp')->willReturn('127.0.0.1');
+        $this->obfuscation = new TestableAdminUrlObfuscation($this->dispatcher, $this->logger, $this->requestContext, $this->ipResolver);
     }
 
     public function testImplementsRequiredInterfaces(): void

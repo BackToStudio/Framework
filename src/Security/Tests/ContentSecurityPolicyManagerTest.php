@@ -6,6 +6,7 @@ namespace BackTo\Framework\Security\Tests;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
+use BackTo\Framework\Contracts\ResponseEmitterInterface;
 use BackTo\Framework\Security\Contracts\ContentSecurityPolicyInterface;
 use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
 use BackTo\Framework\Security\ContentSecurityPolicyManager;
@@ -14,12 +15,15 @@ use PHPUnit\Framework\TestCase;
 class ContentSecurityPolicyManagerTest extends TestCase
 {
     private HookDispatcherInterface $dispatcher;
+    private ResponseEmitterInterface $responseEmitter;
     private ContentSecurityPolicyManager $csp;
 
     protected function setUp(): void
     {
         $this->dispatcher = $this->createMock(HookDispatcherInterface::class);
-        $this->csp = new ContentSecurityPolicyManager($this->dispatcher);
+        $this->responseEmitter = $this->createMock(ResponseEmitterInterface::class);
+        $this->responseEmitter->method('headersSent')->willReturn(false);
+        $this->csp = new ContentSecurityPolicyManager($this->dispatcher, $this->responseEmitter);
     }
 
     public function testImplementsRequiredInterfaces(): void
@@ -127,7 +131,7 @@ class ContentSecurityPolicyManagerTest extends TestCase
 
     public function testReportOnlyMode(): void
     {
-        $csp = new ContentSecurityPolicyManager($this->dispatcher, true);
+        $csp = new ContentSecurityPolicyManager($this->dispatcher, $this->responseEmitter, true);
         $this->assertTrue($csp->isReportOnly());
     }
 

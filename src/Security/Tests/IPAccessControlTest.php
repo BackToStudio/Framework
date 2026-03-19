@@ -6,26 +6,42 @@ namespace BackTo\Framework\Security\Tests;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
-use BackTo\Framework\Contracts\RequestContextInterface;
 use BackTo\Framework\Observability\Contracts\LoggerInterface;
+use BackTo\Framework\Security\Contracts\ClientIpResolverInterface;
 use BackTo\Framework\Security\Contracts\IPAccessControlInterface;
 use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
 use BackTo\Framework\Security\IPAccessControl;
 use PHPUnit\Framework\TestCase;
 
+class MutableIpResolver implements ClientIpResolverInterface
+{
+    public string $ip = '127.0.0.1';
+
+    public function getClientIp(): string
+    {
+        return $this->ip;
+    }
+}
+
 class TestableIPAccessControl extends IPAccessControl
 {
-    private string $clientIp = '1.2.3.4';
     public bool $accessDenied = false;
+    private MutableIpResolver $mutableResolver;
+
+    public static function create(
+        HookDispatcherInterface $hookDispatcher,
+        LoggerInterface $logger,
+    ): self {
+        $resolver = new MutableIpResolver();
+        $instance = new self($hookDispatcher, $logger, $resolver);
+        $instance->mutableResolver = $resolver;
+
+        return $instance;
+    }
 
     public function setClientIp(string $ip): void
     {
-        $this->clientIp = $ip;
-    }
-
-    protected function getClientIp(): string
-    {
-        return $this->clientIp;
+        $this->mutableResolver->ip = $ip;
     }
 
     protected function denyAccess(): void
@@ -38,18 +54,16 @@ class IPAccessControlTest extends TestCase
 {
     private HookDispatcherInterface $dispatcher;
     private LoggerInterface $logger;
-    private RequestContextInterface $requestContext;
+    private ClientIpResolverInterface $ipResolver;
     private TestableIPAccessControl $acl;
 
     protected function setUp(): void
     {
         $this->dispatcher = $this->createMock(HookDispatcherInterface::class);
         $this->logger = $this->createMock(LoggerInterface::class);
-        $this->requestContext = $this->createMock(RequestContextInterface::class);
-        $this->requestContext->method('getRemoteAddr')->willReturn('127.0.0.1');
-        $this->requestContext->method('server')->willReturn('');
-        $this->requestContext->method('getMethod')->willReturn('GET');
-        $this->acl = new TestableIPAccessControl($this->dispatcher, $this->logger, $this->requestContext);
+        $this->ipResolver = $this->createMock(ClientIpResolverInterface::class);
+        $this->ipResolver->method('getClientIp')->willReturn('127.0.0.1');
+        $this->acl = TestableIPAccessControl::create($this->dispatcher, $this->logger);
     }
 
     public function testImplementsRequiredInterfaces(): void

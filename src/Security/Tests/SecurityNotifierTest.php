@@ -6,8 +6,8 @@ namespace BackTo\Framework\Security\Tests;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
-use BackTo\Framework\Contracts\RequestContextInterface;
 use BackTo\Framework\Options\Contracts\OptionsRepositoryInterface;
+use BackTo\Framework\Security\Contracts\ClientIpResolverInterface;
 use BackTo\Framework\Security\Contracts\MailerInterface;
 use BackTo\Framework\Security\Contracts\SecurityNotifierInterface;
 use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
@@ -19,7 +19,7 @@ class SecurityNotifierTest extends TestCase
     private HookDispatcherInterface $dispatcher;
     private MailerInterface $mailer;
     private OptionsRepositoryInterface $options;
-    private RequestContextInterface $requestContext;
+    private ClientIpResolverInterface $ipResolver;
     private SecurityNotifier $notifier;
 
     /** @var array<int, array{to: string, subject: string, body: string}> */
@@ -44,14 +44,10 @@ class SecurityNotifierTest extends TestCase
                 ['blogname', 'WordPress', 'Test Site'],
             ]);
 
-        $this->requestContext = $this->createMock(RequestContextInterface::class);
-        $this->requestContext->method('getRemoteAddr')->willReturn('127.0.0.1');
-        $this->requestContext->method('server')->willReturn('');
-        $this->requestContext->method('getMethod')->willReturn('GET');
-        $this->requestContext->method('getUserAgent')->willReturn('');
-        $this->requestContext->method('post')->willReturn('');
+        $this->ipResolver = $this->createMock(ClientIpResolverInterface::class);
+        $this->ipResolver->method('getClientIp')->willReturn('127.0.0.1');
 
-        $this->notifier = new SecurityNotifier($this->dispatcher, $this->mailer, $this->options, $this->requestContext);
+        $this->notifier = new SecurityNotifier($this->dispatcher, $this->mailer, $this->options, $this->ipResolver);
     }
 
     public function testImplementsRequiredInterfaces(): void
@@ -109,7 +105,7 @@ class SecurityNotifierTest extends TestCase
                 ['blogname', 'WordPress', 'Test Site'],
             ]);
 
-        $notifier = new SecurityNotifier($this->dispatcher, $this->mailer, $options, $this->requestContext);
+        $notifier = new SecurityNotifier($this->dispatcher, $this->mailer, $options, $this->ipResolver);
         $notifier->notify('test_event', 'critical', []);
 
         $this->assertCount(0, $this->sentEmails);
