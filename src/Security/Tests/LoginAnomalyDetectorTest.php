@@ -7,6 +7,7 @@ namespace BackTo\Framework\Security\Tests;
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
 use BackTo\Framework\Contracts\RequestContextInterface;
+use BackTo\Framework\Contracts\SiteContextInterface;
 use BackTo\Framework\Observability\Contracts\LoggerInterface;
 use BackTo\Framework\Security\Contracts\ClientIpResolverInterface;
 use BackTo\Framework\Security\Contracts\LoginLocationRepositoryInterface;
@@ -86,12 +87,14 @@ class LoginAnomalyDetectorTest extends TestCase
         $this->ipResolver = $this->createMock(ClientIpResolverInterface::class);
         $this->ipResolver->method('getClientIp')->willReturn('127.0.0.1');
 
+        $siteContext = $this->createMock(SiteContextInterface::class);
         $this->detector = new TestableLoginAnomalyDetector(
             $this->dispatcher,
             $this->repository,
             $this->logger,
             $this->requestContext,
             $this->ipResolver,
+            $siteContext,
         );
     }
 

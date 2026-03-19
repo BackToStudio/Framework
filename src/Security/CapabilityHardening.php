@@ -6,6 +6,7 @@ namespace BackTo\Framework\Security;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
+use BackTo\Framework\Contracts\UserContextInterface;
 use BackTo\Framework\Observability\Contracts\LoggerInterface;
 use BackTo\Framework\Security\Contracts\AuditLogRepositoryInterface;
 use BackTo\Framework\Security\Contracts\AuditLogSeverity;
@@ -26,6 +27,7 @@ class CapabilityHardening implements Hooks, SecurityRuleInterface
     private readonly LoggerInterface $logger;
     private readonly AuditLogRepositoryInterface $auditLog;
     private readonly ClientIpResolverInterface $ipResolver;
+    private readonly UserContextInterface $userContext;
 
     /** @var string[] Roles that require elevated verification */
     private const PRIVILEGED_ROLES = [
@@ -58,11 +60,13 @@ class CapabilityHardening implements Hooks, SecurityRuleInterface
         LoggerInterface $logger,
         AuditLogRepositoryInterface $auditLog,
         ClientIpResolverInterface $ipResolver,
+        UserContextInterface $userContext,
     ) {
         $this->hookDispatcher = $hookDispatcher;
         $this->logger = $logger;
         $this->auditLog = $auditLog;
         $this->ipResolver = $ipResolver;
+        $this->userContext = $userContext;
     }
 
     public function getName(): string
@@ -188,20 +192,15 @@ class CapabilityHardening implements Hooks, SecurityRuleInterface
 
     protected function getCurrentUserId(): int
     {
-        if (function_exists('get_current_user_id')) {
-            return (int) get_current_user_id();
-        }
-
-        return 0;
+        return $this->userContext->getCurrentUserId();
     }
 
-    
+    /**
+     * @param string[] $oldRoles
+     */
     protected function revertRole(int $userId, array $oldRoles): void
     {
         $role = $oldRoles[0] ?? 'subscriber';
-
-        if (function_exists('wp_update_user')) {
-            wp_update_user(['ID' => $userId, 'role' => $role]);
-        }
+        $this->userContext->setUserRole($userId, $role);
     }
 }

@@ -6,8 +6,10 @@ namespace BackTo\Framework\Security\Tests;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
-use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
 use BackTo\Framework\Contracts\RequestContextInterface;
+use BackTo\Framework\Contracts\SiteContextInterface;
+use BackTo\Framework\Contracts\UserContextInterface;
+use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
 use BackTo\Framework\Security\RestApiSecurity;
 use PHPUnit\Framework\TestCase;
 
@@ -68,12 +70,16 @@ class RestApiSecurityTest extends TestCase
     {
         $this->dispatcher = $this->createMock(HookDispatcherInterface::class);
         $this->requestContext = $this->createMock(RequestContextInterface::class);
-        $this->rule = new TestableRestApiSecurity($this->dispatcher, $this->requestContext);
+        $userContext = $this->createMock(UserContextInterface::class);
+        $siteContext = $this->createMock(SiteContextInterface::class);
+        $this->rule = new TestableRestApiSecurity($this->dispatcher, $this->requestContext, $userContext, $siteContext);
     }
 
     public function testConstructorAcceptsAdditionalPublicPatterns(): void
     {
-        $rule = new RestApiSecurity($this->dispatcher, $this->requestContext, ['#^/custom/#']);
+        $userContext = $this->createMock(UserContextInterface::class);
+        $siteContext = $this->createMock(SiteContextInterface::class);
+        $rule = new RestApiSecurity($this->dispatcher, $this->requestContext, $userContext, $siteContext, ['#^/custom/#']);
         $this->assertInstanceOf(RestApiSecurity::class, $rule);
     }
 

@@ -8,6 +8,7 @@ use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
 use BackTo\Framework\Contracts\RequestContextInterface;
 use BackTo\Framework\Contracts\ResponseEmitterInterface;
+use BackTo\Framework\Contracts\SiteContextInterface;
 use BackTo\Framework\Observability\Contracts\LoggerInterface;
 use BackTo\Framework\Security\CommentSpamProtection;
 use BackTo\Framework\Security\Contracts\ClientIpResolverInterface;
@@ -96,7 +97,8 @@ class CommentSpamProtectionTest extends TestCase
         $this->ipResolver = $this->createMock(ClientIpResolverInterface::class);
         $this->ipResolver->method('getClientIp')->willReturn('127.0.0.1');
         $responseEmitter = $this->createMock(ResponseEmitterInterface::class);
-        $this->protection = new TestableCommentSpamProtection($this->dispatcher, $this->logger, $this->requestContext, $this->ipResolver, $responseEmitter);
+        $siteContext = $this->createMock(SiteContextInterface::class);
+        $this->protection = new TestableCommentSpamProtection($this->dispatcher, $this->logger, $this->requestContext, $this->ipResolver, $responseEmitter, $siteContext);
     }
 
     public function testImplementsRequiredInterfaces(): void

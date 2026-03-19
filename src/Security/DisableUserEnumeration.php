@@ -8,6 +8,7 @@ use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
 use BackTo\Framework\Contracts\RequestContextInterface;
 use BackTo\Framework\Contracts\ResponseEmitterInterface;
+use BackTo\Framework\Contracts\UserContextInterface;
 use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
 
 class DisableUserEnumeration implements Hooks, SecurityRuleInterface
@@ -15,15 +16,18 @@ class DisableUserEnumeration implements Hooks, SecurityRuleInterface
     private readonly HookDispatcherInterface $hookDispatcher;
     private readonly RequestContextInterface $requestContext;
     private readonly ResponseEmitterInterface $responseEmitter;
+    private readonly UserContextInterface $userContext;
 
     public function __construct(
         HookDispatcherInterface $hookDispatcher,
         RequestContextInterface $requestContext,
         ResponseEmitterInterface $responseEmitter,
+        UserContextInterface $userContext,
     ) {
         $this->hookDispatcher = $hookDispatcher;
         $this->requestContext = $requestContext;
         $this->responseEmitter = $responseEmitter;
+        $this->userContext = $userContext;
     }
 
     public function getName(): string
@@ -81,6 +85,6 @@ class DisableUserEnumeration implements Hooks, SecurityRuleInterface
 
     protected function isUserLoggedIn(): bool
     {
-        return function_exists('is_user_logged_in') && is_user_logged_in();
+        return $this->userContext->isLoggedIn();
     }
 }

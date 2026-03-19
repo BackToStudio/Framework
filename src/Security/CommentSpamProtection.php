@@ -8,6 +8,7 @@ use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
 use BackTo\Framework\Contracts\RequestContextInterface;
 use BackTo\Framework\Contracts\ResponseEmitterInterface;
+use BackTo\Framework\Contracts\SiteContextInterface;
 use BackTo\Framework\Observability\Contracts\LoggerInterface;
 use BackTo\Framework\Security\Contracts\ClientIpResolverInterface;
 use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
@@ -29,6 +30,7 @@ class CommentSpamProtection implements Hooks, SecurityRuleInterface
     private readonly RequestContextInterface $requestContext;
     private readonly ClientIpResolverInterface $ipResolver;
     private readonly ResponseEmitterInterface $responseEmitter;
+    private readonly SiteContextInterface $siteContext;
 
     private int $maxLinksAllowed = 2;
     private string $honeypotFieldName = 'website_url_confirm';
@@ -51,12 +53,14 @@ class CommentSpamProtection implements Hooks, SecurityRuleInterface
         RequestContextInterface $requestContext,
         ClientIpResolverInterface $ipResolver,
         ResponseEmitterInterface $responseEmitter,
+        SiteContextInterface $siteContext,
     ) {
         $this->hookDispatcher = $hookDispatcher;
         $this->logger = $logger;
         $this->requestContext = $requestContext;
         $this->ipResolver = $ipResolver;
         $this->responseEmitter = $responseEmitter;
+        $this->siteContext = $siteContext;
     }
 
     public function getName(): string
@@ -203,7 +207,7 @@ class CommentSpamProtection implements Hooks, SecurityRuleInterface
 
     protected function getSiteHost(): string
     {
-        return (string) parse_url(\site_url(), PHP_URL_HOST);
+        return (string) parse_url($this->siteContext->getSiteUrl(), PHP_URL_HOST);
     }
 
     protected function denyComment(string $message): void

@@ -6,6 +6,7 @@ namespace BackTo\Framework\Security\Tests;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
+use BackTo\Framework\Contracts\UserContextInterface;
 use BackTo\Framework\Observability\Contracts\LoggerInterface;
 use BackTo\Framework\Security\CapabilityHardening;
 use BackTo\Framework\Security\Contracts\AuditLogRepositoryInterface;
@@ -56,11 +57,13 @@ class CapabilityHardeningTest extends TestCase
         $this->auditLog = $this->createMock(AuditLogRepositoryInterface::class);
         $this->ipResolver = $this->createMock(ClientIpResolverInterface::class);
         $this->ipResolver->method('getClientIp')->willReturn('127.0.0.1');
+        $userContext = $this->createMock(UserContextInterface::class);
         $this->hardening = new TestableCapabilityHardening(
             $this->dispatcher,
             $this->logger,
             $this->auditLog,
             $this->ipResolver,
+            $userContext,
         );
     }
 

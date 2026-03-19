@@ -7,6 +7,7 @@ namespace BackTo\Framework\Security;
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
 use BackTo\Framework\Contracts\RequestContextInterface;
+use BackTo\Framework\Contracts\UserContextInterface;
 use BackTo\Framework\Observability\Contracts\LoggerInterface;
 use BackTo\Framework\Security\Contracts\ClientIpResolverInterface;
 use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
@@ -27,6 +28,7 @@ class AdminUrlObfuscation implements Hooks, SecurityRuleInterface
     private readonly LoggerInterface $logger;
     private readonly RequestContextInterface $requestContext;
     private readonly ClientIpResolverInterface $ipResolver;
+    private readonly UserContextInterface $userContext;
 
     private string $loginSlug = '';
 
@@ -35,11 +37,13 @@ class AdminUrlObfuscation implements Hooks, SecurityRuleInterface
         LoggerInterface $logger,
         RequestContextInterface $requestContext,
         ClientIpResolverInterface $ipResolver,
+        UserContextInterface $userContext,
     ) {
         $this->hookDispatcher = $hookDispatcher;
         $this->logger = $logger;
         $this->requestContext = $requestContext;
         $this->ipResolver = $ipResolver;
+        $this->userContext = $userContext;
     }
 
     public function getName(): string
@@ -156,11 +160,7 @@ class AdminUrlObfuscation implements Hooks, SecurityRuleInterface
 
     protected function isLoggedIn(): bool
     {
-        if (function_exists('is_user_logged_in')) {
-            return is_user_logged_in();
-        }
-
-        return false;
+        return $this->userContext->isLoggedIn();
     }
 
     protected function loadLoginPage(): void

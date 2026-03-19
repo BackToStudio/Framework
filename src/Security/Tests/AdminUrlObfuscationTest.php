@@ -7,6 +7,7 @@ namespace BackTo\Framework\Security\Tests;
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
 use BackTo\Framework\Contracts\RequestContextInterface;
+use BackTo\Framework\Contracts\UserContextInterface;
 use BackTo\Framework\Observability\Contracts\LoggerInterface;
 use BackTo\Framework\Security\AdminUrlObfuscation;
 use BackTo\Framework\Security\Contracts\ClientIpResolverInterface;
@@ -80,7 +81,8 @@ class AdminUrlObfuscationTest extends TestCase
         $this->requestContext->method('getMethod')->willReturn('GET');
         $this->ipResolver = $this->createMock(ClientIpResolverInterface::class);
         $this->ipResolver->method('getClientIp')->willReturn('127.0.0.1');
-        $this->obfuscation = new TestableAdminUrlObfuscation($this->dispatcher, $this->logger, $this->requestContext, $this->ipResolver);
+        $userContext = $this->createMock(UserContextInterface::class);
+        $this->obfuscation = new TestableAdminUrlObfuscation($this->dispatcher, $this->logger, $this->requestContext, $this->ipResolver, $userContext);
     }
 
     public function testImplementsRequiredInterfaces(): void
