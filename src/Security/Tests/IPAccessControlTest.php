@@ -6,6 +6,7 @@ namespace BackTo\Framework\Security\Tests;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
+use BackTo\Framework\Contracts\ResponseEmitterInterface;
 use BackTo\Framework\Observability\Contracts\LoggerInterface;
 use BackTo\Framework\Security\Contracts\ClientIpResolverInterface;
 use BackTo\Framework\Security\Contracts\IPAccessControlInterface;
@@ -31,9 +32,17 @@ class TestableIPAccessControl extends IPAccessControl
     public static function create(
         HookDispatcherInterface $hookDispatcher,
         LoggerInterface $logger,
+        ?ResponseEmitterInterface $responseEmitter = null,
     ): self {
         $resolver = new MutableIpResolver();
-        $instance = new self($hookDispatcher, $logger, $resolver);
+        $emitter = $responseEmitter ?? new class implements ResponseEmitterInterface {
+            public function sendHeader(string $header): void {}
+            public function removeHeader(string $name): void {}
+            public function setStatusCode(int $code): void {}
+            public function headersSent(): bool { return false; }
+            public function terminate(): never { throw new \RuntimeException('terminated'); }
+        };
+        $instance = new self($hookDispatcher, $logger, $resolver, $emitter);
         $instance->mutableResolver = $resolver;
 
         return $instance;

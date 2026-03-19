@@ -7,6 +7,7 @@ namespace BackTo\Framework\Security;
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
 use BackTo\Framework\Contracts\RequestContextInterface;
+use BackTo\Framework\Contracts\ResponseEmitterInterface;
 use BackTo\Framework\Observability\Contracts\LoggerInterface;
 use BackTo\Framework\Security\Contracts\ClientIpResolverInterface;
 use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
@@ -27,6 +28,7 @@ class CommentSpamProtection implements Hooks, SecurityRuleInterface
     private readonly LoggerInterface $logger;
     private readonly RequestContextInterface $requestContext;
     private readonly ClientIpResolverInterface $ipResolver;
+    private readonly ResponseEmitterInterface $responseEmitter;
 
     private int $maxLinksAllowed = 2;
     private string $honeypotFieldName = 'website_url_confirm';
@@ -48,11 +50,13 @@ class CommentSpamProtection implements Hooks, SecurityRuleInterface
         LoggerInterface $logger,
         RequestContextInterface $requestContext,
         ClientIpResolverInterface $ipResolver,
+        ResponseEmitterInterface $responseEmitter,
     ) {
         $this->hookDispatcher = $hookDispatcher;
         $this->logger = $logger;
         $this->requestContext = $requestContext;
         $this->ipResolver = $ipResolver;
+        $this->responseEmitter = $responseEmitter;
     }
 
     public function getName(): string
@@ -204,7 +208,9 @@ class CommentSpamProtection implements Hooks, SecurityRuleInterface
 
     protected function denyComment(string $message): void
     {
-        wp_die($message, 'Comment Blocked', ['response' => 403, 'back_link' => true]);
+        $this->responseEmitter->setStatusCode(403);
+        $this->responseEmitter->sendHeader('Content-Type: text/html; charset=UTF-8');
+        echo $this->escapeHtml($message);
+        $this->responseEmitter->terminate();
     }
-
 }

@@ -192,40 +192,71 @@ final class UploadSecurity implements Hooks, SecurityRuleInterface
             return false;
         }
 
-        // Check both the full content AND the contents inside CDATA sections,
-        // which browsers may interpret as executable markup.
-        $contentLower = strtolower($content);
+        $cdataContents = $this->extractCdataContents($content);
 
-        // Extract CDATA contents to also scan them for dangerous patterns
-        $cdataContents = '';
+        return !$this->containsDangerousSvgTags($content, $cdataContents)
+            && !$this->containsEventHandlers($content, $cdataContents)
+            && !$this->containsDangerousUris($content, $cdataContents);
+    }
+
+    /**
+     * Extract concatenated CDATA section contents from SVG markup.
+     */
+    private function extractCdataContents(string $content): string
+    {
         if (preg_match_all('/<!\[CDATA\[(.*?)\]\]>/si', $content, $matches)) {
-            $cdataContents = implode(' ', $matches[1]);
+            return implode(' ', $matches[1]);
         }
+
+        return '';
+    }
+
+    /**
+     * Check if content or CDATA contains dangerous SVG elements.
+     */
+    private function containsDangerousSvgTags(string $content, string $cdataContents): bool
+    {
+        $contentLower = strtolower($content);
         $cdataLower = strtolower($cdataContents);
 
         foreach (self::SVG_DANGEROUS_TAGS as $tag) {
             if (str_contains($contentLower, '<' . $tag) || str_contains($cdataLower, '<' . $tag)) {
-                return false;
+                return true;
             }
         }
 
-        if (preg_match(self::SVG_EVENT_HANDLER_PATTERN, $content) === 1
-            || preg_match(self::SVG_EVENT_HANDLER_PATTERN, $cdataContents) === 1) {
-            return false;
+        return false;
+    }
+
+    /**
+     * Check if content or CDATA contains event handler attributes.
+     */
+    private function containsEventHandlers(string $content, string $cdataContents): bool
+    {
+        return preg_match(self::SVG_EVENT_HANDLER_PATTERN, $content) === 1
+            || ($cdataContents !== '' && preg_match(self::SVG_EVENT_HANDLER_PATTERN, $cdataContents) === 1);
+    }
+
+    /**
+     * Check if content or CDATA contains dangerous URIs (data: or javascript:).
+     */
+    private function containsDangerousUris(string $content, string $cdataContents): bool
+    {
+        $patterns = [
+            '/href\s*=\s*["\']?\s*data:/i',
+            '/href\s*=\s*["\']?\s*javascript:/i',
+        ];
+
+        foreach ($patterns as $pattern) {
+            if (preg_match($pattern, $content) === 1) {
+                return true;
+            }
+
+            if ($cdataContents !== '' && preg_match($pattern, $cdataContents) === 1) {
+                return true;
+            }
         }
 
-        // Block data: URIs in href/xlink:href (can execute JS)
-        if (preg_match('/href\s*=\s*["\']?\s*data:/i', $content) === 1
-            || preg_match('/href\s*=\s*["\']?\s*data:/i', $cdataContents) === 1) {
-            return false;
-        }
-
-        // Block javascript: URIs
-        if (preg_match('/href\s*=\s*["\']?\s*javascript:/i', $content) === 1
-            || preg_match('/href\s*=\s*["\']?\s*javascript:/i', $cdataContents) === 1) {
-            return false;
-        }
-
-        return true;
+        return false;
     }
 }

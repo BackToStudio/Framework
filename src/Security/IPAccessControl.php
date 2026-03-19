@@ -6,6 +6,7 @@ namespace BackTo\Framework\Security;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
+use BackTo\Framework\Contracts\ResponseEmitterInterface;
 use BackTo\Framework\Observability\Contracts\LoggerInterface;
 use BackTo\Framework\Security\Contracts\ClientIpResolverInterface;
 use BackTo\Framework\Security\Contracts\IPAccessControlInterface;
@@ -24,6 +25,7 @@ class IPAccessControl implements Hooks, SecurityRuleInterface, IPAccessControlIn
     private readonly HookDispatcherInterface $hookDispatcher;
     private readonly LoggerInterface $logger;
     private readonly ClientIpResolverInterface $ipResolver;
+    private readonly ResponseEmitterInterface $responseEmitter;
 
     /** @var string[] */
     private array $whitelist = [];
@@ -35,10 +37,12 @@ class IPAccessControl implements Hooks, SecurityRuleInterface, IPAccessControlIn
         HookDispatcherInterface $hookDispatcher,
         LoggerInterface $logger,
         ClientIpResolverInterface $ipResolver,
+        ResponseEmitterInterface $responseEmitter,
     ) {
         $this->hookDispatcher = $hookDispatcher;
         $this->logger = $logger;
         $this->ipResolver = $ipResolver;
+        $this->responseEmitter = $responseEmitter;
     }
 
     public function getName(): string
@@ -222,10 +226,9 @@ class IPAccessControl implements Hooks, SecurityRuleInterface, IPAccessControlIn
 
     protected function denyAccess(): void
     {
-        wp_die(
-            'Access denied. Your IP address is not authorized to access this area.',
-            'Forbidden',
-            ['response' => 403]
-        );
+        $this->responseEmitter->setStatusCode(403);
+        $this->responseEmitter->sendHeader('Content-Type: text/plain; charset=UTF-8');
+        echo 'Access denied. Your IP address is not authorized to access this area.';
+        $this->responseEmitter->terminate();
     }
 }
