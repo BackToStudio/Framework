@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Options;
 
-use BackTo\Framework\Contracts\ExtensionInterface;
+use BackTo\Framework\Compose\AbstractExtension;
 use BackTo\Framework\Options\Contracts\OptionsRepositoryInterface;
 use BackTo\Framework\Options\Infrastructure\WordPressOptionsRepository;
 use BackToVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
 
-final class OptionsExtension implements ExtensionInterface
+final class OptionsExtension extends AbstractExtension
 {
     public function getBundle(): ?array
     {

@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\PostType;
 
-use BackTo\Framework\Contracts\ExtensionInterface;
+use BackTo\Framework\Compose\AbstractExtension;
 use BackTo\Framework\PostType\Contracts\PostTypeInterface;
 use BackTo\Framework\PostType\Contracts\PostTypeRegistrarInterface;
 use BackTo\Framework\PostType\DependencyInjection\Compiler\RegisterPostTypePass;
 use BackTo\Framework\PostType\Infrastructure\WordPressPostTypeRegistrar;
 use BackToVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
 
-final class PostTypeExtension implements ExtensionInterface
+final class PostTypeExtension extends AbstractExtension
 {
     public function getBundle(): ?array
     {

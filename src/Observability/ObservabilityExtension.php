@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Observability;
 
-use BackTo\Framework\Contracts\ExtensionInterface;
+use BackTo\Framework\Compose\AbstractExtension;
 use BackTo\Framework\Observability\Contracts\ErrorHandlerInterface;
 use BackTo\Framework\Observability\Contracts\HealthCheckInterface;
 use BackTo\Framework\Observability\Contracts\LoggerInterface;
@@ -13,7 +13,7 @@ use BackTo\Framework\Observability\DependencyInjection\Compiler\RegisterHealthCh
 use BackTo\Framework\Observability\Infrastructure\WordPressLogger;
 use BackToVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
 
-final class ObservabilityExtension implements ExtensionInterface
+final class ObservabilityExtension extends AbstractExtension
 {
     public function getBundle(): ?array
     {

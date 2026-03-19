@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Performance;
 
-use BackTo\Framework\Contracts\ExtensionInterface;
+use BackTo\Framework\Compose\AbstractExtension;
 use BackTo\Framework\Performance\Contracts\DatabaseOptimizerInterface;
 use BackTo\Framework\Performance\Contracts\HtmlOptimizerInterface;
 use BackTo\Framework\Performance\Contracts\PageCacheInterface;
@@ -15,7 +15,7 @@ use BackTo\Framework\Performance\Infrastructure\WordPressHtmlOptimizer;
 use BackTo\Framework\Performance\Infrastructure\WordPressPageCache;
 use BackToVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
 
-final class PerformanceExtension implements ExtensionInterface
+final class PerformanceExtension extends AbstractExtension
 {
     public function getBundle(): ?array
     {

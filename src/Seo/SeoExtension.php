@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Seo;
 
-use BackTo\Framework\Contracts\ExtensionInterface;
+use BackTo\Framework\Compose\AbstractExtension;
 use BackToVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
 
-final class SeoExtension implements ExtensionInterface
+final class SeoExtension extends AbstractExtension
 {
     public function getBundle(): ?array
     {

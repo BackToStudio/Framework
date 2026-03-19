@@ -10,21 +10,27 @@ use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\HookInterface;
 use BackTo\Framework\Contracts\AdminHooks;
 use BackTo\Framework\Contracts\Hooks;
-use BackTo\Framework\Contracts\RegistryInterface;
+use BackTo\Framework\Hooks\Contracts\HookRegistryInterface;
 
-final class HookRegistry implements RegistryInterface
+final class HookRegistry implements HookRegistryInterface
 {
     /** @var HookInterface[] */
     protected array $hooks = [];
     private ?string $pluginFile = null;
     private readonly HookDispatcherInterface $hookDispatcher;
 
+    /** @var array<callable(HookInterface, HookDispatcherInterface, bool, ?string): void> */
+    private array $hookRunners = [];
+
     public function __construct(HookDispatcherInterface $hookDispatcher)
     {
         $this->hookDispatcher = $hookDispatcher;
+        $this->registerDefaultRunners();
     }
 
-    
+    /**
+     * @return HookInterface[]
+     */
     public function getHooks(): array
     {
         return $this->hooks;
@@ -44,25 +50,63 @@ final class HookRegistry implements RegistryInterface
         return $this;
     }
 
+    /**
+     * Register a custom hook runner for extending hook execution.
+     *
+     * Each runner receives the hook, the dispatcher, the isAdmin flag,
+     * and the plugin file path (or null for themes).
+     *
+     * This allows adding new hook types (e.g., CronHooks, RestHooks)
+     * without modifying this class (Open/Closed Principle).
+     *
+     * @param callable(HookInterface, HookDispatcherInterface, bool, ?string): void $runner
+     */
+    public function addRunner(callable $runner): self
+    {
+        $this->hookRunners[] = $runner;
+
+        return $this;
+    }
+
     public function runHooks(): void
     {
         $isAdmin = $this->hookDispatcher->isAdmin();
-        $hasPluginFile = $this->pluginFile !== null;
 
-        foreach ($this->getHooks() as $action) {
-            if ($action instanceof Hooks) {
-                $action->hooks();
-            } elseif ($action instanceof AdminHooks && $isAdmin) {
-                $action->hooks();
-            }
-
-            if ($hasPluginFile && $action instanceof ActivationHooks) {
-                $this->hookDispatcher->registerActivationHook($this->pluginFile, [$action, 'activate']);
-            }
-
-            if ($hasPluginFile && $action instanceof DeactivationHooks) {
-                $this->hookDispatcher->registerDeactivationHook($this->pluginFile, [$action, 'deactivate']);
+        foreach ($this->getHooks() as $hook) {
+            foreach ($this->hookRunners as $runner) {
+                $runner($hook, $this->hookDispatcher, $isAdmin, $this->pluginFile);
             }
         }
+    }
+
+    private function registerDefaultRunners(): void
+    {
+        // Front/global hooks
+        $this->addRunner(static function (HookInterface $hook): void {
+            if ($hook instanceof Hooks) {
+                $hook->hooks();
+            }
+        });
+
+        // Admin-only hooks
+        $this->addRunner(static function (HookInterface $hook, HookDispatcherInterface $dispatcher, bool $isAdmin): void {
+            if ($isAdmin && $hook instanceof AdminHooks) {
+                $hook->hooks();
+            }
+        });
+
+        // Plugin activation hooks
+        $this->addRunner(static function (HookInterface $hook, HookDispatcherInterface $dispatcher, bool $isAdmin, ?string $pluginFile): void {
+            if ($pluginFile !== null && $hook instanceof ActivationHooks) {
+                $dispatcher->registerActivationHook($pluginFile, [$hook, 'activate']);
+            }
+        });
+
+        // Plugin deactivation hooks
+        $this->addRunner(static function (HookInterface $hook, HookDispatcherInterface $dispatcher, bool $isAdmin, ?string $pluginFile): void {
+            if ($pluginFile !== null && $hook instanceof DeactivationHooks) {
+                $dispatcher->registerDeactivationHook($pluginFile, [$hook, 'deactivate']);
+            }
+        });
     }
 }

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Gdpr;
 
-use BackTo\Framework\Contracts\ExtensionInterface;
+use BackTo\Framework\Compose\AbstractExtension;
 use BackTo\Framework\Gdpr\Contracts\ConsentCategoryInterface;
 use BackTo\Framework\Gdpr\Contracts\ConsentStorageInterface;
 use BackTo\Framework\Gdpr\Contracts\TrackingScriptInterface;
@@ -13,7 +13,7 @@ use BackTo\Framework\Gdpr\DependencyInjection\Compiler\RegisterTrackingScriptPas
 use BackTo\Framework\Gdpr\Infrastructure\CookieConsentStorage;
 use BackToVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
 
-final class GdprExtension implements ExtensionInterface
+final class GdprExtension extends AbstractExtension
 {
     public function getBundle(): ?array
     {

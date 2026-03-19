@@ -14,7 +14,7 @@ use BackTo\Framework\Compose\DependencyInjection\Compiler\ResolveInstanceOfCondi
 use BackTo\Framework\Contracts\ExtensionInterface;
 use BackTo\Framework\Contracts\RegistryInterface;
 use BackTo\Framework\Hooks\HooksExtension;
-use BackTo\Framework\Hooks\HookRegistry;
+use BackTo\Framework\Hooks\Contracts\HookRegistryInterface;
 use BackTo\Framework\Observability\ObservabilityConfigurator;
 use BackTo\Framework\Observability\ObservabilityExtension;
 use BackTo\Framework\Options\OptionsExtension;
@@ -198,8 +198,8 @@ trait WordPressContainer
                 return;
             }
 
-            /** @var HookRegistry $hooksRegistry */
-            $hooksRegistry = $container->get(HookRegistry::class);
+            /** @var HookRegistryInterface $hooksRegistry */
+            $hooksRegistry = $container->get(HookRegistryInterface::class);
             $hooksRegistry->runHooks();
         } catch (Exception $e) {
             if ($this->isDebug()) {
@@ -282,18 +282,7 @@ trait WordPressContainer
         $bundles = [];
 
         foreach ($this->getExtensions() as $extension) {
-            // Extensions with multiple bundles (e.g., Security + TwoFactor).
-            if (method_exists($extension, 'getBundles')) {
-                /** @var array<array{dir: string, namespace: string, exclude: string}> $extensionBundles */
-                $extensionBundles = $extension->getBundles();
-                foreach ($extensionBundles as $bundle) {
-                    $bundles[] = $bundle;
-                }
-                continue;
-            }
-
-            $bundle = $extension->getBundle();
-            if ($bundle !== null) {
+            foreach ($extension->getBundles() as $bundle) {
                 $bundles[] = $bundle;
             }
         }

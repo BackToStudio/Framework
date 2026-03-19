@@ -6,10 +6,10 @@ namespace BackTo\Framework\Cache;
 
 use BackTo\Framework\Cache\Contracts\TransientCleanerInterface;
 use BackTo\Framework\Cache\Infrastructure\WordPressTransientCleaner;
-use BackTo\Framework\Contracts\ExtensionInterface;
+use BackTo\Framework\Compose\AbstractExtension;
 use BackToVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
 
-final class CacheExtension implements ExtensionInterface
+final class CacheExtension extends AbstractExtension
 {
     public function getBundle(): ?array
     {

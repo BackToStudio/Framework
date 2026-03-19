@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\PostMeta;
 
-use BackTo\Framework\Contracts\ExtensionInterface;
+use BackTo\Framework\Compose\AbstractExtension;
 use BackTo\Framework\PostMeta\Contracts\PostMetaRegistrarInterface;
 use BackTo\Framework\PostMeta\Contracts\PostMetaStructureInterface;
 use BackTo\Framework\PostMeta\DependencyInjection\Compiler\RegisterPostMetaStructurePass;
 use BackTo\Framework\PostMeta\Infrastructure\WordPressPostMetaRegistrar;
 use BackToVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
 
-final class PostMetaExtension implements ExtensionInterface
+final class PostMetaExtension extends AbstractExtension
 {
     public function getBundle(): ?array
     {

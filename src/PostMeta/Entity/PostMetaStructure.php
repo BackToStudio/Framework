@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\PostMeta\Entity;
 
+use BackTo\Framework\PostMeta\Contracts\MetaAccessControlInterface;
+use BackTo\Framework\PostMeta\Contracts\MetaKeyAwareInterface;
+use BackTo\Framework\PostMeta\Contracts\MetaSchemaInterface;
 use BackTo\Framework\PostMeta\Contracts\PostMetaStructureInterface;
 use BackTo\Framework\PostMeta\ValueObject\MetaKey;
 
@@ -26,12 +29,14 @@ final class PostMetaStructure implements PostMetaStructureInterface
     private bool $showInRest = false;
     private bool $revisionsEnabled = false;
 
+    // ── MetaKeyAwareInterface ───────────────────────────────
+
     public function getObjectType(): string
     {
         return $this->objectType;
     }
 
-    public function setObjectType(string $objectType): PostMetaStructureInterface
+    public function setObjectType(string $objectType): MetaKeyAwareInterface
     {
         $this->objectType = $objectType;
         return $this;
@@ -45,9 +50,77 @@ final class PostMetaStructure implements PostMetaStructureInterface
         return $this->metaKey;
     }
 
-    public function setMetaKey(MetaKey|string $metaKey): PostMetaStructureInterface
+    public function setMetaKey(MetaKey|string $metaKey): MetaKeyAwareInterface
     {
         $this->metaKey = $metaKey instanceof MetaKey ? $metaKey : new MetaKey($metaKey);
+        return $this;
+    }
+
+    public function getObjectSubtype(): string
+    {
+        return $this->objectSubtype;
+    }
+
+    public function setObjectSubtype(string $objectSubtype): MetaKeyAwareInterface
+    {
+        $this->objectSubtype = $objectSubtype;
+        return $this;
+    }
+
+    // ── MetaSchemaInterface ─────────────────────────────────
+
+    public function getType(): string
+    {
+        return $this->type;
+    }
+
+    public function setType(string $type): MetaSchemaInterface
+    {
+        $this->type = $type;
+        return $this;
+    }
+
+    public function getLabel(): string
+    {
+        return $this->label;
+    }
+
+    public function setLabel(string $label): MetaSchemaInterface
+    {
+        $this->label = $label;
+        return $this;
+    }
+
+    public function getDescription(): string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(string $description): MetaSchemaInterface
+    {
+        $this->description = $description;
+        return $this;
+    }
+
+    public function isSingle(): bool
+    {
+        return $this->single;
+    }
+
+    public function setSingle(bool $single): MetaSchemaInterface
+    {
+        $this->single = $single;
+        return $this;
+    }
+
+    public function getDefault(): mixed
+    {
+        return $this->default;
+    }
+
+    public function setDefault(mixed $default): MetaSchemaInterface
+    {
+        $this->default = $default;
         return $this;
     }
 
@@ -62,84 +135,20 @@ final class PostMetaStructure implements PostMetaStructureInterface
     /**
      * @param array<string, mixed> $args
      */
-    public function setArgs(array $args): PostMetaStructureInterface
+    public function setArgs(array $args): MetaSchemaInterface
     {
         $this->args = $args;
         return $this;
     }
 
-    public function getObjectSubtype(): string
-    {
-        return $this->objectSubtype;
-    }
-
-    public function setObjectSubtype(string $objectSubtype): PostMetaStructureInterface
-    {
-        $this->objectSubtype = $objectSubtype;
-        return $this;
-    }
-
-    public function getType(): string
-    {
-        return $this->type;
-    }
-
-    public function setType(string $type): PostMetaStructureInterface
-    {
-        $this->type = $type;
-        return $this;
-    }
-
-    public function getLabel(): string
-    {
-        return $this->label;
-    }
-
-    public function setLabel(string $label): PostMetaStructureInterface
-    {
-        $this->label = $label;
-        return $this;
-    }
-
-    public function getDescription(): string
-    {
-        return $this->description;
-    }
-
-    public function setDescription(string $description): PostMetaStructureInterface
-    {
-        $this->description = $description;
-        return $this;
-    }
-
-    public function isSingle(): bool
-    {
-        return $this->single;
-    }
-
-    public function setSingle(bool $single): PostMetaStructureInterface
-    {
-        $this->single = $single;
-        return $this;
-    }
-
-    public function getDefault(): mixed
-    {
-        return $this->default;
-    }
-
-    public function setDefault(mixed $default): PostMetaStructureInterface
-    {
-        $this->default = $default;
-        return $this;
-    }
+    // ── MetaAccessControlInterface ──────────────────────────
 
     public function getSanitizeCallback(): ?callable
     {
         return $this->sanitizeCallback;
     }
 
-    public function setSanitizeCallback(callable $callback): PostMetaStructureInterface
+    public function setSanitizeCallback(callable $callback): MetaAccessControlInterface
     {
         $this->sanitizeCallback = $callback;
         return $this;
@@ -150,7 +159,7 @@ final class PostMetaStructure implements PostMetaStructureInterface
         return $this->authCallback;
     }
 
-    public function setAuthCallback(?callable $callback): PostMetaStructureInterface
+    public function setAuthCallback(?callable $callback): MetaAccessControlInterface
     {
         $this->authCallback = $callback;
         return $this;
@@ -161,17 +170,17 @@ final class PostMetaStructure implements PostMetaStructureInterface
         return $this->showInRest;
     }
 
-    public function dontShowInRest(): PostMetaStructureInterface
+    public function dontShowInRest(): MetaAccessControlInterface
     {
         return $this->setShowInRest(false);
     }
 
-    public function showInRest(): PostMetaStructureInterface
+    public function showInRest(): MetaAccessControlInterface
     {
         return $this->setShowInRest(true);
     }
 
-    public function setShowInRest(bool $showInRest): PostMetaStructureInterface
+    public function setShowInRest(bool $showInRest): MetaAccessControlInterface
     {
         $this->showInRest = $showInRest;
         return $this;
@@ -182,7 +191,7 @@ final class PostMetaStructure implements PostMetaStructureInterface
         return $this->revisionsEnabled;
     }
 
-    public function setRevisionsEnabled(bool $enabled): PostMetaStructureInterface
+    public function setRevisionsEnabled(bool $enabled): MetaAccessControlInterface
     {
         $this->revisionsEnabled = $enabled;
         return $this;
