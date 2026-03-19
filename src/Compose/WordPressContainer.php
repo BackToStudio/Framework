@@ -258,15 +258,31 @@ trait WordPressContainer
 
         // Register each extension.
         foreach ($this->getExtensions() as $extension) {
-            // Apply default configuration parameters.
-            foreach ($extension->getDefaultConfiguration() as $key => $value) {
-                if (!$containerBuilder->hasParameter($key)) {
-                    $containerBuilder->setParameter($key, $value);
+            try {
+                // Apply default configuration parameters.
+                foreach ($extension->getDefaultConfiguration() as $key => $value) {
+                    if (!$containerBuilder->hasParameter($key)) {
+                        $containerBuilder->setParameter($key, $value);
+                    }
+                }
+
+                // Register compiler passes, autoconfiguration, and port bindings.
+                $extension->register($containerBuilder);
+            } catch (\Throwable $e) {
+                // A single broken extension must not crash the entire application.
+                // Log the failure and continue loading remaining extensions.
+                \error_log(\sprintf(
+                    '[BackTo Framework] Extension %s failed to register: %s in %s:%d',
+                    \get_class($extension),
+                    $e->getMessage(),
+                    $e->getFile(),
+                    $e->getLine()
+                ));
+
+                if ($this->isDebug()) {
+                    throw $e;
                 }
             }
-
-            // Register compiler passes, autoconfiguration, and port bindings.
-            $extension->register($containerBuilder);
         }
 
         return $containerBuilder;
@@ -362,18 +378,30 @@ trait WordPressContainer
      */
     private function loadModuleConfigFile(string $filePath, string $configuratorClass, ContainerBuilder $containerBuilder): void
     {
-        $callback = require $filePath;
+        try {
+            $callback = require $filePath;
 
-        if (!is_callable($callback)) {
-            return;
-        }
+            if (!is_callable($callback)) {
+                return;
+            }
 
-        /** @var ModuleConfiguratorInterface $configurator */
-        $configurator = new $configuratorClass();
-        $callback($configurator);
+            /** @var ModuleConfiguratorInterface $configurator */
+            $configurator = new $configuratorClass();
+            $callback($configurator);
 
-        foreach ($configurator->toParameters() as $key => $value) {
-            $containerBuilder->setParameter($key, $value);
+            foreach ($configurator->toParameters() as $key => $value) {
+                $containerBuilder->setParameter($key, $value);
+            }
+        } catch (\Throwable $e) {
+            \error_log(\sprintf(
+                '[BackTo Framework] Config file %s failed to load: %s',
+                basename($filePath),
+                $e->getMessage()
+            ));
+
+            if ($this->isDebug()) {
+                throw $e;
+            }
         }
     }
 

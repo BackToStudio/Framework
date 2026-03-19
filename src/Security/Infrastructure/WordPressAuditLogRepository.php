@@ -28,6 +28,10 @@ final class WordPressAuditLogRepository implements AuditLogRepositoryInterface
      */
     public function store(string $event, string $severity, array $context): void
     {
+        // Always re-read from database to reduce the race condition window.
+        // Two concurrent writes can still lose events, but the stale in-memory
+        // cache was making this much worse.
+        $this->cachedEvents = null;
         $events = $this->loadEvents();
 
         $events[] = [

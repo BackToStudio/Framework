@@ -146,7 +146,7 @@ class TwoFactorAuthentication implements Hooks, SecurityRuleInterface
             return null;
         }
 
-        // Only allow alphanumeric characters (TOTP codes are digits, backup codes are alphanumeric)
+        // Strip non-alphanumeric characters (TOTP codes are digits, backup codes are alphanumeric).
         $sanitized = preg_replace('/[^a-zA-Z0-9]/', '', trim($code));
 
         if ($sanitized === '' || $sanitized === null) {

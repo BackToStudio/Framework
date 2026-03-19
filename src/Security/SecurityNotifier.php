@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Security;
 
+use BackTo\Framework\Cache\Contracts\TransientStoreInterface;
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
 use BackTo\Framework\Options\Contracts\OptionsRepositoryInterface;
@@ -31,11 +32,15 @@ use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
  */
 final class SecurityNotifier implements Hooks, SecurityRuleInterface, SecurityNotifierInterface
 {
+    private const FAILED_LOGIN_TRANSIENT_PREFIX = 'backto_notif_login_fails_';
+    private const FAILED_LOGIN_WINDOW = 600; // 10 minutes
+
     private readonly HookDispatcherInterface $hookDispatcher;
     private readonly MailerInterface $mailer;
     private readonly OptionsRepositoryInterface $options;
     private readonly ClientIpResolverInterface $ipResolver;
     private readonly SecurityAlertFormatter $formatter;
+    private readonly TransientStoreInterface $transientStore;
 
     /** @var string[] */
     private array $recipients = [];
@@ -57,9 +62,6 @@ final class SecurityNotifier implements Hooks, SecurityRuleInterface, SecurityNo
 
     private int $failedLoginThreshold = 10;
 
-    /** @var array<string, int> IP => failed count for current request cycle */
-    private array $failedLoginCounts = [];
-
     /**
      * @param string[] $criticalEvents Override the default list of events that trigger notifications.
      */
@@ -68,6 +70,7 @@ final class SecurityNotifier implements Hooks, SecurityRuleInterface, SecurityNo
         MailerInterface $mailer,
         OptionsRepositoryInterface $options,
         ClientIpResolverInterface $ipResolver,
+        TransientStoreInterface $transientStore,
         ?SecurityAlertFormatter $formatter = null,
         array $criticalEvents = [],
     ) {
@@ -75,6 +78,7 @@ final class SecurityNotifier implements Hooks, SecurityRuleInterface, SecurityNo
         $this->mailer = $mailer;
         $this->options = $options;
         $this->ipResolver = $ipResolver;
+        $this->transientStore = $transientStore;
         $this->formatter = $formatter ?? new SecurityAlertFormatter($options);
         $this->criticalEvents = $criticalEvents !== [] ? $criticalEvents : self::DEFAULT_CRITICAL_EVENTS;
     }
@@ -170,13 +174,16 @@ final class SecurityNotifier implements Hooks, SecurityRuleInterface, SecurityNo
     public function onLoginFailed(string $username): void
     {
         $ip = $this->ipResolver->getClientIp();
-        $this->failedLoginCounts[$ip] = ($this->failedLoginCounts[$ip] ?? 0) + 1;
+        $key = self::FAILED_LOGIN_TRANSIENT_PREFIX . md5($ip);
 
-        if ($this->failedLoginCounts[$ip] === $this->failedLoginThreshold) {
+        $count = (int) ($this->transientStore->get($key) ?: 0) + 1;
+        $this->transientStore->set($key, $count, self::FAILED_LOGIN_WINDOW);
+
+        if ($count === $this->failedLoginThreshold) {
             $this->notify('login_failed_threshold', AuditLogSeverity::Warning->value, [
                 'ip' => $ip,
                 'username' => $username,
-                'attempts' => $this->failedLoginCounts[$ip],
+                'attempts' => $count,
             ]);
         }
     }

@@ -78,10 +78,16 @@ class QueueProcessor
 
     protected function acquireLock(): bool
     {
-        if ($this->transientStore->get(self::LOCK_KEY)) {
+        // Check if lock is already held.
+        $existing = $this->transientStore->get(self::LOCK_KEY);
+
+        if ($existing !== false && $existing !== null) {
             return false;
         }
 
+        // Acquire the lock. This is not fully atomic with WordPress transients,
+        // but the check-then-set window is small. For truly concurrent environments,
+        // a database-level advisory lock would be required.
         $this->transientStore->set(self::LOCK_KEY, \getmypid() ?: 1, self::LOCK_TIMEOUT);
 
         return true;

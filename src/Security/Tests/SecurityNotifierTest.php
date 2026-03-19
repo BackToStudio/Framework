@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Security\Tests;
 
+use BackTo\Framework\Cache\Contracts\TransientStoreInterface;
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
 use BackTo\Framework\Options\Contracts\OptionsRepositoryInterface;
@@ -20,10 +21,14 @@ class SecurityNotifierTest extends TestCase
     private MailerInterface $mailer;
     private OptionsRepositoryInterface $options;
     private ClientIpResolverInterface $ipResolver;
+    private TransientStoreInterface $transientStore;
     private SecurityNotifier $notifier;
 
     /** @var array<int, array{to: string, subject: string, body: string}> */
     private array $sentEmails = [];
+
+    /** @var array<string, mixed> In-memory store for transient mock */
+    private array $transientData = [];
 
     protected function setUp(): void
     {
@@ -47,7 +52,17 @@ class SecurityNotifierTest extends TestCase
         $this->ipResolver = $this->createMock(ClientIpResolverInterface::class);
         $this->ipResolver->method('getClientIp')->willReturn('127.0.0.1');
 
-        $this->notifier = new SecurityNotifier($this->dispatcher, $this->mailer, $this->options, $this->ipResolver);
+        $this->transientData = [];
+        $this->transientStore = $this->createMock(TransientStoreInterface::class);
+        $this->transientStore->method('get')
+            ->willReturnCallback(fn (string $key) => $this->transientData[$key] ?? false);
+        $this->transientStore->method('set')
+            ->willReturnCallback(function (string $key, mixed $value): bool {
+                $this->transientData[$key] = $value;
+                return true;
+            });
+
+        $this->notifier = new SecurityNotifier($this->dispatcher, $this->mailer, $this->options, $this->ipResolver, $this->transientStore);
     }
 
     public function testImplementsRequiredInterfaces(): void
@@ -105,7 +120,7 @@ class SecurityNotifierTest extends TestCase
                 ['blogname', 'WordPress', 'Test Site'],
             ]);
 
-        $notifier = new SecurityNotifier($this->dispatcher, $this->mailer, $options, $this->ipResolver);
+        $notifier = new SecurityNotifier($this->dispatcher, $this->mailer, $options, $this->ipResolver, $this->transientStore);
         $notifier->notify('test_event', 'critical', []);
 
         $this->assertCount(0, $this->sentEmails);
