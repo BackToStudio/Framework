@@ -9,7 +9,7 @@ use BackTo\Framework\PostType\Contracts\PostInterface;
 use BackTo\Framework\PostType\Contracts\PostRepositoryInterface;
 use BackTo\Framework\PostType\Factory\PostFactory;
 use BackTo\Framework\PostType\Repository\PostQueryBuilder;
-use BackTo\Framework\PostType\Repository\SortDirection;
+use BackTo\Framework\Query\SortDirection;
 
 use function get_post;
 use function get_posts;

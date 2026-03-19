@@ -29,4 +29,20 @@ enum PostStatus: string
     {
         return in_array($this, [self::Publish, self::Private], true);
     }
+
+    /**
+     * Whether the status represents a trashed post.
+     */
+    public function isTrashed(): bool
+    {
+        return $this === self::Trash;
+    }
+
+    /**
+     * Whether the status represents a scheduled (future) post.
+     */
+    public function isScheduled(): bool
+    {
+        return $this === self::Future;
+    }
 }

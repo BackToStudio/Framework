@@ -26,7 +26,7 @@ interface PostRepositoryInterface
      * @param array<string, mixed> $criteria
      * @return PostInterface[]
      */
-    public function findBy(array $criteria, ?string $orderBy = null, \BackTo\Framework\PostType\Repository\SortDirection $order = \BackTo\Framework\PostType\Repository\SortDirection::DESC, ?int $limit = null): array;
+    public function findBy(array $criteria, ?string $orderBy = null, \BackTo\Framework\Query\SortDirection $order = \BackTo\Framework\Query\SortDirection::DESC, ?int $limit = null): array;
 
     /**
      * @param array<string, mixed> $criteria

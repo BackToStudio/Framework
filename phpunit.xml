@@ -69,6 +69,15 @@
         <testsuite name="queue">
             <directory>src/Queue/Tests</directory>
         </testsuite>
+        <testsuite name="exception">
+            <directory>src/Exception/Tests</directory>
+        </testsuite>
+        <testsuite name="http">
+            <directory>src/Http/Tests</directory>
+        </testsuite>
+        <testsuite name="query">
+            <directory>src/Query/Tests</directory>
+        </testsuite>
     </testsuites>
 
     <coverage cacheDirectory=".phpunit.cache/code-coverage">

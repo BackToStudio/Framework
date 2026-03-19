@@ -196,4 +196,41 @@ final class PostMetaStructure implements PostMetaStructureInterface
         $this->revisionsEnabled = $enabled;
         return $this;
     }
+
+    // ── Domain Logic ────────────────────────────────────────
+
+    /**
+     * Build the WordPress registration args array from this structure.
+     *
+     * Encapsulates the transformation from domain model to WordPress API,
+     * eliminating Feature Envy in RegisterPostMetaStructure.
+     *
+     * @return array<string, mixed>
+     */
+    public function toRegistrationArgs(): array
+    {
+        $args = [
+            'object_subtype' => $this->objectSubtype,
+            'type' => $this->type,
+            'label' => $this->label,
+            'description' => $this->description,
+            'single' => $this->single,
+            'show_in_rest' => $this->showInRest,
+            'revisions_enabled' => $this->revisionsEnabled,
+        ];
+
+        if ($this->default !== null) {
+            $args['default'] = $this->default;
+        }
+
+        if (\is_callable($this->sanitizeCallback)) {
+            $args['sanitize_callback'] = $this->sanitizeCallback;
+        }
+
+        if (\is_callable($this->authCallback)) {
+            $args['auth_callback'] = $this->authCallback;
+        }
+
+        return $args;
+    }
 }
