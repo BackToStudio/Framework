@@ -56,7 +56,7 @@ final class RemoveUnusedCss implements Hooks
 
     public function startBuffering(): void
     {
-        if (\is_admin()) {
+        if ($this->hookDispatcher->isAdmin()) {
             return;
         }
 

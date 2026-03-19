@@ -7,11 +7,13 @@ namespace BackTo\Framework\Hooks;
 use BackTo\Framework\Compose\AbstractExtension;
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\HookInterface;
+use BackTo\Framework\Contracts\QueryContextInterface;
 use BackTo\Framework\Contracts\SiteContextInterface;
 use BackTo\Framework\Contracts\UserContextInterface;
 use BackTo\Framework\Hooks\Contracts\HookRegistryInterface;
 use BackTo\Framework\Hooks\DependencyInjection\Compiler\RegisterHookPass;
 use BackTo\Framework\Hooks\Infrastructure\WordPressHookDispatcher;
+use BackTo\Framework\Hooks\Infrastructure\WordPressQueryContext;
 use BackTo\Framework\Hooks\Infrastructure\WordPressSiteContext;
 use BackTo\Framework\Hooks\Infrastructure\WordPressUserContext;
 use BackToVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -42,6 +44,9 @@ final class HooksExtension extends AbstractExtension
 
         $containerBuilder->register(SiteContextInterface::class, WordPressSiteContext::class);
         $containerBuilder->setAlias(WordPressSiteContext::class, SiteContextInterface::class);
+
+        $containerBuilder->register(QueryContextInterface::class, WordPressQueryContext::class);
+        $containerBuilder->setAlias(WordPressQueryContext::class, QueryContextInterface::class);
 
         $containerBuilder->setAlias(HookRegistryInterface::class, HookRegistry::class)
             ->setPublic(true);

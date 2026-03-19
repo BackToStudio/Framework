@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Performance;
 
+use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\RequestContextInterface;
+use BackTo\Framework\Contracts\UserContextInterface;
 
 /**
  * Determines whether the current request is eligible for page caching.
@@ -18,6 +20,8 @@ use BackTo\Framework\Contracts\RequestContextInterface;
 class CacheableRequestChecker
 {
     private readonly RequestContextInterface $requestContext;
+    private readonly HookDispatcherInterface $hookDispatcher;
+    private readonly UserContextInterface $userContext;
 
     /** @var string[] */
     private readonly array $excludedPrefixes;
@@ -27,15 +31,19 @@ class CacheableRequestChecker
      */
     public function __construct(
         RequestContextInterface $requestContext,
+        HookDispatcherInterface $hookDispatcher,
+        UserContextInterface $userContext,
         array $excludedPrefixes = ['/wp-admin', '/wp-json', '/wp-login.php', '/wp-cron.php', '/xmlrpc.php']
     ) {
         $this->requestContext = $requestContext;
+        $this->hookDispatcher = $hookDispatcher;
+        $this->userContext = $userContext;
         $this->excludedPrefixes = $excludedPrefixes;
     }
 
     public function isCacheable(): bool
     {
-        if ($this->isAdmin()) {
+        if ($this->hookDispatcher->isAdmin()) {
             return false;
         }
 
@@ -43,7 +51,7 @@ class CacheableRequestChecker
             return false;
         }
 
-        if ($this->isUserLoggedIn()) {
+        if ($this->userContext->isLoggedIn()) {
             return false;
         }
 
@@ -60,15 +68,5 @@ class CacheableRequestChecker
         }
 
         return true;
-    }
-
-    protected function isAdmin(): bool
-    {
-        return \is_admin();
-    }
-
-    protected function isUserLoggedIn(): bool
-    {
-        return \is_user_logged_in();
     }
 }

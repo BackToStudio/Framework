@@ -10,14 +10,6 @@ use PHPUnit\Framework\TestCase;
 
 class DeferScriptsTest extends TestCase
 {
-    protected function setUp(): void
-    {
-        if (!function_exists('is_admin')) {
-            /** @phpstan-ignore-next-line */
-            eval('function is_admin(): bool { return false; }');
-        }
-    }
-
     public function testHooksAreRegistered(): void
     {
         $dispatcher = $this->createMock(HookDispatcherInterface::class);
@@ -42,6 +34,7 @@ class DeferScriptsTest extends TestCase
     public function testAddDeferAttributeToScript(): void
     {
         $dispatcher = $this->createMock(HookDispatcherInterface::class);
+        $dispatcher->method('isAdmin')->willReturn(false);
         $hook = new DeferScripts($dispatcher);
 
         $tag = '<script src="https://example.com/script.js"></script>';
@@ -64,11 +57,36 @@ class DeferScriptsTest extends TestCase
     public function testDoesNotDoubleDeferAttribute(): void
     {
         $dispatcher = $this->createMock(HookDispatcherInterface::class);
+        $dispatcher->method('isAdmin')->willReturn(false);
         $hook = new DeferScripts($dispatcher);
 
         $tag = '<script defer src="https://example.com/script.js"></script>';
         $result = $hook->addDeferAttribute($tag, 'my-script');
 
         $this->assertSame(1, substr_count($result, 'defer'));
+    }
+
+    public function testSkipsDeferOnAdmin(): void
+    {
+        $dispatcher = $this->createMock(HookDispatcherInterface::class);
+        $dispatcher->method('isAdmin')->willReturn(true);
+        $hook = new DeferScripts($dispatcher);
+
+        $tag = '<script src="https://example.com/script.js"></script>';
+        $result = $hook->addDeferAttribute($tag, 'my-script');
+
+        $this->assertStringNotContainsString('defer', $result);
+    }
+
+    public function testSkipsQueryStringRemovalOnAdmin(): void
+    {
+        $dispatcher = $this->createMock(HookDispatcherInterface::class);
+        $dispatcher->method('isAdmin')->willReturn(true);
+        $hook = new DeferScripts($dispatcher);
+
+        $src = 'https://example.com/style.css?ver=1.0';
+        $result = $hook->removeVersionQueryString($src);
+
+        $this->assertSame($src, $result);
     }
 }

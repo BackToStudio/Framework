@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace BackTo\Framework\Performance;
 
 use BackTo\Framework\Contracts\RequestContextInterface;
+use BackTo\Framework\Contracts\SiteContextInterface;
 
 /**
  * Resolves the current request URL for page cache keying.
@@ -15,10 +16,14 @@ use BackTo\Framework\Contracts\RequestContextInterface;
 class RequestUrlResolver
 {
     private readonly RequestContextInterface $requestContext;
+    private readonly SiteContextInterface $siteContext;
 
-    public function __construct(RequestContextInterface $requestContext)
-    {
+    public function __construct(
+        RequestContextInterface $requestContext,
+        SiteContextInterface $siteContext,
+    ) {
         $this->requestContext = $requestContext;
+        $this->siteContext = $siteContext;
     }
 
     public function getCurrentUrl(): string
@@ -34,17 +39,12 @@ class RequestUrlResolver
     {
         $host = $this->requestContext->getHost();
 
-        $siteHost = (string) parse_url($this->getSiteUrl(), PHP_URL_HOST);
+        $siteHost = (string) parse_url($this->siteContext->getSiteUrl(), PHP_URL_HOST);
 
         if ($siteHost !== '' && $host !== $siteHost) {
             return $siteHost;
         }
 
         return $host;
-    }
-
-    protected function getSiteUrl(): string
-    {
-        return \site_url();
     }
 }

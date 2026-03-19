@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace BackTo\Framework\Performance\Tests;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
+use BackTo\Framework\Contracts\QueryContextInterface;
 use BackTo\Framework\Performance\CacheableRequestChecker;
 use BackTo\Framework\Performance\Contracts\PageCacheInterface;
 use BackTo\Framework\Performance\Hooks\ServePageCache;
@@ -17,6 +18,7 @@ class ServePageCacheTest extends TestCase
     private PageCacheInterface $pageCache;
     private CacheableRequestChecker $requestChecker;
     private RequestUrlResolver $urlResolver;
+    private QueryContextInterface $queryContext;
     private ServePageCache $cache;
 
     protected function setUp(): void
@@ -25,11 +27,13 @@ class ServePageCacheTest extends TestCase
         $this->pageCache = $this->createMock(PageCacheInterface::class);
         $this->requestChecker = $this->createMock(CacheableRequestChecker::class);
         $this->urlResolver = $this->createMock(RequestUrlResolver::class);
+        $this->queryContext = $this->createMock(QueryContextInterface::class);
         $this->cache = new ServePageCache(
             $this->hookDispatcher,
             $this->pageCache,
             $this->requestChecker,
             $this->urlResolver,
+            $this->queryContext,
         );
     }
 

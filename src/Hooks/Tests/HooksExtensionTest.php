@@ -7,6 +7,7 @@ namespace BackTo\Framework\Hooks\Tests;
 use BackTo\Framework\Contracts\ExtensionInterface;
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\HookInterface;
+use BackTo\Framework\Contracts\QueryContextInterface;
 use BackTo\Framework\Hooks\DependencyInjection\Compiler\RegisterHookPass;
 use BackTo\Framework\Hooks\HooksExtension;
 use BackTo\Framework\Hooks\Infrastructure\WordPressHookDispatcher;
@@ -87,6 +88,13 @@ class HooksExtensionTest extends TestCase
         $this->extension->register($this->container);
 
         $this->assertTrue($this->container->has(WordPressHookDispatcher::class));
+    }
+
+    public function testRegisterBindsQueryContextInterface(): void
+    {
+        $this->extension->register($this->container);
+
+        $this->assertTrue($this->container->has(QueryContextInterface::class));
     }
 
     public function testGetDefaultConfigurationReturnsEmptyArray(): void

@@ -40,7 +40,7 @@ final class DisableHeartbeat implements Hooks
 
     public function deregisterHeartbeatOnFrontend(): void
     {
-        if (!\is_admin()) {
+        if (!$this->hookDispatcher->isAdmin()) {
             \wp_deregister_script('heartbeat');
         }
     }

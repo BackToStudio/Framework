@@ -6,6 +6,7 @@ namespace BackTo\Framework\Performance\Hooks;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
+use BackTo\Framework\Contracts\QueryContextInterface;
 use BackTo\Framework\Performance\CacheableRequestChecker;
 use BackTo\Framework\Performance\Contracts\PageCacheInterface;
 use BackTo\Framework\Performance\RequestUrlResolver;
@@ -27,6 +28,7 @@ final class ServePageCache implements Hooks
     private readonly PageCacheInterface $pageCache;
     private readonly CacheableRequestChecker $requestChecker;
     private readonly RequestUrlResolver $urlResolver;
+    private readonly QueryContextInterface $queryContext;
     private readonly int $ttl;
 
     public function __construct(
@@ -34,12 +36,14 @@ final class ServePageCache implements Hooks
         PageCacheInterface $pageCache,
         CacheableRequestChecker $requestChecker,
         RequestUrlResolver $urlResolver,
+        QueryContextInterface $queryContext,
         int $ttl = 3600,
     ) {
         $this->hookDispatcher = $hookDispatcher;
         $this->pageCache = $pageCache;
         $this->requestChecker = $requestChecker;
         $this->urlResolver = $urlResolver;
+        $this->queryContext = $queryContext;
         $this->ttl = $ttl;
     }
 
@@ -81,7 +85,7 @@ final class ServePageCache implements Hooks
             return;
         }
 
-        if (\is_404() || \is_search()) {
+        if ($this->queryContext->is404() || $this->queryContext->isSearch()) {
             return;
         }
 

@@ -52,7 +52,7 @@ final class DeferScripts implements Hooks
             return $tag;
         }
 
-        if (\is_admin()) {
+        if ($this->hookDispatcher->isAdmin()) {
             return $tag;
         }
 
@@ -68,7 +68,7 @@ final class DeferScripts implements Hooks
      */
     public function removeVersionQueryString(string $src): string
     {
-        if (\is_admin()) {
+        if ($this->hookDispatcher->isAdmin()) {
             return $src;
         }
 

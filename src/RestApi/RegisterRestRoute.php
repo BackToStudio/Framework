@@ -6,6 +6,7 @@ namespace BackTo\Framework\RestApi;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
+use BackTo\Framework\Contracts\UserContextInterface;
 use BackTo\Framework\RestApi\Contracts\RestRouteRegistrarInterface;
 
 class RegisterRestRoute implements Hooks
@@ -13,15 +14,18 @@ class RegisterRestRoute implements Hooks
     private readonly RestRouteRegistry $registry;
     private readonly RestRouteRegistrarInterface $registrar;
     private readonly HookDispatcherInterface $hookDispatcher;
+    private readonly UserContextInterface $userContext;
 
     public function __construct(
         RestRouteRegistry $registry,
         RestRouteRegistrarInterface $registrar,
         HookDispatcherInterface $hookDispatcher,
+        UserContextInterface $userContext,
     ) {
         $this->registry = $registry;
         $this->registrar = $registrar;
         $this->hookDispatcher = $hookDispatcher;
+        $this->userContext = $userContext;
     }
 
     public function hooks(): void
@@ -29,21 +33,12 @@ class RegisterRestRoute implements Hooks
         $this->hookDispatcher->addAction('rest_api_init', [$this, 'registerRoutes']);
     }
 
-    protected function isUserLoggedIn(): bool
-    {
-        if (function_exists('is_user_logged_in')) {
-            return is_user_logged_in();
-        }
-
-        return false;
-    }
-
     /**
      * Default permission callback: require authenticated user.
      */
     public function requireAuthentication(): bool
     {
-        return $this->isUserLoggedIn();
+        return $this->userContext->isLoggedIn();
     }
 
     public function registerRoutes(): void
