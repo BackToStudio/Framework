@@ -5,8 +5,7 @@ declare(strict_types=1);
 namespace BackTo\Framework\Http\Infrastructure;
 
 use BackTo\Framework\Http\Contracts\HttpClientInterface;
-use Nyholm\Psr7\Request;
-use Nyholm\Psr7\Response;
+use BackTo\Framework\Http\Response;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 

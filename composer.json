@@ -10,8 +10,7 @@
   "require": {
     "php": ">=8.2",
     "psr/http-client": "^1.0",
-    "psr/http-message": "^2.0",
-    "nyholm/psr7": "^1.8"
+    "psr/http-message": "^2.0"
   },
   "replace": {
     "backto/admin": "self.version",

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace BackTo\Framework\Performance\Tests;
 
 use BackTo\Framework\Http\Contracts\HttpClientInterface;
-use Nyholm\Psr7\Response;
+use BackTo\Framework\Http\Response;
 use BackTo\Framework\Performance\Contracts\PageCacheInterface;
 use BackTo\Framework\Performance\PreloadExecutor;
 use PHPUnit\Framework\TestCase;
