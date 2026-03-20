@@ -6,6 +6,7 @@ namespace BackTo\Framework\Bundle\Security\Tests;
 
 use BackTo\Framework\Contracts\AdminPageInterface;
 use BackTo\Framework\Contracts\NonceManagerInterface;
+use BackTo\Framework\Contracts\ResponseEmitterInterface;
 use BackTo\Framework\Bundle\Security\Audit\AuditLogAdminPage;
 use BackTo\Framework\Bundle\Security\Audit\AuditLogCsvExporter;
 use BackTo\Framework\Bundle\Security\AuditLog\AuditLogRenderer;
@@ -99,6 +100,7 @@ class AuditLogAdminPageTest extends TestCase
             $this->repository,
             $this->requestContext,
             $this->nonceManager,
+            null,
             null,
             $this->renderer,
         );
@@ -263,7 +265,8 @@ class AuditLogAdminPageTest extends TestCase
             ['timestamp' => 1700000000, 'event' => 'login_success', 'severity' => 'info', 'context' => ['ip' => '1.2.3.4']],
         ]);
 
-        $exporter = new class ($this->repository) extends AuditLogCsvExporter {
+        $responseEmitter = $this->createMock(ResponseEmitterInterface::class);
+        $exporter = new class ($this->repository, $responseEmitter) extends AuditLogCsvExporter {
             protected function sendCsvHeaders(): void
             {
                 // No-op in tests

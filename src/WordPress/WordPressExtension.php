@@ -10,9 +10,11 @@ use BackTo\Framework\Contracts\EscaperInterface;
 use BackTo\Framework\Contracts\NonceManagerInterface;
 use BackTo\Framework\Contracts\PluginCheckerInterface;
 use BackTo\Framework\Contracts\QueryContextInterface;
+use BackTo\Framework\Contracts\ResponseEmitterInterface;
 use BackTo\Framework\Contracts\ScriptManagerInterface;
 use BackTo\Framework\Contracts\SiteContextInterface;
 use BackTo\Framework\Contracts\UserContextInterface;
+use BackTo\Framework\Http\NativeResponseEmitter;
 use BackTo\Framework\WordPress\Infrastructure\WordPressContentQuery;
 use BackTo\Framework\WordPress\Infrastructure\WordPressEscaper;
 use BackTo\Framework\WordPress\Infrastructure\WordPressNonceManager;
@@ -62,6 +64,9 @@ final class WordPressExtension extends AbstractExtension
 
         $containerBuilder->register(PluginCheckerInterface::class, WordPressPluginChecker::class);
         $containerBuilder->setAlias(WordPressPluginChecker::class, PluginCheckerInterface::class);
+
+        $containerBuilder->register(ResponseEmitterInterface::class, NativeResponseEmitter::class);
+        $containerBuilder->setAlias(NativeResponseEmitter::class, ResponseEmitterInterface::class);
     }
 
     public function getDefaultConfiguration(): array

@@ -7,6 +7,7 @@ namespace BackTo\Framework\Bundle\Performance\Hooks\Cache;
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
 use BackTo\Framework\Contracts\QueryContextInterface;
+use BackTo\Framework\Contracts\ResponseEmitterInterface;
 use BackTo\Framework\Bundle\Performance\CacheableRequestChecker;
 use BackTo\Framework\Bundle\Performance\Contracts\PageCacheInterface;
 use BackTo\Framework\Bundle\Performance\RequestUrlResolver;
@@ -29,6 +30,7 @@ final class ServePageCache implements Hooks
     private readonly CacheableRequestChecker $requestChecker;
     private readonly RequestUrlResolver $urlResolver;
     private readonly QueryContextInterface $queryContext;
+    private readonly ResponseEmitterInterface $responseEmitter;
     private readonly int $ttl;
 
     public function __construct(
@@ -37,6 +39,7 @@ final class ServePageCache implements Hooks
         CacheableRequestChecker $requestChecker,
         RequestUrlResolver $urlResolver,
         QueryContextInterface $queryContext,
+        ResponseEmitterInterface $responseEmitter,
         int $ttl = 3600,
     ) {
         $this->hookDispatcher = $hookDispatcher;
@@ -44,6 +47,7 @@ final class ServePageCache implements Hooks
         $this->requestChecker = $requestChecker;
         $this->urlResolver = $urlResolver;
         $this->queryContext = $queryContext;
+        $this->responseEmitter = $responseEmitter;
         $this->ttl = $ttl;
     }
 
@@ -69,11 +73,9 @@ final class ServePageCache implements Hooks
             return;
         }
 
-        // @codeCoverageIgnoreStart
-        header('X-Page-Cache: HIT');
+        $this->responseEmitter->sendHeader('X-Page-Cache: HIT');
         echo $html;
-        exit;
-        // @codeCoverageIgnoreEnd
+        $this->responseEmitter->terminate();
     }
 
     /**

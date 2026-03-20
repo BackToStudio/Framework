@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace BackTo\Framework\Bundle\Security\Audit;
 
 use BackTo\Framework\Cache\Contracts\TransientStoreInterface;
+use BackTo\Framework\Contracts\ResponseEmitterInterface;
 use BackTo\Framework\Bundle\Security\Contracts\AuditLogRepositoryInterface;
 
 /**
@@ -16,13 +17,16 @@ class AuditLogCsvExporter
     private const EXPORT_COOLDOWN_SECONDS = 60;
 
     private readonly AuditLogRepositoryInterface $repository;
+    private readonly ResponseEmitterInterface $responseEmitter;
     private readonly ?TransientStoreInterface $transientStore;
 
     public function __construct(
         AuditLogRepositoryInterface $repository,
+        ResponseEmitterInterface $responseEmitter,
         ?TransientStoreInterface $transientStore = null,
     ) {
         $this->repository = $repository;
+        $this->responseEmitter = $responseEmitter;
         $this->transientStore = $transientStore;
     }
 
@@ -75,8 +79,8 @@ class AuditLogCsvExporter
 
     protected function sendCsvHeaders(): void
     {
-        header('Content-Type: text/csv; charset=utf-8');
-        header('Content-Disposition: attachment; filename="audit-log-' . gmdate('Y-m-d') . '.csv"');
+        $this->responseEmitter->sendHeader('Content-Type: text/csv; charset=utf-8');
+        $this->responseEmitter->sendHeader('Content-Disposition: attachment; filename="audit-log-' . gmdate('Y-m-d') . '.csv"');
     }
 
     /**
