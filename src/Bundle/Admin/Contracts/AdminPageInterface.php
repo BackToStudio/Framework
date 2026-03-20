@@ -4,24 +4,9 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Bundle\Admin\Contracts;
 
-use BackTo\Framework\Contracts\HookInterface;
-
 /**
- * Represents an admin menu page to be registered.
+ * @deprecated Use BackTo\Framework\Contracts\AdminPageInterface instead.
  */
-interface AdminPageInterface extends HookInterface
+interface AdminPageInterface extends \BackTo\Framework\Contracts\AdminPageInterface
 {
-    public function getPageTitle(): string;
-
-    public function getMenuTitle(): string;
-
-    public function getCapability(): string;
-
-    public function getMenuSlug(): string;
-
-    public function getIconUrl(): string;
-
-    public function getPosition(): ?int;
-
-    public function render(): void;
 }

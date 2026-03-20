@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace BackTo\Framework\Bundle\Admin\Tests;
 
 use BackTo\Framework\Bundle\Admin\AdminPageRegistry;
-use BackTo\Framework\Bundle\Admin\Contracts\AdminPageInterface;
+use BackTo\Framework\Contracts\AdminPageInterface;
 use BackTo\Framework\Bundle\Admin\Contracts\AdminPageRegistrarInterface;
 use BackTo\Framework\Bundle\Admin\RegisterAdminPage;
 use BackTo\Framework\Contracts\AdminHooks;
