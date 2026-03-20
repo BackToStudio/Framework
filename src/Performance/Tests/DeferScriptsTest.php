@@ -5,37 +5,44 @@ declare(strict_types=1);
 namespace BackTo\Framework\Performance\Tests;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
+use BackTo\Framework\Contracts\QueryContextInterface;
 use BackTo\Framework\Performance\Hooks\DeferScripts;
 use PHPUnit\Framework\TestCase;
 
 class DeferScriptsTest extends TestCase
 {
+    private HookDispatcherInterface $dispatcher;
+    private QueryContextInterface $queryContext;
+
+    protected function setUp(): void
+    {
+        $this->dispatcher = $this->createMock(HookDispatcherInterface::class);
+        $this->queryContext = $this->createMock(QueryContextInterface::class);
+    }
+
     public function testHooksAreRegistered(): void
     {
-        $dispatcher = $this->createMock(HookDispatcherInterface::class);
-        $dispatcher->expects($this->exactly(3))
+        $this->dispatcher->expects($this->exactly(3))
             ->method('addFilter');
 
-        $hook = new DeferScripts($dispatcher);
+        $hook = new DeferScripts($this->dispatcher, $this->queryContext);
         $hook->hooks();
     }
 
     public function testHooksRegisteredWithoutQueryStringRemoval(): void
     {
-        $dispatcher = $this->createMock(HookDispatcherInterface::class);
-        $dispatcher->expects($this->once())
+        $this->dispatcher->expects($this->once())
             ->method('addFilter')
             ->with('script_loader_tag');
 
-        $hook = new DeferScripts($dispatcher, [], false);
+        $hook = new DeferScripts($this->dispatcher, $this->queryContext, [], false);
         $hook->hooks();
     }
 
     public function testAddDeferAttributeToScript(): void
     {
-        $dispatcher = $this->createMock(HookDispatcherInterface::class);
-        $dispatcher->method('isAdmin')->willReturn(false);
-        $hook = new DeferScripts($dispatcher);
+        $this->queryContext->method('isAdmin')->willReturn(false);
+        $hook = new DeferScripts($this->dispatcher, $this->queryContext);
 
         $tag = '<script src="https://example.com/script.js"></script>';
         $result = $hook->addDeferAttribute($tag, 'my-script');
@@ -45,8 +52,7 @@ class DeferScriptsTest extends TestCase
 
     public function testExcludesJqueryFromDefer(): void
     {
-        $dispatcher = $this->createMock(HookDispatcherInterface::class);
-        $hook = new DeferScripts($dispatcher);
+        $hook = new DeferScripts($this->dispatcher, $this->queryContext);
 
         $tag = '<script src="https://example.com/jquery.js"></script>';
         $result = $hook->addDeferAttribute($tag, 'jquery-core');
@@ -56,9 +62,8 @@ class DeferScriptsTest extends TestCase
 
     public function testDoesNotDoubleDeferAttribute(): void
     {
-        $dispatcher = $this->createMock(HookDispatcherInterface::class);
-        $dispatcher->method('isAdmin')->willReturn(false);
-        $hook = new DeferScripts($dispatcher);
+        $this->queryContext->method('isAdmin')->willReturn(false);
+        $hook = new DeferScripts($this->dispatcher, $this->queryContext);
 
         $tag = '<script defer src="https://example.com/script.js"></script>';
         $result = $hook->addDeferAttribute($tag, 'my-script');
@@ -68,9 +73,8 @@ class DeferScriptsTest extends TestCase
 
     public function testSkipsDeferOnAdmin(): void
     {
-        $dispatcher = $this->createMock(HookDispatcherInterface::class);
-        $dispatcher->method('isAdmin')->willReturn(true);
-        $hook = new DeferScripts($dispatcher);
+        $this->queryContext->method('isAdmin')->willReturn(true);
+        $hook = new DeferScripts($this->dispatcher, $this->queryContext);
 
         $tag = '<script src="https://example.com/script.js"></script>';
         $result = $hook->addDeferAttribute($tag, 'my-script');
@@ -80,9 +84,8 @@ class DeferScriptsTest extends TestCase
 
     public function testSkipsQueryStringRemovalOnAdmin(): void
     {
-        $dispatcher = $this->createMock(HookDispatcherInterface::class);
-        $dispatcher->method('isAdmin')->willReturn(true);
-        $hook = new DeferScripts($dispatcher);
+        $this->queryContext->method('isAdmin')->willReturn(true);
+        $hook = new DeferScripts($this->dispatcher, $this->queryContext);
 
         $src = 'https://example.com/style.css?ver=1.0';
         $result = $hook->removeVersionQueryString($src);

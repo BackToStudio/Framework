@@ -6,6 +6,7 @@ namespace BackTo\Framework\Performance\Hooks;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
+use BackTo\Framework\Contracts\QueryContextInterface;
 
 /**
  * Add defer attribute to enqueued scripts and remove version query strings.
@@ -16,19 +17,22 @@ use BackTo\Framework\Contracts\Hooks;
 final class DeferScripts implements Hooks
 {
     private readonly HookDispatcherInterface $hookDispatcher;
+    private readonly QueryContextInterface $queryContext;
 
     /** @var string[] Script handles to exclude from deferring */
     private readonly array $excludedHandles;
 
     private readonly bool $removeQueryStrings;
 
-    
+
     public function __construct(
         HookDispatcherInterface $hookDispatcher,
+        QueryContextInterface $queryContext,
         array $excludedHandles = ['jquery-core', 'jquery-migrate'],
         bool $removeQueryStrings = true
     ) {
         $this->hookDispatcher = $hookDispatcher;
+        $this->queryContext = $queryContext;
         $this->excludedHandles = $excludedHandles;
         $this->removeQueryStrings = $removeQueryStrings;
     }
@@ -52,7 +56,7 @@ final class DeferScripts implements Hooks
             return $tag;
         }
 
-        if ($this->hookDispatcher->isAdmin()) {
+        if ($this->queryContext->isAdmin()) {
             return $tag;
         }
 
@@ -68,7 +72,7 @@ final class DeferScripts implements Hooks
      */
     public function removeVersionQueryString(string $src): string
     {
-        if ($this->hookDispatcher->isAdmin()) {
+        if ($this->queryContext->isAdmin()) {
             return $src;
         }
 

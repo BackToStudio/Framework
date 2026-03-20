@@ -65,13 +65,14 @@ class ObservableHookDispatcherTest extends TestCase
         $this->dispatcher->addFilter('the_title', static fn ($t) => $t);
     }
 
-    public function testIsAdminDelegatesToInner(): void
+    public function testApplyFiltersDelegatesToInner(): void
     {
         $this->inner->expects($this->once())
-            ->method('isAdmin')
-            ->willReturn(true);
+            ->method('applyFilters')
+            ->with('my_filter', 'value', 'arg1')
+            ->willReturn('filtered');
 
-        $this->assertTrue($this->dispatcher->isAdmin());
+        $this->assertSame('filtered', $this->dispatcher->applyFilters('my_filter', 'value', 'arg1'));
     }
 
     public function testRegisterActivationHookLogs(): void

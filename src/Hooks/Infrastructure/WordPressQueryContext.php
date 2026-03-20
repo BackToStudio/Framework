@@ -8,6 +8,11 @@ use BackTo\Framework\Contracts\QueryContextInterface;
 
 class WordPressQueryContext implements QueryContextInterface
 {
+    public function isAdmin(): bool
+    {
+        return function_exists('is_admin') && \is_admin();
+    }
+
     public function is404(): bool
     {
         return function_exists('is_404') && \is_404();

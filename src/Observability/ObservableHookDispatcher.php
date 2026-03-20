@@ -60,9 +60,9 @@ final class ObservableHookDispatcher implements HookDispatcherInterface
         $this->inner->removeFilter($hookName, $callback, $priority);
     }
 
-    public function isAdmin(): bool
+    public function applyFilters(string $hookName, mixed $value, mixed ...$args): mixed
     {
-        return $this->inner->isAdmin();
+        return $this->inner->applyFilters($hookName, $value, ...$args);
     }
 
     public function registerActivationHook(string $file, callable $callback): void

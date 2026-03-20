@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Performance\Tests;
 
-use BackTo\Framework\Contracts\HookDispatcherInterface;
+use BackTo\Framework\Contracts\QueryContextInterface;
 use BackTo\Framework\Contracts\RequestContextInterface;
 use BackTo\Framework\Contracts\UserContextInterface;
 use BackTo\Framework\Performance\CacheableRequestChecker;
@@ -13,13 +13,13 @@ use PHPUnit\Framework\TestCase;
 class CacheableRequestCheckerTest extends TestCase
 {
     private RequestContextInterface $requestContext;
-    private HookDispatcherInterface $hookDispatcher;
+    private QueryContextInterface $queryContext;
     private UserContextInterface $userContext;
 
     protected function setUp(): void
     {
         $this->requestContext = $this->createMock(RequestContextInterface::class);
-        $this->hookDispatcher = $this->createMock(HookDispatcherInterface::class);
+        $this->queryContext = $this->createMock(QueryContextInterface::class);
         $this->userContext = $this->createMock(UserContextInterface::class);
     }
 
@@ -28,7 +28,7 @@ class CacheableRequestCheckerTest extends TestCase
         if ($excludedPrefixes !== null) {
             return new CacheableRequestChecker(
                 $this->requestContext,
-                $this->hookDispatcher,
+                $this->queryContext,
                 $this->userContext,
                 $excludedPrefixes,
             );
@@ -36,21 +36,21 @@ class CacheableRequestCheckerTest extends TestCase
 
         return new CacheableRequestChecker(
             $this->requestContext,
-            $this->hookDispatcher,
+            $this->queryContext,
             $this->userContext,
         );
     }
 
     public function testReturnsFalseForAdminRequests(): void
     {
-        $this->hookDispatcher->method('isAdmin')->willReturn(true);
+        $this->queryContext->method('isAdmin')->willReturn(true);
 
         $this->assertFalse($this->createChecker()->isCacheable());
     }
 
     public function testReturnsFalseForNonGetRequests(): void
     {
-        $this->hookDispatcher->method('isAdmin')->willReturn(false);
+        $this->queryContext->method('isAdmin')->willReturn(false);
         $this->requestContext->method('getMethod')->willReturn('POST');
 
         $this->assertFalse($this->createChecker()->isCacheable());
@@ -58,7 +58,7 @@ class CacheableRequestCheckerTest extends TestCase
 
     public function testReturnsFalseForLoggedInUsers(): void
     {
-        $this->hookDispatcher->method('isAdmin')->willReturn(false);
+        $this->queryContext->method('isAdmin')->willReturn(false);
         $this->requestContext->method('getMethod')->willReturn('GET');
         $this->userContext->method('isLoggedIn')->willReturn(true);
 
@@ -67,7 +67,7 @@ class CacheableRequestCheckerTest extends TestCase
 
     public function testReturnsFalseWhenQueryParamsPresent(): void
     {
-        $this->hookDispatcher->method('isAdmin')->willReturn(false);
+        $this->queryContext->method('isAdmin')->willReturn(false);
         $this->requestContext->method('getMethod')->willReturn('GET');
         $this->userContext->method('isLoggedIn')->willReturn(false);
         $this->requestContext->method('hasQueryParams')->willReturn(true);
@@ -77,7 +77,7 @@ class CacheableRequestCheckerTest extends TestCase
 
     public function testReturnsFalseForExcludedPrefixes(): void
     {
-        $this->hookDispatcher->method('isAdmin')->willReturn(false);
+        $this->queryContext->method('isAdmin')->willReturn(false);
         $this->requestContext->method('getMethod')->willReturn('GET');
         $this->userContext->method('isLoggedIn')->willReturn(false);
         $this->requestContext->method('hasQueryParams')->willReturn(false);
@@ -88,7 +88,7 @@ class CacheableRequestCheckerTest extends TestCase
 
     public function testReturnsTrueForCacheableRequest(): void
     {
-        $this->hookDispatcher->method('isAdmin')->willReturn(false);
+        $this->queryContext->method('isAdmin')->willReturn(false);
         $this->requestContext->method('getMethod')->willReturn('GET');
         $this->userContext->method('isLoggedIn')->willReturn(false);
         $this->requestContext->method('hasQueryParams')->willReturn(false);
@@ -99,7 +99,7 @@ class CacheableRequestCheckerTest extends TestCase
 
     public function testCustomExcludedPrefixes(): void
     {
-        $this->hookDispatcher->method('isAdmin')->willReturn(false);
+        $this->queryContext->method('isAdmin')->willReturn(false);
         $this->requestContext->method('getMethod')->willReturn('GET');
         $this->userContext->method('isLoggedIn')->willReturn(false);
         $this->requestContext->method('hasQueryParams')->willReturn(false);

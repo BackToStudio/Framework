@@ -6,6 +6,7 @@ namespace BackTo\Framework\Performance\Hooks;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
+use BackTo\Framework\Contracts\QueryContextInterface;
 use BackTo\Framework\Performance\Css\CssRuleFilter;
 use BackTo\Framework\Performance\Css\HtmlSelectorExtractor;
 
@@ -26,6 +27,7 @@ use BackTo\Framework\Performance\Css\HtmlSelectorExtractor;
 final class RemoveUnusedCss implements Hooks
 {
     private readonly HookDispatcherInterface $hookDispatcher;
+    private readonly QueryContextInterface $queryContext;
     private readonly bool $enabled;
 
     /** @var string[] CSS block IDs to never touch */
@@ -36,10 +38,12 @@ final class RemoveUnusedCss implements Hooks
      */
     public function __construct(
         HookDispatcherInterface $hookDispatcher,
+        QueryContextInterface $queryContext,
         bool $enabled = false,
         array $preserveIds = ['global-styles-inline-css']
     ) {
         $this->hookDispatcher = $hookDispatcher;
+        $this->queryContext = $queryContext;
         $this->enabled = $enabled;
         $this->preserveIds = $preserveIds;
     }
@@ -56,7 +60,7 @@ final class RemoveUnusedCss implements Hooks
 
     public function startBuffering(): void
     {
-        if ($this->hookDispatcher->isAdmin()) {
+        if ($this->queryContext->isAdmin()) {
             return;
         }
 

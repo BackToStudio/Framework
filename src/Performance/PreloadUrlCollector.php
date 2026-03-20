@@ -6,6 +6,7 @@ namespace BackTo\Framework\Performance;
 
 use BackTo\Framework\Contracts\ContentQueryInterface;
 use BackTo\Framework\Contracts\SiteContextInterface;
+use BackTo\Framework\Options\Contracts\OptionsRepositoryInterface;
 
 /**
  * Collects URLs that need to be preloaded for cache warming.
@@ -17,15 +18,18 @@ class PreloadUrlCollector
 {
     private readonly ContentQueryInterface $contentQuery;
     private readonly SiteContextInterface $siteContext;
+    private readonly OptionsRepositoryInterface $options;
     private readonly int $batchSize;
 
     public function __construct(
         ContentQueryInterface $contentQuery,
         SiteContextInterface $siteContext,
+        OptionsRepositoryInterface $options,
         int $batchSize = 50,
     ) {
         $this->contentQuery = $contentQuery;
         $this->siteContext = $siteContext;
+        $this->options = $options;
         $this->batchSize = $batchSize;
     }
 
@@ -117,7 +121,7 @@ class PreloadUrlCollector
     /** @return string[] */
     private function collectBlogPageUrl(): array
     {
-        $blogPageId = (int) $this->contentQuery->getOption('page_for_posts');
+        $blogPageId = (int) $this->options->get('page_for_posts', 0);
 
         if ($blogPageId <= 0) {
             return [];

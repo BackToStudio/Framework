@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Performance;
 
-use BackTo\Framework\Contracts\HookDispatcherInterface;
+use BackTo\Framework\Contracts\QueryContextInterface;
 use BackTo\Framework\Contracts\RequestContextInterface;
 use BackTo\Framework\Contracts\UserContextInterface;
 
@@ -20,7 +20,7 @@ use BackTo\Framework\Contracts\UserContextInterface;
 class CacheableRequestChecker
 {
     private readonly RequestContextInterface $requestContext;
-    private readonly HookDispatcherInterface $hookDispatcher;
+    private readonly QueryContextInterface $queryContext;
     private readonly UserContextInterface $userContext;
 
     /** @var string[] */
@@ -31,19 +31,19 @@ class CacheableRequestChecker
      */
     public function __construct(
         RequestContextInterface $requestContext,
-        HookDispatcherInterface $hookDispatcher,
+        QueryContextInterface $queryContext,
         UserContextInterface $userContext,
         array $excludedPrefixes = ['/wp-admin', '/wp-json', '/wp-login.php', '/wp-cron.php', '/xmlrpc.php']
     ) {
         $this->requestContext = $requestContext;
-        $this->hookDispatcher = $hookDispatcher;
+        $this->queryContext = $queryContext;
         $this->userContext = $userContext;
         $this->excludedPrefixes = $excludedPrefixes;
     }
 
     public function isCacheable(): bool
     {
-        if ($this->hookDispatcher->isAdmin()) {
+        if ($this->queryContext->isAdmin()) {
             return false;
         }
 

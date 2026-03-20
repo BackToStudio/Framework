@@ -30,11 +30,6 @@ final class WordPressContentQuery implements ContentQueryInterface
         return \get_post_type($postId);
     }
 
-    public function getOption(string $option, mixed $default = false): mixed
-    {
-        return \get_option($option, $default);
-    }
-
     public function getComment(int $commentId): ?object
     {
         $comment = \get_comment($commentId);

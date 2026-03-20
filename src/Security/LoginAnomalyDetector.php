@@ -7,7 +7,6 @@ namespace BackTo\Framework\Security;
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
 use BackTo\Framework\Contracts\RequestContextInterface;
-use BackTo\Framework\Contracts\SiteContextInterface;
 use BackTo\Framework\Observability\Contracts\LoggerInterface;
 use BackTo\Framework\Security\Contracts\ClientIpResolverInterface;
 use BackTo\Framework\Security\Contracts\LoginLocationRepositoryInterface;
@@ -32,7 +31,6 @@ class LoginAnomalyDetector implements Hooks, SecurityRuleInterface
     private readonly LoggerInterface $logger;
     private readonly RequestContextInterface $requestContext;
     private readonly ClientIpResolverInterface $ipResolver;
-    private readonly SiteContextInterface $siteContext;
 
     /** @var int Max seconds between logins from different countries to flag impossible travel */
     private const IMPOSSIBLE_TRAVEL_THRESHOLD = 3600; // 1 hour
@@ -43,14 +41,12 @@ class LoginAnomalyDetector implements Hooks, SecurityRuleInterface
         LoggerInterface $logger,
         RequestContextInterface $requestContext,
         ClientIpResolverInterface $ipResolver,
-        SiteContextInterface $siteContext,
     ) {
         $this->hookDispatcher = $hookDispatcher;
         $this->repository = $repository;
         $this->logger = $logger;
         $this->requestContext = $requestContext;
         $this->ipResolver = $ipResolver;
-        $this->siteContext = $siteContext;
     }
 
     public function getName(): string
@@ -164,7 +160,7 @@ class LoginAnomalyDetector implements Hooks, SecurityRuleInterface
     {
         $remoteAddr = $this->requestContext->server('REMOTE_ADDR', '0.0.0.0');
         /** @var string[] $trustedProxies */
-        $trustedProxies = $this->siteContext->applyFilters('backto_trusted_proxies', []);
+        $trustedProxies = $this->hookDispatcher->applyFilters('backto_trusted_proxies', []);
 
         $isTrustedProxy = $trustedProxies !== [] && in_array($remoteAddr, $trustedProxies, true);
 

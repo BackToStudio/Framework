@@ -6,6 +6,7 @@ namespace BackTo\Framework\Performance\Tests;
 
 use BackTo\Framework\Contracts\ContentQueryInterface;
 use BackTo\Framework\Contracts\SiteContextInterface;
+use BackTo\Framework\Options\Contracts\OptionsRepositoryInterface;
 use BackTo\Framework\Performance\PreloadUrlCollector;
 use PHPUnit\Framework\TestCase;
 
@@ -13,22 +14,24 @@ class PreloadUrlCollectorTest extends TestCase
 {
     private ContentQueryInterface $contentQuery;
     private SiteContextInterface $siteContext;
+    private OptionsRepositoryInterface $options;
 
     protected function setUp(): void
     {
         $this->contentQuery = $this->createMock(ContentQueryInterface::class);
         $this->siteContext = $this->createMock(SiteContextInterface::class);
         $this->siteContext->method('getHomeUrl')->willReturn('https://example.com');
+        $this->options = $this->createMock(OptionsRepositoryInterface::class);
     }
 
     private function createCollector(int $batchSize = 50): PreloadUrlCollector
     {
-        return new PreloadUrlCollector($this->contentQuery, $this->siteContext, $batchSize);
+        return new PreloadUrlCollector($this->contentQuery, $this->siteContext, $this->options, $batchSize);
     }
 
     public function testGetSiteUrlsIncludesHomeUrl(): void
     {
-        $this->contentQuery->method('getOption')->willReturn(0);
+        $this->options->method('get')->willReturn(0);
         $this->contentQuery->method('getPosts')->willReturn([]);
         $this->contentQuery->method('getCategories')->willReturn([]);
         $this->contentQuery->method('getTags')->willReturn([]);
@@ -43,7 +46,7 @@ class PreloadUrlCollectorTest extends TestCase
         $post = new \stdClass();
         $post->ID = 1;
 
-        $this->contentQuery->method('getOption')->willReturn(0);
+        $this->options->method('get')->willReturn(0);
         $this->contentQuery->method('getPosts')->willReturnCallback(function (array $args) use ($post) {
             if ($args['post_type'] === 'post') {
                 return [$post];
@@ -68,7 +71,7 @@ class PreloadUrlCollectorTest extends TestCase
             $posts[] = $post;
         }
 
-        $this->contentQuery->method('getOption')->willReturn(0);
+        $this->options->method('get')->willReturn(0);
         $this->contentQuery->method('getPosts')->willReturn($posts);
         $this->contentQuery->method('getPermalink')->willReturnCallback(fn ($id) => "https://example.com/post-{$id}");
         $this->contentQuery->method('getCategories')->willReturn([]);
@@ -89,7 +92,7 @@ class PreloadUrlCollectorTest extends TestCase
         $this->contentQuery->method('getPostType')->with(42)->willReturn('post');
         $this->contentQuery->method('getPost')->with(42)->willReturn($post);
         $this->contentQuery->method('getPermalink')->willReturn('https://example.com/my-post');
-        $this->contentQuery->method('getOption')->willReturn(0);
+        $this->options->method('get')->willReturn(0);
         $this->contentQuery->method('getPostTypeArchiveLink')->willReturn(false);
         $this->contentQuery->method('getObjectTaxonomies')->willReturn([]);
         $this->contentQuery->method('getPostTerms')->willReturn([]);

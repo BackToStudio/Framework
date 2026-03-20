@@ -6,6 +6,7 @@ namespace BackTo\Framework\Security\Tests;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
+use BackTo\Framework\Contracts\QueryContextInterface;
 use BackTo\Framework\Contracts\RequestContextInterface;
 use BackTo\Framework\Contracts\ResponseEmitterInterface;
 use BackTo\Framework\Contracts\UserContextInterface;
@@ -37,7 +38,7 @@ class DisableUserEnumerationTest extends TestCase
     {
         $dispatcher = $this->createMock(HookDispatcherInterface::class);
         $requestContext = $this->createMock(RequestContextInterface::class);
-        $rule = new DisableUserEnumeration($dispatcher, $requestContext, $this->createMock(ResponseEmitterInterface::class), $this->createMock(UserContextInterface::class));
+        $rule = new DisableUserEnumeration($dispatcher, $this->createMock(QueryContextInterface::class), $requestContext, $this->createMock(ResponseEmitterInterface::class), $this->createMock(UserContextInterface::class));
 
         $this->assertInstanceOf(Hooks::class, $rule);
         $this->assertInstanceOf(SecurityRuleInterface::class, $rule);
@@ -47,7 +48,7 @@ class DisableUserEnumerationTest extends TestCase
     {
         $dispatcher = $this->createMock(HookDispatcherInterface::class);
         $requestContext = $this->createMock(RequestContextInterface::class);
-        $rule = new DisableUserEnumeration($dispatcher, $requestContext, $this->createMock(ResponseEmitterInterface::class), $this->createMock(UserContextInterface::class));
+        $rule = new DisableUserEnumeration($dispatcher, $this->createMock(QueryContextInterface::class), $requestContext, $this->createMock(ResponseEmitterInterface::class), $this->createMock(UserContextInterface::class));
 
         $this->assertSame('disable_user_enumeration', $rule->getName());
     }
@@ -65,7 +66,7 @@ class DisableUserEnumerationTest extends TestCase
             ->with('rest_endpoints', $this->anything());
 
         $requestContext = $this->createMock(RequestContextInterface::class);
-        $rule = new DisableUserEnumeration($dispatcher, $requestContext, $this->createMock(ResponseEmitterInterface::class), $this->createMock(UserContextInterface::class));
+        $rule = new DisableUserEnumeration($dispatcher, $this->createMock(QueryContextInterface::class), $requestContext, $this->createMock(ResponseEmitterInterface::class), $this->createMock(UserContextInterface::class));
         $rule->hooks();
     }
 
@@ -73,7 +74,7 @@ class DisableUserEnumerationTest extends TestCase
     {
         $dispatcher = $this->createMock(HookDispatcherInterface::class);
         $requestContext = $this->createMock(RequestContextInterface::class);
-        $rule = new TestableDisableUserEnumeration($dispatcher, $requestContext, $this->createMock(ResponseEmitterInterface::class), $this->createMock(UserContextInterface::class));
+        $rule = new TestableDisableUserEnumeration($dispatcher, $this->createMock(QueryContextInterface::class), $requestContext, $this->createMock(ResponseEmitterInterface::class), $this->createMock(UserContextInterface::class));
         $rule->setUserLoggedIn(false);
 
         $endpoints = [
@@ -95,7 +96,7 @@ class DisableUserEnumerationTest extends TestCase
     {
         $dispatcher = $this->createMock(HookDispatcherInterface::class);
         $requestContext = $this->createMock(RequestContextInterface::class);
-        $rule = new TestableDisableUserEnumeration($dispatcher, $requestContext, $this->createMock(ResponseEmitterInterface::class), $this->createMock(UserContextInterface::class));
+        $rule = new TestableDisableUserEnumeration($dispatcher, $this->createMock(QueryContextInterface::class), $requestContext, $this->createMock(ResponseEmitterInterface::class), $this->createMock(UserContextInterface::class));
         $rule->setUserLoggedIn(true);
 
         $endpoints = [

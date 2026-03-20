@@ -24,8 +24,6 @@ interface ContentQueryInterface
 
     public function getPostType(int $postId): string|false;
 
-    public function getOption(string $option, mixed $default = false): mixed;
-
     public function getComment(int $commentId): ?object;
 
     public function getTheDate(string $format, ?object $post = null): string;

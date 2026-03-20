@@ -6,6 +6,7 @@ namespace BackTo\Framework\Performance\Hooks;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
+use BackTo\Framework\Contracts\QueryContextInterface;
 use BackTo\Framework\Contracts\ScriptManagerInterface;
 
 /**
@@ -17,17 +18,20 @@ use BackTo\Framework\Contracts\ScriptManagerInterface;
 final class DisableHeartbeat implements Hooks
 {
     private readonly HookDispatcherInterface $hookDispatcher;
+    private readonly QueryContextInterface $queryContext;
     private readonly ScriptManagerInterface $scriptManager;
     private readonly bool $disableFrontend;
     private readonly int $adminInterval;
 
     public function __construct(
         HookDispatcherInterface $hookDispatcher,
+        QueryContextInterface $queryContext,
         ScriptManagerInterface $scriptManager,
         bool $disableFrontend = true,
         int $adminInterval = 60
     ) {
         $this->hookDispatcher = $hookDispatcher;
+        $this->queryContext = $queryContext;
         $this->scriptManager = $scriptManager;
         $this->disableFrontend = $disableFrontend;
         $this->adminInterval = $adminInterval;
@@ -44,7 +48,7 @@ final class DisableHeartbeat implements Hooks
 
     public function deregisterHeartbeatOnFrontend(): void
     {
-        if (!$this->hookDispatcher->isAdmin()) {
+        if (!$this->queryContext->isAdmin()) {
             $this->scriptManager->deregisterScript('heartbeat');
         }
     }

@@ -90,16 +90,13 @@ class WordPressHookDispatcherTest extends TestCase
         $this->assertSame(10, $removed['priority']);
     }
 
-    public function testIsAdminReturnsFalseByDefault(): void
+    public function testApplyFiltersDelegatesToWordPress(): void
     {
-        $GLOBALS['_wp_is_admin'] = false;
-        $this->assertFalse($this->dispatcher->isAdmin());
-    }
+        $result = $this->dispatcher->applyFilters('my_filter', 'original', 'arg1');
 
-    public function testIsAdminReturnsTrueWhenInAdminContext(): void
-    {
-        $GLOBALS['_wp_is_admin'] = true;
-        $this->assertTrue($this->dispatcher->isAdmin());
+        $this->assertSame('original', $result);
+        $this->assertCount(1, $GLOBALS['_wp_hooks']['apply_filters']);
+        $this->assertSame('my_filter', $GLOBALS['_wp_hooks']['apply_filters'][0]['hook']);
     }
 
     public function testRegisterActivationHook(): void

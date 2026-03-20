@@ -8,7 +8,6 @@ use BackTo\Framework\Contracts\HookDispatcherInterface;
 
 use function add_action;
 use function add_filter;
-use function is_admin;
 use function register_activation_hook;
 use function register_deactivation_hook;
 use function remove_action;
@@ -44,9 +43,9 @@ final class WordPressHookDispatcher implements HookDispatcherInterface
         \do_action($hookName, ...$args);
     }
 
-    public function isAdmin(): bool
+    public function applyFilters(string $hookName, mixed $value, mixed ...$args): mixed
     {
-        return is_admin();
+        return \apply_filters($hookName, $value, ...$args);
     }
 
     public function registerActivationHook(string $file, callable $callback): void

@@ -26,15 +26,6 @@ final class WordPressSiteContext implements SiteContextInterface
         return function_exists('rest_get_url_prefix') ? rest_get_url_prefix() : 'wp-json';
     }
 
-    public function applyFilters(string $hookName, mixed $value, mixed ...$args): mixed
-    {
-        if (function_exists('apply_filters')) {
-            return \apply_filters($hookName, $value, ...$args);
-        }
-
-        return $value;
-    }
-
     public function getBlogInfo(string $show): string
     {
         return function_exists('get_bloginfo') ? \get_bloginfo($show) : '';

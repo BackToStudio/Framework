@@ -12,6 +12,8 @@ namespace BackTo\Framework\Contracts;
  */
 interface QueryContextInterface
 {
+    public function isAdmin(): bool;
+
     public function is404(): bool;
 
     public function isSearch(): bool;

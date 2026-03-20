@@ -6,6 +6,7 @@ namespace BackTo\Framework\Security;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
+use BackTo\Framework\Contracts\QueryContextInterface;
 use BackTo\Framework\Contracts\RequestContextInterface;
 use BackTo\Framework\Contracts\ResponseEmitterInterface;
 use BackTo\Framework\Contracts\UserContextInterface;
@@ -14,17 +15,20 @@ use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
 class DisableUserEnumeration implements Hooks, SecurityRuleInterface
 {
     private readonly HookDispatcherInterface $hookDispatcher;
+    private readonly QueryContextInterface $queryContext;
     private readonly RequestContextInterface $requestContext;
     private readonly ResponseEmitterInterface $responseEmitter;
     private readonly UserContextInterface $userContext;
 
     public function __construct(
         HookDispatcherInterface $hookDispatcher,
+        QueryContextInterface $queryContext,
         RequestContextInterface $requestContext,
         ResponseEmitterInterface $responseEmitter,
         UserContextInterface $userContext,
     ) {
         $this->hookDispatcher = $hookDispatcher;
+        $this->queryContext = $queryContext;
         $this->requestContext = $requestContext;
         $this->responseEmitter = $responseEmitter;
         $this->userContext = $userContext;
@@ -43,7 +47,7 @@ class DisableUserEnumeration implements Hooks, SecurityRuleInterface
 
     public function blockAuthorQuery(): void
     {
-        if ($this->hookDispatcher->isAdmin()) {
+        if ($this->queryContext->isAdmin()) {
             return;
         }
 
