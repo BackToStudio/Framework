@@ -14,12 +14,12 @@ return function (ContainerConfigurator $configurator) {
              ->exclude('../../../Assets/{DependencyInjection,Entity,Tests,Contracts}');
     $services->load('BackTo\\Framework\\Hooks\\', '../../../Hooks/*')
              ->exclude('../../../Hooks/{DependencyInjection,Entity,Tests,Contracts}');
-    $services->load('BackTo\\Framework\\Blocks\\', '../../../Blocks/*')
-             ->exclude('../../../Blocks/{DependencyInjection,Entity,Tests,Contracts}');
+    $services->load('BackTo\\Framework\\Bundle\\Blocks\\', '../../../Bundle/Blocks/*')
+             ->exclude('../../../Bundle/Blocks/{DependencyInjection,Entity,Tests,Contracts}');
     $services->load('BackTo\\Framework\\PostType\\', '../../../PostType/*')
              ->exclude('../../../PostType/{DependencyInjection,Entity,Tests,Contracts}');
     $services->load('BackTo\\Framework\\Taxonomy\\', '../../../Taxonomy/*')
              ->exclude('../../../Taxonomy/{DependencyInjection,Entity,Tests,Contracts}');
-    $services->load('BackTo\\Framework\\Gdpr\\', '../../../Gdpr/*')
-             ->exclude('../../../Gdpr/{DependencyInjection,Entity,Tests,Contracts}');
+    $services->load('BackTo\\Framework\\Bundle\\Gdpr\\', '../../../Bundle/Gdpr/*')
+             ->exclude('../../../Bundle/Gdpr/{DependencyInjection,Entity,Tests,Contracts}');
 };

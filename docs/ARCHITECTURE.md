@@ -11,32 +11,42 @@ Ce document décrit l'architecture en couches du framework et les relations entr
 Le framework est organisé en **trois couches** qui suivent le principe de dépendance inversée : les couches hautes dépendent des couches basses, jamais l'inverse.
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│                    APPLICATION MODULES                   │
-│                                                         │
-│   Security    Performance    Seo    Admin    Theme       │
-│   Gdpr        Plugin         Blocks                     │
-│                                                         │
-│   Logique métier WordPress. Dépendent du Foundation     │
-│   et entre eux selon les besoins.                       │
-├─────────────────────────────────────────────────────────┤
-│                    DOMAIN SERVICES                       │
-│                                                         │
-│   PostType    Taxonomy    PostMeta    RestApi    Queue   │
-│   Assets      Options     Observability                 │
-│                                                         │
-│   Abstractions métier réutilisables. Dépendent          │
-│   uniquement du Foundation.                             │
-├─────────────────────────────────────────────────────────┤
-│                      FOUNDATION                         │
-│                                                         │
-│   Contracts    Http     Cache     Clock    Exception    │
-│   Hooks        Compose  Query     Cli                   │
-│                                                         │
-│   Infrastructure bas niveau, PSR-compliant.             │
-│   Zéro logique métier WordPress.                        │
-└─────────────────────────────────────────────────────────┘
+src/
+├── Bundle/                        ← APPLICATION BUNDLES
+│   ├── Admin/                       (BackTo\Framework\Bundle\Admin)
+│   ├── Blocks/                      (BackTo\Framework\Bundle\Blocks)
+│   ├── Gdpr/                        (BackTo\Framework\Bundle\Gdpr)
+│   ├── Performance/                 (BackTo\Framework\Bundle\Performance)
+│   ├── Plugin/                      (BackTo\Framework\Bundle\Plugin)
+│   ├── Security/                    (BackTo\Framework\Bundle\Security)
+│   ├── Seo/                         (BackTo\Framework\Bundle\Seo)
+│   └── Theme/                       (BackTo\Framework\Bundle\Theme)
+│
+├── (Domain Services)              ← DOMAIN SERVICES
+│   ├── Assets/                      (BackTo\Framework\Assets)
+│   ├── Observability/               (BackTo\Framework\Observability)
+│   ├── Options/                     (BackTo\Framework\Options)
+│   ├── PostMeta/                    (BackTo\Framework\PostMeta)
+│   ├── PostType/                    (BackTo\Framework\PostType)
+│   ├── Queue/                       (BackTo\Framework\Queue)
+│   ├── RestApi/                     (BackTo\Framework\RestApi)
+│   └── Taxonomy/                    (BackTo\Framework\Taxonomy)
+│
+└── (Foundation)                   ← FOUNDATION
+    ├── Cache/                       (BackTo\Framework\Cache)
+    ├── Cli/                         (BackTo\Framework\Cli)
+    ├── Clock/                       (BackTo\Framework\Clock)
+    ├── Compose/                     (BackTo\Framework\Compose)
+    ├── Contracts/                   (BackTo\Framework\Contracts)
+    ├── Exception/                   (BackTo\Framework\Exception)
+    ├── Hooks/                       (BackTo\Framework\Hooks)
+    ├── Http/                        (BackTo\Framework\Http)
+    └── Query/                       (BackTo\Framework\Query)
 ```
+
+Les bundles applicatifs vivent dans `src/Bundle/` (namespace `BackTo\Framework\Bundle\*`),
+à la manière des Symfony Bundles. Les couches Foundation et Domain Services restent
+à la racine de `src/` (namespace `BackTo\Framework\*`).
 
 ---
 

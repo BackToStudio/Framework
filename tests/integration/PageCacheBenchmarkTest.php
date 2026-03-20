@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Tests\Integration;
 
-use BackTo\Framework\Performance\Infrastructure\WordPressHtmlOptimizer;
-use BackTo\Framework\Performance\Infrastructure\WordPressPageCache;
+use BackTo\Framework\Bundle\Performance\Infrastructure\WordPressHtmlOptimizer;
+use BackTo\Framework\Bundle\Performance\Infrastructure\WordPressPageCache;
 use PHPUnit\Framework\TestCase;
 
 /**

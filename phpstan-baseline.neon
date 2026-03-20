@@ -1,46 +1,652 @@
 parameters:
 	ignoreErrors:
 		-
-			message: '#^Method BackTo\\Framework\\Admin\\AdminExtension\:\:getBundle\(\) never returns null so it can be removed from the return type\.$#'
-			identifier: return.unusedType
-			count: 1
-			path: src/Admin/AdminExtension.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Admin\\AdminPageRegistry\:\:getPages\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Admin/AdminPageRegistry.php
-
-		-
 			message: '#^Method BackTo\\Framework\\Assets\\AssetsExtension\:\:getBundle\(\) never returns null so it can be removed from the return type\.$#'
 			identifier: return.unusedType
 			count: 1
 			path: src/Assets/AssetsExtension.php
 
 		-
-			message: '#^Method BackTo\\Framework\\Blocks\\BlockRegistry\:\:getBlocks\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Blocks/BlockRegistry.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Blocks\\BlockStyleRegistry\:\:getBlockStyles\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Blocks/BlockStyleRegistry.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Blocks\\BlocksExtension\:\:getBundle\(\) never returns null so it can be removed from the return type\.$#'
+			message: '#^Method BackTo\\Framework\\Bundle\\Admin\\AdminExtension\:\:getBundle\(\) never returns null so it can be removed from the return type\.$#'
 			identifier: return.unusedType
 			count: 1
-			path: src/Blocks/BlocksExtension.php
+			path: src/Bundle/Admin/AdminExtension.php
 
 		-
-			message: '#^Method BackTo\\Framework\\Blocks\\CustomBlockStyle\:\:getBlocks\(\) return type has no value type specified in iterable type array\.$#'
+			message: '#^Method BackTo\\Framework\\Bundle\\Admin\\AdminPageRegistry\:\:getPages\(\) return type has no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
-			path: src/Blocks/CustomBlockStyle.php
+			path: src/Bundle/Admin/AdminPageRegistry.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Bundle\\Blocks\\BlockRegistry\:\:getBlocks\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bundle/Blocks/BlockRegistry.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Bundle\\Blocks\\BlockStyleRegistry\:\:getBlockStyles\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bundle/Blocks/BlockStyleRegistry.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Bundle\\Blocks\\BlocksExtension\:\:getBundle\(\) never returns null so it can be removed from the return type\.$#'
+			identifier: return.unusedType
+			count: 1
+			path: src/Bundle/Blocks/BlocksExtension.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Bundle\\Blocks\\CustomBlockStyle\:\:getBlocks\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bundle/Blocks/CustomBlockStyle.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Bundle\\Gdpr\\ConsentCategoryRegistry\:\:getCategories\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bundle/Gdpr/ConsentCategoryRegistry.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Bundle\\Gdpr\\Contracts\\ConsentCategoryRegistryInterface\:\:getCategories\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bundle/Gdpr/Contracts/ConsentCategoryRegistryInterface.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Bundle\\Gdpr\\Contracts\\TrackingScriptRegistryInterface\:\:getScripts\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bundle/Gdpr/Contracts/TrackingScriptRegistryInterface.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Bundle\\Gdpr\\Contracts\\TrackingScriptRegistryInterface\:\:getScriptsByCategory\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bundle/Gdpr/Contracts/TrackingScriptRegistryInterface.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Bundle\\Gdpr\\GdprExtension\:\:getBundle\(\) never returns null so it can be removed from the return type\.$#'
+			identifier: return.unusedType
+			count: 1
+			path: src/Bundle/Gdpr/GdprExtension.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Bundle\\Gdpr\\TrackingScriptRegistry\:\:getScripts\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bundle/Gdpr/TrackingScriptRegistry.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Bundle\\Gdpr\\TrackingScriptRegistry\:\:getScriptsByCategory\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bundle/Gdpr/TrackingScriptRegistry.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Bundle\\Performance\\Hooks\\DeferScripts\:\:__construct\(\) has parameter \$excludedHandles with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bundle/Performance/Hooks/DeferScripts.php
+
+		-
+			message: '#^Access to an undefined property object\:\:\$comment_post_ID\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Bundle/Performance/Hooks/InvalidatePageCache.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Bundle\\Performance\\Hooks\\InvalidatePageCache\:\:onPostStatusChange\(\) has parameter \$post with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: src/Bundle/Performance/Hooks/InvalidatePageCache.php
+
+		-
+			message: '#^Access to an undefined property object\:\:\$ID\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Bundle/Performance/Hooks/PreloadPageCache.php
+
+		-
+			message: '#^Access to an undefined property object\:\:\$post_status\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Bundle/Performance/Hooks/PreloadPageCache.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Bundle\\Performance\\Infrastructure\\WordPressDatabaseOptimizer\:\:deleteAutoDrafts\(\) has parameter \$wpdb with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: src/Bundle/Performance/Infrastructure/WordPressDatabaseOptimizer.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Bundle\\Performance\\Infrastructure\\WordPressDatabaseOptimizer\:\:deleteExcessRevisions\(\) has parameter \$wpdb with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: src/Bundle/Performance/Infrastructure/WordPressDatabaseOptimizer.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Bundle\\Performance\\Infrastructure\\WordPressDatabaseOptimizer\:\:deleteExpiredTransients\(\) has parameter \$wpdb with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: src/Bundle/Performance/Infrastructure/WordPressDatabaseOptimizer.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Bundle\\Performance\\Infrastructure\\WordPressDatabaseOptimizer\:\:deleteOrphanedCommentMeta\(\) has parameter \$wpdb with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: src/Bundle/Performance/Infrastructure/WordPressDatabaseOptimizer.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Bundle\\Performance\\Infrastructure\\WordPressDatabaseOptimizer\:\:deleteOrphanedPostMeta\(\) has parameter \$wpdb with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: src/Bundle/Performance/Infrastructure/WordPressDatabaseOptimizer.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Bundle\\Performance\\Infrastructure\\WordPressDatabaseOptimizer\:\:deleteSpamComments\(\) has parameter \$wpdb with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: src/Bundle/Performance/Infrastructure/WordPressDatabaseOptimizer.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Bundle\\Performance\\Infrastructure\\WordPressDatabaseOptimizer\:\:deleteTrashedComments\(\) has parameter \$wpdb with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: src/Bundle/Performance/Infrastructure/WordPressDatabaseOptimizer.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Bundle\\Performance\\Infrastructure\\WordPressDatabaseOptimizer\:\:deleteTrashedPosts\(\) has parameter \$wpdb with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: src/Bundle/Performance/Infrastructure/WordPressDatabaseOptimizer.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Bundle\\Performance\\PerformanceExtension\:\:getBundle\(\) never returns null so it can be removed from the return type\.$#'
+			identifier: return.unusedType
+			count: 1
+			path: src/Bundle/Performance/PerformanceExtension.php
+
+		-
+			message: '#^Access to an undefined property object\:\:\$ID\.$#'
+			identifier: property.notFound
+			count: 2
+			path: src/Bundle/Performance/PreloadUrlCollector.php
+
+		-
+			message: '#^Access to an undefined property object\:\:\$post_author\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Bundle/Performance/PreloadUrlCollector.php
+
+		-
+			message: '#^Access to an undefined property object\:\:\$post_date\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Bundle/Performance/PreloadUrlCollector.php
+
+		-
+			message: '#^Access to an undefined property object\:\:\$term_id\.$#'
+			identifier: property.notFound
+			count: 2
+			path: src/Bundle/Performance/PreloadUrlCollector.php
+
+		-
+			message: '#^Call to function is_string\(\) with string will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: src/Bundle/Security/AuditLogAdminPage.php
+
+		-
+			message: '#^Expression on left side of \?\? is not nullable\.$#'
+			identifier: nullCoalesce.expr
+			count: 7
+			path: src/Bundle/Security/AuditLogAdminPage.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Bundle\\Security\\AutoUpdatePolicy\:\:getAllowedPlugins\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bundle/Security/AutoUpdatePolicy.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Bundle\\Security\\AutoUpdatePolicy\:\:getAllowedThemes\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bundle/Security/AutoUpdatePolicy.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Bundle\\Security\\CapabilityHardening\:\:getSensitiveCapabilities\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bundle/Security/CapabilityHardening.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Bundle\\Security\\ContentSecurityPolicyManager\:\:addDirective\(\) has parameter \$value with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bundle/Security/ContentSecurityPolicyManager.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Bundle\\Security\\Contracts\\ContentSecurityPolicyInterface\:\:addDirective\(\) has parameter \$value with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bundle/Security/Contracts/ContentSecurityPolicyInterface.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Bundle\\Security\\Contracts\\CorsManagerInterface\:\:addAllowedHeader\(\) has parameter \$header with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bundle/Security/Contracts/CorsManagerInterface.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Bundle\\Security\\Contracts\\CorsManagerInterface\:\:addAllowedMethod\(\) has parameter \$method with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bundle/Security/Contracts/CorsManagerInterface.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Bundle\\Security\\Contracts\\CorsManagerInterface\:\:addAllowedOrigin\(\) has parameter \$origin with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bundle/Security/Contracts/CorsManagerInterface.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Bundle\\Security\\Contracts\\IPAccessControlInterface\:\:getBlacklist\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bundle/Security/Contracts/IPAccessControlInterface.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Bundle\\Security\\Contracts\\IPAccessControlInterface\:\:getWhitelist\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bundle/Security/Contracts/IPAccessControlInterface.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Bundle\\Security\\Contracts\\SecurityNotifierInterface\:\:getRecipients\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bundle/Security/Contracts/SecurityNotifierInterface.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Bundle\\Security\\Contracts\\SecurityNotifierInterface\:\:setRecipients\(\) has parameter \$emails with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bundle/Security/Contracts/SecurityNotifierInterface.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Bundle\\Security\\CookieHardening\:\:setSessionCookieParams\(\) has parameter \$params with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bundle/Security/CookieHardening.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Bundle\\Security\\CorsManager\:\:addAllowedHeader\(\) has parameter \$header with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bundle/Security/CorsManager.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Bundle\\Security\\CorsManager\:\:addAllowedMethod\(\) has parameter \$method with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bundle/Security/CorsManager.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Bundle\\Security\\CorsManager\:\:addAllowedOrigin\(\) has parameter \$origin with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bundle/Security/CorsManager.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Bundle\\Security\\CorsManager\:\:getAllowedHeaders\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bundle/Security/CorsManager.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Bundle\\Security\\CorsManager\:\:getAllowedMethods\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bundle/Security/CorsManager.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Bundle\\Security\\CorsManager\:\:getAllowedOrigins\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bundle/Security/CorsManager.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Bundle\\Security\\DirectoryProtection\:\:getProtectedPaths\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bundle/Security/DirectoryProtection.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Bundle\\Security\\HealthCheck\\SecurityHealthCheck\:\:checkCriticalRules\(\) has parameter \$activeRules with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bundle/Security/HealthCheck/SecurityHealthCheck.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Bundle\\Security\\HealthCheck\\SecurityHealthCheck\:\:checkCriticalRules\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bundle/Security/HealthCheck/SecurityHealthCheck.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Bundle\\Security\\IPAccessControl\:\:getBlacklist\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bundle/Security/IPAccessControl.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Bundle\\Security\\IPAccessControl\:\:getWhitelist\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bundle/Security/IPAccessControl.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Bundle\\Security\\IPAccessControl\:\:matchesAny\(\) has parameter \$list with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bundle/Security/IPAccessControl.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Bundle\\Security\\MalwareScanner\:\:listDirectory\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bundle/Security/MalwareScanner.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Bundle\\Security\\MalwareScanner\:\:scanDirectory\(\) has parameter \$files with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bundle/Security/MalwareScanner.php
+
+		-
+			message: '#^Call to function is_string\(\) with string will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: src/Bundle/Security/PasswordPolicy.php
+
+		-
+			message: '#^Expression on left side of \?\? is not nullable\.$#'
+			identifier: nullCoalesce.expr
+			count: 1
+			path: src/Bundle/Security/PasswordPolicy.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Bundle\\Security\\PhpConfigHardening\:\:getDisabledFunctions\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bundle/Security/PhpConfigHardening.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Bundle\\Security\\RestApi\\SecurityAuditLogRoute\:\:getPermissionCallback\(\) never returns null so it can be removed from the return type\.$#'
+			identifier: return.unusedType
+			count: 1
+			path: src/Bundle/Security/RestApi/SecurityAuditLogRoute.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Bundle\\Security\\RestApi\\SecurityHealthRoute\:\:getPermissionCallback\(\) never returns null so it can be removed from the return type\.$#'
+			identifier: return.unusedType
+			count: 1
+			path: src/Bundle/Security/RestApi/SecurityHealthRoute.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Bundle\\Security\\RestApi\\SecurityScanRoute\:\:getPermissionCallback\(\) never returns null so it can be removed from the return type\.$#'
+			identifier: return.unusedType
+			count: 1
+			path: src/Bundle/Security/RestApi/SecurityScanRoute.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Bundle\\Security\\RestApiSecurity\:\:getPublicRoutePatterns\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bundle/Security/RestApiSecurity.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Bundle\\Security\\SecurityAuditLogger\:\:onUserRoleChanged\(\) has parameter \$oldRoles with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bundle/Security/SecurityAuditLogger.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Bundle\\Security\\SecurityNotifier\:\:getRecipients\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bundle/Security/SecurityNotifier.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Bundle\\Security\\SecurityNotifier\:\:onRoleChange\(\) has parameter \$oldRoles with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bundle/Security/SecurityNotifier.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Bundle\\Security\\SecurityNotifier\:\:resolveRecipients\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bundle/Security/SecurityNotifier.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Bundle\\Security\\SecurityNotifier\:\:setRecipients\(\) has parameter \$emails with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bundle/Security/SecurityNotifier.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Bundle\\Security\\SecurityRuleRegistry\:\:getActiveRuleNames\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bundle/Security/SecurityRuleRegistry.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Bundle\\Security\\SecurityRuleRegistry\:\:getRules\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bundle/Security/SecurityRuleRegistry.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Bundle\\Security\\TwoFactor\\BackupCodeManager\:\:findMatchingIndex\(\) should return int\|null but returns int\|string\|null\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Bundle/Security/TwoFactor/BackupCodeManager.php
+
+		-
+			message: '#^Call to function is_string\(\) with string will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: src/Bundle/Security/TwoFactor/TwoFactorAuthentication.php
+
+		-
+			message: '#^Cannot call method getName\(\) on BackTo\\Framework\\Bundle\\Seo\\Contracts\\SeoProviderInterface\|null\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/Bundle/Seo/Actions/DisablePluginSchema.php
+
+		-
+			message: '#^Call to function is_string\(\) with string will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: src/Bundle/Seo/Infrastructure/WordPressBreadcrumbSchemaGenerator.php
+
+		-
+			message: '#^Parameter &\$items by\-ref type of method BackTo\\Framework\\Bundle\\Seo\\Infrastructure\\WordPressBreadcrumbSchemaGenerator\:\:addCustomPostTypeArchive\(\) expects array\<int, array\{name\: string, url\?\: string\}\>, non\-empty\-array\<int, array\{name\: mixed, url\?\: string\}\> given\.$#'
+			identifier: parameterByRef.type
+			count: 1
+			path: src/Bundle/Seo/Infrastructure/WordPressBreadcrumbSchemaGenerator.php
+
+		-
+			message: '#^Parameter &\$items by\-ref type of method BackTo\\Framework\\Bundle\\Seo\\Infrastructure\\WordPressBreadcrumbSchemaGenerator\:\:buildPostTypeArchiveItems\(\) expects array\<int, array\{name\: string, url\?\: string\}\>, non\-empty\-array\<int, array\{name\: mixed, url\?\: string\}\> given\.$#'
+			identifier: parameterByRef.type
+			count: 1
+			path: src/Bundle/Seo/Infrastructure/WordPressBreadcrumbSchemaGenerator.php
+
+		-
+			message: '#^Access to an undefined property object\:\:\$ID\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Bundle/Seo/Schema/Generator/ArticleSchemaGenerator.php
+
+		-
+			message: '#^Access to an undefined property object\:\:\$display_name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Bundle/Seo/Schema/Generator/ArticleSchemaGenerator.php
+
+		-
+			message: '#^Access to an undefined property object\:\:\$post_author\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Bundle/Seo/Schema/Generator/ArticleSchemaGenerator.php
+
+		-
+			message: '#^Access to an undefined property object\:\:\$post_title\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Bundle/Seo/Schema/Generator/ArticleSchemaGenerator.php
+
+		-
+			message: '#^Access to an undefined property object\:\:\$post_type\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Bundle/Seo/Schema/Generator/ArticleSchemaGenerator.php
+
+		-
+			message: '#^Parameter \#1 \$url of method BackTo\\Framework\\Bundle\\Seo\\Schema\\Type\\Article\:\:url\(\) expects string, string\|false given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Bundle/Seo/Schema/Generator/ArticleSchemaGenerator.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Bundle\\Seo\\Schema\\Generator\\OrganizationSchemaGenerator\:\:buildSameAs\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bundle/Seo/Schema/Generator/OrganizationSchemaGenerator.php
+
+		-
+			message: '#^Call to an undefined method object\:\:generate\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: src/Bundle/Seo/Schema/Generator/PostTypeSchemaResolver.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Bundle\\Seo\\Schema\\SchemaRef\:\:toArray\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bundle/Seo/Schema/SchemaRef.php
+
+		-
+			message: '#^PHPDoc tag @return has invalid value \(array\{@id\: string\}\)\: Unexpected token "@id", expected type at offset 25 on line 2$#'
+			identifier: phpDoc.parseError
+			count: 1
+			path: src/Bundle/Seo/Schema/SchemaRef.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Bundle\\Seo\\Schema\\Type\\Article\:\:keywords\(\) has parameter \$keywords with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bundle/Seo/Schema/Type/Article.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Bundle\\Seo\\Schema\\Type\\Course\:\:coursePrerequisites\(\) has parameter \$prerequisites with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bundle/Seo/Schema/Type/Course.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Bundle\\Seo\\Schema\\Type\\Course\:\:offers\(\) has parameter \$offers with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bundle/Seo/Schema/Type/Course.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Bundle\\Seo\\Schema\\Type\\CourseInstance\:\:offers\(\) has parameter \$offers with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bundle/Seo/Schema/Type/CourseInstance.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Bundle\\Seo\\Schema\\Type\\Event\:\:offers\(\) has parameter \$offers with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bundle/Seo/Schema/Type/Event.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Bundle\\Seo\\Schema\\Type\\JobPosting\:\:employmentType\(\) has parameter \$type with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bundle/Seo/Schema/Type/JobPosting.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Bundle\\Seo\\Schema\\Type\\LocalBusiness\:\:sameAs\(\) has parameter \$urls with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bundle/Seo/Schema/Type/LocalBusiness.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Bundle\\Seo\\Schema\\Type\\Organization\:\:sameAs\(\) has parameter \$urls with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bundle/Seo/Schema/Type/Organization.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Bundle\\Seo\\Schema\\Type\\Person\:\:sameAs\(\) has parameter \$urls with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bundle/Seo/Schema/Type/Person.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Bundle\\Seo\\Schema\\Type\\Product\:\:image\(\) has parameter \$image with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bundle/Seo/Schema/Type/Product.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Bundle\\Seo\\Schema\\Type\\Product\:\:offers\(\) has parameter \$offers with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bundle/Seo/Schema/Type/Product.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Bundle\\Seo\\Schema\\Type\\Product\:\:review\(\) has parameter \$reviews with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bundle/Seo/Schema/Type/Product.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Bundle\\Seo\\Schema\\Type\\Question\:\:suggestedAnswer\(\) has parameter \$answers with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bundle/Seo/Schema/Type/Question.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Bundle\\Seo\\Schema\\Type\\VideoObject\:\:regionsAllowed\(\) has parameter \$regions with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bundle/Seo/Schema/Type/VideoObject.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Bundle\\Seo\\Schema\\Type\\VideoObject\:\:thumbnailUrl\(\) has parameter \$url with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bundle/Seo/Schema/Type/VideoObject.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Bundle\\Seo\\SeoExtension\:\:getBundle\(\) never returns null so it can be removed from the return type\.$#'
+			identifier: return.unusedType
+			count: 1
+			path: src/Bundle/Seo/SeoExtension.php
+
+		-
+			message: '#^Method BackTo\\Framework\\Bundle\\Seo\\SeoManager\:\:__construct\(\) has parameter \$providers with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Bundle/Seo/SeoManager.php
 
 		-
 			message: '#^Method BackTo\\Framework\\Cache\\CacheExtension\:\:getBundle\(\) never returns null so it can be removed from the return type\.$#'
@@ -55,7 +661,7 @@ parameters:
 			path: src/Cache/Strategy/AbstractCache.php
 
 		-
-			message: '#^Offset ''assets\.php''\|''cache\.php''\|''observability\.php''\|''performance\.php''\|''rest\-api\.php''\|''security\.php''\|''seo\.php'' on array\{''assets\.php''\: ''BackTo\\\\Framework\\\\Assets\\\\AssetsConfigurator'', ''cache\.php''\: ''BackTo\\\\Framework\\\\Cache\\\\CacheConfigurator'', ''observability\.php''\: ''BackTo\\\\Framework\\\\Observability\\\\ObservabilityConfigurator'', ''performance\.php''\: ''BackTo\\\\Framework\\\\Performance\\\\PerformanceConfigurator'', ''rest\-api\.php''\: ''BackTo\\\\Framework\\\\RestApi\\\\RestApiConfigurator'', ''security\.php''\: ''BackTo\\\\Framework\\\\Security\\\\SecurityConfigurator'', ''seo\.php''\: ''BackTo\\\\Framework\\\\Seo\\\\SeoConfigurator''\} in isset\(\) always exists and is not nullable\.$#'
+			message: '#^Offset ''assets\.php''\|''cache\.php''\|''observability\.php''\|''performance\.php''\|''rest\-api\.php''\|''security\.php''\|''seo\.php'' on array\{''assets\.php''\: ''BackTo\\\\Framework\\\\Assets\\\\AssetsConfigurator'', ''cache\.php''\: ''BackTo\\\\Framework\\\\Cache\\\\CacheConfigurator'', ''observability\.php''\: ''BackTo\\\\Framework\\\\Observability\\\\ObservabilityConfigurator'', ''performance\.php''\: ''BackTo\\\\Framework\\\\Bundle\\\\Performance\\\\PerformanceConfigurator'', ''rest\-api\.php''\: ''BackTo\\\\Framework\\\\RestApi\\\\RestApiConfigurator'', ''security\.php''\: ''BackTo\\\\Framework\\\\Bundle\\\\Security\\\\SecurityConfigurator'', ''seo\.php''\: ''BackTo\\\\Framework\\\\Bundle\\\\Seo\\\\SeoConfigurator''\} in isset\(\) always exists and is not nullable\.$#'
 			identifier: isset.offset
 			count: 1
 			path: src/Compose/AbstractKernel.php
@@ -83,48 +689,6 @@ parameters:
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/Contracts/ScriptManagerInterface.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Gdpr\\ConsentCategoryRegistry\:\:getCategories\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Gdpr/ConsentCategoryRegistry.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Gdpr\\Contracts\\ConsentCategoryRegistryInterface\:\:getCategories\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Gdpr/Contracts/ConsentCategoryRegistryInterface.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Gdpr\\Contracts\\TrackingScriptRegistryInterface\:\:getScripts\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Gdpr/Contracts/TrackingScriptRegistryInterface.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Gdpr\\Contracts\\TrackingScriptRegistryInterface\:\:getScriptsByCategory\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Gdpr/Contracts/TrackingScriptRegistryInterface.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Gdpr\\GdprExtension\:\:getBundle\(\) never returns null so it can be removed from the return type\.$#'
-			identifier: return.unusedType
-			count: 1
-			path: src/Gdpr/GdprExtension.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Gdpr\\TrackingScriptRegistry\:\:getScripts\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Gdpr/TrackingScriptRegistry.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Gdpr\\TrackingScriptRegistry\:\:getScriptsByCategory\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Gdpr/TrackingScriptRegistry.php
 
 		-
 			message: '#^Method BackTo\\Framework\\Hooks\\HooksExtension\:\:getBundle\(\) never returns null so it can be removed from the return type\.$#'
@@ -239,114 +803,6 @@ parameters:
 			identifier: return.unusedType
 			count: 1
 			path: src/Options/OptionsExtension.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Performance\\Hooks\\DeferScripts\:\:__construct\(\) has parameter \$excludedHandles with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Performance/Hooks/DeferScripts.php
-
-		-
-			message: '#^Access to an undefined property object\:\:\$comment_post_ID\.$#'
-			identifier: property.notFound
-			count: 1
-			path: src/Performance/Hooks/InvalidatePageCache.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Performance\\Hooks\\InvalidatePageCache\:\:onPostStatusChange\(\) has parameter \$post with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: src/Performance/Hooks/InvalidatePageCache.php
-
-		-
-			message: '#^Access to an undefined property object\:\:\$ID\.$#'
-			identifier: property.notFound
-			count: 1
-			path: src/Performance/Hooks/PreloadPageCache.php
-
-		-
-			message: '#^Access to an undefined property object\:\:\$post_status\.$#'
-			identifier: property.notFound
-			count: 1
-			path: src/Performance/Hooks/PreloadPageCache.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Performance\\Infrastructure\\WordPressDatabaseOptimizer\:\:deleteAutoDrafts\(\) has parameter \$wpdb with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: src/Performance/Infrastructure/WordPressDatabaseOptimizer.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Performance\\Infrastructure\\WordPressDatabaseOptimizer\:\:deleteExcessRevisions\(\) has parameter \$wpdb with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: src/Performance/Infrastructure/WordPressDatabaseOptimizer.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Performance\\Infrastructure\\WordPressDatabaseOptimizer\:\:deleteExpiredTransients\(\) has parameter \$wpdb with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: src/Performance/Infrastructure/WordPressDatabaseOptimizer.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Performance\\Infrastructure\\WordPressDatabaseOptimizer\:\:deleteOrphanedCommentMeta\(\) has parameter \$wpdb with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: src/Performance/Infrastructure/WordPressDatabaseOptimizer.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Performance\\Infrastructure\\WordPressDatabaseOptimizer\:\:deleteOrphanedPostMeta\(\) has parameter \$wpdb with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: src/Performance/Infrastructure/WordPressDatabaseOptimizer.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Performance\\Infrastructure\\WordPressDatabaseOptimizer\:\:deleteSpamComments\(\) has parameter \$wpdb with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: src/Performance/Infrastructure/WordPressDatabaseOptimizer.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Performance\\Infrastructure\\WordPressDatabaseOptimizer\:\:deleteTrashedComments\(\) has parameter \$wpdb with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: src/Performance/Infrastructure/WordPressDatabaseOptimizer.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Performance\\Infrastructure\\WordPressDatabaseOptimizer\:\:deleteTrashedPosts\(\) has parameter \$wpdb with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: src/Performance/Infrastructure/WordPressDatabaseOptimizer.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Performance\\PerformanceExtension\:\:getBundle\(\) never returns null so it can be removed from the return type\.$#'
-			identifier: return.unusedType
-			count: 1
-			path: src/Performance/PerformanceExtension.php
-
-		-
-			message: '#^Access to an undefined property object\:\:\$ID\.$#'
-			identifier: property.notFound
-			count: 2
-			path: src/Performance/PreloadUrlCollector.php
-
-		-
-			message: '#^Access to an undefined property object\:\:\$post_author\.$#'
-			identifier: property.notFound
-			count: 1
-			path: src/Performance/PreloadUrlCollector.php
-
-		-
-			message: '#^Access to an undefined property object\:\:\$post_date\.$#'
-			identifier: property.notFound
-			count: 1
-			path: src/Performance/PreloadUrlCollector.php
-
-		-
-			message: '#^Access to an undefined property object\:\:\$term_id\.$#'
-			identifier: property.notFound
-			count: 2
-			path: src/Performance/PreloadUrlCollector.php
 
 		-
 			message: '#^Parameter \#2 \$meta_key of function delete_post_meta expects string, BackTo\\Framework\\PostMeta\\ValueObject\\MetaKey given\.$#'
@@ -509,462 +965,6 @@ parameters:
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/RestApi/RestRouteRegistry.php
-
-		-
-			message: '#^Call to function is_string\(\) with string will always evaluate to true\.$#'
-			identifier: function.alreadyNarrowedType
-			count: 1
-			path: src/Security/AuditLogAdminPage.php
-
-		-
-			message: '#^Expression on left side of \?\? is not nullable\.$#'
-			identifier: nullCoalesce.expr
-			count: 7
-			path: src/Security/AuditLogAdminPage.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Security\\AutoUpdatePolicy\:\:getAllowedPlugins\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Security/AutoUpdatePolicy.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Security\\AutoUpdatePolicy\:\:getAllowedThemes\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Security/AutoUpdatePolicy.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Security\\CapabilityHardening\:\:getSensitiveCapabilities\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Security/CapabilityHardening.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Security\\ContentSecurityPolicyManager\:\:addDirective\(\) has parameter \$value with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Security/ContentSecurityPolicyManager.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Security\\Contracts\\ContentSecurityPolicyInterface\:\:addDirective\(\) has parameter \$value with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Security/Contracts/ContentSecurityPolicyInterface.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Security\\Contracts\\CorsManagerInterface\:\:addAllowedHeader\(\) has parameter \$header with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Security/Contracts/CorsManagerInterface.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Security\\Contracts\\CorsManagerInterface\:\:addAllowedMethod\(\) has parameter \$method with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Security/Contracts/CorsManagerInterface.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Security\\Contracts\\CorsManagerInterface\:\:addAllowedOrigin\(\) has parameter \$origin with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Security/Contracts/CorsManagerInterface.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Security\\Contracts\\IPAccessControlInterface\:\:getBlacklist\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Security/Contracts/IPAccessControlInterface.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Security\\Contracts\\IPAccessControlInterface\:\:getWhitelist\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Security/Contracts/IPAccessControlInterface.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Security\\Contracts\\SecurityNotifierInterface\:\:getRecipients\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Security/Contracts/SecurityNotifierInterface.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Security\\Contracts\\SecurityNotifierInterface\:\:setRecipients\(\) has parameter \$emails with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Security/Contracts/SecurityNotifierInterface.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Security\\CookieHardening\:\:setSessionCookieParams\(\) has parameter \$params with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Security/CookieHardening.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Security\\CorsManager\:\:addAllowedHeader\(\) has parameter \$header with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Security/CorsManager.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Security\\CorsManager\:\:addAllowedMethod\(\) has parameter \$method with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Security/CorsManager.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Security\\CorsManager\:\:addAllowedOrigin\(\) has parameter \$origin with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Security/CorsManager.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Security\\CorsManager\:\:getAllowedHeaders\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Security/CorsManager.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Security\\CorsManager\:\:getAllowedMethods\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Security/CorsManager.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Security\\CorsManager\:\:getAllowedOrigins\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Security/CorsManager.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Security\\DirectoryProtection\:\:getProtectedPaths\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Security/DirectoryProtection.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Security\\HealthCheck\\SecurityHealthCheck\:\:checkCriticalRules\(\) has parameter \$activeRules with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Security/HealthCheck/SecurityHealthCheck.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Security\\HealthCheck\\SecurityHealthCheck\:\:checkCriticalRules\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Security/HealthCheck/SecurityHealthCheck.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Security\\IPAccessControl\:\:getBlacklist\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Security/IPAccessControl.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Security\\IPAccessControl\:\:getWhitelist\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Security/IPAccessControl.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Security\\IPAccessControl\:\:matchesAny\(\) has parameter \$list with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Security/IPAccessControl.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Security\\MalwareScanner\:\:listDirectory\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Security/MalwareScanner.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Security\\MalwareScanner\:\:scanDirectory\(\) has parameter \$files with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Security/MalwareScanner.php
-
-		-
-			message: '#^Call to function is_string\(\) with string will always evaluate to true\.$#'
-			identifier: function.alreadyNarrowedType
-			count: 1
-			path: src/Security/PasswordPolicy.php
-
-		-
-			message: '#^Expression on left side of \?\? is not nullable\.$#'
-			identifier: nullCoalesce.expr
-			count: 1
-			path: src/Security/PasswordPolicy.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Security\\PhpConfigHardening\:\:getDisabledFunctions\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Security/PhpConfigHardening.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Security\\RestApi\\SecurityAuditLogRoute\:\:getPermissionCallback\(\) never returns null so it can be removed from the return type\.$#'
-			identifier: return.unusedType
-			count: 1
-			path: src/Security/RestApi/SecurityAuditLogRoute.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Security\\RestApi\\SecurityHealthRoute\:\:getPermissionCallback\(\) never returns null so it can be removed from the return type\.$#'
-			identifier: return.unusedType
-			count: 1
-			path: src/Security/RestApi/SecurityHealthRoute.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Security\\RestApi\\SecurityScanRoute\:\:getPermissionCallback\(\) never returns null so it can be removed from the return type\.$#'
-			identifier: return.unusedType
-			count: 1
-			path: src/Security/RestApi/SecurityScanRoute.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Security\\RestApiSecurity\:\:getPublicRoutePatterns\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Security/RestApiSecurity.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Security\\SecurityAuditLogger\:\:onUserRoleChanged\(\) has parameter \$oldRoles with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Security/SecurityAuditLogger.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Security\\SecurityNotifier\:\:getRecipients\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Security/SecurityNotifier.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Security\\SecurityNotifier\:\:onRoleChange\(\) has parameter \$oldRoles with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Security/SecurityNotifier.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Security\\SecurityNotifier\:\:resolveRecipients\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Security/SecurityNotifier.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Security\\SecurityNotifier\:\:setRecipients\(\) has parameter \$emails with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Security/SecurityNotifier.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Security\\SecurityRuleRegistry\:\:getActiveRuleNames\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Security/SecurityRuleRegistry.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Security\\SecurityRuleRegistry\:\:getRules\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Security/SecurityRuleRegistry.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Security\\TwoFactor\\BackupCodeManager\:\:findMatchingIndex\(\) should return int\|null but returns int\|string\|null\.$#'
-			identifier: return.type
-			count: 1
-			path: src/Security/TwoFactor/BackupCodeManager.php
-
-		-
-			message: '#^Call to function is_string\(\) with string will always evaluate to true\.$#'
-			identifier: function.alreadyNarrowedType
-			count: 1
-			path: src/Security/TwoFactor/TwoFactorAuthentication.php
-
-		-
-			message: '#^Cannot call method getName\(\) on BackTo\\Framework\\Seo\\Contracts\\SeoProviderInterface\|null\.$#'
-			identifier: method.nonObject
-			count: 1
-			path: src/Seo/Actions/DisablePluginSchema.php
-
-		-
-			message: '#^Call to function is_string\(\) with string will always evaluate to true\.$#'
-			identifier: function.alreadyNarrowedType
-			count: 1
-			path: src/Seo/Infrastructure/WordPressBreadcrumbSchemaGenerator.php
-
-		-
-			message: '#^Parameter &\$items by\-ref type of method BackTo\\Framework\\Seo\\Infrastructure\\WordPressBreadcrumbSchemaGenerator\:\:addCustomPostTypeArchive\(\) expects array\<int, array\{name\: string, url\?\: string\}\>, non\-empty\-array\<int, array\{name\: mixed, url\?\: string\}\> given\.$#'
-			identifier: parameterByRef.type
-			count: 1
-			path: src/Seo/Infrastructure/WordPressBreadcrumbSchemaGenerator.php
-
-		-
-			message: '#^Parameter &\$items by\-ref type of method BackTo\\Framework\\Seo\\Infrastructure\\WordPressBreadcrumbSchemaGenerator\:\:buildPostTypeArchiveItems\(\) expects array\<int, array\{name\: string, url\?\: string\}\>, non\-empty\-array\<int, array\{name\: mixed, url\?\: string\}\> given\.$#'
-			identifier: parameterByRef.type
-			count: 1
-			path: src/Seo/Infrastructure/WordPressBreadcrumbSchemaGenerator.php
-
-		-
-			message: '#^Access to an undefined property object\:\:\$ID\.$#'
-			identifier: property.notFound
-			count: 1
-			path: src/Seo/Schema/Generator/ArticleSchemaGenerator.php
-
-		-
-			message: '#^Access to an undefined property object\:\:\$display_name\.$#'
-			identifier: property.notFound
-			count: 1
-			path: src/Seo/Schema/Generator/ArticleSchemaGenerator.php
-
-		-
-			message: '#^Access to an undefined property object\:\:\$post_author\.$#'
-			identifier: property.notFound
-			count: 1
-			path: src/Seo/Schema/Generator/ArticleSchemaGenerator.php
-
-		-
-			message: '#^Access to an undefined property object\:\:\$post_title\.$#'
-			identifier: property.notFound
-			count: 1
-			path: src/Seo/Schema/Generator/ArticleSchemaGenerator.php
-
-		-
-			message: '#^Access to an undefined property object\:\:\$post_type\.$#'
-			identifier: property.notFound
-			count: 1
-			path: src/Seo/Schema/Generator/ArticleSchemaGenerator.php
-
-		-
-			message: '#^Parameter \#1 \$url of method BackTo\\Framework\\Seo\\Schema\\Type\\Article\:\:url\(\) expects string, string\|false given\.$#'
-			identifier: argument.type
-			count: 1
-			path: src/Seo/Schema/Generator/ArticleSchemaGenerator.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Seo\\Schema\\Generator\\OrganizationSchemaGenerator\:\:buildSameAs\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Seo/Schema/Generator/OrganizationSchemaGenerator.php
-
-		-
-			message: '#^Call to an undefined method object\:\:generate\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: src/Seo/Schema/Generator/PostTypeSchemaResolver.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Seo\\Schema\\SchemaRef\:\:toArray\(\) return type has no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Seo/Schema/SchemaRef.php
-
-		-
-			message: '#^PHPDoc tag @return has invalid value \(array\{@id\: string\}\)\: Unexpected token "@id", expected type at offset 25 on line 2$#'
-			identifier: phpDoc.parseError
-			count: 1
-			path: src/Seo/Schema/SchemaRef.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Seo\\Schema\\Type\\Article\:\:keywords\(\) has parameter \$keywords with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Seo/Schema/Type/Article.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Seo\\Schema\\Type\\Course\:\:coursePrerequisites\(\) has parameter \$prerequisites with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Seo/Schema/Type/Course.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Seo\\Schema\\Type\\Course\:\:offers\(\) has parameter \$offers with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Seo/Schema/Type/Course.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Seo\\Schema\\Type\\CourseInstance\:\:offers\(\) has parameter \$offers with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Seo/Schema/Type/CourseInstance.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Seo\\Schema\\Type\\Event\:\:offers\(\) has parameter \$offers with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Seo/Schema/Type/Event.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Seo\\Schema\\Type\\JobPosting\:\:employmentType\(\) has parameter \$type with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Seo/Schema/Type/JobPosting.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Seo\\Schema\\Type\\LocalBusiness\:\:sameAs\(\) has parameter \$urls with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Seo/Schema/Type/LocalBusiness.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Seo\\Schema\\Type\\Organization\:\:sameAs\(\) has parameter \$urls with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Seo/Schema/Type/Organization.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Seo\\Schema\\Type\\Person\:\:sameAs\(\) has parameter \$urls with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Seo/Schema/Type/Person.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Seo\\Schema\\Type\\Product\:\:image\(\) has parameter \$image with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Seo/Schema/Type/Product.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Seo\\Schema\\Type\\Product\:\:offers\(\) has parameter \$offers with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Seo/Schema/Type/Product.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Seo\\Schema\\Type\\Product\:\:review\(\) has parameter \$reviews with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Seo/Schema/Type/Product.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Seo\\Schema\\Type\\Question\:\:suggestedAnswer\(\) has parameter \$answers with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Seo/Schema/Type/Question.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Seo\\Schema\\Type\\VideoObject\:\:regionsAllowed\(\) has parameter \$regions with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Seo/Schema/Type/VideoObject.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Seo\\Schema\\Type\\VideoObject\:\:thumbnailUrl\(\) has parameter \$url with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Seo/Schema/Type/VideoObject.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Seo\\SeoExtension\:\:getBundle\(\) never returns null so it can be removed from the return type\.$#'
-			identifier: return.unusedType
-			count: 1
-			path: src/Seo/SeoExtension.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Seo\\SeoManager\:\:__construct\(\) has parameter \$providers with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Seo/SeoManager.php
 
 		-
 			message: '#^Method BackTo\\Framework\\Taxonomy\\Contracts\\TaxonomyInterface\:\:getPostTypes\(\) return type has no value type specified in iterable type array\.$#'
