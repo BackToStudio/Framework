@@ -1,242 +1,211 @@
-# Architecture du bundle SEO
+# SEO Bundle -- Architecture & Design
 
-Ce document explique les choix de conception, les patterns utilises et le fonctionnement interne du bundle SEO.
+*Explanation -- Understanding-oriented*
 
 ---
 
-## Le pattern JSON-LD @graph
+## Why generate structured data in PHP?
 
-### Pourquoi un graphe ?
+WordPress SEO plugins (Yoast, SEOPress) generate their own JSON-LD, but their output is limited to generic types (WebSite, Organization, Article). When a theme needs Product, Event, Course, or FAQ schemas tied to custom post types, plugin-generated markup is insufficient.
 
-Les donnees structurees Schema.org peuvent etre exprimees de differentes manieres en JSON-LD. L'approche la plus simple consiste a emettre un objet JSON independant par entite. Le bundle SEO adopte une approche differente : il regroupe toutes les entites dans un unique objet `@graph`.
+The SEO bundle places structured data generation in the theme's PHP layer, where it has full access to post data, custom fields, and business logic. The result is a single `<script type="application/ld+json">` block in the `<head>` with a coherent `@graph` linking all entities.
+
+---
+
+## The JSON-LD @graph pattern
+
+### Why a graph?
+
+Schema.org entities on a page are related: an Article has a publisher (Organization), belongs to a WebSite, and sits in a BreadcrumbList. Rather than emitting separate `<script>` blocks for each entity, the bundle groups them into a single `@graph`:
 
 ```json
 {
   "@context": "https://schema.org",
   "@graph": [
-    { "@type": "WebSite", "@id": "https://example.com/#website", "..." : "..." },
-    { "@type": "Organization", "@id": "https://example.com/#organization", "..." : "..." },
-    { "@type": "Article", "@id": "https://example.com/article/#article", "..." : "..." },
-    { "@type": "BreadcrumbList", "..." : "..." }
+    { "@type": "WebSite", "@id": "https://example.com/#website" },
+    { "@type": "Organization", "@id": "https://example.com/#organization" },
+    { "@type": "Article", "publisher": { "@id": "https://example.com/#organization" } }
   ]
 }
 ```
 
-Cette approche presente plusieurs avantages :
+This approach provides:
 
-1. **Une seule balise `<script>`** -- un seul point d'injection dans le `<head>`, plus facile a inspecter et a deboguer
-2. **Conformite Google** -- Google recommande le format `@graph` pour les entites liees sur une meme page
-3. **Pas de duplication** -- les entites partagees (Organization, WebSite) sont declarees une seule fois et referencees partout
+1. **One `<script>` block** -- easier to inspect and debug
+2. **Google compliance** -- Google recommends `@graph` for related entities on the same page
+3. **No duplication** -- shared entities (Organization, WebSite) are declared once and referenced everywhere
 
-### Le mecanisme @id
+### The @id mechanism
 
-Chaque noeud du graphe peut recevoir un identifiant unique via la propriete `@id`. Les autres noeuds referencent cet identifiant au lieu de dupliquer les donnees.
+Each node receives a unique `@id`. Other nodes reference it instead of duplicating data. The framework uses these conventions:
 
-Convention d'identifiants utilisee par le framework :
-
-| Noeud | @id |
+| Node | @id |
 |---|---|
 | WebSite | `{siteUrl}/#website` |
 | Organization | `{siteUrl}/#organization` |
 | Article | `{permalink}/#article` |
 
-Lorsqu'un Article doit indiquer son editeur, il ne duplique pas l'Organisation complete. Il utilise une reference :
+The `SchemaRef` class encapsulates this. `Schema::ref('#organization')` produces `{"@id": "#organization"}`. Generators use this to link WebSite, Organization, and Article nodes.
 
-```json
-{
-  "@type": "Article",
-  "publisher": { "@id": "https://example.com/#organization" }
-}
-```
+### One or many schemas?
 
-Google et les autres moteurs de recherche resolvent automatiquement ces references dans le graphe.
+`SchemaManager` adapts its output format automatically:
 
-La classe `SchemaRef` encapsule cette mecanique. L'appel `Schema::ref('#organization')` produit un objet qui se serialise en `{"@id": "#organization"}`. Les generateurs internes utilisent cette classe pour creer les liens entre WebSite, Organization et Article.
+- **One schema** -- emitted as a plain JSON-LD object with `@context`, no `@graph`
+- **Multiple schemas** -- wrapped in `@context` + `@graph`
 
-### Un ou plusieurs schemas ?
-
-Le `SchemaManager` adapte automatiquement le format de sortie :
-
-- **Un seul schema** : l'objet est emis directement avec `@context`, sans `@graph`
-- **Plusieurs schemas** : un objet englobant avec `@context` et `@graph` est genere
-
-Ce comportement est transparent pour le developpeur.
+This is transparent to the developer.
 
 ---
 
-## Pipeline de generation des schemas
+## Generation pipeline
 
-La generation des donnees structurees suit un pipeline en trois etapes, orchestre par les hooks WordPress.
+Structured data generation follows a three-stage pipeline orchestrated by WordPress hooks.
 
-### Etape 1 : RegisterDefaultSchemas (hook `wp`)
+### Stage 1: RegisterDefaultSchemas (hook: `wp`)
 
-Le hook `RegisterDefaultSchemas` s'execute sur l'action `wp`, quand le contexte de la requete est connu (page courante, post type, etc.). Il effectue quatre operations dans l'ordre :
+Runs on the `wp` action, when the query context is established. It performs four operations in order:
 
-1. **WebSiteSchemaGenerator** -- genere un noeud `WebSite` avec le nom du site, l'URL, la description et un `SearchAction` pour le moteur de recherche interne
-2. **OrganizationSchemaGenerator** -- genere un noeud `Organization` avec le nom du site, le logo (`custom_logo`) et les liens sociaux `sameAs` extraits du provider SEO
-3. **PostTypeSchemaResolver** -- consulte le mapping `post_type_map` de la configuration pour trouver un generateur associe au post type courant (par defaut : `ArticleSchemaGenerator` pour `post`). S'execute uniquement sur les pages singulaires (`is_singular()`)
-4. **BreadcrumbSchemaGeneratorInterface** -- genere un `BreadcrumbList` contextuel. L'implementation par defaut (`WordPressBreadcrumbSchemaGenerator`) construit le fil d'Ariane selon le type de page
+1. **WebSiteSchemaGenerator** -- produces a WebSite node with site name, URL, description, and a SearchAction for the sitelinks search box
+2. **OrganizationSchemaGenerator** -- produces an Organization node with site name, logo (`custom_logo` theme mod), and `sameAs` links from the SEO provider
+3. **PostTypeSchemaResolver** -- checks the `post_type_map` configuration for a generator matching the current post type. Runs only on singular pages (`is_singular()`). Default mapping: `post` to `ArticleSchemaGenerator`
+4. **BreadcrumbSchemaGeneratorInterface** -- produces a BreadcrumbList from the current page context. The default implementation (`WordPressBreadcrumbSchemaGenerator`) builds breadcrumbs for posts, pages, archives, taxonomies, authors, and search results
 
-Apres ces quatre etapes, l'action `framework/seo/schema` est declenchee, passant le `SchemaManager` comme parametre. C'est le point d'extension principal pour les themes : ils peuvent ajouter des schemas supplementaires (FAQ, Product, Event, etc.) ou modifier ceux existants.
+After these four steps, the `framework/seo/schema` action fires with the `SchemaManager` as its parameter. This is the primary extension point for themes.
 
-### Etape 2 : SchemaManager (registre)
+### Stage 2: SchemaManager (registry)
 
-Le `SchemaManager` est un registre central. Chaque generateur y ajoute ses schemas via `add()`. Il accumule les `SchemaType` sans les transformer.
+The `SchemaManager` is a simple registry. Each generator adds schemas via `add()`. No transformation happens at this stage -- schemas remain as PHP objects with typed properties.
 
-A cette etape, les schemas sont des objets PHP avec des proprietes typees. Aucun JSON n'a encore ete genere.
+### Stage 3: InjectSchemaInHead (hook: `wp_head`, priority 1)
 
-### Etape 3 : InjectSchemaInHead (hook `wp_head`)
+Calls `SchemaManager::render()`, which:
 
-Le hook `InjectSchemaInHead` s'execute sur `wp_head` avec la priorite 1 (parmi les premiers). Il appelle `SchemaManager::render()` qui :
-
-1. Convertit chaque `SchemaType` en tableau via `toArray()`, resolvant recursivement les schemas imbriques et les `SchemaRef`
-2. Construit l'enveloppe `@context` / `@graph`
-3. Encode en JSON avec `JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE`
-4. Enveloppe le JSON dans une balise `<script type="application/ld+json">`
-
-Le resultat est ecrit directement dans le `<head>` via `echo`.
-
-### Diagramme du pipeline
+1. Converts each `SchemaType` to an array via `toArray()`, recursively resolving nested schemas and `SchemaRef` instances
+2. Builds the `@context` / `@graph` envelope
+3. Encodes as JSON with `JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE`
+4. Wraps in `<script type="application/ld+json">`
 
 ```
-wp (action WordPress)
-  └── RegisterDefaultSchemas::register()
-        ├── WebSiteSchemaGenerator::generate()     ──► SchemaManager::add()
-        ├── OrganizationSchemaGenerator::generate() ──► SchemaManager::add()
-        ├── PostTypeSchemaResolver::resolve()       ──► SchemaManager::add()
-        ├── BreadcrumbSchemaGenerator::generate()   ──► SchemaManager::add()
-        └── do_action('framework/seo/schema')       ──► [theme/plugins ajoutent des schemas]
+wp (WordPress action)
+  RegisterDefaultSchemas::register()
+    WebSiteSchemaGenerator::generate()      --> SchemaManager::add()
+    OrganizationSchemaGenerator::generate()  --> SchemaManager::add()
+    PostTypeSchemaResolver::resolve()        --> SchemaManager::add()
+    BreadcrumbSchemaGenerator::generate()    --> SchemaManager::add()
+    do_action('framework/seo/schema')        --> [theme adds custom schemas]
 
-wp_head (action WordPress, priorite 1)
-  └── InjectSchemaInHead::render()
-        └── SchemaManager::render()
-              ├── SchemaType::toArray()  (pour chaque schema)
-              ├── Construction @graph
-              └── json_encode() + <script>
+wp_head (WordPress action, priority 1)
+  InjectSchemaInHead::render()
+    SchemaManager::render()
+      SchemaType::toArray() (for each schema)
+      Build @graph
+      json_encode() + <script>
 ```
 
 ---
 
-## Mapping post type vers generateur
+## Post type to generator mapping
 
-Le `PostTypeSchemaResolver` permet d'associer un generateur de schema a chaque post type via le fichier `config/seo.php` :
+The `PostTypeSchemaResolver` maps post types to schema generators via the `config/seo.php` file:
 
 ```php
 'post_type_map' => [
-    'post'       => ArticleSchemaGenerator::class,
-    'formation'  => CourseSchemaGenerator::class,
-    'evenement'  => EventSchemaGenerator::class,
-    'produit'    => ProductSchemaGenerator::class,
+    'post'   => ArticleSchemaGenerator::class,
+    'event'  => EventSchemaGenerator::class,
+    'course' => CourseSchemaGenerator::class,
 ],
 ```
 
-Chaque generateur doit exposer une methode `generate(?int $postId): ?SchemaType`. Le resolver :
+Each generator must expose a `generate(?int $postId): ?SchemaType` method. The resolver:
 
-1. Verifie que la page courante est singuliere (`is_singular()`)
-2. Recupere le `post_type` du post courant
-3. Cherche un generateur correspondant dans le mapping
-4. Appelle `generate($postId)` et ajoute le resultat au `SchemaManager`
+1. Checks that the current page is singular (`is_singular()`)
+2. Reads the `post_type` of the current post
+3. Looks up a generator in the mapping
+4. Calls `generate($postId)` and adds the result to the `SchemaManager`
 
-Cette approche permet aux themes de mapper n'importe quel CPT a n'importe quel type Schema.org sans modifier le code du framework. Le generateur est un simple objet PHP, sans interface imposee (duck typing sur la methode `generate`).
+Generators use duck typing (no interface required) -- any object with a `generate(?int): ?SchemaType` method works. This keeps custom generators simple and decoupled from the framework.
 
 ---
 
-## Abstraction des providers SEO
+## SEO provider abstraction
 
-### Le probleme
+### The problem
 
-Les plugins SEO WordPress (Yoast SEO, SEOPress, Rank Math, etc.) stockent leurs donnees de manieres radicalement differentes :
+WordPress SEO plugins store data in completely different ways:
 
-| Donnee | Yoast SEO | SEOPress |
+| Data | Yoast SEO | SEOPress |
 |---|---|---|
-| Titre SEO | `_yoast_wpseo_title` | `_seopress_titles_title` |
-| Description | `_yoast_wpseo_metadesc` | `_seopress_titles_desc` |
-| URL canonique | `_yoast_wpseo_canonical` | `_seopress_robots_canonical` |
+| SEO title | `_yoast_wpseo_title` | `_seopress_titles_title` |
+| Meta description | `_yoast_wpseo_metadesc` | `_seopress_titles_desc` |
+| Canonical URL | `_yoast_wpseo_canonical` | `_seopress_robots_canonical` |
 | Facebook URL | `wpseo_social[facebook_site]` | `seopress_social_option_name[..._facebook]` |
-| Schema JSON-LD | filtre `wpseo_json_ld_output` | filtre `seopress_schemas_auto_enabled` |
+| Schema output | `wpseo_json_ld_output` filter | `seopress_schemas_auto_enabled` filter |
 
-Un theme qui accede directement a ces meta-cles se couple a un plugin specifique, rendant le changement de plugin couteux.
+A theme accessing these meta keys directly couples itself to a specific plugin.
 
-### La solution : SeoProviderInterface
+### The solution: SeoProviderInterface
 
-Le framework definit une interface unifiee `SeoProviderInterface` qui herite de `MetaProviderInterface` (titre, description, Open Graph) et `SocialLinksProviderInterface` (liens sociaux). Chaque plugin SEO est encapsule dans un provider :
+The framework defines a unified `SeoProviderInterface` that extends `MetaProviderInterface` (title, description, Open Graph) and `SocialLinksProviderInterface` (social URLs). Each plugin is wrapped in a provider:
 
-- `YoastProvider` -- lit `wpseo_social` et `_yoast_wpseo_*`
-- `SeoPressProvider` -- lit `seopress_social_option_name` et `_seopress_*`
+- `YoastProvider` -- reads `wpseo_social` and `_yoast_wpseo_*`
+- `SeoPressProvider` -- reads `seopress_social_option_name` and `_seopress_*`
 
-Le `SeoManager` itere sur les providers enregistres et retourne le premier qui repond `true` a `isActive()`. Le theme n'a jamais besoin de savoir quel plugin est installe.
+The `SeoManager` iterates over registered providers and returns the first one where `isActive()` returns `true`. Theme code never needs to know which plugin is installed.
 
-### Schema de resolution
+### Adding support for a new plugin
 
-```
-SeoManager
-  ├── YoastProvider::isActive()?  ──► wordpress-seo/wp-seo.php actif?
-  ├── SeoPressProvider::isActive()? ──► wp-seopress/seopress.php actif?
-  └── null (aucun plugin SEO)
-```
+To support a new SEO plugin (e.g. Rank Math):
 
-### Detection des plugins
+1. Create a class implementing `SeoProviderInterface`
+2. Register it via `SeoManager::addProvider()`
 
-Les providers utilisent `PluginCheckerInterface::isActive()` pour verifier la presence du plugin par son fichier (`wordpress-seo/wp-seo.php`, `wp-seopress/seopress.php`). Cette verification est basee sur la liste des plugins actifs WordPress, sans charger de code du plugin.
-
-### Extensibilite
-
-Pour supporter un nouveau plugin SEO (par exemple Rank Math), il suffit de :
-
-1. Creer une classe implementant `SeoProviderInterface`
-2. L'enregistrer via `SeoManager::addProvider()`
-
-Le reste du framework (liens sociaux dans Twig, `sameAs` de l'Organization, desactivation du schema natif) fonctionnera automatiquement.
+The rest of the framework (social links in Twig, Organization `sameAs`, plugin schema disabling) works automatically.
 
 ---
 
-## Integration Timber/Twig
+## Timber/Twig integration
 
-Le bundle expose deux types de donnees dans le contexte Timber :
+The bundle exposes two types of data in the Timber context:
 
-### SchemaManager dans le contexte
+### SchemaManager
 
-Le hook `AddSchemaToTimberContext` ajoute le `SchemaManager` sous la cle `schema`. Dans un template Twig :
+`AddSchemaToTimberContext` adds the `SchemaManager` under the `schema` key. In a Twig template: `{{ schema.render()|raw }}`. This allows rendering JSON-LD at a specific template location instead of relying on `wp_head`. Both mechanisms coexist.
 
-```twig
-{{ schema.render()|raw }}
-```
+### Social links
 
-Cela permet d'injecter le JSON-LD a un endroit precis du template plutot que via `wp_head`. Les deux mecanismes coexistent : `InjectSchemaInHead` ecrit dans `wp_head`, et `schema.render()` peut etre utilise dans un template.
+`AddSocialLinksToTimberContext` adds social links as top-level context variables: `facebook`, `twitter`, `instagram`, `linkedin`, `pinterest`, `youtube`. Each is either a URL string or `null`.
 
-### Liens sociaux dans le contexte
-
-Le hook `AddSocialLinksToTimberContext` ajoute les liens sociaux comme variables de premier niveau : `facebook`, `twitter`, `instagram`, `linkedin`, `pinterest`, `youtube`. Chaque variable contient soit l'URL du reseau social (chaine), soit `null`.
-
-Cette approche a ete choisie pour simplifier l'utilisation dans les templates : `{% if facebook %}` est plus lisible que `{% if social_links.facebook %}`.
+Top-level variables were chosen for simplicity: `{% if facebook %}` reads better than `{% if social_links.facebook %}`.
 
 ---
 
-## Validation des schemas
+## Schema validation
 
-Chaque type Schema.org declare ses proprietes requises pour les resultats enrichis Google via la methode protegee `getRequiredProperties()`. Par exemple, `Product` requiert `name`, `image` et `offers`.
+Each schema type declares its Google-required properties via the protected `getRequiredProperties()` method. For example, `Product` requires `name`, `image`, and `offers`.
 
-La validation est optionnelle et non bloquante : un schema incomplet sera quand meme rendu en JSON-LD. La methode `validate()` retourne la liste des proprietes manquantes, permettant au developpeur de verifier la conformite pendant le developpement.
-
-Le `SchemaManager` offre une validation globale via `validate()`, qui retourne un tableau associatif `[type => [proprietes manquantes]]` pour tous les schemas enregistres.
+Validation is optional and non-blocking: an incomplete schema is still rendered as JSON-LD. The `validate()` method returns missing property names, allowing developers to check conformance during development. The `SchemaManager` provides global validation via `validate()`, returning `[type => [missing properties]]` for all registered schemas.
 
 ---
 
-## Desactivation du schema natif des plugins
+## Plugin schema disabling
 
-Les plugins SEO generent leur propre schema JSON-LD, ce qui creerait des doublons avec le schema du framework. L'action `DisablePluginSchema` neutralise cette sortie :
+SEO plugins generate their own JSON-LD, which would duplicate the framework's output. `DisablePluginSchema` neutralizes this:
 
-- **Yoast SEO** : filtre `wpseo_json_ld_output` avec `__return_empty_array`
-- **SEOPress** : filtre `seopress_schemas_auto_enabled` avec `__return_false`
+- **Yoast SEO**: `wpseo_json_ld_output` filter with `__return_empty_array`
+- **SEOPress**: `seopress_schemas_auto_enabled` filter with `__return_false`
 
-Cette desactivation est activee par defaut (`schema.disable_plugin_schema` vaut `true`). Le theme peut la desactiver dans `config/seo.php` s'il souhaite conserver le schema du plugin.
+This is enabled by default (`schema.disable_plugin_schema` is `true`). Themes can disable it in `config/seo.php` to keep the plugin's schema output.
 
-L'action verifie d'abord qu'un provider SEO est actif avant de tenter de desactiver quoi que ce soit, evitant les appels inutiles.
+The action checks that an SEO provider is active before attempting to disable anything, avoiding unnecessary filter registration.
 
 ---
 
-## Nettoyage de l'empreinte Yoast
+## Yoast footprint cleanup
 
-Yoast SEO injecte des commentaires HTML (`<!-- This site is optimized with the Yoast SEO plugin ... -->`) et expose son numero de version dans le code source. Ces informations n'apportent rien a l'utilisateur final et peuvent reveler la stack technique du site.
+Yoast SEO injects HTML comments (`<!-- This site is optimized with the Yoast SEO plugin ... -->`) and exposes its version number in the page source. `CleanYoastFootprint` removes these via two Yoast-native filters:
 
-L'action `CleanYoastFootprint` supprime ces marqueurs via deux filtres WordPress natifs de Yoast. Cette action est automatique et ne necessite aucune configuration.
+- `wpseo_debug_markers` -- `__return_false`
+- `wpseo_hide_version` -- `__return_true`
+
+This runs automatically with no configuration required.
