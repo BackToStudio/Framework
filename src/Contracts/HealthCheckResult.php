@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace BackTo\Framework\Observability\Contracts;
+namespace BackTo\Framework\Contracts;
 
 /**
  * Value object representing the result of a health check.

@@ -20,7 +20,7 @@ use BackTo\Framework\Contracts\RegistryInterface;
 use BackTo\Framework\Hooks\HooksExtension;
 use BackTo\Framework\Http\HttpExtension;
 use BackTo\Framework\Hooks\DependencyInjection\Compiler\RegisterHookPass;
-use BackTo\Framework\Observability\Contracts\HealthCheckInterface;
+use BackTo\Framework\Contracts\HealthCheckInterface;
 use BackTo\Framework\Observability\DependencyInjection\Compiler\RegisterHealthCheckPass;
 use BackTo\Framework\Observability\ObservabilityExtension;
 use BackTo\Framework\Options\OptionsExtension;

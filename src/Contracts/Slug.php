@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace BackTo\Framework\Compose\ValueObject;
+namespace BackTo\Framework\Contracts;
 
 use InvalidArgumentException;
 use Stringable;

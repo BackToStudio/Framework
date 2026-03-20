@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace BackTo\Framework\Observability\Contracts;
+namespace BackTo\Framework\Contracts;
 
 /**
  * Port interface for health checks.

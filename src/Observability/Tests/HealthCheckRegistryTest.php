@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Observability\Tests;
 
-use BackTo\Framework\Observability\Contracts\HealthCheckInterface;
-use BackTo\Framework\Observability\Contracts\HealthCheckResult;
+use BackTo\Framework\Contracts\HealthCheckInterface;
+use BackTo\Framework\Contracts\HealthCheckResult;
 use BackTo\Framework\Observability\HealthCheckRegistry;
 use PHPUnit\Framework\TestCase;
 

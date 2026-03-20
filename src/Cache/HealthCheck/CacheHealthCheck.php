@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace BackTo\Framework\Cache\HealthCheck;
 
 use BackTo\Framework\Cache\Contracts\CacheInterface;
-use BackTo\Framework\Observability\Contracts\HealthCheckInterface;
-use BackTo\Framework\Observability\Contracts\HealthCheckResult;
+use BackTo\Framework\Contracts\HealthCheckInterface;
+use BackTo\Framework\Contracts\HealthCheckResult;
 
 /**
  * Verifies that the cache subsystem is operational.

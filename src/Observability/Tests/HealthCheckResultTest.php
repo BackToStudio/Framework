@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Observability\Tests;
 
-use BackTo\Framework\Observability\Contracts\HealthCheckResult;
+use BackTo\Framework\Contracts\HealthCheckResult;
 use PHPUnit\Framework\TestCase;
 
 class HealthCheckResultTest extends TestCase
