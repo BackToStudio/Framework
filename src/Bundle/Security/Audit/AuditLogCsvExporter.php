@@ -45,19 +45,10 @@ class AuditLogCsvExporter
             return;
         }
 
-        fputcsv($output, ['Timestamp', 'Event', 'Severity', 'Context']);
+        fputcsv($output, self::csvHeader());
 
         foreach ($events as $event) {
-            $timestamp = (int) ($event['timestamp'] ?? 0);
-            $context = $event['context'] ?? [];
-            $contextStr = is_array($context) ? (string) json_encode($context) : '';
-
-            fputcsv($output, [
-                gmdate('Y-m-d H:i:s', $timestamp),
-                (string) ($event['event'] ?? ''),
-                (string) ($event['severity'] ?? ''),
-                $contextStr,
-            ]);
+            fputcsv($output, self::formatRow($event));
         }
 
         fclose($output);
@@ -75,6 +66,34 @@ class AuditLogCsvExporter
     public function markExported(): void
     {
         $this->transientStore?->set('backto_audit_export_lock', '1', self::EXPORT_COOLDOWN_SECONDS);
+    }
+
+    /**
+     * @return string[]
+     */
+    public static function csvHeader(): array
+    {
+        return ['Timestamp', 'Event', 'Severity', 'Context'];
+    }
+
+    /**
+     * Format a single audit event into a CSV row.
+     *
+     * @param array<string, mixed> $event
+     * @return string[]
+     */
+    public static function formatRow(array $event): array
+    {
+        $timestamp = (int) ($event['timestamp'] ?? 0);
+        $context = $event['context'] ?? [];
+        $contextStr = is_array($context) ? (string) json_encode($context) : '';
+
+        return [
+            gmdate('Y-m-d H:i:s', $timestamp),
+            (string) ($event['event'] ?? ''),
+            (string) ($event['severity'] ?? ''),
+            $contextStr,
+        ];
     }
 
     protected function sendCsvHeaders(): void

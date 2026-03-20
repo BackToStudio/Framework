@@ -99,11 +99,20 @@ final class ServePageCache implements Hooks
      */
     public function captureOutput(string $html): string
     {
-        if (strlen($html) > 0 && !str_contains($html, 'Fatal error')) {
-            $this->pageCache->put($this->urlResolver->getCurrentUrl(), $html, $this->ttl);
-            $html .= "\n<!-- X-Page-Cache: MISS -->";
+        if (!$this->isCacheableOutput($html)) {
+            return $html;
         }
 
-        return $html;
+        $this->pageCache->put($this->urlResolver->getCurrentUrl(), $html, $this->ttl);
+
+        return $html . "\n<!-- X-Page-Cache: MISS -->";
+    }
+
+    /**
+     * Whether the captured output is suitable for caching.
+     */
+    private function isCacheableOutput(string $html): bool
+    {
+        return $html !== '' && !str_contains($html, 'Fatal error');
     }
 }
