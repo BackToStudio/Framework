@@ -42,6 +42,24 @@ Technical descriptions of the framework's modules, contracts, and architecture.
 - [Configuration reference](reference/configuration.md) — framework-level configuration
 - [Compatibility matrix](reference/compatibility.md)
 
+## Bundles
+
+Chaque bundle possède sa propre documentation Diataxis complète (README, tutorial, how-to, reference, explanation).
+
+| Bundle | Description | Docs |
+|--------|-------------|------|
+| [Security](security/README.md) | Hardening WordPress, 2FA, CSP, rate limiting, audit | [tutorial](security/tutorial.md) · [how-to](security/how-to.md) · [reference](security/reference.md) · [explanation](security/explanation.md) |
+| [Performance](performance/README.md) | Page cache, minification HTML/CSS/JS, optimisation images, .htaccess | [tutorial](performance/tutorial.md) · [how-to](performance/how-to.md) · [reference](performance/reference.md) · [explanation](performance/explanation.md) |
+| [Seo](seo/README.md) | Schema.org JSON-LD, breadcrumbs, meta, API fluide | [tutorial](seo/tutorial.md) · [how-to](seo/how-to.md) · [reference](seo/reference.md) · [explanation](seo/explanation.md) |
+| [Http](http/README.md) | Couche HTTP, routing, middleware, request/response | [tutorial](http/tutorial.md) · [how-to](http/how-to.md) · [reference](http/reference.md) · [explanation](http/explanation.md) |
+| [Admin](admin/README.md) | Pages d'administration, settings, notices | — |
+| [Blocks](blocks/README.md) | Enregistrement et gestion des blocs Gutenberg | — |
+| [Plugin](plugin/README.md) | Cycle de vie plugin, activation, désactivation | — |
+| [Theme](theme/README.md) | Support thème, assets, menus, sidebars | — |
+| [Gdpr](gdpr/README.md) | Consentement RGPD, gestion des scripts de tracking | — |
+
+Voir aussi : [Architecture globale](ARCHITECTURE.md)
+
 ## Explanation
 
 Background, design decisions, and conceptual understanding.
