@@ -6,6 +6,8 @@ namespace BackTo\Framework\Tests\Integration\Security;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\RequestContextInterface;
+use BackTo\Framework\Contracts\ResponseEmitterInterface;
+use BackTo\Framework\Contracts\UserContextInterface;
 use BackTo\Framework\Observability\Contracts\LoggerInterface;
 use BackTo\Framework\Bundle\Security\Hardening\AdminUrlObfuscation;
 use BackTo\Framework\Bundle\Security\Contracts\ClientIpResolverInterface;
@@ -49,6 +51,8 @@ class AdminUrlObfuscationIntegrationTest extends TestCase
     private RequestContextInterface $requestContext;
     private LoggerInterface $logger;
     private ClientIpResolverInterface $ipResolver;
+    private UserContextInterface $userContext;
+    private ResponseEmitterInterface $responseEmitter;
 
     /** @var array<int, array{level: string, message: string, context: array<string, mixed>}> */
     private array $logEntries = [];
@@ -102,6 +106,12 @@ class AdminUrlObfuscationIntegrationTest extends TestCase
         // -- Mock IpResolver
         $this->ipResolver = $this->createMock(ClientIpResolverInterface::class);
         $this->ipResolver->method('getClientIp')->willReturn('203.0.113.42');
+
+        // -- Mock UserContext
+        $this->userContext = $this->createMock(UserContextInterface::class);
+
+        // -- Mock ResponseEmitter
+        $this->responseEmitter = $this->createMock(ResponseEmitterInterface::class);
     }
 
     // =================================================================
@@ -531,6 +541,7 @@ class AdminUrlObfuscationIntegrationTest extends TestCase
 
         $obfuscation1 = new TestableAdminUrlObfuscation(
             $this->hookDispatcher, $this->logger, $this->requestContext, $ipResolver1,
+            $this->userContext, $this->responseEmitter,
             requestUri: '/wp-login.php', isLoggedIn: false,
         );
         $obfuscation1->setLoginSlug('acces-securise');
@@ -542,6 +553,7 @@ class AdminUrlObfuscationIntegrationTest extends TestCase
 
         $obfuscation2 = new TestableAdminUrlObfuscation(
             $this->hookDispatcher, $this->logger, $this->requestContext, $ipResolver2,
+            $this->userContext, $this->responseEmitter,
             requestUri: '/wp-login.php', isLoggedIn: false,
         );
         $obfuscation2->setLoginSlug('acces-securise');
@@ -593,6 +605,8 @@ class AdminUrlObfuscationIntegrationTest extends TestCase
             $this->logger,
             $this->requestContext,
             $this->ipResolver,
+            $this->userContext,
+            $this->responseEmitter,
         );
     }
 
@@ -605,6 +619,8 @@ class AdminUrlObfuscationIntegrationTest extends TestCase
             $this->logger,
             $this->requestContext,
             $this->ipResolver,
+            $this->userContext,
+            $this->responseEmitter,
             requestUri: $requestUri,
             isLoggedIn: $isLoggedIn,
         );
@@ -631,10 +647,12 @@ class TestableAdminUrlObfuscation extends AdminUrlObfuscation
         LoggerInterface $logger,
         RequestContextInterface $requestContext,
         ClientIpResolverInterface $ipResolver,
+        UserContextInterface $userContext,
+        ResponseEmitterInterface $responseEmitter,
         string $requestUri = '/',
         bool $isLoggedIn = false,
     ) {
-        parent::__construct($hookDispatcher, $logger, $requestContext, $ipResolver);
+        parent::__construct($hookDispatcher, $logger, $requestContext, $ipResolver, $userContext, $responseEmitter);
         $this->fakeRequestUri = $requestUri;
         $this->fakeIsLoggedIn = $isLoggedIn;
     }
