@@ -96,6 +96,10 @@ final class Post implements PostInterface
 
     public function setPostType(string $postType): PostInterface
     {
+        if (trim($postType) === '') {
+            throw new \InvalidArgumentException('Post type cannot be empty.');
+        }
+
         $this->postType = $postType;
         return $this;
     }

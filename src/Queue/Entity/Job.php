@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Queue\Entity;
 
+use Psr\Clock\ClockInterface;
+
 /**
  * Represents a queued job instance with its state and metadata.
  */
 final class Job
 {
+    private ?ClockInterface $clock = null;
     private int $id = 0;
     private string $key = '';
     private string $group = 'default';
@@ -27,6 +30,18 @@ final class Job
     private ?\DateTimeImmutable $createdAt = null;
     private ?\DateTimeImmutable $updatedAt = null;
     private int $intervalSeconds = 0;
+
+    public function setClock(ClockInterface $clock): self
+    {
+        $this->clock = $clock;
+
+        return $this;
+    }
+
+    private function now(): \DateTimeImmutable
+    {
+        return $this->clock?->now() ?? new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
+    }
 
     public function getId(): int
     {
@@ -253,7 +268,7 @@ final class Job
             return true;
         }
 
-        return $this->scheduledAt <= new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
+        return $this->scheduledAt <= $this->now();
     }
 
     public function canRetry(): bool
@@ -278,7 +293,7 @@ final class Job
 
         $this->status = JobStatus::Running;
         $this->claimToken = $claimToken;
-        $this->claimedAt = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
+        $this->claimedAt = $this->now();
 
         return $this;
     }
@@ -292,7 +307,7 @@ final class Job
         }
 
         $this->status = JobStatus::Completed;
-        $this->completedAt = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
+        $this->completedAt = $this->now();
         $this->claimToken = '';
 
         return $this;

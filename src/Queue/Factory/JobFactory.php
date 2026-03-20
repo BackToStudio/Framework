@@ -7,6 +7,7 @@ namespace BackTo\Framework\Queue\Factory;
 use BackTo\Framework\Exception\FrameworkException;
 use BackTo\Framework\Queue\Entity\Job;
 use BackTo\Framework\Queue\Entity\JobStatus;
+use Psr\Clock\ClockInterface;
 
 final class JobFactory
 {
@@ -14,6 +15,13 @@ final class JobFactory
     private const MAX_GROUP_LENGTH = 255;
     private const MAX_ERROR_LENGTH = 5000;
     private const MAX_PAYLOAD_BYTES = 1048576; // 1 MB
+
+    private readonly ?ClockInterface $clock;
+
+    public function __construct(?ClockInterface $clock = null)
+    {
+        $this->clock = $clock;
+    }
 
     /**
      * Create a new Job entity ready for enqueuing.
@@ -53,7 +61,7 @@ final class JobFactory
             $intervalSeconds = 0;
         }
 
-        $now = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
+        $now = $this->clock?->now() ?? new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
         $scheduledAt = $delay > 0
             ? $now->modify("+{$delay} seconds")
             : $now;
@@ -69,6 +77,10 @@ final class JobFactory
         }
 
         $job = new Job();
+
+        if ($this->clock !== null) {
+            $job->setClock($this->clock);
+        }
         $job->setKey($key)
             ->setGroup($group)
             ->setPayload($payload)
@@ -91,6 +103,10 @@ final class JobFactory
     public function fromRow(array $row): Job
     {
         $job = new Job();
+
+        if ($this->clock !== null) {
+            $job->setClock($this->clock);
+        }
         $job->setId((int) ($row['id'] ?? 0))
             ->setKey((string) ($row['job_key'] ?? ''))
             ->setGroup((string) ($row['job_group'] ?? 'default'))

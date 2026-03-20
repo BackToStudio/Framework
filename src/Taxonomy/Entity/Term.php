@@ -26,6 +26,10 @@ final class Term implements TermInterface
 
     public function setName(string $name): TermInterface
     {
+        if (trim($name) === '') {
+            throw new \InvalidArgumentException('Term name cannot be empty.');
+        }
+
         $this->name = $name;
         return $this;
     }
@@ -48,6 +52,10 @@ final class Term implements TermInterface
 
     public function setTaxonomy(string $taxonomy): TermInterface
     {
+        if (trim($taxonomy) === '') {
+            throw new \InvalidArgumentException('Taxonomy name cannot be empty.');
+        }
+
         $this->taxonomy = $taxonomy;
         return $this;
     }
