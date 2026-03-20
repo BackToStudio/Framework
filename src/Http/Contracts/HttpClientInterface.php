@@ -4,34 +4,31 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Http\Contracts;
 
+use Psr\Http\Client\ClientInterface;
+use Psr\Http\Message\ResponseInterface;
+
 /**
- * Port interface for HTTP client operations.
+ * Extended HTTP client interface.
  *
- * Inspired by PSR-18 and Symfony HttpClient. Provides a simple,
- * framework-agnostic API for sending HTTP requests.
+ * Extends PSR-18 ClientInterface with convenience methods
+ * for common HTTP verbs, avoiding boilerplate request creation.
  *
- * Common options (adapter-dependent):
- * - timeout: int — Request timeout in seconds
- * - headers: array<string, string> — HTTP headers
- * - body: string — Request body
- * - blocking: bool — Whether to wait for the response (default: true)
+ * @see ClientInterface for the PSR-18 sendRequest() method
  */
-interface HttpClientInterface
+interface HttpClientInterface extends ClientInterface
 {
     /**
-     * Send an HTTP request.
-     *
      * @param array<string, mixed> $options
      */
-    public function request(string $method, string $url, array $options = []): HttpResponseInterface;
+    public function get(string $url, array $options = []): ResponseInterface;
 
     /**
      * @param array<string, mixed> $options
      */
-    public function get(string $url, array $options = []): HttpResponseInterface;
+    public function post(string $url, array $options = []): ResponseInterface;
 
     /**
      * @param array<string, mixed> $options
      */
-    public function post(string $url, array $options = []): HttpResponseInterface;
+    public function request(string $method, string $url, array $options = []): ResponseInterface;
 }

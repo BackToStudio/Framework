@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace BackTo\Framework\Performance\Tests;
 
 use BackTo\Framework\Http\Contracts\HttpClientInterface;
-use BackTo\Framework\Http\HttpResponse;
+use Nyholm\Psr7\Response;
 use BackTo\Framework\Performance\Contracts\PageCacheInterface;
 use BackTo\Framework\Performance\PreloadExecutor;
 use PHPUnit\Framework\TestCase;
@@ -55,7 +55,7 @@ class PreloadExecutorTest extends TestCase
                 $this->assertArrayHasKey('timeout', $args);
                 $this->assertFalse($args['blocking']);
 
-                return new HttpResponse(200, '');
+                return new Response(200);
             });
 
         $this->executor->preload(['https://example.com/', 'https://example.com/about']);

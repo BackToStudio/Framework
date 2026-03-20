@@ -5,34 +5,52 @@ declare(strict_types=1);
 namespace BackTo\Framework\Http\Infrastructure;
 
 use BackTo\Framework\Http\Contracts\HttpClientInterface;
-use BackTo\Framework\Http\Contracts\HttpResponseInterface;
-use BackTo\Framework\Http\HttpResponse;
+use Nyholm\Psr7\Request;
+use Nyholm\Psr7\Response;
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
 
 /**
- * WordPress adapter for HTTP client operations.
+ * WordPress adapter implementing PSR-18 + convenience methods.
  *
- * Wraps wp_remote_request(), wp_remote_get(), wp_remote_post()
- * and converts WP responses into HttpResponseInterface.
+ * Wraps wp_remote_request() and converts WP responses into PSR-7.
  */
 final class WordPressHttpClient implements HttpClientInterface
 {
-    public function request(string $method, string $url, array $options = []): HttpResponseInterface
+    public function sendRequest(RequestInterface $request): ResponseInterface
     {
-        $args = $this->buildArgs($method, $options);
+        $args = [
+            'method'  => $request->getMethod(),
+            'headers' => [],
+            'body'    => (string) $request->getBody(),
+        ];
 
-        $response = \wp_remote_request($url, $args);
+        foreach ($request->getHeaders() as $name => $values) {
+            $args['headers'][$name] = implode(', ', $values);
+        }
 
-        return $this->toResponse($response);
+        $wpResponse = \wp_remote_request((string) $request->getUri(), $args);
+
+        return $this->toResponse($wpResponse);
     }
 
-    public function get(string $url, array $options = []): HttpResponseInterface
+    public function get(string $url, array $options = []): ResponseInterface
     {
         return $this->request('GET', $url, $options);
     }
 
-    public function post(string $url, array $options = []): HttpResponseInterface
+    public function post(string $url, array $options = []): ResponseInterface
     {
         return $this->request('POST', $url, $options);
+    }
+
+    public function request(string $method, string $url, array $options = []): ResponseInterface
+    {
+        $args = $this->buildArgs($method, $options);
+
+        $wpResponse = \wp_remote_request($url, $args);
+
+        return $this->toResponse($wpResponse);
     }
 
     /**
@@ -71,25 +89,25 @@ final class WordPressHttpClient implements HttpClientInterface
     }
 
     /**
-     * @param array<string, mixed>|\WP_Error $response
+     * @param array<string, mixed>|\WP_Error $wpResponse
      */
-    private function toResponse(mixed $response): HttpResponseInterface
+    private function toResponse(mixed $wpResponse): ResponseInterface
     {
-        if ($response instanceof \WP_Error) {
-            return new HttpResponse(0, $response->get_error_message());
+        if ($wpResponse instanceof \WP_Error) {
+            return new Response(0, [], $wpResponse->get_error_message());
         }
 
-        $statusCode = (int) \wp_remote_retrieve_response_code($response);
-        $body = (string) \wp_remote_retrieve_body($response);
-        $rawHeaders = \wp_remote_retrieve_headers($response);
+        $statusCode = (int) \wp_remote_retrieve_response_code($wpResponse);
+        $body = (string) \wp_remote_retrieve_body($wpResponse);
+        $rawHeaders = \wp_remote_retrieve_headers($wpResponse);
 
         $headers = [];
-        if ($rawHeaders instanceof \WpOrg\Requests\Utility\CaseInsensitiveDictionary || is_iterable($rawHeaders)) {
+        if (is_iterable($rawHeaders)) {
             foreach ($rawHeaders as $name => $value) {
                 $headers[(string) $name] = is_array($value) ? $value : [(string) $value];
             }
         }
 
-        return new HttpResponse($statusCode, $body, $headers);
+        return new Response($statusCode, $headers, $body);
     }
 }
