@@ -14,6 +14,7 @@ use BackTo\Framework\Compose\DependencyInjection\Compiler\ResolveInstanceOfCondi
 use BackTo\Framework\Contracts\ExtensionInterface;
 use BackTo\Framework\Contracts\RegistryInterface;
 use BackTo\Framework\Hooks\HooksExtension;
+use BackTo\Framework\Http\HttpExtension;
 use BackTo\Framework\Hooks\Contracts\HookRegistryInterface;
 use BackTo\Framework\Observability\ObservabilityConfigurator;
 use BackTo\Framework\Observability\ObservabilityExtension;
@@ -31,6 +32,7 @@ use BackTo\Framework\Bundle\Security\SecurityExtension;
 use BackTo\Framework\Bundle\Seo\SeoConfigurator;
 use BackTo\Framework\Bundle\Seo\SeoExtension;
 use BackTo\Framework\Taxonomy\TaxonomyExtension;
+use BackTo\Framework\WordPress\WordPressExtension;
 use Exception;
 use LogicException;
 use ReflectionObject;
@@ -227,6 +229,8 @@ trait WordPressContainer
     protected function getExtensions(): array
     {
         return [
+            new WordPressExtension(),
+            new HttpExtension(),
             new HooksExtension(),
             new AssetsExtension(),
             new BlocksExtension(),

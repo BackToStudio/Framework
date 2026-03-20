@@ -700,55 +700,55 @@ parameters:
 			message: '#^Call to function is_array\(\) with array\<int, int\|string\|WP_Term\> will always evaluate to true\.$#'
 			identifier: function.alreadyNarrowedType
 			count: 1
-			path: src/Hooks/Infrastructure/WordPressContentQuery.php
+			path: src/WordPress/Infrastructure/WordPressContentQuery.php
 
 		-
-			message: '#^Method BackTo\\Framework\\Hooks\\Infrastructure\\WordPressContentQuery\:\:getCategories\(\) should return array\<object\> but returns array\<int, int\|string\|WP_Term\>\.$#'
+			message: '#^Method BackTo\\Framework\\WordPress\\Infrastructure\\WordPressContentQuery\:\:getCategories\(\) should return array\<object\> but returns array\<int, int\|string\|WP_Term\>\.$#'
 			identifier: return.type
 			count: 1
-			path: src/Hooks/Infrastructure/WordPressContentQuery.php
+			path: src/WordPress/Infrastructure/WordPressContentQuery.php
 
 		-
-			message: '#^Method BackTo\\Framework\\Hooks\\Infrastructure\\WordPressContentQuery\:\:getPosts\(\) should return array\<object\> but returns array\<int, int\|WP_Post\>\.$#'
+			message: '#^Method BackTo\\Framework\\WordPress\\Infrastructure\\WordPressContentQuery\:\:getPosts\(\) should return array\<object\> but returns array\<int, int\|WP_Post\>\.$#'
 			identifier: return.type
 			count: 1
-			path: src/Hooks/Infrastructure/WordPressContentQuery.php
+			path: src/WordPress/Infrastructure/WordPressContentQuery.php
 
 		-
-			message: '#^Method BackTo\\Framework\\Hooks\\Infrastructure\\WordPressContentQuery\:\:getTags\(\) should return array\<object\> but returns array\<int, int\|string\|WP_Term\>\.$#'
+			message: '#^Method BackTo\\Framework\\WordPress\\Infrastructure\\WordPressContentQuery\:\:getTags\(\) should return array\<object\> but returns array\<int, int\|string\|WP_Term\>\.$#'
 			identifier: return.type
 			count: 1
-			path: src/Hooks/Infrastructure/WordPressContentQuery.php
+			path: src/WordPress/Infrastructure/WordPressContentQuery.php
 
 		-
 			message: '#^Parameter \#1 \$post of function get_the_excerpt expects int\|WP_Post\|null, object\|null given\.$#'
 			identifier: argument.type
 			count: 1
-			path: src/Hooks/Infrastructure/WordPressContentQuery.php
+			path: src/WordPress/Infrastructure/WordPressContentQuery.php
 
 		-
 			message: '#^Parameter \#1 \$post of function get_the_post_thumbnail_url expects int\|WP_Post\|null, object given\.$#'
 			identifier: argument.type
 			count: 1
-			path: src/Hooks/Infrastructure/WordPressContentQuery.php
+			path: src/WordPress/Infrastructure/WordPressContentQuery.php
 
 		-
 			message: '#^Parameter \#1 \$term of function get_term_link expects int\|string\|WP_Term, object given\.$#'
 			identifier: argument.type
 			count: 1
-			path: src/Hooks/Infrastructure/WordPressContentQuery.php
+			path: src/WordPress/Infrastructure/WordPressContentQuery.php
 
 		-
 			message: '#^Parameter \#2 \$post of function get_the_date expects int\|WP_Post\|null, object\|null given\.$#'
 			identifier: argument.type
 			count: 1
-			path: src/Hooks/Infrastructure/WordPressContentQuery.php
+			path: src/WordPress/Infrastructure/WordPressContentQuery.php
 
 		-
 			message: '#^Parameter \#2 \$post of function get_the_modified_date expects int\|WP_Post\|null, object\|null given\.$#'
 			identifier: argument.type
 			count: 1
-			path: src/Hooks/Infrastructure/WordPressContentQuery.php
+			path: src/WordPress/Infrastructure/WordPressContentQuery.php
 
 		-
 			message: '#^Parameter \#1 \$hook_name of function apply_filters expects non\-empty\-string, string given\.$#'
@@ -775,16 +775,16 @@ parameters:
 			path: src/Hooks/Infrastructure/WordPressHookDispatcher.php
 
 		-
-			message: '#^Method BackTo\\Framework\\Hooks\\Infrastructure\\WordPressScriptManager\:\:registerScript\(\) has parameter \$deps with no value type specified in iterable type array\.$#'
+			message: '#^Method BackTo\\Framework\\WordPress\\Infrastructure\\WordPressScriptManager\:\:registerScript\(\) has parameter \$deps with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
-			path: src/Hooks/Infrastructure/WordPressScriptManager.php
+			path: src/WordPress/Infrastructure/WordPressScriptManager.php
 
 		-
-			message: '#^Method BackTo\\Framework\\Hooks\\Infrastructure\\WordPressScriptManager\:\:registerStyle\(\) has parameter \$deps with no value type specified in iterable type array\.$#'
+			message: '#^Method BackTo\\Framework\\WordPress\\Infrastructure\\WordPressScriptManager\:\:registerStyle\(\) has parameter \$deps with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
-			path: src/Hooks/Infrastructure/WordPressScriptManager.php
+			path: src/WordPress/Infrastructure/WordPressScriptManager.php
 
 		-
 			message: '#^Method BackTo\\Framework\\Observability\\ObservabilityExtension\:\:getBundle\(\) never returns null so it can be removed from the return type\.$#'

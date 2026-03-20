@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace BackTo\Framework\Hooks\Infrastructure;
+namespace BackTo\Framework\WordPress\Infrastructure;
 
 use BackTo\Framework\Contracts\SiteContextInterface;
 

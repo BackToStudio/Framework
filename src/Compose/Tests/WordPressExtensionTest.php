@@ -18,6 +18,7 @@ use BackTo\Framework\Contracts\ExtensionInterface;
 use BackTo\Framework\Contracts\HookInterface;
 use BackTo\Framework\Contracts\RegistryInterface;
 use BackTo\Framework\Hooks\HooksExtension;
+use BackTo\Framework\Http\HttpExtension;
 use BackTo\Framework\Hooks\DependencyInjection\Compiler\RegisterHookPass;
 use BackTo\Framework\Observability\Contracts\HealthCheckInterface;
 use BackTo\Framework\Observability\DependencyInjection\Compiler\RegisterHealthCheckPass;
@@ -44,6 +45,7 @@ use BackTo\Framework\Bundle\Seo\SeoExtension;
 use BackTo\Framework\Taxonomy\Contracts\TaxonomyInterface;
 use BackTo\Framework\Taxonomy\DependencyInjection\Compiler\RegisterTaxonomyPass;
 use BackTo\Framework\Taxonomy\TaxonomyExtension;
+use BackTo\Framework\WordPress\WordPressExtension;
 use BackToVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
 use PHPUnit\Framework\TestCase;
 
@@ -67,6 +69,8 @@ class WordPressExtensionTest extends TestCase
     public function extensionImplementsInterfaceProvider(): array
     {
         return [
+            'WordPress' => [new WordPressExtension()],
+            'Http' => [new HttpExtension()],
             'Hooks' => [new HooksExtension()],
             'PostType' => [new PostTypeExtension()],
             'Taxonomy' => [new TaxonomyExtension()],
@@ -181,6 +185,8 @@ class WordPressExtensionTest extends TestCase
     public function testAllExtensionsRegisterWithoutConflict(): void
     {
         $extensions = [
+            new WordPressExtension(),
+            new HttpExtension(),
             new HooksExtension(),
             new PostTypeExtension(),
             new TaxonomyExtension(),
