@@ -21,9 +21,18 @@ interface HookDispatcherInterface
     public function removeFilter(string $hookName, callable|string $callback, int $priority = 10): void;
 
     /**
-     * Check if the current request is for an admin page.
+     * Execute an action hook.
      */
-    public function isAdmin(): bool;
+    public function doAction(string $hookName, mixed ...$args): void;
+
+    /**
+     * Apply a filter hook and return the result.
+     *
+     * @param mixed $value The value to filter.
+     * @param mixed ...$args Additional arguments passed to callbacks.
+     * @return mixed The filtered value.
+     */
+    public function applyFilters(string $hookName, mixed $value, mixed ...$args): mixed;
 
     /**
      * Register an activation hook for a plugin file.

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Compose;
 
-use BackTo\Framework\Compose\ValueObject\Slug;
+use BackTo\Framework\Contracts\Slug;
 use BackTo\Framework\Contracts\SlugInterface;
 
 trait HasSlug

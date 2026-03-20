@@ -47,6 +47,21 @@ if (!function_exists('is_admin')) {
     }
 }
 
+if (!function_exists('do_action')) {
+    function do_action(string $hookName, mixed ...$args): void
+    {
+        $GLOBALS['_wp_hooks']['do_actions'][] = ['hook' => $hookName, 'args' => $args];
+    }
+}
+
+if (!function_exists('apply_filters')) {
+    function apply_filters(string $hookName, mixed $value, mixed ...$args): mixed
+    {
+        $GLOBALS['_wp_hooks']['apply_filters'][] = ['hook' => $hookName, 'value' => $value, 'args' => $args];
+        return $value;
+    }
+}
+
 if (!function_exists('register_activation_hook')) {
     function register_activation_hook(string $file, callable $callback): void
     {

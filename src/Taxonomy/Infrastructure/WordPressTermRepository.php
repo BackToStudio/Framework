@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace BackTo\Framework\Taxonomy\Infrastructure;
 
 use BackTo\Framework\Exception\TermNotFoundException;
-use BackTo\Framework\PostType\Repository\SortDirection;
+use BackTo\Framework\Query\SortDirection;
 use BackTo\Framework\Taxonomy\Contracts\TermInterface;
 use BackTo\Framework\Taxonomy\Contracts\TermRepositoryInterface;
 use BackTo\Framework\Taxonomy\Factory\TermFactory;

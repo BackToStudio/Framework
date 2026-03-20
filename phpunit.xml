@@ -24,7 +24,7 @@
             <directory>src/PostType/Tests</directory>
         </testsuite>
         <testsuite name="blocks">
-            <directory>src/Blocks/Tests</directory>
+            <directory>src/Bundle/Blocks/Tests</directory>
         </testsuite>
         <testsuite name="hooks">
             <directory>src/Hooks/Tests</directory>
@@ -39,10 +39,10 @@
             <directory>src/Cache/Tests</directory>
         </testsuite>
         <testsuite name="seo">
-            <directory>src/Seo/Tests</directory>
+            <directory>src/Bundle/Seo/Tests</directory>
         </testsuite>
         <testsuite name="admin">
-            <directory>src/Admin/Tests</directory>
+            <directory>src/Bundle/Admin/Tests</directory>
         </testsuite>
         <testsuite name="assets">
             <directory>src/Assets/Tests</directory>
@@ -51,23 +51,38 @@
             <directory>src/Options/Tests</directory>
         </testsuite>
         <testsuite name="plugin">
-            <directory>src/Plugin/Tests</directory>
+            <directory>src/Bundle/Plugin/Tests</directory>
         </testsuite>
         <testsuite name="theme">
-            <directory>src/Theme/Tests</directory>
+            <directory>src/Bundle/Theme/Tests</directory>
         </testsuite>
         <testsuite name="rest-api">
             <directory>src/RestApi/Tests</directory>
         </testsuite>
         <testsuite name="security">
-            <directory>src/Security/Tests</directory>
-            <directory>src/Security/TwoFactor/Tests</directory>
+            <directory>src/Bundle/Security/Tests</directory>
+            <directory>src/Bundle/Security/TwoFactor/Tests</directory>
         </testsuite>
         <testsuite name="performance">
-            <directory>src/Performance/Tests</directory>
+            <directory>src/Bundle/Performance/Tests</directory>
         </testsuite>
         <testsuite name="queue">
             <directory>src/Queue/Tests</directory>
+        </testsuite>
+        <testsuite name="exception">
+            <directory>src/Exception/Tests</directory>
+        </testsuite>
+        <testsuite name="http">
+            <directory>src/Http/Tests</directory>
+        </testsuite>
+        <testsuite name="clock">
+            <directory>src/Clock/Tests</directory>
+        </testsuite>
+        <testsuite name="observability">
+            <directory>src/Observability/Tests</directory>
+        </testsuite>
+        <testsuite name="query">
+            <directory>src/Query/Tests</directory>
         </testsuite>
     </testsuites>
 

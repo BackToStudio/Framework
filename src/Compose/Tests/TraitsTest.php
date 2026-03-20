@@ -8,7 +8,7 @@ use BackTo\Framework\Compose\HasId;
 use BackTo\Framework\Compose\HasParentId;
 use BackTo\Framework\Compose\HasSlug;
 use BackTo\Framework\Compose\TextDomain;
-use BackTo\Framework\Compose\ValueObject\Slug;
+use BackTo\Framework\Contracts\Slug;
 use BackTo\Framework\Contracts\IdInterface;
 use BackTo\Framework\Contracts\ParentIdInterface;
 use BackTo\Framework\Contracts\SlugInterface;

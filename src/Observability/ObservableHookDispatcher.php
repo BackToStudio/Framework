@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace BackTo\Framework\Observability;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
-use BackTo\Framework\Observability\Contracts\LoggerInterface;
+use BackTo\Framework\Contracts\LoggerInterface;
 use BackTo\Framework\Observability\Contracts\PerformanceCollectorInterface;
 
 /**
@@ -60,9 +60,14 @@ final class ObservableHookDispatcher implements HookDispatcherInterface
         $this->inner->removeFilter($hookName, $callback, $priority);
     }
 
-    public function isAdmin(): bool
+    public function doAction(string $hookName, mixed ...$args): void
     {
-        return $this->inner->isAdmin();
+        $this->inner->doAction($hookName, ...$args);
+    }
+
+    public function applyFilters(string $hookName, mixed $value, mixed ...$args): mixed
+    {
+        return $this->inner->applyFilters($hookName, $value, ...$args);
     }
 
     public function registerActivationHook(string $file, callable $callback): void

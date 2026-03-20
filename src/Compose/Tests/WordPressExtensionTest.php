@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Compose\Tests;
 
-use BackTo\Framework\Admin\AdminExtension;
-use BackTo\Framework\Admin\Contracts\AdminPageInterface;
-use BackTo\Framework\Admin\DependencyInjection\Compiler\RegisterAdminPagePass;
+use BackTo\Framework\Bundle\Admin\AdminExtension;
+use BackTo\Framework\Contracts\AdminPageInterface;
+use BackTo\Framework\Bundle\Admin\DependencyInjection\Compiler\RegisterAdminPagePass;
 use BackTo\Framework\Assets\AssetsExtension;
-use BackTo\Framework\Blocks\BlocksExtension;
-use BackTo\Framework\Blocks\DependencyInjection\Compiler\RegisterBlockPass;
-use BackTo\Framework\Blocks\DependencyInjection\Compiler\RegisterBlockStylePass;
+use BackTo\Framework\Bundle\Blocks\BlocksExtension;
+use BackTo\Framework\Bundle\Blocks\DependencyInjection\Compiler\RegisterBlockPass;
+use BackTo\Framework\Bundle\Blocks\DependencyInjection\Compiler\RegisterBlockStylePass;
 use BackTo\Framework\Cache\CacheExtension;
 use BackTo\Framework\Contracts\BlockInterface;
 use BackTo\Framework\Contracts\BlockStyleInterface;
@@ -18,8 +18,9 @@ use BackTo\Framework\Contracts\ExtensionInterface;
 use BackTo\Framework\Contracts\HookInterface;
 use BackTo\Framework\Contracts\RegistryInterface;
 use BackTo\Framework\Hooks\HooksExtension;
+use BackTo\Framework\Http\HttpExtension;
 use BackTo\Framework\Hooks\DependencyInjection\Compiler\RegisterHookPass;
-use BackTo\Framework\Observability\Contracts\HealthCheckInterface;
+use BackTo\Framework\Contracts\HealthCheckInterface;
 use BackTo\Framework\Observability\DependencyInjection\Compiler\RegisterHealthCheckPass;
 use BackTo\Framework\Observability\ObservabilityExtension;
 use BackTo\Framework\Options\OptionsExtension;
@@ -32,18 +33,19 @@ use BackTo\Framework\PostType\PostTypeExtension;
 use BackTo\Framework\RestApi\Contracts\RestRouteInterface;
 use BackTo\Framework\RestApi\DependencyInjection\Compiler\RegisterRestRoutePass;
 use BackTo\Framework\RestApi\RestApiExtension;
-use BackTo\Framework\Security\Contracts\SecurityRuleInterface;
-use BackTo\Framework\Security\DependencyInjection\Compiler\RegisterSecurityRulePass;
-use BackTo\Framework\Gdpr\Contracts\ConsentCategoryInterface;
-use BackTo\Framework\Gdpr\Contracts\TrackingScriptInterface;
-use BackTo\Framework\Gdpr\DependencyInjection\Compiler\RegisterConsentCategoryPass;
-use BackTo\Framework\Gdpr\DependencyInjection\Compiler\RegisterTrackingScriptPass;
-use BackTo\Framework\Gdpr\GdprExtension;
-use BackTo\Framework\Security\SecurityExtension;
-use BackTo\Framework\Seo\SeoExtension;
+use BackTo\Framework\Bundle\Security\Contracts\SecurityRuleInterface;
+use BackTo\Framework\Bundle\Security\DependencyInjection\Compiler\RegisterSecurityRulePass;
+use BackTo\Framework\Bundle\Gdpr\Contracts\ConsentCategoryInterface;
+use BackTo\Framework\Bundle\Gdpr\Contracts\TrackingScriptInterface;
+use BackTo\Framework\Bundle\Gdpr\DependencyInjection\Compiler\RegisterConsentCategoryPass;
+use BackTo\Framework\Bundle\Gdpr\DependencyInjection\Compiler\RegisterTrackingScriptPass;
+use BackTo\Framework\Bundle\Gdpr\GdprExtension;
+use BackTo\Framework\Bundle\Security\SecurityExtension;
+use BackTo\Framework\Bundle\Seo\SeoExtension;
 use BackTo\Framework\Taxonomy\Contracts\TaxonomyInterface;
 use BackTo\Framework\Taxonomy\DependencyInjection\Compiler\RegisterTaxonomyPass;
 use BackTo\Framework\Taxonomy\TaxonomyExtension;
+use BackTo\Framework\WordPress\WordPressExtension;
 use BackToVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
 use PHPUnit\Framework\TestCase;
 
@@ -67,6 +69,8 @@ class WordPressExtensionTest extends TestCase
     public function extensionImplementsInterfaceProvider(): array
     {
         return [
+            'WordPress' => [new WordPressExtension()],
+            'Http' => [new HttpExtension()],
             'Hooks' => [new HooksExtension()],
             'PostType' => [new PostTypeExtension()],
             'Taxonomy' => [new TaxonomyExtension()],
@@ -175,12 +179,14 @@ class WordPressExtensionTest extends TestCase
         $extension = new SecurityExtension();
 
         $this->assertNull($extension->getBundle());
-        $this->assertCount(2, $extension->getBundles());
+        $this->assertCount(9, $extension->getBundles());
     }
 
     public function testAllExtensionsRegisterWithoutConflict(): void
     {
         $extensions = [
+            new WordPressExtension(),
+            new HttpExtension(),
             new HooksExtension(),
             new PostTypeExtension(),
             new TaxonomyExtension(),

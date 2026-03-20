@@ -5,14 +5,14 @@ declare(strict_types=1);
 namespace BackTo\Framework\Tests\Integration;
 
 use BackTo\Framework\Hooks\Infrastructure\WordPressHookDispatcher;
-use BackTo\Framework\Performance\Hooks\CleanHead;
-use BackTo\Framework\Performance\Hooks\DisableEmojis;
-use BackTo\Framework\Performance\Hooks\DisableEmbeds;
-use BackTo\Framework\Performance\Hooks\DisableXMLRPC;
-use BackTo\Framework\Performance\Hooks\LimitPostRevisions;
-use BackTo\Framework\Performance\Hooks\DeferScripts;
-use BackTo\Framework\Performance\Hooks\DisableHeartbeat;
-use BackTo\Framework\Performance\Infrastructure\WordPressHtmlOptimizer;
+use BackTo\Framework\Bundle\Performance\Hooks\Cleanup\CleanHead;
+use BackTo\Framework\Bundle\Performance\Hooks\Cleanup\DisableEmojis;
+use BackTo\Framework\Bundle\Performance\Hooks\Cleanup\DisableEmbeds;
+use BackTo\Framework\Bundle\Performance\Hooks\Cleanup\DisableXMLRPC;
+use BackTo\Framework\Bundle\Performance\Hooks\Cleanup\LimitPostRevisions;
+use BackTo\Framework\Bundle\Performance\Hooks\Assets\DeferScripts;
+use BackTo\Framework\Bundle\Performance\Hooks\Cleanup\DisableHeartbeat;
+use BackTo\Framework\Bundle\Performance\Infrastructure\WordPressHtmlOptimizer;
 use PHPUnit\Framework\TestCase;
 
 /**

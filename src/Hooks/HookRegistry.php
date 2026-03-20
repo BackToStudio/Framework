@@ -8,6 +8,7 @@ use BackTo\Framework\Contracts\ActivationHooks;
 use BackTo\Framework\Contracts\DeactivationHooks;
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\HookInterface;
+use BackTo\Framework\Contracts\QueryContextInterface;
 use BackTo\Framework\Contracts\AdminHooks;
 use BackTo\Framework\Contracts\Hooks;
 use BackTo\Framework\Hooks\Contracts\HookRegistryInterface;
@@ -18,13 +19,15 @@ final class HookRegistry implements HookRegistryInterface
     protected array $hooks = [];
     private ?string $pluginFile = null;
     private readonly HookDispatcherInterface $hookDispatcher;
+    private readonly QueryContextInterface $queryContext;
 
     /** @var array<callable(HookInterface, HookDispatcherInterface, bool, ?string): void> */
     private array $hookRunners = [];
 
-    public function __construct(HookDispatcherInterface $hookDispatcher)
+    public function __construct(HookDispatcherInterface $hookDispatcher, QueryContextInterface $queryContext)
     {
         $this->hookDispatcher = $hookDispatcher;
+        $this->queryContext = $queryContext;
         $this->registerDefaultRunners();
     }
 
@@ -70,7 +73,7 @@ final class HookRegistry implements HookRegistryInterface
 
     public function runHooks(): void
     {
-        $isAdmin = $this->hookDispatcher->isAdmin();
+        $isAdmin = $this->queryContext->isAdmin();
 
         foreach ($this->getHooks() as $hook) {
             foreach ($this->hookRunners as $runner) {

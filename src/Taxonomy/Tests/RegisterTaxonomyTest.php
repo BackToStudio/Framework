@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace BackTo\Framework\Taxonomy\Tests;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
-use BackTo\Framework\Observability\Contracts\LoggerInterface;
+use BackTo\Framework\Contracts\LoggerInterface;
 use BackTo\Framework\Taxonomy\Contracts\TaxonomyRegistrarInterface;
 use BackTo\Framework\Taxonomy\RegisterTaxonomy;
 use BackTo\Framework\Taxonomy\TaxonomyFactory;

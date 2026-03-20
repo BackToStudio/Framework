@@ -55,4 +55,16 @@ interface PostInterface extends IdInterface, SlugInterface, ParentIdInterface, P
 
 
     public function setModifiedAt(DateTimeInterface $modifiedAt): PostInterface;
+
+    public function isPublished(): bool;
+
+    public function isDraft(): bool;
+
+    public function isTrashed(): bool;
+
+    public function hasBeenModifiedAfterPublication(): bool;
+
+    public function hasContent(): bool;
+
+    public function hasExcerpt(): bool;
 }

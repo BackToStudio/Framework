@@ -121,45 +121,27 @@ final class PostQueryBuilder
 
     public function whereMeta(MetaKey|string $key, mixed $value, MetaCompare $compare = MetaCompare::EQUAL): self
     {
-        if (!isset($this->args['meta_query'])) {
-            $this->args['meta_query'] = [];
-        }
-
-        $this->args['meta_query'][] = [
+        return $this->addMetaQuery([
             'key' => (string) $key,
             'value' => $value,
             'compare' => $compare->value,
-        ];
-
-        return $this;
+        ]);
     }
 
     public function whereMetaExists(MetaKey|string $key): self
     {
-        if (!isset($this->args['meta_query'])) {
-            $this->args['meta_query'] = [];
-        }
-
-        $this->args['meta_query'][] = [
+        return $this->addMetaQuery([
             'key' => (string) $key,
             'compare' => MetaCompare::EXISTS->value,
-        ];
-
-        return $this;
+        ]);
     }
 
     public function whereMetaNotExists(MetaKey|string $key): self
     {
-        if (!isset($this->args['meta_query'])) {
-            $this->args['meta_query'] = [];
-        }
-
-        $this->args['meta_query'][] = [
+        return $this->addMetaQuery([
             'key' => (string) $key,
             'compare' => MetaCompare::NOT_EXISTS->value,
-        ];
-
-        return $this;
+        ]);
     }
 
     
@@ -222,7 +204,21 @@ final class PostQueryBuilder
         return $this->args;
     }
 
-    
+    /**
+     * @param array<string, mixed> $clause
+     */
+    private function addMetaQuery(array $clause): self
+    {
+        if (!isset($this->args['meta_query'])) {
+            $this->args['meta_query'] = [];
+        }
+
+        $this->args['meta_query'][] = $clause;
+
+        return $this;
+    }
+
+
     private function addTaxQuery(string $taxonomy, string $field, array $terms): self
     {
         if (!isset($this->args['tax_query'])) {

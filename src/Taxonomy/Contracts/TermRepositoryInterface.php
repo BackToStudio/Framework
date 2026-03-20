@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Taxonomy\Contracts;
 
-use BackTo\Framework\PostType\Repository\SortDirection;
+use BackTo\Framework\Query\SortDirection;
 
 /**
  * Port for retrieving and querying taxonomy terms.

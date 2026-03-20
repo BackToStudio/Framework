@@ -74,4 +74,58 @@ final class Taxonomy implements TaxonomyInterface
 
         return $this;
     }
+
+    // ── Domain Logic ────────────────────────────────────────
+
+    /**
+     * Whether this taxonomy is hierarchical (like categories).
+     */
+    public function isHierarchical(): bool
+    {
+        return (bool) ($this->args['hierarchical'] ?? false);
+    }
+
+    /**
+     * Whether this taxonomy is exposed in the REST API.
+     */
+    public function isExposedInRest(): bool
+    {
+        return (bool) ($this->args['show_in_rest'] ?? false);
+    }
+
+    /**
+     * Whether this taxonomy is publicly queryable.
+     */
+    public function isPubliclyQueryable(): bool
+    {
+        return (bool) ($this->args['publicly_queryable'] ?? false);
+    }
+
+    /**
+     * Whether the taxonomy key has been set.
+     */
+    public function hasKey(): bool
+    {
+        return $this->key !== '';
+    }
+
+    /**
+     * Whether this taxonomy is attached to a given post type.
+     */
+    public function isAttachedTo(string $postType): bool
+    {
+        return \in_array($postType, $this->postTypes, true);
+    }
+
+    /**
+     * Remove a post type association.
+     */
+    public function removePostType(string $postType): TaxonomyInterface
+    {
+        $this->postTypes = array_values(
+            array_filter($this->postTypes, static fn (string $pt): bool => $pt !== $postType)
+        );
+
+        return $this;
+    }
 }

@@ -6,57 +6,48 @@ namespace BackTo\Framework\RestApi\Tests;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
+use BackTo\Framework\Contracts\UserContextInterface;
 use BackTo\Framework\RestApi\Contracts\RestRouteInterface;
 use BackTo\Framework\RestApi\Contracts\RestRouteRegistrarInterface;
 use BackTo\Framework\RestApi\RegisterRestRoute;
 use BackTo\Framework\RestApi\RestRouteRegistry;
 use PHPUnit\Framework\TestCase;
 
-/**
- * Testable subclass to control isUserLoggedIn().
- */
-class TestableRegisterRestRoute extends RegisterRestRoute
-{
-    private bool $loggedIn = false;
-
-    public function setLoggedIn(bool $loggedIn): void
-    {
-        $this->loggedIn = $loggedIn;
-    }
-
-    protected function isUserLoggedIn(): bool
-    {
-        return $this->loggedIn;
-    }
-}
-
 class RegisterRestRouteTest extends TestCase
 {
+    private UserContextInterface $userContext;
+    private HookDispatcherInterface $hookDispatcher;
+
+    protected function setUp(): void
+    {
+        $this->userContext = $this->createMock(UserContextInterface::class);
+        $this->hookDispatcher = $this->createMock(HookDispatcherInterface::class);
+    }
+
+    private function createRegister(
+        ?RestRouteRegistry $registry = null,
+        ?RestRouteRegistrarInterface $registrar = null,
+    ): RegisterRestRoute {
+        return new RegisterRestRoute(
+            $registry ?? new RestRouteRegistry(),
+            $registrar ?? $this->createMock(RestRouteRegistrarInterface::class),
+            $this->hookDispatcher,
+            $this->userContext,
+        );
+    }
+
     public function testImplementsHooks(): void
     {
-        $register = new RegisterRestRoute(
-            new RestRouteRegistry(),
-            $this->createMock(RestRouteRegistrarInterface::class),
-            $this->createMock(HookDispatcherInterface::class),
-        );
-
-        $this->assertInstanceOf(Hooks::class, $register);
+        $this->assertInstanceOf(Hooks::class, $this->createRegister());
     }
 
     public function testHooksRegistersRestApiInitAction(): void
     {
-        $dispatcher = $this->createMock(HookDispatcherInterface::class);
-        $dispatcher->expects($this->once())
+        $this->hookDispatcher->expects($this->once())
             ->method('addAction')
             ->with('rest_api_init', $this->anything());
 
-        $register = new RegisterRestRoute(
-            new RestRouteRegistry(),
-            $this->createMock(RestRouteRegistrarInterface::class),
-            $dispatcher,
-        );
-
-        $register->hooks();
+        $this->createRegister()->hooks();
     }
 
     public function testRegisterRoutesUsesSecureDefaultPermission(): void
@@ -83,13 +74,7 @@ class RegisterRestRouteTest extends TestCase
                 }),
             );
 
-        $register = new RegisterRestRoute(
-            $registry,
-            $registrar,
-            $this->createMock(HookDispatcherInterface::class),
-        );
-
-        $register->registerRoutes();
+        $this->createRegister($registry, $registrar)->registerRoutes();
     }
 
     public function testRegisterRoutesWithCustomPermissionCallback(): void
@@ -118,13 +103,7 @@ class RegisterRestRouteTest extends TestCase
                 }),
             );
 
-        $register = new RegisterRestRoute(
-            $registry,
-            $registrar,
-            $this->createMock(HookDispatcherInterface::class),
-        );
-
-        $register->registerRoutes();
+        $this->createRegister($registry, $registrar)->registerRoutes();
     }
 
     public function testRegisterRoutesWithEmptyRegistry(): void
@@ -132,36 +111,20 @@ class RegisterRestRouteTest extends TestCase
         $registrar = $this->createMock(RestRouteRegistrarInterface::class);
         $registrar->expects($this->never())->method('register');
 
-        $register = new RegisterRestRoute(
-            new RestRouteRegistry(),
-            $registrar,
-            $this->createMock(HookDispatcherInterface::class),
-        );
-
-        $register->registerRoutes();
+        $this->createRegister(registrar: $registrar)->registerRoutes();
     }
 
     public function testRequireAuthenticationDeniesUnauthenticated(): void
     {
-        $register = new TestableRegisterRestRoute(
-            new RestRouteRegistry(),
-            $this->createMock(RestRouteRegistrarInterface::class),
-            $this->createMock(HookDispatcherInterface::class),
-        );
+        $this->userContext->method('isLoggedIn')->willReturn(false);
 
-        $register->setLoggedIn(false);
-        $this->assertFalse($register->requireAuthentication());
+        $this->assertFalse($this->createRegister()->requireAuthentication());
     }
 
     public function testRequireAuthenticationAllowsAuthenticated(): void
     {
-        $register = new TestableRegisterRestRoute(
-            new RestRouteRegistry(),
-            $this->createMock(RestRouteRegistrarInterface::class),
-            $this->createMock(HookDispatcherInterface::class),
-        );
+        $this->userContext->method('isLoggedIn')->willReturn(true);
 
-        $register->setLoggedIn(true);
-        $this->assertTrue($register->requireAuthentication());
+        $this->assertTrue($this->createRegister()->requireAuthentication());
     }
 }

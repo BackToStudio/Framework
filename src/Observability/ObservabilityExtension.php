@@ -6,8 +6,8 @@ namespace BackTo\Framework\Observability;
 
 use BackTo\Framework\Compose\AbstractExtension;
 use BackTo\Framework\Observability\Contracts\ErrorHandlerInterface;
-use BackTo\Framework\Observability\Contracts\HealthCheckInterface;
-use BackTo\Framework\Observability\Contracts\LoggerInterface;
+use BackTo\Framework\Contracts\HealthCheckInterface;
+use BackTo\Framework\Contracts\LoggerInterface;
 use BackTo\Framework\Observability\Contracts\PerformanceCollectorInterface;
 use BackTo\Framework\Observability\DependencyInjection\Compiler\RegisterHealthCheckPass;
 use BackTo\Framework\Observability\Infrastructure\WordPressLogger;

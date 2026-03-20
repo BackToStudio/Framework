@@ -4,38 +4,47 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Assets\Tests;
 
-use BackTo\Framework\Assets\WordPressScriptsAssets;
+use BackTo\Framework\Assets\AssetResolver;
+use BackTo\Framework\Assets\Infrastructure\WordPressScriptsAssets;
+use BackTo\Framework\Contracts\ScriptManagerInterface;
 use BackTo\Framework\Exception\AssetBuildNotFoundException;
 use PHPUnit\Framework\TestCase;
 
 class WordPressScriptsAssetsTest extends TestCase
 {
-    public function testHasBuildFolderReturnsFalseWhenMissing(): void
-    {
-        $assets = new WordPressScriptsAssets('/nonexistent/path', 'https://example.com');
+    private ScriptManagerInterface $scriptManager;
 
-        $this->assertFalse($assets->hasBuildFolder());
+    protected function setUp(): void
+    {
+        $this->scriptManager = $this->createMock(ScriptManagerInterface::class);
     }
 
-    public function testHasBuildFolderReturnsTrueWhenExists(): void
+    public function testAssetResolverHasBuildFolderReturnsFalseWhenMissing(): void
+    {
+        $resolver = new AssetResolver('/nonexistent/path', 'https://example.com');
+
+        $this->assertFalse($resolver->hasBuildFolder());
+    }
+
+    public function testAssetResolverHasBuildFolderReturnsTrueWhenExists(): void
     {
         $tmpDir = \sys_get_temp_dir() . '/wp-assets-test-' . \uniqid();
         \mkdir($tmpDir . '/build', 0755, true);
 
-        $assets = new WordPressScriptsAssets($tmpDir, 'https://example.com');
+        $resolver = new AssetResolver($tmpDir, 'https://example.com');
 
-        $this->assertTrue($assets->hasBuildFolder());
+        $this->assertTrue($resolver->hasBuildFolder());
 
         \rmdir($tmpDir . '/build');
         \rmdir($tmpDir);
     }
 
-    public function testEnsureBuildFolderExistsThrowsWhenMissing(): void
+    public function testAssetResolverEnsureBuildFolderExistsThrowsWhenMissing(): void
     {
         $this->expectException(AssetBuildNotFoundException::class);
 
-        $assets = new WordPressScriptsAssets('/nonexistent/path', 'https://example.com');
-        $assets->ensureBuildFolderExists();
+        $resolver = new AssetResolver('/nonexistent/path', 'https://example.com');
+        $resolver->ensureBuildFolderExists();
     }
 
     public function testGetAssetReturnsDefaultsWhenNoAssetFile(): void
@@ -43,8 +52,8 @@ class WordPressScriptsAssetsTest extends TestCase
         $tmpDir = \sys_get_temp_dir() . '/wp-assets-test-' . \uniqid();
         \mkdir($tmpDir . '/build', 0755, true);
 
-        $assets = new WordPressScriptsAssets($tmpDir, 'https://example.com');
-        $result = $assets->getAsset('app.js');
+        $resolver = new AssetResolver($tmpDir, 'https://example.com');
+        $result = $resolver->getAsset('app.js');
 
         $this->assertSame([], $result['dependencies']);
         $this->assertNull($result['version']);
@@ -64,14 +73,54 @@ class WordPressScriptsAssetsTest extends TestCase
             '<?php return ["dependencies" => ["wp-element"], "version" => "abc123"];',
         );
 
-        $assets = new WordPressScriptsAssets($tmpDir, 'https://example.com');
-        $result = $assets->getAsset('app.js');
+        $resolver = new AssetResolver($tmpDir, 'https://example.com');
+        $result = $resolver->getAsset('app.js');
 
         $this->assertSame(['wp-element'], $result['dependencies']);
         $this->assertSame('abc123', $result['version']);
         $this->assertSame('https://example.com/build/app.js', $result['uri']);
 
         \unlink($tmpDir . '/build/app.asset.php');
+        \rmdir($tmpDir . '/build');
+        \rmdir($tmpDir);
+    }
+
+    public function testRegisterStyleDelegatesToScriptManager(): void
+    {
+        $tmpDir = \sys_get_temp_dir() . '/wp-assets-test-' . \uniqid();
+        \mkdir($tmpDir . '/build', 0755, true);
+
+        $resolver = new AssetResolver($tmpDir, 'https://example.com');
+
+        $this->scriptManager->expects($this->once())
+            ->method('registerStyle')
+            ->with('my-style', 'https://example.com/build/style.css', [], null, 'all');
+
+        $assets = new WordPressScriptsAssets($resolver, $this->scriptManager);
+        $assets->registerStyle('my-style', 'style.css');
+
+        \rmdir($tmpDir . '/build');
+        \rmdir($tmpDir);
+    }
+
+    public function testEnqueueScriptRegistersAndEnqueues(): void
+    {
+        $tmpDir = \sys_get_temp_dir() . '/wp-assets-test-' . \uniqid();
+        \mkdir($tmpDir . '/build', 0755, true);
+
+        $resolver = new AssetResolver($tmpDir, 'https://example.com');
+
+        $this->scriptManager->expects($this->once())
+            ->method('registerScript')
+            ->with('my-script', 'https://example.com/build/app.js', [], null, true);
+
+        $this->scriptManager->expects($this->once())
+            ->method('enqueueScript')
+            ->with('my-script');
+
+        $assets = new WordPressScriptsAssets($resolver, $this->scriptManager);
+        $assets->enqueueScript('my-script', 'app.js');
+
         \rmdir($tmpDir . '/build');
         \rmdir($tmpDir);
     }

@@ -48,4 +48,48 @@ final class PostType implements PostTypeInterface
 
         return $this;
     }
+
+    // ── Domain Logic ────────────────────────────────────────
+
+    /**
+     * Whether this post type is hierarchical (like pages).
+     */
+    public function isHierarchical(): bool
+    {
+        return (bool) ($this->args['hierarchical'] ?? false);
+    }
+
+    /**
+     * Whether this post type is exposed in the REST API.
+     */
+    public function isExposedInRest(): bool
+    {
+        return (bool) ($this->args['show_in_rest'] ?? false);
+    }
+
+    /**
+     * Whether this post type is publicly queryable.
+     */
+    public function isPublic(): bool
+    {
+        return (bool) ($this->args['public'] ?? false);
+    }
+
+    /**
+     * Whether the post type supports a specific feature (e.g. 'title', 'editor', 'thumbnail').
+     */
+    public function supports(string $feature): bool
+    {
+        $supports = $this->args['supports'] ?? [];
+
+        return \is_array($supports) && \in_array($feature, $supports, true);
+    }
+
+    /**
+     * Whether the post type key has been set.
+     */
+    public function hasKey(): bool
+    {
+        return $this->key !== '';
+    }
 }

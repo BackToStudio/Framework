@@ -10,6 +10,7 @@ use BackTo\Framework\Contracts\DeactivationHooks;
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\HookInterface;
 use BackTo\Framework\Contracts\Hooks;
+use BackTo\Framework\Contracts\QueryContextInterface;
 use BackTo\Framework\Contracts\RegistryInterface;
 use BackTo\Framework\Hooks\HookRegistry;
 use PHPUnit\Framework\TestCase;
@@ -50,29 +51,38 @@ class DeactivationHookStub implements HookInterface, DeactivationHooks
 
 class HookRegistryTest extends TestCase
 {
-    private function createMockDispatcher(bool $isAdmin = false): HookDispatcherInterface
+    private function createRegistry(bool $isAdmin = false): HookRegistry
     {
         $dispatcher = $this->createMock(HookDispatcherInterface::class);
-        $dispatcher->method('isAdmin')->willReturn($isAdmin);
+        $queryContext = $this->createMock(QueryContextInterface::class);
+        $queryContext->method('isAdmin')->willReturn($isAdmin);
 
-        return $dispatcher;
+        return new HookRegistry($dispatcher, $queryContext);
+    }
+
+    private function createRegistryWithDispatcher(HookDispatcherInterface $dispatcher, bool $isAdmin = false): HookRegistry
+    {
+        $queryContext = $this->createMock(QueryContextInterface::class);
+        $queryContext->method('isAdmin')->willReturn($isAdmin);
+
+        return new HookRegistry($dispatcher, $queryContext);
     }
 
     public function testImplementsRegistryInterface(): void
     {
-        $registry = new HookRegistry($this->createMockDispatcher());
+        $registry = $this->createRegistry();
         $this->assertInstanceOf(RegistryInterface::class, $registry);
     }
 
     public function testEmptyRegistry(): void
     {
-        $registry = new HookRegistry($this->createMockDispatcher());
+        $registry = $this->createRegistry();
         $this->assertCount(0, $registry->getHooks());
     }
 
     public function testAddHook(): void
     {
-        $registry = new HookRegistry($this->createMockDispatcher());
+        $registry = $this->createRegistry();
         $hook = new FrontHookStub();
         $registry->addHook($hook);
         $this->assertCount(1, $registry->getHooks());
@@ -80,14 +90,14 @@ class HookRegistryTest extends TestCase
 
     public function testAddHookReturnsSelf(): void
     {
-        $registry = new HookRegistry($this->createMockDispatcher());
+        $registry = $this->createRegistry();
         $result = $registry->addHook(new FrontHookStub());
         $this->assertSame($registry, $result);
     }
 
     public function testRunHooksCallsFrontHooks(): void
     {
-        $registry = new HookRegistry($this->createMockDispatcher());
+        $registry = $this->createRegistry();
         $hook = new FrontHookStub();
         $registry->addHook($hook);
         $registry->runHooks();
@@ -96,7 +106,7 @@ class HookRegistryTest extends TestCase
 
     public function testRunHooksCallsAdminHooksWhenIsAdmin(): void
     {
-        $registry = new HookRegistry($this->createMockDispatcher(true));
+        $registry = $this->createRegistry(true);
         $hook = new AdminHookStub();
         $registry->addHook($hook);
         $registry->runHooks();
@@ -105,7 +115,7 @@ class HookRegistryTest extends TestCase
 
     public function testRunHooksDoesNotCallAdminHooksWhenNotAdmin(): void
     {
-        $registry = new HookRegistry($this->createMockDispatcher(false));
+        $registry = $this->createRegistry(false);
         $hook = new AdminHookStub();
         $registry->addHook($hook);
         $registry->runHooks();
@@ -115,12 +125,11 @@ class HookRegistryTest extends TestCase
     public function testRunHooksRegistersActivationHookWithPluginFile(): void
     {
         $dispatcher = $this->createMock(HookDispatcherInterface::class);
-        $dispatcher->method('isAdmin')->willReturn(false);
         $dispatcher->expects($this->once())
             ->method('registerActivationHook')
             ->with('plugin.php', $this->anything());
 
-        $registry = new HookRegistry($dispatcher);
+        $registry = $this->createRegistryWithDispatcher($dispatcher);
         $registry->setPluginFile('plugin.php');
         $registry->addHook(new ActivationHookStub());
         $registry->runHooks();
@@ -129,12 +138,11 @@ class HookRegistryTest extends TestCase
     public function testRunHooksRegistersDeactivationHookWithPluginFile(): void
     {
         $dispatcher = $this->createMock(HookDispatcherInterface::class);
-        $dispatcher->method('isAdmin')->willReturn(false);
         $dispatcher->expects($this->once())
             ->method('registerDeactivationHook')
             ->with('plugin.php', $this->anything());
 
-        $registry = new HookRegistry($dispatcher);
+        $registry = $this->createRegistryWithDispatcher($dispatcher);
         $registry->setPluginFile('plugin.php');
         $registry->addHook(new DeactivationHookStub());
         $registry->runHooks();
@@ -143,11 +151,10 @@ class HookRegistryTest extends TestCase
     public function testRunHooksDoesNotRegisterActivationHookWithoutPluginFile(): void
     {
         $dispatcher = $this->createMock(HookDispatcherInterface::class);
-        $dispatcher->method('isAdmin')->willReturn(false);
         $dispatcher->expects($this->never())
             ->method('registerActivationHook');
 
-        $registry = new HookRegistry($dispatcher);
+        $registry = $this->createRegistryWithDispatcher($dispatcher);
         $registry->addHook(new ActivationHookStub());
         $registry->runHooks();
     }

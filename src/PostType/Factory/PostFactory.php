@@ -7,7 +7,7 @@ namespace BackTo\Framework\PostType\Factory;
 use BackTo\Framework\PostType\Contracts\PostInterface;
 use BackTo\Framework\PostType\Entity\Post;
 use BackTo\Framework\PostType\Entity\PostStatus;
-use BackTo\Framework\Observability\Contracts\LoggerInterface;
+use BackTo\Framework\Contracts\LoggerInterface;
 use DateTimeImmutable;
 use Exception;
 use WP_Post;

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Compose\Tests;
 
-use BackTo\Framework\Compose\ValueObject\Slug;
+use BackTo\Framework\Contracts\Slug;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 

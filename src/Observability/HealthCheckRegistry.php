@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace BackTo\Framework\Observability;
 
 use BackTo\Framework\Contracts\RegistryInterface;
-use BackTo\Framework\Observability\Contracts\HealthCheckInterface;
-use BackTo\Framework\Observability\Contracts\HealthCheckResult;
+use BackTo\Framework\Contracts\HealthCheckInterface;
+use BackTo\Framework\Contracts\HealthCheckResult;
 
 /**
  * Collects and executes all registered health checks.

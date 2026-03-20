@@ -107,29 +107,31 @@ final class TermQueryBuilder
 
     public function whereMeta(string $key, mixed $value, MetaCompare $compare = MetaCompare::EQUAL): self
     {
-        if (!isset($this->args['meta_query'])) {
-            $this->args['meta_query'] = [];
-        }
-
-        $this->args['meta_query'][] = [
+        return $this->addMetaQuery([
             'key' => $key,
             'value' => $value,
             'compare' => $compare->value,
-        ];
-
-        return $this;
+        ]);
     }
 
     public function whereMetaExists(string $key): self
+    {
+        return $this->addMetaQuery([
+            'key' => $key,
+            'compare' => MetaCompare::EXISTS->value,
+        ]);
+    }
+
+    /**
+     * @param array<string, mixed> $clause
+     */
+    private function addMetaQuery(array $clause): self
     {
         if (!isset($this->args['meta_query'])) {
             $this->args['meta_query'] = [];
         }
 
-        $this->args['meta_query'][] = [
-            'key' => $key,
-            'compare' => MetaCompare::EXISTS->value,
-        ];
+        $this->args['meta_query'][] = $clause;
 
         return $this;
     }

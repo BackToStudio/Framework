@@ -7,8 +7,8 @@ namespace BackTo\Framework\Tests\Integration\Security;
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\RequestContextInterface;
 use BackTo\Framework\Observability\Contracts\LoggerInterface;
-use BackTo\Framework\Security\AdminUrlObfuscation;
-use BackTo\Framework\Security\Contracts\ClientIpResolverInterface;
+use BackTo\Framework\Bundle\Security\Hardening\AdminUrlObfuscation;
+use BackTo\Framework\Bundle\Security\Contracts\ClientIpResolverInterface;
 use PHPUnit\Framework\TestCase;
 
 /**

@@ -29,4 +29,9 @@ interface TermInterface extends IdInterface, SlugInterface, ParentIdInterface
     
     public function setTaxonomy(string $taxonomy): TermInterface;
 
+    public function isTopLevel(): bool;
+
+    public function belongsTo(string $taxonomy): bool;
+
+    public function hasDescription(): bool;
 }

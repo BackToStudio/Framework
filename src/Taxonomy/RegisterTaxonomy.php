@@ -8,7 +8,7 @@ use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
 use BackTo\Framework\Exception\FrameworkException;
 use BackTo\Framework\Exception\InvalidTaxonomyException;
-use BackTo\Framework\Observability\Contracts\LoggerInterface;
+use BackTo\Framework\Contracts\LoggerInterface;
 use BackTo\Framework\Taxonomy\Contracts\TaxonomyRegistrarInterface;
 
 final class RegisterTaxonomy implements Hooks

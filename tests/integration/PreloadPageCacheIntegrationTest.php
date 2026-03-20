@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace BackTo\Framework\Tests\Integration;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
-use BackTo\Framework\Performance\Contracts\PageCacheInterface;
-use BackTo\Framework\Performance\Hooks\PreloadPageCache;
+use BackTo\Framework\Bundle\Performance\Contracts\PageCacheInterface;
+use BackTo\Framework\Bundle\Performance\Hooks\Cache\PreloadPageCache;
 use PHPUnit\Framework\TestCase;
 
 /**

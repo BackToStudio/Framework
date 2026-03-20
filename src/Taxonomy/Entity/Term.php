@@ -51,4 +51,30 @@ final class Term implements TermInterface
         $this->taxonomy = $taxonomy;
         return $this;
     }
+
+    // ── Domain Logic ────────────────────────────────────────
+
+    /**
+     * Whether this term is a root term (has no parent).
+     */
+    public function isTopLevel(): bool
+    {
+        return $this->getParentId() === null || $this->getParentId() === 0;
+    }
+
+    /**
+     * Whether this term belongs to a given taxonomy.
+     */
+    public function belongsTo(string $taxonomy): bool
+    {
+        return $this->taxonomy === $taxonomy;
+    }
+
+    /**
+     * Whether this term has a description.
+     */
+    public function hasDescription(): bool
+    {
+        return trim($this->description) !== '';
+    }
 }

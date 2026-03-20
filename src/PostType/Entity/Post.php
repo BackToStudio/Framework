@@ -121,4 +121,58 @@ final class Post implements PostInterface
         $this->modifiedAt = $modifiedAt;
         return $this;
     }
+
+    // ── Domain Logic ────────────────────────────────────────
+
+    /**
+     * Whether this post is visible to front-end visitors.
+     */
+    public function isPublished(): bool
+    {
+        return $this->status === PostStatus::Publish;
+    }
+
+    /**
+     * Whether the post content can be modified (draft-like statuses).
+     */
+    public function isDraft(): bool
+    {
+        return $this->status->isEditable();
+    }
+
+    /**
+     * Whether the post is in the trash.
+     */
+    public function isTrashed(): bool
+    {
+        return $this->status === PostStatus::Trash;
+    }
+
+    /**
+     * Whether the post has been modified after publication.
+     */
+    public function hasBeenModifiedAfterPublication(): bool
+    {
+        if ($this->publishedAt === null || $this->modifiedAt === null) {
+            return false;
+        }
+
+        return $this->modifiedAt > $this->publishedAt;
+    }
+
+    /**
+     * Whether the post has non-empty content.
+     */
+    public function hasContent(): bool
+    {
+        return trim($this->content) !== '';
+    }
+
+    /**
+     * Whether the post has a non-empty excerpt.
+     */
+    public function hasExcerpt(): bool
+    {
+        return trim($this->excerpt) !== '';
+    }
 }

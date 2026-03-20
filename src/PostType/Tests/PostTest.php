@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\PostType\Tests;
 
-use BackTo\Framework\Compose\ValueObject\Slug;
+use BackTo\Framework\Contracts\Slug;
 use BackTo\Framework\PostType\Entity\Post;
 use BackTo\Framework\PostType\Entity\PostStatus;
 use BackTo\Framework\PostType\Entity\PostType;

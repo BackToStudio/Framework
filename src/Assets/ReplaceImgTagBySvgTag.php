@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace BackTo\Framework\Assets;
 
 
-use BackTo\Framework\Observability\Contracts\LoggerInterface;
+use BackTo\Framework\Contracts\LoggerInterface;
 use Exception;
 
 use function array_key_exists;

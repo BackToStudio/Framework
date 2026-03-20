@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Observability\HealthCheck;
 
-use BackTo\Framework\Observability\Contracts\HealthCheckInterface;
-use BackTo\Framework\Observability\Contracts\HealthCheckResult;
+use BackTo\Framework\Contracts\HealthCheckInterface;
+use BackTo\Framework\Contracts\HealthCheckResult;
 
 /**
  * Verifies that the DI container is compiled and functional.

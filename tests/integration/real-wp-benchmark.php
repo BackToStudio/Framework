@@ -18,8 +18,8 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../../vendor/autoload.php';
 
-use BackTo\Framework\Performance\Infrastructure\WordPressHtmlOptimizer;
-use BackTo\Framework\Performance\Infrastructure\WordPressPageCache;
+use BackTo\Framework\Bundle\Performance\Infrastructure\WordPressHtmlOptimizer;
+use BackTo\Framework\Bundle\Performance\Infrastructure\WordPressPageCache;
 
 // ── Configuration ──
 $wpUrl = getenv('WP_BENCHMARK_URL') ?: 'http://localhost:8787';
