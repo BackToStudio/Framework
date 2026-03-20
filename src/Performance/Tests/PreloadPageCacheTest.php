@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Performance\Tests;
 
+use BackTo\Framework\Contracts\ContentQueryInterface;
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Performance\Hooks\PreloadPageCache;
 use BackTo\Framework\Performance\PreloadExecutor;
@@ -15,6 +16,7 @@ class PreloadPageCacheTest extends TestCase
 {
     private PreloadPageCache $preloader;
     private HookDispatcherInterface $hookDispatcher;
+    private ContentQueryInterface $contentQuery;
     private PreloadUrlCollector $urlCollector;
     private PreloadExecutor $executor;
     private CronSchedulerInterface $cronScheduler;
@@ -22,11 +24,13 @@ class PreloadPageCacheTest extends TestCase
     protected function setUp(): void
     {
         $this->hookDispatcher = $this->createMock(HookDispatcherInterface::class);
+        $this->contentQuery = $this->createMock(ContentQueryInterface::class);
         $this->urlCollector = $this->createMock(PreloadUrlCollector::class);
         $this->executor = $this->createMock(PreloadExecutor::class);
         $this->cronScheduler = $this->createMock(CronSchedulerInterface::class);
         $this->preloader = new PreloadPageCache(
             $this->hookDispatcher,
+            $this->contentQuery,
             $this->urlCollector,
             $this->executor,
             $this->cronScheduler,
@@ -60,6 +64,70 @@ class PreloadPageCacheTest extends TestCase
     {
         $this->assertSame('btf_preload_page_cache', PreloadPageCache::CRON_HOOK);
         $this->assertSame('btf_preload_page_cache_full', PreloadPageCache::CRON_FULL_HOOK);
+    }
+
+    public function testSchedulePostPreloadSchedulesCronForPublishedPost(): void
+    {
+        $post = new \stdClass();
+        $post->post_status = 'publish';
+
+        $this->contentQuery->method('getPost')->with(42)->willReturn($post);
+        $this->contentQuery->method('isPostRevision')->with(42)->willReturn(false);
+        $this->contentQuery->method('isPostAutosave')->with(42)->willReturn(false);
+
+        $this->cronScheduler->expects($this->once())->method('clear');
+        $this->cronScheduler->expects($this->once())->method('scheduleSingle');
+        $this->cronScheduler->expects($this->once())->method('spawn');
+
+        $this->preloader->schedulePostPreload(42);
+    }
+
+    public function testSchedulePostPreloadSkipsNullPost(): void
+    {
+        $this->contentQuery->method('getPost')->willReturn(null);
+
+        $this->cronScheduler->expects($this->never())->method('scheduleSingle');
+
+        $this->preloader->schedulePostPreload(42);
+    }
+
+    public function testSchedulePostPreloadSkipsDraftPost(): void
+    {
+        $post = new \stdClass();
+        $post->post_status = 'draft';
+
+        $this->contentQuery->method('getPost')->willReturn($post);
+
+        $this->cronScheduler->expects($this->never())->method('scheduleSingle');
+
+        $this->preloader->schedulePostPreload(42);
+    }
+
+    public function testSchedulePostPreloadSkipsRevision(): void
+    {
+        $post = new \stdClass();
+        $post->post_status = 'publish';
+
+        $this->contentQuery->method('getPost')->willReturn($post);
+        $this->contentQuery->method('isPostRevision')->with(42)->willReturn(true);
+
+        $this->cronScheduler->expects($this->never())->method('scheduleSingle');
+
+        $this->preloader->schedulePostPreload(42);
+    }
+
+    public function testSchedulePostPreloadSkipsAutosave(): void
+    {
+        $post = new \stdClass();
+        $post->post_status = 'publish';
+
+        $this->contentQuery->method('getPost')->willReturn($post);
+        $this->contentQuery->method('isPostRevision')->willReturn(false);
+        $this->contentQuery->method('isPostAutosave')->with(42)->willReturn(true);
+
+        $this->cronScheduler->expects($this->never())->method('scheduleSingle');
+
+        $this->preloader->schedulePostPreload(42);
     }
 
     public function testScheduleOnPublishSkipsSameStatus(): void
@@ -136,6 +204,7 @@ class PreloadPageCacheTest extends TestCase
     {
         $preloader = new PreloadPageCache(
             $this->hookDispatcher,
+            $this->contentQuery,
             $this->urlCollector,
             $this->executor,
             $this->cronScheduler,
@@ -147,6 +216,7 @@ class PreloadPageCacheTest extends TestCase
     {
         $preloader = new PreloadPageCache(
             $this->hookDispatcher,
+            $this->contentQuery,
             $this->urlCollector,
             $this->executor,
             $this->cronScheduler,

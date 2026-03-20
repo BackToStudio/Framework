@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Seo\Provider;
 
+use BackTo\Framework\Contracts\ContentQueryInterface;
+use BackTo\Framework\Contracts\PluginCheckerInterface;
+use BackTo\Framework\Options\Contracts\OptionsRepositoryInterface;
 use BackTo\Framework\Seo\Contracts\SeoProviderInterface;
 
 /**
@@ -14,6 +17,12 @@ final class SeoPressProvider implements SeoProviderInterface
     private const PLUGIN_FILE = 'wp-seopress/seopress.php';
     private const SOCIAL_OPTION = 'seopress_social_option_name';
 
+    public function __construct(
+        private readonly PluginCheckerInterface $pluginChecker,
+        private readonly OptionsRepositoryInterface $options,
+        private readonly ContentQueryInterface $contentQuery,
+    ) {}
+
     public function getName(): string
     {
         return 'seopress';
@@ -21,7 +30,7 @@ final class SeoPressProvider implements SeoProviderInterface
 
     public function isActive(): bool
     {
-        return \is_plugin_active(self::PLUGIN_FILE);
+        return $this->pluginChecker->isActive(self::PLUGIN_FILE);
     }
 
     // --- Social Links ---
@@ -102,7 +111,7 @@ final class SeoPressProvider implements SeoProviderInterface
 
     private function getSocialOption(string $key): ?string
     {
-        $options = \get_option(self::SOCIAL_OPTION, []);
+        $options = $this->options->get(self::SOCIAL_OPTION, []);
 
         if (!is_array($options) || !isset($options[$key])) {
             return null;
@@ -115,13 +124,13 @@ final class SeoPressProvider implements SeoProviderInterface
 
     private function getPostMeta(?int $postId, string $key): ?string
     {
-        $postId = $postId ?? \get_the_ID();
+        $postId = $postId ?? $this->contentQuery->getCurrentPostId();
 
         if (!$postId) {
             return null;
         }
 
-        $value = \get_post_meta($postId, $key, true);
+        $value = $this->contentQuery->getPostMeta($postId, $key, true);
 
         return is_string($value) && $value !== '' ? $value : null;
     }

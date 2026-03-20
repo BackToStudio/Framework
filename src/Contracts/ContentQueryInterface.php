@@ -74,4 +74,12 @@ interface ContentQueryInterface
     public function getYearLink(int $year): string;
 
     public function getMonthLink(int $year, int $month): string;
+
+    public function getCurrentPostId(): int|false;
+
+    public function isPostRevision(int $postId): bool;
+
+    public function isPostAutosave(int $postId): bool;
+
+    public function getPostMeta(int $postId, string $key, bool $single = true): mixed;
 }

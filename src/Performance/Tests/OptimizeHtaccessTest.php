@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Performance\Tests;
 
+use BackTo\Framework\Cache\Contracts\TransientStoreInterface;
 use BackTo\Framework\Contracts\ActivationHooks;
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
@@ -16,7 +17,6 @@ use PHPUnit\Framework\TestCase;
 class TestableOptimizeHtaccess extends OptimizeHtaccess
 {
     private ?string $htaccessPath = null;
-    private ?string $storedHash = null;
 
     /** @var array<string, array{marker: string, lines: string[]}> */
     private array $markerCalls = [];
@@ -45,30 +45,22 @@ class TestableOptimizeHtaccess extends OptimizeHtaccess
 
         return true;
     }
-
-    protected function getDirectivesHash(): ?string
-    {
-        return $this->storedHash;
-    }
-
-    protected function storeDirectivesHash(string $hash): void
-    {
-        $this->storedHash = $hash;
-    }
 }
 
 class OptimizeHtaccessTest extends TestCase
 {
     private HookDispatcherInterface $hookDispatcher;
+    private TransientStoreInterface $transientStore;
 
     protected function setUp(): void
     {
         $this->hookDispatcher = $this->createMock(HookDispatcherInterface::class);
+        $this->transientStore = $this->createMock(TransientStoreInterface::class);
     }
 
     public function testImplementsRequiredInterfaces(): void
     {
-        $hook = new OptimizeHtaccess($this->hookDispatcher);
+        $hook = new OptimizeHtaccess($this->hookDispatcher, $this->transientStore);
 
         $this->assertInstanceOf(Hooks::class, $hook);
         $this->assertInstanceOf(ActivationHooks::class, $hook);
@@ -85,13 +77,13 @@ class OptimizeHtaccessTest extends TestCase
             ->method('addAction')
             ->with('admin_init', $this->anything());
 
-        $hook = new OptimizeHtaccess($this->hookDispatcher);
+        $hook = new OptimizeHtaccess($this->hookDispatcher, $this->transientStore);
         $hook->hooks();
     }
 
     public function testBuildDirectivesIncludesAllSectionsbyDefault(): void
     {
-        $hook = new OptimizeHtaccess($this->hookDispatcher);
+        $hook = new OptimizeHtaccess($this->hookDispatcher, $this->transientStore);
         $lines = $hook->buildDirectives();
         $content = implode("\n", $lines);
 
@@ -105,6 +97,7 @@ class OptimizeHtaccessTest extends TestCase
     {
         $hook = new OptimizeHtaccess(
             $this->hookDispatcher,
+            $this->transientStore,
             gzip: true,
             browserCache: false,
             removeEtags: false,
@@ -123,6 +116,7 @@ class OptimizeHtaccessTest extends TestCase
     {
         $hook = new OptimizeHtaccess(
             $this->hookDispatcher,
+            $this->transientStore,
             gzip: false,
             browserCache: true,
             removeEtags: false,
@@ -140,6 +134,7 @@ class OptimizeHtaccessTest extends TestCase
     {
         $hook = new OptimizeHtaccess(
             $this->hookDispatcher,
+            $this->transientStore,
             gzip: false,
             browserCache: false,
             removeEtags: true,
@@ -156,6 +151,7 @@ class OptimizeHtaccessTest extends TestCase
     {
         $hook = new OptimizeHtaccess(
             $this->hookDispatcher,
+            $this->transientStore,
             gzip: false,
             browserCache: false,
             removeEtags: false,
@@ -172,6 +168,7 @@ class OptimizeHtaccessTest extends TestCase
     {
         $hook = new OptimizeHtaccess(
             $this->hookDispatcher,
+            $this->transientStore,
             gzip: false,
             browserCache: false,
             removeEtags: false,
@@ -185,6 +182,7 @@ class OptimizeHtaccessTest extends TestCase
     {
         $hook = new OptimizeHtaccess(
             $this->hookDispatcher,
+            $this->transientStore,
             gzip: true,
             browserCache: false,
             removeEtags: false,
@@ -206,6 +204,7 @@ class OptimizeHtaccessTest extends TestCase
     {
         $hook = new OptimizeHtaccess(
             $this->hookDispatcher,
+            $this->transientStore,
             gzip: true,
             browserCache: false,
             removeEtags: false,
@@ -221,6 +220,7 @@ class OptimizeHtaccessTest extends TestCase
     {
         $hook = new OptimizeHtaccess(
             $this->hookDispatcher,
+            $this->transientStore,
             gzip: false,
             browserCache: true,
             removeEtags: false,
@@ -238,6 +238,7 @@ class OptimizeHtaccessTest extends TestCase
     {
         $hook = new OptimizeHtaccess(
             $this->hookDispatcher,
+            $this->transientStore,
             gzip: false,
             browserCache: true,
             removeEtags: false,
@@ -253,6 +254,7 @@ class OptimizeHtaccessTest extends TestCase
     {
         $hook = new OptimizeHtaccess(
             $this->hookDispatcher,
+            $this->transientStore,
             gzip: false,
             browserCache: true,
             removeEtags: false,
@@ -270,6 +272,7 @@ class OptimizeHtaccessTest extends TestCase
     {
         $hook = new OptimizeHtaccess(
             $this->hookDispatcher,
+            $this->transientStore,
             gzip: false,
             browserCache: true,
             removeEtags: false,
@@ -282,7 +285,9 @@ class OptimizeHtaccessTest extends TestCase
 
     public function testApplyDirectivesWritesToHtaccess(): void
     {
-        $hook = new TestableOptimizeHtaccess($this->hookDispatcher);
+        $this->transientStore->method('get')->willReturn(null);
+
+        $hook = new TestableOptimizeHtaccess($this->hookDispatcher, $this->transientStore);
         $hook->setHtaccessPath('/var/www/html/.htaccess');
 
         $hook->applyDirectives();
@@ -295,7 +300,7 @@ class OptimizeHtaccessTest extends TestCase
 
     public function testApplyDirectivesSkipsNullPath(): void
     {
-        $hook = new TestableOptimizeHtaccess($this->hookDispatcher);
+        $hook = new TestableOptimizeHtaccess($this->hookDispatcher, $this->transientStore);
         $hook->setHtaccessPath(null);
 
         $hook->applyDirectives();
@@ -305,7 +310,7 @@ class OptimizeHtaccessTest extends TestCase
 
     public function testRemoveDirectivesWritesEmptyLines(): void
     {
-        $hook = new TestableOptimizeHtaccess($this->hookDispatcher);
+        $hook = new TestableOptimizeHtaccess($this->hookDispatcher, $this->transientStore);
         $hook->setHtaccessPath('/var/www/html/.htaccess');
 
         $hook->removeDirectives();
@@ -317,7 +322,7 @@ class OptimizeHtaccessTest extends TestCase
 
     public function testRemoveDirectivesSkipsNullPath(): void
     {
-        $hook = new TestableOptimizeHtaccess($this->hookDispatcher);
+        $hook = new TestableOptimizeHtaccess($this->hookDispatcher, $this->transientStore);
         $hook->setHtaccessPath(null);
 
         $hook->removeDirectives();
@@ -327,7 +332,9 @@ class OptimizeHtaccessTest extends TestCase
 
     public function testActivateCallsApplyDirectives(): void
     {
-        $hook = new TestableOptimizeHtaccess($this->hookDispatcher);
+        $this->transientStore->method('get')->willReturn(null);
+
+        $hook = new TestableOptimizeHtaccess($this->hookDispatcher, $this->transientStore);
         $hook->setHtaccessPath('/var/www/html/.htaccess');
 
         $hook->activate();
@@ -341,6 +348,7 @@ class OptimizeHtaccessTest extends TestCase
     {
         $hook = new TestableOptimizeHtaccess(
             $this->hookDispatcher,
+            $this->transientStore,
             gzip: false,
             browserCache: false,
             removeEtags: false,
@@ -350,42 +358,42 @@ class OptimizeHtaccessTest extends TestCase
 
         $hook->applyDirectives();
 
-        // No lines to write → no call
+        // No lines to write -> no call
         $this->assertEmpty($hook->getMarkerCalls());
     }
 
     public function testApplyDirectivesSkipsRedundantWrite(): void
     {
-        $hook = new TestableOptimizeHtaccess($this->hookDispatcher);
+        $hook = new OptimizeHtaccess($this->hookDispatcher, $this->transientStore);
+        $lines = $hook->buildDirectives();
+        $expectedHash = md5(implode("\n", $lines));
+
+        // TransientStore returns the same hash -> skip write
+        $this->transientStore->method('get')->willReturn($expectedHash);
+
+        $testable = new TestableOptimizeHtaccess($this->hookDispatcher, $this->transientStore);
+        $testable->setHtaccessPath('/var/www/html/.htaccess');
+        $testable->applyDirectives();
+
+        $this->assertEmpty($testable->getMarkerCalls());
+    }
+
+    public function testApplyDirectivesStoresHashAfterWrite(): void
+    {
+        $this->transientStore->method('get')->willReturn(null);
+        $this->transientStore->expects($this->once())
+            ->method('set')
+            ->with('backto_htaccess_hash', $this->isType('string'), 86400);
+
+        $hook = new TestableOptimizeHtaccess($this->hookDispatcher, $this->transientStore);
         $hook->setHtaccessPath('/var/www/html/.htaccess');
 
-        // First call writes
         $hook->applyDirectives();
-        $this->assertCount(1, $hook->getMarkerCalls());
-
-        // Reset calls tracking to verify second call is skipped
-        // We can't reset markerCalls directly, but a second call with same hash
-        // should NOT call insertWithMarkers again — since markerCalls accumulates
-        // by key, size would still be 1 if it overwrites, so let's check differently:
-        // Remove the path from marker calls and re-apply
-        $hook2 = new TestableOptimizeHtaccess($this->hookDispatcher);
-        $hook2->setHtaccessPath('/var/www/html/.htaccess');
-
-        // First apply — writes
-        $hook2->applyDirectives();
-        $this->assertNotEmpty($hook2->getMarkerCalls());
-
-        // Second apply — should be skipped (hash matches)
-        // The hash is stored after first apply, so insertWithMarkers won't be called
-        // We verify by checking that the stored hash prevents redundant writes
-        $reflection = new \ReflectionMethod($hook2, 'getDirectivesHash');
-        $storedHash = $reflection->invoke($hook2);
-        $this->assertNotNull($storedHash);
     }
 
     public function testDefaultStaticTtlIsOneYear(): void
     {
-        $hook = new OptimizeHtaccess($this->hookDispatcher);
+        $hook = new OptimizeHtaccess($this->hookDispatcher, $this->transientStore);
         $content = implode("\n", $hook->buildDirectives());
 
         $this->assertStringContainsString('31536000', $content);

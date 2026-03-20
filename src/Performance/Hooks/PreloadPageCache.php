@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Performance\Hooks;
 
+use BackTo\Framework\Contracts\ContentQueryInterface;
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
 use BackTo\Framework\Performance\PreloadExecutor;
@@ -27,6 +28,7 @@ final class PreloadPageCache implements Hooks
 
     public function __construct(
         private readonly HookDispatcherInterface $hookDispatcher,
+        private readonly ContentQueryInterface $contentQuery,
         private readonly PreloadUrlCollector $urlCollector,
         private readonly PreloadExecutor $executor,
         private readonly CronSchedulerInterface $cronScheduler,
@@ -47,9 +49,9 @@ final class PreloadPageCache implements Hooks
 
     public function schedulePostPreload(int $postId): void
     {
-        $post = \get_post($postId);
+        $post = $this->contentQuery->getPost($postId);
 
-        if (!$post instanceof \WP_Post) {
+        if ($post === null) {
             return;
         }
 
@@ -57,7 +59,7 @@ final class PreloadPageCache implements Hooks
             return;
         }
 
-        if (\wp_is_post_revision($postId) || \wp_is_post_autosave($postId)) {
+        if ($this->contentQuery->isPostRevision($postId) || $this->contentQuery->isPostAutosave($postId)) {
             return;
         }
 
@@ -67,7 +69,7 @@ final class PreloadPageCache implements Hooks
     }
 
     /**
-     * @param \WP_Post $post
+     * @param object $post
      */
     public function scheduleOnPublish(string $newStatus, string $oldStatus, $post): void
     {

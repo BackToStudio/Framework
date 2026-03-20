@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Performance\Hooks;
 
+use BackTo\Framework\Cache\Contracts\TransientStoreInterface;
 use BackTo\Framework\Contracts\ActivationHooks;
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
@@ -45,6 +46,7 @@ class OptimizeHtaccess implements Hooks, ActivationHooks
 
     public function __construct(
         HookDispatcherInterface $hookDispatcher,
+        private readonly TransientStoreInterface $transientStore,
         bool $gzip = true,
         bool $browserCache = true,
         bool $removeEtags = true,
@@ -328,19 +330,13 @@ class OptimizeHtaccess implements Hooks, ActivationHooks
 
     protected function getDirectivesHash(): ?string
     {
-        if (!function_exists('get_transient')) {
-            return null;
-        }
-
-        $hash = \get_transient(self::HASH_TRANSIENT);
+        $hash = $this->transientStore->get(self::HASH_TRANSIENT);
 
         return is_string($hash) ? $hash : null;
     }
 
     protected function storeDirectivesHash(string $hash): void
     {
-        if (function_exists('set_transient')) {
-            \set_transient(self::HASH_TRANSIENT, $hash, DAY_IN_SECONDS);
-        }
+        $this->transientStore->set(self::HASH_TRANSIENT, $hash, 86400);
     }
 }

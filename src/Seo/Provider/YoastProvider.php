@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Seo\Provider;
 
+use BackTo\Framework\Contracts\ContentQueryInterface;
+use BackTo\Framework\Contracts\PluginCheckerInterface;
+use BackTo\Framework\Options\Contracts\OptionsRepositoryInterface;
 use BackTo\Framework\Seo\Contracts\SeoProviderInterface;
 
 /**
@@ -14,8 +17,14 @@ final class YoastProvider implements SeoProviderInterface
     private const PLUGIN_FILE = 'wordpress-seo/wp-seo.php';
     private const SOCIAL_OPTION = 'wpseo_social';
 
-    /** @var array<string, mixed>|null Cached social options to avoid repeated get_option() calls */
+    /** @var array<string, mixed>|null Cached social options to avoid repeated calls */
     private ?array $socialOptionsCache = null;
+
+    public function __construct(
+        private readonly PluginCheckerInterface $pluginChecker,
+        private readonly OptionsRepositoryInterface $options,
+        private readonly ContentQueryInterface $contentQuery,
+    ) {}
 
     public function getName(): string
     {
@@ -24,7 +33,7 @@ final class YoastProvider implements SeoProviderInterface
 
     public function isActive(): bool
     {
-        return \is_plugin_active(self::PLUGIN_FILE);
+        return $this->pluginChecker->isActive(self::PLUGIN_FILE);
     }
 
     // --- Social Links ---
@@ -106,7 +115,7 @@ final class YoastProvider implements SeoProviderInterface
     private function getSocialOption(string $key): ?string
     {
         if ($this->socialOptionsCache === null) {
-            $options = \get_option(self::SOCIAL_OPTION, []);
+            $options = $this->options->get(self::SOCIAL_OPTION, []);
             $this->socialOptionsCache = is_array($options) ? $options : [];
         }
 
@@ -121,13 +130,13 @@ final class YoastProvider implements SeoProviderInterface
 
     private function getPostMeta(?int $postId, string $key): ?string
     {
-        $postId = $postId ?? \get_the_ID();
+        $postId = $postId ?? $this->contentQuery->getCurrentPostId();
 
         if (!$postId) {
             return null;
         }
 
-        $value = \get_post_meta($postId, $key, true);
+        $value = $this->contentQuery->getPostMeta($postId, $key, true);
 
         return is_string($value) && $value !== '' ? $value : null;
     }

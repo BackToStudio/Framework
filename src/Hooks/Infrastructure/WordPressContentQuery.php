@@ -129,4 +129,24 @@ final class WordPressContentQuery implements ContentQueryInterface
     {
         return (string) \get_month_link($year, $month);
     }
+
+    public function getCurrentPostId(): int|false
+    {
+        return \get_the_ID();
+    }
+
+    public function isPostRevision(int $postId): bool
+    {
+        return (bool) \wp_is_post_revision($postId);
+    }
+
+    public function isPostAutosave(int $postId): bool
+    {
+        return (bool) \wp_is_post_autosave($postId);
+    }
+
+    public function getPostMeta(int $postId, string $key, bool $single = true): mixed
+    {
+        return \get_post_meta($postId, $key, $single);
+    }
 }
