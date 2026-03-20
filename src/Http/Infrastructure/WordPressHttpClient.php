@@ -101,10 +101,8 @@ final class WordPressHttpClient implements HttpClientInterface
         $rawHeaders = \wp_remote_retrieve_headers($wpResponse);
 
         $headers = [];
-        if (is_iterable($rawHeaders)) {
-            foreach ($rawHeaders as $name => $value) {
-                $headers[(string) $name] = is_array($value) ? $value : [(string) $value];
-            }
+        foreach ($rawHeaders as $name => $value) {
+            $headers[(string) $name] = is_array($value) ? $value : [(string) $value];
         }
 
         return new Response($statusCode, $headers, $body);
