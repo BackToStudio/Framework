@@ -27,5 +27,5 @@ return static function (PerformanceConfigurator $performance): void {
 |---|---|---|
 | [Getting started](tutorial.md) | Tutorial | Enable page caching and see a cache hit step by step |
 | [Common tasks](how-to/README.md) | How-to | Practical recipes for real-world performance tuning |
-| [API reference](reference.md) | Reference | Complete interface, class, and configuration documentation |
-| [Architecture](explanation.md) | Explanation | Design decisions, cache lifecycle, minification pipeline |
+| [API reference](reference/README.md) | Reference | Complete interface, class, and configuration documentation |
+| [Architecture](explanation/README.md) | Explanation | Design decisions, cache lifecycle, minification pipeline |

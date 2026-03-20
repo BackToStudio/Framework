@@ -91,5 +91,5 @@ Visit a page and view the source. The HTML is now minified: whitespace between b
 ## Next steps
 
 - See [Common tasks](how-to/README.md) for practical recipes (cache TTL tuning, resource hints, WooCommerce optimization, script deferral)
-- See [API reference](reference.md) for the complete configuration and class documentation
-- See [Architecture](explanation.md) to understand how the cache lifecycle and minification pipeline work
+- See [API reference](reference/README.md) for the complete configuration and class documentation
+- See [Architecture](explanation/README.md) to understand how the cache lifecycle and minification pipeline work

@@ -27,5 +27,5 @@ $kernel->boot();
 |---|---|---|
 | [Getting started](tutorial.md) | Tutorial | Bootstrap your first plugin with PluginKernel |
 | [Common tasks](how-to/README.md) | How-to | Mu-plugin translations, environment config, service files |
-| [API reference](reference.md) | Reference | Kernel methods, I18n classes, interfaces |
-| [Architecture](explanation.md) | Explanation | Kernel lifecycle, DI parameters, plugin vs mu-plugin |
+| [API reference](reference/README.md) | Reference | Kernel methods, I18n classes, interfaces |
+| [Architecture](explanation/README.md) | Explanation | Kernel lifecycle, DI parameters, plugin vs mu-plugin |

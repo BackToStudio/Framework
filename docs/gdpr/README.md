@@ -20,5 +20,5 @@ $kernel->addExtension(new GdprExtension());
 |---|---|---|
 | [Getting started](tutorial.md) | Tutorial | Set up the consent banner and add your first tracking script |
 | [Common tasks](how-to/README.md) | How-to | Add presets, custom scripts, server-side consent checks |
-| [API reference](reference.md) | Reference | Interfaces, entities, presets, registries |
-| [Architecture](explanation.md) | Explanation | Consent flow, rendering separation, cookie security |
+| [API reference](reference/README.md) | Reference | Interfaces, entities, presets, registries |
+| [Architecture](explanation/README.md) | Explanation | Consent flow, rendering separation, cookie security |

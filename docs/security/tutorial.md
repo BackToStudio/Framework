@@ -86,5 +86,5 @@ Open an incognito window and attempt to log in with an incorrect password severa
 ## Next steps
 
 - See [Common tasks](how-to/README.md) for recipes like CSP configuration, IP access control, and two-factor authentication
-- See [API reference](reference.md) for the complete list of security rules and their hooks
-- See [Architecture](explanation.md) to understand why the bundle is designed this way
+- See [API reference](reference/README.md) for the complete list of security rules and their hooks
+- See [Architecture](explanation/README.md) to understand why the bundle is designed this way

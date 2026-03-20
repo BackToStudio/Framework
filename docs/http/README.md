@@ -14,5 +14,5 @@ Developers can use the standard PSR-18 `sendRequest()` method or convenience sho
 |---|---|---|
 | [Getting started](tutorial.md) | Tutorial | Send your first HTTP request step by step |
 | [Common tasks](how-to/README.md) | How-to | Practical recipes for real-world use cases |
-| [API reference](reference.md) | Reference | Complete interface and class documentation |
-| [Architecture](explanation.md) | Explanation | Design decisions, PSR compliance, WordPress integration |
+| [API reference](reference/README.md) | Reference | Complete interface and class documentation |
+| [Architecture](explanation/README.md) | Explanation | Design decisions, PSR compliance, WordPress integration |
