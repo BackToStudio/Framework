@@ -8,8 +8,8 @@ use BackTo\Framework\Compose\AbstractExtension;
 use BackTo\Framework\Bundle\Performance\Contracts\DatabaseOptimizerInterface;
 use BackTo\Framework\Bundle\Performance\Contracts\HtmlOptimizerInterface;
 use BackTo\Framework\Bundle\Performance\Contracts\PageCacheInterface;
-use BackTo\Framework\Bundle\Performance\Hooks\MinifyHtml;
-use BackTo\Framework\Bundle\Performance\Hooks\RemoveUnusedCss;
+use BackTo\Framework\Bundle\Performance\Hooks\Html\MinifyHtml;
+use BackTo\Framework\Bundle\Performance\Hooks\Html\RemoveUnusedCss;
 use BackTo\Framework\Bundle\Performance\Infrastructure\WordPressDatabaseOptimizer;
 use BackTo\Framework\Bundle\Performance\Infrastructure\WordPressHtmlOptimizer;
 use BackTo\Framework\Bundle\Performance\Infrastructure\WordPressPageCache;
@@ -19,10 +19,57 @@ final class PerformanceExtension extends AbstractExtension
 {
     public function getBundle(): ?array
     {
+        return null;
+    }
+
+    /**
+     * @return array<int, array{dir: string, namespace: string, exclude: string}>
+     */
+    public function getBundles(): array
+    {
         return [
-            'dir' => __DIR__,
-            'namespace' => 'BackTo\\Framework\\Bundle\\Performance\\',
-            'exclude' => '{Tests,Contracts,Infrastructure}',
+            // Root-level services (Configurator, Configuration, support classes)
+            [
+                'dir' => __DIR__,
+                'namespace' => 'BackTo\\Framework\\Bundle\\Performance\\',
+                'exclude' => '{Tests,Contracts,Infrastructure,Hooks,Css}',
+            ],
+            // Cache: page cache, preloading, invalidation
+            [
+                'dir' => __DIR__ . '/Hooks/Cache',
+                'namespace' => 'BackTo\\Framework\\Bundle\\Performance\\Hooks\\Cache\\',
+                'exclude' => '{Tests}',
+            ],
+            // Assets: JS deferral, resource hints, image optimization
+            [
+                'dir' => __DIR__ . '/Hooks/Assets',
+                'namespace' => 'BackTo\\Framework\\Bundle\\Performance\\Hooks\\Assets\\',
+                'exclude' => '{Tests}',
+            ],
+            // Html: minification, unused CSS removal
+            [
+                'dir' => __DIR__ . '/Hooks/Html',
+                'namespace' => 'BackTo\\Framework\\Bundle\\Performance\\Hooks\\Html\\',
+                'exclude' => '{Tests}',
+            ],
+            // Cleanup: heartbeat, revisions, dashboard, WooCommerce, head, XML-RPC, embeds, emojis
+            [
+                'dir' => __DIR__ . '/Hooks/Cleanup',
+                'namespace' => 'BackTo\\Framework\\Bundle\\Performance\\Hooks\\Cleanup\\',
+                'exclude' => '{Tests}',
+            ],
+            // Server: htaccess optimization
+            [
+                'dir' => __DIR__ . '/Hooks/Server',
+                'namespace' => 'BackTo\\Framework\\Bundle\\Performance\\Hooks\\Server\\',
+                'exclude' => '{Tests}',
+            ],
+            // CSS utilities (CssRuleFilter, SelectorMatcher, HtmlSelectorExtractor)
+            [
+                'dir' => __DIR__ . '/Css',
+                'namespace' => 'BackTo\\Framework\\Bundle\\Performance\\Css\\',
+                'exclude' => '{Tests}',
+            ],
         ];
     }
 

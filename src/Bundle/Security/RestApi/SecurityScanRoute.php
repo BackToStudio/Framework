@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace BackTo\Framework\Bundle\Security\RestApi;
 
 use BackTo\Framework\RestApi\Contracts\RestRouteInterface;
-use BackTo\Framework\Bundle\Security\FileIntegrityMonitor;
-use BackTo\Framework\Bundle\Security\MalwareScanner;
+use BackTo\Framework\Bundle\Security\Audit\FileIntegrityMonitor;
+use BackTo\Framework\Bundle\Security\Audit\MalwareScanner;
 use WP_REST_Response;
 
 /**

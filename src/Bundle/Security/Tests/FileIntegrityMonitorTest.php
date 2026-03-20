@@ -6,11 +6,11 @@ namespace BackTo\Framework\Bundle\Security\Tests;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
-use BackTo\Framework\Observability\Contracts\LoggerInterface;
+use BackTo\Framework\Contracts\LoggerInterface;
 use BackTo\Framework\Queue\Contracts\CronSchedulerInterface;
 use BackTo\Framework\Bundle\Security\Contracts\FileIntegrityRepositoryInterface;
 use BackTo\Framework\Bundle\Security\Contracts\SecurityRuleInterface;
-use BackTo\Framework\Bundle\Security\FileIntegrityMonitor;
+use BackTo\Framework\Bundle\Security\Audit\FileIntegrityMonitor;
 use PHPUnit\Framework\TestCase;
 
 /**

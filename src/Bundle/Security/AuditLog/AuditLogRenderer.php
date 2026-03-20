@@ -6,7 +6,7 @@ namespace BackTo\Framework\Bundle\Security\AuditLog;
 
 use BackTo\Framework\Contracts\NonceManagerInterface;
 use BackTo\Framework\Bundle\Security\Contracts\AuditLogSeverity;
-use BackTo\Framework\Bundle\Security\HtmlEscapeTrait;
+use BackTo\Framework\Bundle\Security\Hardening\HtmlEscapeTrait;
 
 /**
  * Renders the audit log admin page HTML.

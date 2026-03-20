@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace BackTo\Framework\Bundle\Security\Tests;
 
 use BackTo\Framework\Bundle\Security\Contracts\SecurityRuleInterface;
-use BackTo\Framework\Bundle\Security\PhpConfigHardening;
+use BackTo\Framework\Bundle\Security\Hardening\PhpConfigHardening;
 use PHPUnit\Framework\TestCase;
 
 class TestablePhpConfigHardening extends PhpConfigHardening

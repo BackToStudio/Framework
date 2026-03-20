@@ -12,7 +12,7 @@ use BackTo\Framework\Bundle\Security\Contracts\ClientIpResolverInterface;
 use BackTo\Framework\Bundle\Security\Contracts\MailerInterface;
 use BackTo\Framework\Bundle\Security\Contracts\SecurityNotifierInterface;
 use BackTo\Framework\Bundle\Security\Contracts\SecurityRuleInterface;
-use BackTo\Framework\Bundle\Security\SecurityNotifier;
+use BackTo\Framework\Bundle\Security\Audit\SecurityNotifier;
 use PHPUnit\Framework\TestCase;
 
 class SecurityNotifierTest extends TestCase

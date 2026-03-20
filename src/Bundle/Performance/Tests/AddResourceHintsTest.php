@@ -6,7 +6,7 @@ namespace BackTo\Framework\Bundle\Performance\Tests;
 
 use BackTo\Framework\Contracts\EscaperInterface;
 use BackTo\Framework\Contracts\HookDispatcherInterface;
-use BackTo\Framework\Bundle\Performance\Hooks\AddResourceHints;
+use BackTo\Framework\Bundle\Performance\Hooks\Assets\AddResourceHints;
 use PHPUnit\Framework\TestCase;
 
 class AddResourceHintsTest extends TestCase

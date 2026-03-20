@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Bundle\Performance\Tests;
 
-use BackTo\Framework\Bundle\Performance\Hooks\RemoveUnusedCss;
+use BackTo\Framework\Bundle\Performance\Hooks\Html\RemoveUnusedCss;
 use PHPUnit\Framework\TestCase;
 
 class RemoveUnusedCssTest extends TestCase

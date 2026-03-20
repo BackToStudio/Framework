@@ -6,7 +6,7 @@ namespace BackTo\Framework\Bundle\Performance\Tests;
 
 use BackTo\Framework\Contracts\ContentQueryInterface;
 use BackTo\Framework\Contracts\HookDispatcherInterface;
-use BackTo\Framework\Bundle\Performance\Hooks\PreloadPageCache;
+use BackTo\Framework\Bundle\Performance\Hooks\Cache\PreloadPageCache;
 use BackTo\Framework\Bundle\Performance\PreloadExecutor;
 use BackTo\Framework\Bundle\Performance\PreloadUrlCollector;
 use BackTo\Framework\Queue\Contracts\CronSchedulerInterface;

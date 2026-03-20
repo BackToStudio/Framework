@@ -7,7 +7,7 @@ namespace BackTo\Framework\Bundle\Security\Tests;
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
 use BackTo\Framework\Bundle\Security\Contracts\SecurityRuleInterface;
-use BackTo\Framework\Bundle\Security\UploadSecurity;
+use BackTo\Framework\Bundle\Security\Hardening\UploadSecurity;
 use PHPUnit\Framework\TestCase;
 
 class UploadSecurityTest extends TestCase

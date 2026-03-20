@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace BackTo\Framework\Bundle\Performance\Tests;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
-use BackTo\Framework\Bundle\Performance\Hooks\DisableXMLRPC;
+use BackTo\Framework\Bundle\Performance\Hooks\Cleanup\DisableXMLRPC;
 use PHPUnit\Framework\TestCase;
 
 class DisableXMLRPCTest extends TestCase

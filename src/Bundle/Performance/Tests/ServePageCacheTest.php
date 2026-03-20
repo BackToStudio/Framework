@@ -8,7 +8,7 @@ use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\QueryContextInterface;
 use BackTo\Framework\Bundle\Performance\CacheableRequestChecker;
 use BackTo\Framework\Bundle\Performance\Contracts\PageCacheInterface;
-use BackTo\Framework\Bundle\Performance\Hooks\ServePageCache;
+use BackTo\Framework\Bundle\Performance\Hooks\Cache\ServePageCache;
 use BackTo\Framework\Bundle\Performance\RequestUrlResolver;
 use PHPUnit\Framework\TestCase;
 

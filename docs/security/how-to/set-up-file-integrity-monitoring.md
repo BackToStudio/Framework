@@ -5,7 +5,7 @@
 ```php
 <?php
 
-$services->set(\BackTo\Framework\Bundle\Security\FileIntegrityMonitor::class)
+$services->set(\BackTo\Framework\Bundle\Security\Audit\FileIntegrityMonitor::class)
     ->autowire()
     ->autoconfigure();
 ```
@@ -21,7 +21,7 @@ $services->set(\BackTo\Framework\Bundle\Security\FileIntegrityMonitor::class)
 ```php
 <?php
 
-use BackTo\Framework\Bundle\Security\FileIntegrityMonitor;
+use BackTo\Framework\Bundle\Security\Audit\FileIntegrityMonitor;
 
 $monitor = $container->get(FileIntegrityMonitor::class);
 

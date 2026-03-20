@@ -7,7 +7,7 @@ namespace BackTo\Framework\Bundle\Performance\Tests;
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\QueryContextInterface;
 use BackTo\Framework\Contracts\ScriptManagerInterface;
-use BackTo\Framework\Bundle\Performance\Hooks\DisableHeartbeat;
+use BackTo\Framework\Bundle\Performance\Hooks\Cleanup\DisableHeartbeat;
 use PHPUnit\Framework\TestCase;
 
 class DisableHeartbeatTest extends TestCase

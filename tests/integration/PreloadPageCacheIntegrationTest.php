@@ -6,7 +6,7 @@ namespace BackTo\Framework\Tests\Integration;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Bundle\Performance\Contracts\PageCacheInterface;
-use BackTo\Framework\Bundle\Performance\Hooks\PreloadPageCache;
+use BackTo\Framework\Bundle\Performance\Hooks\Cache\PreloadPageCache;
 use PHPUnit\Framework\TestCase;
 
 /**

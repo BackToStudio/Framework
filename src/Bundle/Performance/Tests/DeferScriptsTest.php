@@ -6,7 +6,7 @@ namespace BackTo\Framework\Bundle\Performance\Tests;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\QueryContextInterface;
-use BackTo\Framework\Bundle\Performance\Hooks\DeferScripts;
+use BackTo\Framework\Bundle\Performance\Hooks\Assets\DeferScripts;
 use PHPUnit\Framework\TestCase;
 
 class DeferScriptsTest extends TestCase

@@ -8,7 +8,7 @@ use BackTo\Framework\Cache\Contracts\TransientStoreInterface;
 use BackTo\Framework\Contracts\ActivationHooks;
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
-use BackTo\Framework\Bundle\Performance\Hooks\OptimizeHtaccess;
+use BackTo\Framework\Bundle\Performance\Hooks\Server\OptimizeHtaccess;
 use PHPUnit\Framework\TestCase;
 
 /**

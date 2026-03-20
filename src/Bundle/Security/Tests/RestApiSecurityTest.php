@@ -10,7 +10,7 @@ use BackTo\Framework\Contracts\RequestContextInterface;
 use BackTo\Framework\Contracts\SiteContextInterface;
 use BackTo\Framework\Contracts\UserContextInterface;
 use BackTo\Framework\Bundle\Security\Contracts\SecurityRuleInterface;
-use BackTo\Framework\Bundle\Security\RestApiSecurity;
+use BackTo\Framework\Bundle\Security\Hardening\RestApiSecurity;
 use PHPUnit\Framework\TestCase;
 
 /**

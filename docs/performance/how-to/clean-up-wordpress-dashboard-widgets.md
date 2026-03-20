@@ -5,7 +5,7 @@
 ```php
 <?php
 
-$services->set(\BackTo\Framework\Bundle\Performance\Hooks\CleanDashboard::class)
+$services->set(\BackTo\Framework\Bundle\Performance\Hooks\Cleanup\CleanDashboard::class)
     ->autowire()
     ->autoconfigure();
 ```

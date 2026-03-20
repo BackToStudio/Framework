@@ -11,7 +11,7 @@ Enable it in your service configuration:
 ```php
 <?php
 
-$services->set(\BackTo\Framework\Bundle\Security\LoginAnomalyDetector::class)
+$services->set(\BackTo\Framework\Bundle\Security\Auth\LoginAnomalyDetector::class)
     ->autowire()
     ->autoconfigure();
 ```

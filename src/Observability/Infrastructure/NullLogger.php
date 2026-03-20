@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Observability\Infrastructure;
 
-use BackTo\Framework\Observability\Contracts\LoggerInterface;
+use BackTo\Framework\Contracts\LoggerInterface;
 
 /**
  * No-op logger for production or testing.

@@ -8,7 +8,7 @@ use BackTo\Framework\Contracts\ActivationHooks;
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
 use BackTo\Framework\Bundle\Security\Contracts\SecurityRuleInterface;
-use BackTo\Framework\Bundle\Security\DirectoryProtection;
+use BackTo\Framework\Bundle\Security\Hardening\DirectoryProtection;
 use PHPUnit\Framework\TestCase;
 
 /**

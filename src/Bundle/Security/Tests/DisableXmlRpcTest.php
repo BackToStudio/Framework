@@ -7,7 +7,7 @@ namespace BackTo\Framework\Bundle\Security\Tests;
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
 use BackTo\Framework\Bundle\Security\Contracts\SecurityRuleInterface;
-use BackTo\Framework\Bundle\Security\DisableXmlRpc;
+use BackTo\Framework\Bundle\Security\Hardening\DisableXmlRpc;
 use PHPUnit\Framework\TestCase;
 
 class DisableXmlRpcTest extends TestCase

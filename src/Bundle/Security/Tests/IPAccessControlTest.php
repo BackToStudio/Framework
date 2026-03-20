@@ -7,11 +7,11 @@ namespace BackTo\Framework\Bundle\Security\Tests;
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
 use BackTo\Framework\Contracts\ResponseEmitterInterface;
-use BackTo\Framework\Observability\Contracts\LoggerInterface;
+use BackTo\Framework\Contracts\LoggerInterface;
 use BackTo\Framework\Bundle\Security\Contracts\ClientIpResolverInterface;
 use BackTo\Framework\Bundle\Security\Contracts\IPAccessControlInterface;
 use BackTo\Framework\Bundle\Security\Contracts\SecurityRuleInterface;
-use BackTo\Framework\Bundle\Security\IPAccessControl;
+use BackTo\Framework\Bundle\Security\Network\IPAccessControl;
 use PHPUnit\Framework\TestCase;
 
 class MutableIpResolver implements ClientIpResolverInterface

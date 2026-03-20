@@ -7,7 +7,7 @@ namespace BackTo\Framework\Bundle\Performance\Tests;
 use BackTo\Framework\Contracts\ContentQueryInterface;
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Bundle\Performance\Contracts\PageCacheInterface;
-use BackTo\Framework\Bundle\Performance\Hooks\InvalidatePageCache;
+use BackTo\Framework\Bundle\Performance\Hooks\Cache\InvalidatePageCache;
 use PHPUnit\Framework\TestCase;
 
 class InvalidatePageCacheTest extends TestCase

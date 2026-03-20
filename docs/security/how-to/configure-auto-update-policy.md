@@ -3,7 +3,7 @@
 ```php
 <?php
 
-use BackTo\Framework\Bundle\Security\AutoUpdatePolicy;
+use BackTo\Framework\Bundle\Security\Hardening\AutoUpdatePolicy;
 
 $autoUpdate = $container->get(AutoUpdatePolicy::class);
 

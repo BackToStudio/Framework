@@ -11,7 +11,7 @@ use BackTo\Framework\Contracts\RequestContextInterface;
 use BackTo\Framework\Contracts\ResponseEmitterInterface;
 use BackTo\Framework\Contracts\UserContextInterface;
 use BackTo\Framework\Bundle\Security\Contracts\SecurityRuleInterface;
-use BackTo\Framework\Bundle\Security\DisableUserEnumeration;
+use BackTo\Framework\Bundle\Security\Auth\DisableUserEnumeration;
 use PHPUnit\Framework\TestCase;
 
 /**

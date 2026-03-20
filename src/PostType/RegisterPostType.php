@@ -8,7 +8,7 @@ use BackTo\Framework\Contracts\ActivationHooks;
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
 use BackTo\Framework\Exception\FrameworkException;
-use BackTo\Framework\Observability\Contracts\LoggerInterface;
+use BackTo\Framework\Contracts\LoggerInterface;
 use BackTo\Framework\PostType\Contracts\PostTypeRegistrarInterface;
 
 final class RegisterPostType implements Hooks, ActivationHooks

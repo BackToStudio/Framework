@@ -179,7 +179,7 @@ class WordPressExtensionTest extends TestCase
         $extension = new SecurityExtension();
 
         $this->assertNull($extension->getBundle());
-        $this->assertCount(2, $extension->getBundles());
+        $this->assertCount(9, $extension->getBundles());
     }
 
     public function testAllExtensionsRegisterWithoutConflict(): void

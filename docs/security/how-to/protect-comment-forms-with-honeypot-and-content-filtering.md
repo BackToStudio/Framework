@@ -11,7 +11,7 @@ Enable it:
 ```php
 <?php
 
-$services->set(\BackTo\Framework\Bundle\Security\CommentSpamProtection::class)
+$services->set(\BackTo\Framework\Bundle\Security\Hardening\CommentSpamProtection::class)
     ->autowire()
     ->autoconfigure();
 ```
@@ -21,7 +21,7 @@ $services->set(\BackTo\Framework\Bundle\Security\CommentSpamProtection::class)
 ```php
 <?php
 
-use BackTo\Framework\Bundle\Security\CommentSpamProtection;
+use BackTo\Framework\Bundle\Security\Hardening\CommentSpamProtection;
 
 $spam = $container->get(CommentSpamProtection::class);
 

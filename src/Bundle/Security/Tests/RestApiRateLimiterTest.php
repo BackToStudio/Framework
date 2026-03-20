@@ -10,7 +10,7 @@ use BackTo\Framework\Contracts\ResponseEmitterInterface;
 use BackTo\Framework\Bundle\Security\Contracts\ClientIpResolverInterface;
 use BackTo\Framework\Bundle\Security\Contracts\RateLimiterRepositoryInterface;
 use BackTo\Framework\Bundle\Security\Contracts\SecurityRuleInterface;
-use BackTo\Framework\Bundle\Security\RestApiRateLimiter;
+use BackTo\Framework\Bundle\Security\Network\RestApiRateLimiter;
 use PHPUnit\Framework\TestCase;
 
 class TestableRestApiRateLimiter extends RestApiRateLimiter

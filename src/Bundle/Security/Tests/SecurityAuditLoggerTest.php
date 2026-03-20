@@ -9,7 +9,7 @@ use BackTo\Framework\Contracts\Hooks;
 use BackTo\Framework\Bundle\Security\Contracts\AuditLogRepositoryInterface;
 use BackTo\Framework\Bundle\Security\Contracts\ClientIpResolverInterface;
 use BackTo\Framework\Bundle\Security\Contracts\SecurityRuleInterface;
-use BackTo\Framework\Bundle\Security\SecurityAuditLogger;
+use BackTo\Framework\Bundle\Security\Audit\SecurityAuditLogger;
 use PHPUnit\Framework\TestCase;
 
 class SecurityAuditLoggerTest extends TestCase

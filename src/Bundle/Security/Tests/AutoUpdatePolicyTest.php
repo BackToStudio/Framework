@@ -6,8 +6,8 @@ namespace BackTo\Framework\Bundle\Security\Tests;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
-use BackTo\Framework\Observability\Contracts\LoggerInterface;
-use BackTo\Framework\Bundle\Security\AutoUpdatePolicy;
+use BackTo\Framework\Contracts\LoggerInterface;
+use BackTo\Framework\Bundle\Security\Hardening\AutoUpdatePolicy;
 use BackTo\Framework\Bundle\Security\Contracts\SecurityRuleInterface;
 use PHPUnit\Framework\TestCase;
 

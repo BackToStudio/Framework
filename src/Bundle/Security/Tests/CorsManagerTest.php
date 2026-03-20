@@ -10,7 +10,7 @@ use BackTo\Framework\Contracts\RequestContextInterface;
 use BackTo\Framework\Contracts\ResponseEmitterInterface;
 use BackTo\Framework\Bundle\Security\Contracts\CorsManagerInterface;
 use BackTo\Framework\Bundle\Security\Contracts\SecurityRuleInterface;
-use BackTo\Framework\Bundle\Security\CorsManager;
+use BackTo\Framework\Bundle\Security\Headers\CorsManager;
 use PHPUnit\Framework\TestCase;
 
 class TestableCorsManager extends CorsManager

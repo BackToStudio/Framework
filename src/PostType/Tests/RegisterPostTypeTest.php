@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace BackTo\Framework\PostType\Tests;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
-use BackTo\Framework\Observability\Contracts\LoggerInterface;
+use BackTo\Framework\Contracts\LoggerInterface;
 use BackTo\Framework\PostType\Contracts\PostTypeRegistrarInterface;
 use BackTo\Framework\PostType\PostTypeFactory;
 use BackTo\Framework\PostType\PostTypeRegistry;

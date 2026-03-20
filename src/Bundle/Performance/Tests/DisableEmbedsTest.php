@@ -6,7 +6,7 @@ namespace BackTo\Framework\Bundle\Performance\Tests;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\ScriptManagerInterface;
-use BackTo\Framework\Bundle\Performance\Hooks\DisableEmbeds;
+use BackTo\Framework\Bundle\Performance\Hooks\Cleanup\DisableEmbeds;
 use PHPUnit\Framework\TestCase;
 
 class DisableEmbedsTest extends TestCase

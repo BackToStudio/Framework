@@ -3,7 +3,7 @@
 ```php
 <?php
 
-use BackTo\Framework\Bundle\Security\SecurityAuditLogger;
+use BackTo\Framework\Bundle\Security\Audit\SecurityAuditLogger;
 
 $auditLogger = $container->get(SecurityAuditLogger::class);
 $purged = $auditLogger->purgeOldEvents(90); // events older than 90 days

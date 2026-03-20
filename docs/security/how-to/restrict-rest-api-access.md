@@ -7,7 +7,7 @@ To add custom public routes, pass additional patterns when the service is regist
 ```php
 <?php
 
-use BackTo\Framework\Bundle\Security\RestApiSecurity;
+use BackTo\Framework\Bundle\Security\Hardening\RestApiSecurity;
 
 $restSecurity = new RestApiSecurity(
     $hookDispatcher,

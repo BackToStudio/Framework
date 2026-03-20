@@ -7,7 +7,7 @@ namespace BackTo\Framework\Bundle\Security\Tests;
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
 use BackTo\Framework\Bundle\Security\Contracts\SecurityRuleInterface;
-use BackTo\Framework\Bundle\Security\DisableFileEditor;
+use BackTo\Framework\Bundle\Security\Hardening\DisableFileEditor;
 use PHPUnit\Framework\TestCase;
 
 class DisableFileEditorTest extends TestCase

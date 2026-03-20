@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace BackTo\Framework\Observability;
 
 use BackTo\Framework\Observability\Contracts\ErrorHandlerInterface;
-use BackTo\Framework\Observability\Contracts\LoggerInterface;
+use BackTo\Framework\Contracts\LoggerInterface;
 
 /**
  * Framework error handler with error boundary support.

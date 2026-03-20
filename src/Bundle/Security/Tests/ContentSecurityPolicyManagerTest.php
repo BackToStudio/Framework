@@ -9,7 +9,7 @@ use BackTo\Framework\Contracts\Hooks;
 use BackTo\Framework\Contracts\ResponseEmitterInterface;
 use BackTo\Framework\Bundle\Security\Contracts\ContentSecurityPolicyInterface;
 use BackTo\Framework\Bundle\Security\Contracts\SecurityRuleInterface;
-use BackTo\Framework\Bundle\Security\ContentSecurityPolicyManager;
+use BackTo\Framework\Bundle\Security\Headers\ContentSecurityPolicyManager;
 use PHPUnit\Framework\TestCase;
 
 class ContentSecurityPolicyManagerTest extends TestCase

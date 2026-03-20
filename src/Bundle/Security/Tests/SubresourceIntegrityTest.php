@@ -8,7 +8,7 @@ use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
 use BackTo\Framework\Bundle\Security\Contracts\SecurityRuleInterface;
 use BackTo\Framework\Bundle\Security\Contracts\SubresourceIntegrityInterface;
-use BackTo\Framework\Bundle\Security\SubresourceIntegrity;
+use BackTo\Framework\Bundle\Security\Headers\SubresourceIntegrity;
 use PHPUnit\Framework\TestCase;
 
 class SubresourceIntegrityTest extends TestCase

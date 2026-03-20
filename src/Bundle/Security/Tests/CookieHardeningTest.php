@@ -7,7 +7,7 @@ namespace BackTo\Framework\Bundle\Security\Tests;
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
 use BackTo\Framework\Bundle\Security\Contracts\SecurityRuleInterface;
-use BackTo\Framework\Bundle\Security\CookieHardening;
+use BackTo\Framework\Bundle\Security\Hardening\CookieHardening;
 use PHPUnit\Framework\TestCase;
 
 class TestableCookieHardening extends CookieHardening

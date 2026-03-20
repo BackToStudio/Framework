@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace BackTo\Framework\Bundle\Performance\Tests;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
-use BackTo\Framework\Bundle\Performance\Hooks\LimitPostRevisions;
+use BackTo\Framework\Bundle\Performance\Hooks\Cleanup\LimitPostRevisions;
 use PHPUnit\Framework\TestCase;
 
 class LimitPostRevisionsTest extends TestCase

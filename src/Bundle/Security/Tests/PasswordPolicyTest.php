@@ -8,7 +8,7 @@ use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
 use BackTo\Framework\Bundle\Security\Contracts\SecurityRuleInterface;
 use BackTo\Framework\Contracts\RequestContextInterface;
-use BackTo\Framework\Bundle\Security\PasswordPolicy;
+use BackTo\Framework\Bundle\Security\Auth\PasswordPolicy;
 use PHPUnit\Framework\TestCase;
 
 class PasswordPolicyTest extends TestCase

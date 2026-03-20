@@ -8,7 +8,7 @@ use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
 use BackTo\Framework\Contracts\RequestContextInterface;
 use BackTo\Framework\Bundle\Security\Contracts\SecurityRuleInterface;
-use BackTo\Framework\Bundle\Security\SessionManager;
+use BackTo\Framework\Bundle\Security\Auth\SessionManager;
 use PHPUnit\Framework\TestCase;
 
 class SessionManagerTest extends TestCase

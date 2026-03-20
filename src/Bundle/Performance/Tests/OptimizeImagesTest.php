@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace BackTo\Framework\Bundle\Performance\Tests;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
-use BackTo\Framework\Bundle\Performance\Hooks\OptimizeImages;
+use BackTo\Framework\Bundle\Performance\Hooks\Assets\OptimizeImages;
 use PHPUnit\Framework\TestCase;
 
 class OptimizeImagesTest extends TestCase

@@ -9,9 +9,9 @@ use BackTo\Framework\Bundle\Security\Contracts\AuditLogRepositoryInterface;
 use BackTo\Framework\Bundle\Security\RestApi\SecurityAuditLogRoute;
 use BackTo\Framework\Bundle\Security\RestApi\SecurityHealthRoute;
 use BackTo\Framework\Bundle\Security\RestApi\SecurityScanRoute;
-use BackTo\Framework\Bundle\Security\FileIntegrityMonitor;
+use BackTo\Framework\Bundle\Security\Audit\FileIntegrityMonitor;
 use BackTo\Framework\Bundle\Security\HealthCheck\SecurityHealthCheck;
-use BackTo\Framework\Bundle\Security\MalwareScanner;
+use BackTo\Framework\Bundle\Security\Audit\MalwareScanner;
 use PHPUnit\Framework\TestCase;
 
 class SecurityRestApiTest extends TestCase

@@ -3,7 +3,7 @@
 ```php
 <?php
 
-use BackTo\Framework\Bundle\Security\AdminUrlObfuscation;
+use BackTo\Framework\Bundle\Security\Hardening\AdminUrlObfuscation;
 
 $obfuscation = $container->get(AdminUrlObfuscation::class);
 $obfuscation->setLoginSlug('my-secure-login');

@@ -6,10 +6,10 @@ namespace BackTo\Framework\Bundle\Security\Tests;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
-use BackTo\Framework\Observability\Contracts\LoggerInterface;
+use BackTo\Framework\Contracts\LoggerInterface;
 use BackTo\Framework\Bundle\Security\Contracts\SecurityRuleInterface;
 use BackTo\Framework\Contracts\RequestContextInterface;
-use BackTo\Framework\Bundle\Security\DatabaseHardening;
+use BackTo\Framework\Bundle\Security\Hardening\DatabaseHardening;
 use PHPUnit\Framework\TestCase;
 
 class TestableDatabaseHardening extends DatabaseHardening

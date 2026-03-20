@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace BackTo\Framework\Observability;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
-use BackTo\Framework\Observability\Contracts\LoggerInterface;
+use BackTo\Framework\Contracts\LoggerInterface;
 use BackTo\Framework\Observability\Contracts\PerformanceCollectorInterface;
 
 /**

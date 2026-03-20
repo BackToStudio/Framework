@@ -6,7 +6,7 @@ namespace BackTo\Framework\Bundle\Performance\Tests;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Bundle\Performance\Contracts\HtmlOptimizerInterface;
-use BackTo\Framework\Bundle\Performance\Hooks\MinifyHtml;
+use BackTo\Framework\Bundle\Performance\Hooks\Html\MinifyHtml;
 use PHPUnit\Framework\TestCase;
 
 class MinifyHtmlTest extends TestCase

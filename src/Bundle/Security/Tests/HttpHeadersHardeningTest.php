@@ -8,7 +8,7 @@ use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
 use BackTo\Framework\Contracts\ResponseEmitterInterface;
 use BackTo\Framework\Bundle\Security\Contracts\SecurityRuleInterface;
-use BackTo\Framework\Bundle\Security\HttpHeadersHardening;
+use BackTo\Framework\Bundle\Security\Headers\HttpHeadersHardening;
 use PHPUnit\Framework\TestCase;
 
 class HttpHeadersHardeningTest extends TestCase

@@ -5,7 +5,7 @@ Modify the global limits:
 ```php
 <?php
 
-use BackTo\Framework\Bundle\Security\RestApiRateLimiter;
+use BackTo\Framework\Bundle\Security\Network\RestApiRateLimiter;
 
 $rateLimiter = $container->get(RestApiRateLimiter::class);
 

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Bundle\Security\TwoFactor;
 
-use BackTo\Framework\Observability\Contracts\LoggerInterface;
+use BackTo\Framework\Contracts\LoggerInterface;
 use BackTo\Framework\Bundle\Security\TwoFactor\Contracts\BackupCodeManagerInterface;
 use BackTo\Framework\Bundle\Security\TwoFactor\Contracts\TotpProviderInterface;
 use BackTo\Framework\Bundle\Security\TwoFactor\Contracts\TwoFactorRepositoryInterface;
