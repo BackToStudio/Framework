@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Bundle\Seo\Schema\Generator;
 
+use BackTo\Framework\Contracts\QueryContextInterface;
 use BackTo\Framework\Bundle\Seo\Schema\SchemaType;
 
 /**
@@ -68,6 +69,27 @@ final class PostTypeSchemaResolver
         $generator = $this->generators[$postType];
 
         return $generator->generate($postId);
+    }
+
+    /**
+     * Resolve a schema for the current queried object, if applicable.
+     *
+     * Returns null when the current request is not a singular post
+     * or when no generator is registered for the queried post type.
+     */
+    public function resolveFromContext(QueryContextInterface $queryContext): ?SchemaType
+    {
+        if (!$queryContext->isSingular()) {
+            return null;
+        }
+
+        $post = $queryContext->getQueriedObject();
+
+        if (!$post instanceof \WP_Post) {
+            return null;
+        }
+
+        return $this->resolve($post->post_type, $post->ID);
     }
 
     /**
