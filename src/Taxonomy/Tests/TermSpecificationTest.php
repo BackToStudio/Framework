@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Taxonomy\Tests;
 
+use BackTo\Framework\Taxonomy\Contracts\TermQueryGatewayInterface;
 use BackTo\Framework\Taxonomy\Factory\TermFactory;
 use BackTo\Framework\Taxonomy\Repository\TermQueryBuilder;
 use BackTo\Framework\Taxonomy\Specification\AndTermSpecification;
@@ -16,7 +17,10 @@ class TermSpecificationTest extends TestCase
 {
     private function createQueryBuilder(): TermQueryBuilder
     {
-        return new TermQueryBuilder($this->createMock(TermFactory::class));
+        return new TermQueryBuilder(
+            $this->createMock(TermFactory::class),
+            $this->createMock(TermQueryGatewayInterface::class),
+        );
     }
 
     // --- TermsInTaxonomy ---

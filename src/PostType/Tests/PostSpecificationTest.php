@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace BackTo\Framework\PostType\Tests;
 
 use BackTo\Framework\PostMeta\ValueObject\MetaKey;
+use BackTo\Framework\PostType\Contracts\PostQueryGatewayInterface;
 use BackTo\Framework\PostType\Entity\PostStatus;
 use BackTo\Framework\PostType\Factory\PostFactory;
 use BackTo\Framework\Query\MetaCompare;
@@ -23,7 +24,10 @@ class PostSpecificationTest extends TestCase
 {
     private function createQueryBuilder(): PostQueryBuilder
     {
-        return new PostQueryBuilder($this->createMock(PostFactory::class));
+        return new PostQueryBuilder(
+            $this->createMock(PostFactory::class),
+            $this->createMock(PostQueryGatewayInterface::class),
+        );
     }
 
     // --- PublishedPosts ---

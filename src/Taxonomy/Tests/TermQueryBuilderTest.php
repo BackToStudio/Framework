@@ -6,6 +6,7 @@ namespace BackTo\Framework\Taxonomy\Tests;
 
 use BackTo\Framework\Query\MetaCompare;
 use BackTo\Framework\Query\SortDirection;
+use BackTo\Framework\Taxonomy\Contracts\TermQueryGatewayInterface;
 use BackTo\Framework\Taxonomy\Factory\TermFactory;
 use BackTo\Framework\Taxonomy\Repository\TermQueryBuilder;
 use PHPUnit\Framework\TestCase;
@@ -15,7 +16,8 @@ class TermQueryBuilderTest extends TestCase
     private function createQueryBuilder(): TermQueryBuilder
     {
         $factory = $this->createMock(TermFactory::class);
-        return new TermQueryBuilder($factory);
+        $gateway = $this->createMock(TermQueryGatewayInterface::class);
+        return new TermQueryBuilder($factory, $gateway);
     }
 
     public function testTaxonomy(): void
