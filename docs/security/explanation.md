@@ -1,279 +1,143 @@
-# Architecture du bundle Security
+# Security Bundle — Architecture & Design
 
-Ce document explique les choix architecturaux du bundle Security, les patterns utilises et la logique derriere les decisions de conception.
-
----
-
-## Strategie de defense en profondeur
-
-Le bundle Security applique le principe de **defense en profondeur** (defense-in-depth) : chaque couche de protection fonctionne independamment des autres. Si une couche est contournee, les suivantes restent actives.
-
-Les couches sont organisees ainsi :
-
-```
-Requete entrante
-  |
-  v
-[1. En-tetes HTTP]          HttpHeadersHardening, SecurityHeadersConfigurator, CSP
-  |
-  v
-[2. Controle d'acces]       IPAccessControl, RestApiSecurity, DisableXmlRpc
-  |
-  v
-[3. Rate limiting]          RestApiRateLimiter
-  |
-  v
-[4. Authentification]       LoginHardening (throttle) -> 2FA -> SessionManager
-  |
-  v
-[5. Autorisation]           CapabilityHardening, DisableFileEditor
-  |
-  v
-[6. Validation des donnees] DatabaseHardening, UploadSecurity, CommentSpamProtection
-  |
-  v
-[7. Surveillance]           SecurityAuditLogger, LoginAnomalyDetector, FileIntegrityMonitor
-  |
-  v
-[8. Notification]           SecurityNotifier
-```
-
-Chaque couche agit sur un aspect specifique de la securite. Par exemple, meme si un attaquant reussit a contourner le rate limiting (couche 3), il devra encore passer le throttle de login (couche 4), la 2FA, puis le durcissement des capabilities (couche 5), pendant que la couche 7 enregistre chaque tentative.
+*Explanation — Understanding-oriented*
 
 ---
 
-## Le pattern SecurityRuleInterface
+## Defense in depth
 
-### Probleme resolu
+The bundle applies **defense in depth**: each security layer operates independently. If one layer is bypassed, the others remain active. The layers are ordered by the request lifecycle:
 
-Comment ajouter de nouvelles regles de securite sans modifier le code existant, tout en garantissant que toutes les regles sont activees au demarrage ?
+```
+Incoming request
+  |
+  v
+[1. HTTP headers]         HttpHeadersHardening, CSP, CookieHardening
+  |
+  v
+[2. Access control]       IPAccessControl, RestApiSecurity, DisableXmlRpc
+  |
+  v
+[3. Rate limiting]        RestApiRateLimiter
+  |
+  v
+[4. Authentication]       LoginHardening (throttle) -> 2FA -> SessionManager
+  |
+  v
+[5. Authorization]        CapabilityHardening, DisableFileEditor
+  |
+  v
+[6. Input validation]     DatabaseHardening, UploadSecurity, CommentSpamProtection
+  |
+  v
+[7. Monitoring]           SecurityAuditLogger, LoginAnomalyDetector, FileIntegrityMonitor
+  |
+  v
+[8. Notification]         SecurityNotifier
+```
+
+Even if an attacker bypasses rate limiting (layer 3), they still face login throttling and 2FA (layer 4), capability restrictions (layer 5), and every attempt is logged by layer 7.
+
+---
+
+## The SecurityRuleInterface pattern
+
+### Problem
+
+How do you add new security rules without modifying existing code, while ensuring all rules are activated at boot?
 
 ### Solution
 
-Le pattern repose sur trois elements :
+The pattern has three parts:
 
-1. **`SecurityRuleInterface`** etend `HookInterface` et ajoute `getName(): string`. C'est un marqueur qui identifie une classe comme regle de securite.
+1. **`SecurityRuleInterface`** extends `HookInterface` and adds `getName(): string`. It marks a class as a security rule.
 
-2. **Auto-configuration DI** : dans `SecurityExtension::register()`, toute classe implementant `SecurityRuleInterface` recoit automatiquement le tag `wordpress.security_rule` :
+2. **Auto-configuration:** `SecurityExtension` tags every `SecurityRuleInterface` implementation with `wordpress.security_rule` automatically.
 
-```php
-$containerBuilder->registerForAutoconfiguration(SecurityRuleInterface::class)
-    ->addTag('wordpress.security_rule');
-```
+3. **`RegisterSecurityRulePass`:** This compiler pass collects all tagged services and injects them into `SecurityRuleRegistry`.
 
-3. **`RegisterSecurityRulePass`** : ce compiler pass collecte tous les services tagges et les injecte dans le `SecurityRuleRegistry`. Il etend `AbstractTaggedServiceCompilerPass`, ce qui standardise le pattern de collecte de services tagges dans le framework.
-
-### Avantages
-
-- **Open/Closed** : ajouter une regle = creer une classe, pas de configuration supplementaire
-- **Decouplage** : chaque regle ne connait que ses propres dependances
-- **Testabilite** : chaque regle est testable en isolation
-- **Visibilite** : le `SecurityRuleRegistry` permet d'inspecter les regles actives a tout moment (utilise par `SecurityHealthCheck`)
+The result is **Open/Closed**: adding a rule means creating a class. No configuration changes, no registration code. The registry also powers `SecurityHealthCheck`, which verifies that critical rules are present at runtime.
 
 ---
 
-## Ordonnancement des priorites de hooks
+## Hook priority ordering
 
-Les priorites des hooks WordPress sont critiques pour le bon fonctionnement de la securite. Le bundle definit un ordre explicite sur les hooks partages :
+Several WordPress hooks are shared across multiple security rules. The bundle defines an explicit priority order to ensure correct execution:
 
-### Chaine `authenticate`
-
-```
-Priorite 20 : WordPress core (authentification username/password)
-Priorite 30 : LoginHardening (throttling IP et compte)
-Priorite 40 : TwoFactorAuthentication (verification TOTP/backup code)
-```
-
-Cette chaine garantit que :
-- Le throttle bloque les tentatives avant la 2FA (economie de ressources)
-- La 2FA ne s'execute que sur les authentifications reussies
-- Les erreurs de throttle sont renvoyees avant toute verification de code
-
-### Chaine `wp_login`
+### `authenticate` filter chain
 
 ```
-Priorite 10 : LoginHardening (reset des compteurs)
-Priorite 10 : SecurityAuditLogger (journalisation)
-Priorite 20 : LoginAnomalyDetector (detection d'anomalies apres enregistrement)
+Priority 20: WordPress core (username/password validation)
+Priority 30: LoginHardening (IP and account throttling)
+Priority 40: TwoFactorAuthentication (TOTP/backup code verification)
 ```
 
-### Chaine `set_user_role`
+Throttling runs before 2FA to reject brute-force attempts cheaply. 2FA only executes when credentials are valid.
+
+### `set_user_role` action chain
 
 ```
-Priorite  5 : CapabilityHardening (bloque auto-promotion, revert le role)
-Priorite 10 : SecurityAuditLogger (journalise le changement)
-Priorite 15 : SecurityNotifier (envoie une notification email)
+Priority  5: CapabilityHardening (blocks self-promotion, reverts the role)
+Priority 10: SecurityAuditLogger (logs the change)
+Priority 15: SecurityNotifier (sends email alert)
 ```
 
-L'ordre est documente dans les PHPDoc de chaque classe. Cette convention evite les conflits et rend le flux previsible.
+The capability check runs first to prevent the change. If it proceeds, it is logged and then reported.
 
 ---
 
-## Design du journal d'audit (Audit Trail)
+## Hexagonal architecture
 
-### Architecture
+The bundle follows the **ports and adapters** pattern used throughout the framework. Security rules depend on port interfaces (in `Contracts/`), never on WordPress functions directly.
 
-Le journal d'audit suit le pattern **Repository** :
+**Ports** define what the domain needs: throttle tracking, audit storage, nonce management, mail delivery, IP resolution. **Adapters** (in `Infrastructure/`) implement those ports using WordPress APIs: transients, `wp_options`, `user_meta`, `wp_mail`, and `wp_create_nonce`.
 
-```
-SecurityAuditLogger (collecte)
-    |
-    v
-AuditLogRepositoryInterface (port)
-    |
-    v
-WordPressAuditLogRepository (adaptateur, stockage wp_options / table custom)
-```
+This separation means:
 
-### Choix de conception
-
-**Severite a trois niveaux** : l'enum `AuditLogSeverity` definit `Info`, `Warning` et `Critical`. Trois niveaux suffisent pour la securite WordPress — un systeme de logging general (comme PSR-3) serait surdimensionne.
-
-**Options critiques filtrees** : le `SecurityAuditLogger` ne journalise que les modifications sur un ensemble restreint d'options (`siteurl`, `home`, `admin_email`, `users_can_register`, `default_role`, `permalink_structure`, `blogdescription`). Cela evite le bruit des mises a jour de transients et d'options non significatives.
-
-**Sanitization des valeurs** : les valeurs complexes (tableaux, objets) sont remplacees par `[complex value]` pour eviter les problemes de serialisation et les fuites de donnees sensibles.
-
-**Export avec cooldown** : `AuditLogCsvExporter` impose un delai de 60 secondes entre les exports pour empecher les abus (DoS par exports repetes).
-
-### Chaine de notification
-
-```
-Evenement securite
-    |
-    v
-SecurityAuditLogger (stocke dans le repository)
-    |
-    v
-Action WordPress 'backto_security_event'
-    |
-    v
-SecurityNotifier (filtre les evenements critiques, envoie les emails)
-    |
-    v
-SecurityAlertFormatter (formate sujet et corps)
-    |
-    v
-MailerInterface -> WordPressMailer (wp_mail)
-```
+- **Testability** — Unit tests mock the port interfaces. No WordPress bootstrap required.
+- **Substitutability** — Swapping storage (e.g., Redis instead of transients) means writing one adapter, not changing any rule.
+- **Clarity** — Reading a rule's constructor signature tells you exactly what it depends on.
 
 ---
 
-## Flux d'authentification 2FA
+## Two-factor authentication flow
 
-### Diagramme de sequence
+The 2FA implementation uses the `authenticate` filter at priority 40. It does not add an intermediate page. Instead, it returns a `WP_Error` with code `two_factor_required`, which signals the login form to display the 2FA field.
 
 ```
-Utilisateur          WordPress Core       LoginHardening       TwoFactorAuth
-    |                     |                     |                    |
-    |-- login request --->|                     |                    |
-    |                     |-- authenticate(20)->|                    |
-    |                     |    (user valide)    |                    |
-    |                     |                     |-- throttle(30) --->|
-    |                     |                     |    (IP OK)         |
-    |                     |                     |                    |-- check 2FA(40)
-    |                     |                     |                    |    user a 2FA?
-    |                     |                     |                    |
-    |<--- WP_Error('two_factor_required') ------|--------------------+
-    |                     |                     |                    |
-    |-- login + code 2FA->|                     |                    |
-    |                     |-- authenticate(20)->|                    |
-    |                     |                     |-- throttle(30) --->|
-    |                     |                     |                    |-- verify code(40)
-    |                     |                     |                    |    TOTP OK?
-    |                     |                     |                    |    backup code?
-    |<--- session valide --|--------------------|--------------------|
+Login request
+  -> WordPress core validates credentials (priority 20)
+  -> LoginHardening checks throttle (priority 30)
+  -> TwoFactorAuthentication checks 2FA status (priority 40)
+     -> If 2FA enabled and no code: return WP_Error('two_factor_required')
+     -> If 2FA enabled and code present: verify TOTP or backup code
+     -> If valid: return WP_User (login succeeds)
 ```
 
-### Points cles
-
-- La 2FA n'ajoute pas de page intermediaire : elle utilise le filtre `authenticate` a la priorite 40 pour renvoyer un `WP_Error` avec le code `two_factor_required` qui signale au formulaire de login d'afficher le champ 2FA.
-- Le champ POST est `backto_2fa_code`, sanitize pour ne garder que les caracteres alphanumeriques.
-- Les codes de secours sont verifies en temps constant (iteration de tous les hashes) pour prevenir les attaques par timing.
-- La consommation d'un code de secours est atomique : le code est supprime immediatement apres verification, et le nombre restant est journalise.
-
-### Separation des responsabilites
-
-- `TwoFactorAuthentication` : uniquement l'interception de login (SRP)
-- `TwoFactorSetupManager` : cycle de vie (setup, confirm, disable, regenerate)
-- `TotpProvider` : algorithme TOTP pur (RFC 6238)
-- `BackupCodeManager` : generation et verification des codes de secours
-- `Base32` : encodage/decodage pour les secrets TOTP
+Responsibilities are split across dedicated classes: `TwoFactorAuthentication` handles login interception only, `TwoFactorSetupManager` handles the lifecycle (setup, confirm, disable), `TotpProvider` implements the RFC 6238 algorithm, and `BackupCodeManager` handles backup code generation and constant-time verification.
 
 ---
 
-## Pattern hexagonal dans le bundle Security
+## Audit trail design
 
-Le bundle Security applique l'**architecture hexagonale** (ports et adaptateurs) de maniere systematique.
+The audit system uses the Repository pattern:
 
-### Ports (interfaces dans `Contracts/`)
-
-Les ports definissent les capacites dont la logique metier a besoin :
-
-| Port | Responsabilite |
-|------|----------------|
-| `LoginThrottleInterface` | Comptage et verrouillage des tentatives |
-| `AuditLogRepositoryInterface` | Stockage/lecture des evenements d'audit |
-| `FileIntegrityRepositoryInterface` | Stockage/lecture des baselines de hash |
-| `RateLimiterRepositoryInterface` | Comptage des requetes API |
-| `LoginLocationRepositoryInterface` | Historique des localisations de connexion |
-| `TwoFactorRepositoryInterface` | Stockage des secrets et codes 2FA |
-| `ClientIpResolverInterface` | Resolution de l'IP client |
-| `NonceManagerInterface` | Generation/verification des nonces |
-| `InputSanitizerInterface` | Sanitization des entrees |
-| `OutputEscaperInterface` | Echappement des sorties |
-| `MailerInterface` | Envoi d'emails |
-| `ContentSecurityPolicyInterface` | Gestion des directives CSP |
-| `CorsManagerInterface` | Gestion CORS |
-| `SubresourceIntegrityInterface` | Gestion SRI |
-| `IPAccessControlInterface` | Controle d'acces IP |
-| `SecurityNotifierInterface` | Notifications de securite |
-
-### Adaptateurs (dans `Infrastructure/`)
-
-Les adaptateurs implementent les ports avec les specifites WordPress :
-
-| Adaptateur | Port | Mecanisme WordPress |
-|------------|------|---------------------|
-| `WordPressLoginThrottle` | `LoginThrottleInterface` | transients WP |
-| `WordPressAuditLogRepository` | `AuditLogRepositoryInterface` | table custom / wp_options |
-| `WordPressFileIntegrityRepository` | `FileIntegrityRepositoryInterface` | wp_options |
-| `WordPressRateLimiterRepository` | `RateLimiterRepositoryInterface` | transients WP |
-| `WordPressLoginLocationRepository` | `LoginLocationRepositoryInterface` | user meta |
-| `WordPressTwoFactorRepository` | `TwoFactorRepositoryInterface` | user meta |
-| `WordPressNonceManager` | `NonceManagerInterface` | wp_create_nonce / wp_verify_nonce |
-| `WordPressInputSanitizer` | `InputSanitizerInterface` | sanitize_text_field et al. |
-| `WordPressOutputEscaper` | `OutputEscaperInterface` | esc_html, esc_attr et al. |
-| `WordPressMailer` | `MailerInterface` | wp_mail |
-
-### Enregistrement dans `SecurityExtension`
-
-La methode `registerPortBindings()` connecte chaque port a son adaptateur WordPress via le conteneur DI :
-
-```php
-$containerBuilder->register(LoginThrottleInterface::class, WordPressLoginThrottle::class);
-$containerBuilder->setAlias(WordPressLoginThrottle::class, LoginThrottleInterface::class);
+```
+SecurityAuditLogger -> AuditLogRepositoryInterface -> WordPressAuditLogRepository
 ```
 
-Des alias supplementaires sont definis quand une interface a plusieurs facettes. Par exemple, `TwoFactorRepositoryInterface` a trois alias (`TwoFactorStateInterface`, `TwoFactorSecretInterface`, `TwoFactorBackupCodeInterface`) qui permettent de typer precisement les dependances dans les constructeurs tout en utilisant une seule implementation.
+Three severity levels (`Info`, `Warning`, `Critical`) are sufficient for security events. Only a curated set of WordPress options (`siteurl`, `home`, `admin_email`, `users_can_register`, `default_role`, `permalink_structure`, `blogdescription`) are monitored to avoid noise from transient updates.
 
-### Avantages
-
-- **Testabilite** : les regles de securite ne dependent jamais de WordPress directement, uniquement des ports. Les tests unitaires injectent des mocks.
-- **Substituabilite** : changer de stockage (ex: Redis au lieu de transients) = creer un nouvel adaptateur, pas de modification de la logique metier.
-- **Separation des couches** : la logique de securite (`LoginHardening`, `TwoFactorAuthentication`, etc.) ne contient aucun appel WordPress direct. Tout passe par les interfaces.
+The notification chain flows through a WordPress action: `SecurityAuditLogger` dispatches `backto_security_event`, which `SecurityNotifier` listens to. Critical events trigger email alerts formatted by `SecurityAlertFormatter` and sent through `MailerInterface`.
 
 ---
 
-## Remarques supplementaires
+## Why generic login error messages?
 
-### Le trait `HtmlEscapeTrait`
+`LoginHardening` replaces WordPress's default login errors with a generic message. WordPress normally says "The password you entered for the username X is incorrect," which confirms the username exists. The bundle returns the same message regardless of whether the username or password was wrong, preventing username enumeration through the login form.
 
-Utilise par `CommentSpamProtection` pour echapper les sorties HTML. Centralise `escapeHtml()` et `escapeAttr()` pour les classes qui produisent du HTML sans passer par un moteur de templates.
+---
 
-### Le health check comme invariant
+## Session management trade-offs
 
-`SecurityHealthCheck` agit comme un invariant de deploiement : il verifie que les 8 regles critiques sont presentes dans le registre. Un deploiement ou les regles critiques manquent retourne un statut `unhealthy`. C'est un mecanisme de detection rapide des mauvaises configurations.
-
-### Gestion des sessions concurrentes
-
-`SessionManager` detruit les sessions les plus anciennes quand le maximum est depasse. Le mecanisme inclut deux passes pour gerer les conditions de course (nouvelle session creee entre la lecture et la suppression).
+`SessionManager` limits concurrent sessions per user (default: 1). When a new session exceeds the limit, the oldest sessions are destroyed. This prevents credential sharing and limits the blast radius of a compromised password. The implementation runs two passes to handle race conditions where a new session is created between reading and deleting existing ones.

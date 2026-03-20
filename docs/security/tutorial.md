@@ -1,21 +1,28 @@
-# Tutoriel : Demarrer avec le bundle Security
+# Getting started with the Security bundle
 
-Ce tutoriel vous guide pas a pas pour activer la securite dans un plugin BackTo Framework, configurer le durcissement de base et activer l'authentification a deux facteurs.
+*Tutorial — Learning-oriented*
 
-## Prerequis
+This tutorial walks you through enabling the Security bundle in a plugin, customizing a few settings, and verifying that the protections are active. By the end you will have a hardened WordPress site with security headers, login throttling, and audit logging.
 
-- PHP 8.2+
-- Un plugin BackTo Framework fonctionnel
-- Acces administrateur a WordPress
+## Prerequisites
 
-## Etape 1 : Enregistrer le bundle Security
+- A WordPress plugin or theme using the BackTo Framework
+- The framework's DI container configured
+- Admin access to the WordPress site
 
-Le bundle Security se charge via `SecurityExtension`. Enregistrez-le dans votre plugin :
+## Step 1: Register the Security extension
+
+Add `SecurityExtension` to your plugin's extensions:
 
 ```php
-use BackTo\Framework\Bundle\Security\SecurityExtension;
+<?php
 
-final class MyPlugin extends AbstractPlugin
+namespace MyPlugin;
+
+use BackTo\Framework\Bundle\Security\SecurityExtension;
+use BackTo\Framework\Plugin\AbstractPlugin;
+
+class MyPlugin extends AbstractPlugin
 {
     protected function getExtensions(): array
     {
@@ -26,122 +33,58 @@ final class MyPlugin extends AbstractPlugin
 }
 ```
 
-A ce stade, toutes les regles de securite sont automatiquement decouvertes et enregistrees via le tag DI `wordpress.security_rule`. Les valeurs par defaut sont appliquees.
+All security rules are now auto-discovered and active with their defaults. No further configuration is required to get baseline protection.
 
-## Etape 2 : Comprendre les valeurs par defaut
+## Step 2: Verify the security headers
 
-Le bundle est actif des l'enregistrement avec ces valeurs par defaut :
+Open your site in a browser and inspect the response headers (DevTools > Network tab > select the page request > Headers). You should see:
 
-| Parametre | Valeur par defaut | Effet |
-|-----------|-------------------|-------|
-| `security.headers_enabled` | `true` | En-tetes HTTP securises actifs |
-| `security.xmlrpc_disabled` | `true` | XML-RPC desactive |
-| `security.hide_version` | `true` | Version WordPress masquee |
-| `security.csp_report_only` | `false` | CSP en mode enforcement |
-| `security.password_min_length` | `12` | Longueur minimale des mots de passe |
-| `security.max_concurrent_sessions` | `1` | Une seule session par utilisateur |
-| `security.rest_api_require_auth` | `true` | REST API necessite authentification |
-| `security.disable_file_editor` | `true` | Editeur de fichiers desactive |
-| `security.two_factor_enabled` | `false` | 2FA desactive par defaut |
-| `security.two_factor_issuer` | `'WordPress'` | Nom affiche dans l'app TOTP |
+- `X-Content-Type-Options: nosniff`
+- `X-Frame-Options: SAMEORIGIN`
+- `Referrer-Policy: strict-origin-when-cross-origin`
+- `Strict-Transport-Security: max-age=31536000; includeSubDomains; preload`
+- `Permissions-Policy: camera=(), microphone=(), geolocation=()`
+- No `X-Powered-By` header
 
-## Etape 3 : Configurer le durcissement de base
+These are sent automatically by `HttpHeadersHardening`.
 
-Creez un fichier `config/security.php` dans votre plugin pour surcharger les parametres :
+## Step 3: Customize the configuration
+
+Create `config/security.php` in your plugin to override defaults:
 
 ```php
+<?php
+
 use BackTo\Framework\Bundle\Security\SecurityConfigurator;
 
 return static function (SecurityConfigurator $security): void {
     $security
-        ->headersEnabled(true)
-        ->xmlrpcDisabled(true)
-        ->hideVersion(true)
-        ->disableFileEditor(true)
-        ->restApiRequireAuth(true)
         ->passwordMinLength(16)
-        ->maxConcurrentSessions(1);
+        ->maxConcurrentSessions(1)
+        ->restApiRequireAuth(true);
 };
 ```
 
-### Ce qui se passe automatiquement
+This enforces a 16-character minimum password, limits each user to one active session, and requires authentication for REST API access.
 
-Avec cette configuration, le framework active :
+## Step 4: Trigger a login event
 
-1. **En-tetes HTTP securises** (`HttpHeadersHardening`) : X-Content-Type-Options, X-Frame-Options, Referrer-Policy, Permissions-Policy, HSTS
-2. **Durcissement du login** (`LoginHardening`) : throttling IP/compte, messages d'erreur generiques
-3. **Desactivation XML-RPC** (`DisableXmlRpc`) : suppression du header X-Pingback et des liens RSD
-4. **Masquage de version** (`HideWordPressVersion`) : suppression du meta generator et des parametres `ver=` sur les assets
-5. **Editeur de fichiers desactive** (`DisableFileEditor`) : definition de `DISALLOW_FILE_EDIT`
-6. **Cookies securises** (`CookieHardening`) : attributs Secure, HttpOnly, SameSite=Lax
-7. **Audit de securite** (`SecurityAuditLogger`) : journalisation des evenements critiques
-8. **Politique de mots de passe** (`PasswordPolicy`) : longueur minimale, majuscule, chiffre, caractere special requis
+Log out and log back in to your WordPress site. The `SecurityAuditLogger` records this event automatically.
 
-## Etape 4 : Activer l'authentification a deux facteurs (2FA)
+## Step 5: Check the audit log
 
-Ajoutez l'activation de la 2FA dans votre configuration :
+In the WordPress admin, navigate to the **Audit Log** menu item (shield icon). You should see your login event recorded with:
 
-```php
-return static function (SecurityConfigurator $security): void {
-    $security
-        ->twoFactorEnabled(true)
-        ->twoFactorIssuer('MonApplication');
-};
-```
+- **Event:** `login_success`
+- **Severity:** Info
+- **Context:** your username, IP address, and timestamp
 
-### Flux de configuration 2FA pour un utilisateur
+## Step 6: Test login throttling
 
-La 2FA utilise TOTP (RFC 6238), compatible avec Google Authenticator, Authy, 1Password, etc.
+Open an incognito window and attempt to log in with an incorrect password several times. After repeated failures, `LoginHardening` will temporarily block further attempts from your IP. You will see a generic error message — the bundle never reveals whether the username or password was wrong.
 
-1. **Initialisation** : `TwoFactorSetupManager::setup()` genere un secret et des codes de secours
+## Next steps
 
-```php
-$setupManager = $container->get(TwoFactorSetupManager::class);
-
-$result = $setupManager->setup($userId, $userEmail);
-// $result['secret']           -> secret TOTP Base32
-// $result['provisioning_uri'] -> URI otpauth:// pour QR code
-// $result['backup_codes']     -> 8 codes de secours (format XXXX-XXXX)
-```
-
-2. **Confirmation** : l'utilisateur scanne le QR code et saisit un code pour confirmer
-
-```php
-$confirmed = $setupManager->confirmSetup($userId, $codeFromUser);
-// true  -> 2FA active pour cet utilisateur
-// false -> code invalide, 2FA non active
-```
-
-3. **Authentification** : `TwoFactorAuthentication` intercepte le login (priorite 40 sur le filtre `authenticate`) et exige un code TOTP ou un code de secours
-
-4. **Codes de secours** : 8 codes a usage unique, haches avec bcrypt, verification en temps constant
-
-```php
-$newCodes = $setupManager->regenerateBackupCodes($userId);
-```
-
-5. **Desactivation** :
-
-```php
-$setupManager->disableForUser($userId);
-```
-
-## Etape 5 : Verifier l'installation
-
-### Via le health check
-
-Le framework inclut un health check securite accessible via REST API :
-
-```
-GET /wp-json/backto/v1/security/health
-```
-
-Il verifie que les regles critiques sont actives : `http_headers_hardening`, `disable_xmlrpc`, `hide_wordpress_version`, `login_hardening`, `upload_security`, `capability_hardening`, `security_audit_logger`, `disable_file_editor`.
-
-### Via le journal d'audit
-
-Accedez au journal d'audit dans l'administration WordPress sous **Audit Log** (menu avec l'icone bouclier). Vous pouvez filtrer par type d'evenement et severite, exporter en CSV et purger les anciens evenements.
-
-## Etape suivante
-
-Consultez les [guides pratiques](how-to.md) pour des recettes avancees comme la configuration CSP, le controle d'acces IP, le rate limiting et la configuration CORS pour WordPress headless.
+- See [Common tasks](how-to.md) for recipes like CSP configuration, IP access control, and two-factor authentication
+- See [API reference](reference.md) for the complete list of security rules and their hooks
+- See [Architecture](explanation.md) to understand why the bundle is designed this way
