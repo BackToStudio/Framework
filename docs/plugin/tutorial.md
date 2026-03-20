@@ -60,5 +60,5 @@ Activate the plugin in WordPress. The DI container compiles, services are regist
 
 ## Next steps
 
-- See [Common tasks](how-to.md) for mu-plugin support, environment configuration, and custom services
+- See [Common tasks](how-to/README.md) for mu-plugin support, environment configuration, and custom services
 - See [Architecture](explanation.md) to understand the kernel lifecycle

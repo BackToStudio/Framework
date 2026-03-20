@@ -26,6 +26,6 @@ $kernel->boot();
 | Document | Type | Description |
 |---|---|---|
 | [Getting started](tutorial.md) | Tutorial | Bootstrap your first theme with ThemeKernel |
-| [Common tasks](how-to.md) | How-to | Head cleanup, disabling actions, translations |
+| [Common tasks](how-to/README.md) | How-to | Head cleanup, disabling actions, translations |
 | [API reference](reference.md) | Reference | Kernel methods, cleanup actions, parameters |
 | [Architecture](explanation.md) | Explanation | Why clean the head, action granularity, kernel differences |

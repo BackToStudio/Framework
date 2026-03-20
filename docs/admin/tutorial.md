@@ -87,6 +87,6 @@ Visit your WordPress admin — the "Dashboard" menu item appears at position 2.
 
 ## Next steps
 
-- See [Common tasks](how-to.md) for submenus, editor access, and reusable blocks
+- See [Common tasks](how-to/README.md) for submenus, editor access, and reusable blocks
 - See [API reference](reference.md) for the complete interface documentation
 - See [Architecture](explanation.md) to understand the registry and ports & adapters design

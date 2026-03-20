@@ -98,5 +98,5 @@ This is the standard PSR-18 method. Any library that produces PSR-7 requests is 
 
 ## Next steps
 
-- See [Common tasks](how-to.md) for practical recipes (timeouts, non-blocking requests, error handling)
+- See [Common tasks](how-to/README.md) for practical recipes (timeouts, non-blocking requests, error handling)
 - See [API reference](reference.md) for the complete interface documentation

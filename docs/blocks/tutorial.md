@@ -93,5 +93,5 @@ The style is registered automatically for each listed block on the `after_setup_
 
 ## Next steps
 
-- See [Common tasks](how-to.md) for SVG inlining and multi-block styling
+- See [Common tasks](how-to/README.md) for SVG inlining and multi-block styling
 - See [API reference](reference.md) for the complete class documentation

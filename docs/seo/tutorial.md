@@ -146,6 +146,6 @@ If a schema is missing required properties, `validate()` returns them keyed by t
 
 ## Next steps
 
-- See [Common tasks](how-to.md) for practical recipes (Product schema, custom breadcrumbs, social links in Twig)
+- See [Common tasks](how-to/README.md) for practical recipes (Product schema, custom breadcrumbs, social links in Twig)
 - See [API reference](reference.md) for the complete list of schema types and their methods
 - See [Architecture](explanation.md) to understand the `@graph` design and generation pipeline

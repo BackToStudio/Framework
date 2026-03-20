@@ -93,5 +93,5 @@ Visit your site. The consent banner appears on the first visit (`wp_footer` hook
 
 ## Next steps
 
-- See [Common tasks](how-to.md) for adding other presets and custom scripts
+- See [Common tasks](how-to/README.md) for adding other presets and custom scripts
 - See [Architecture](explanation.md) to understand the consent flow

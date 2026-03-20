@@ -22,6 +22,6 @@ $schema = Schema::article()
 | Document | Type | Description |
 |---|---|---|
 | [Getting started](tutorial.md) | Tutorial | Add Article schema to a blog post and validate it |
-| [Common tasks](how-to.md) | How-to | Practical recipes for schemas, providers, and configuration |
+| [Common tasks](how-to/README.md) | How-to | Practical recipes for schemas, providers, and configuration |
 | [API reference](reference.md) | Reference | Complete class, method, and hook documentation |
 | [Architecture](explanation.md) | Explanation | Design decisions: @graph, provider abstraction, pipeline |

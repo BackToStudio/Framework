@@ -54,5 +54,5 @@ Activate the theme in WordPress. The cleanup actions (`CleanHead`, `RemoveEmojis
 
 ## Next steps
 
-- See [Common tasks](how-to.md) for disabling specific cleanup actions
+- See [Common tasks](how-to/README.md) for disabling specific cleanup actions
 - See [API reference](reference.md) for the complete class documentation

@@ -48,15 +48,15 @@ Each bundle has its own Diataxis documentation (tutorial, how-to, reference, exp
 
 | Bundle | Description | Docs |
 |--------|-------------|------|
-| [Security](security/README.md) | WordPress hardening, 2FA, CSP, rate limiting, audit logging | [tutorial](security/tutorial.md) · [how-to](security/how-to.md) · [reference](security/reference.md) · [explanation](security/explanation.md) |
-| [Performance](performance/README.md) | Page cache, HTML/CSS/JS minification, image optimization, .htaccess | [tutorial](performance/tutorial.md) · [how-to](performance/how-to.md) · [reference](performance/reference.md) · [explanation](performance/explanation.md) |
-| [Seo](seo/README.md) | Schema.org JSON-LD, breadcrumbs, meta tags, fluent API | [tutorial](seo/tutorial.md) · [how-to](seo/how-to.md) · [reference](seo/reference.md) · [explanation](seo/explanation.md) |
-| [Http](http/README.md) | PSR-18 HTTP client, request/response, async support | [tutorial](http/tutorial.md) · [how-to](http/how-to.md) · [reference](http/reference.md) · [explanation](http/explanation.md) |
-| [Admin](admin/README.md) | Admin pages, settings, menu registration, notices | [tutorial](admin/tutorial.md) · [how-to](admin/how-to.md) · [reference](admin/reference.md) · [explanation](admin/explanation.md) |
-| [Blocks](blocks/README.md) | Block registration, block styles, Gutenberg integration | [tutorial](blocks/tutorial.md) · [how-to](blocks/how-to.md) · [reference](blocks/reference.md) · [explanation](blocks/explanation.md) |
-| [Plugin](plugin/README.md) | Plugin lifecycle, activation, deactivation hooks | [tutorial](plugin/tutorial.md) · [how-to](plugin/how-to.md) · [reference](plugin/reference.md) · [explanation](plugin/explanation.md) |
-| [Theme](theme/README.md) | Theme support, assets, menus, sidebars, templates | [tutorial](theme/tutorial.md) · [how-to](theme/how-to.md) · [reference](theme/reference.md) · [explanation](theme/explanation.md) |
-| [Gdpr](gdpr/README.md) | GDPR consent management, tracking script control | [tutorial](gdpr/tutorial.md) · [how-to](gdpr/how-to.md) · [reference](gdpr/reference.md) · [explanation](gdpr/explanation.md) |
+| [Security](security/README.md) | WordPress hardening, 2FA, CSP, rate limiting, audit logging | [tutorial](security/tutorial.md) · [how-to](security/how-to/README.md) · [reference](security/reference.md) · [explanation](security/explanation.md) |
+| [Performance](performance/README.md) | Page cache, HTML/CSS/JS minification, image optimization, .htaccess | [tutorial](performance/tutorial.md) · [how-to](performance/how-to/README.md) · [reference](performance/reference.md) · [explanation](performance/explanation.md) |
+| [Seo](seo/README.md) | Schema.org JSON-LD, breadcrumbs, meta tags, fluent API | [tutorial](seo/tutorial.md) · [how-to](seo/how-to/README.md) · [reference](seo/reference.md) · [explanation](seo/explanation.md) |
+| [Http](http/README.md) | PSR-18 HTTP client, request/response, async support | [tutorial](http/tutorial.md) · [how-to](http/how-to/README.md) · [reference](http/reference.md) · [explanation](http/explanation.md) |
+| [Admin](admin/README.md) | Admin pages, settings, menu registration, notices | [tutorial](admin/tutorial.md) · [how-to](admin/how-to/README.md) · [reference](admin/reference.md) · [explanation](admin/explanation.md) |
+| [Blocks](blocks/README.md) | Block registration, block styles, Gutenberg integration | [tutorial](blocks/tutorial.md) · [how-to](blocks/how-to/README.md) · [reference](blocks/reference.md) · [explanation](blocks/explanation.md) |
+| [Plugin](plugin/README.md) | Plugin lifecycle, activation, deactivation hooks | [tutorial](plugin/tutorial.md) · [how-to](plugin/how-to/README.md) · [reference](plugin/reference.md) · [explanation](plugin/explanation.md) |
+| [Theme](theme/README.md) | Theme support, assets, menus, sidebars, templates | [tutorial](theme/tutorial.md) · [how-to](theme/how-to/README.md) · [reference](theme/reference.md) · [explanation](theme/explanation.md) |
+| [Gdpr](gdpr/README.md) | GDPR consent management, tracking script control | [tutorial](gdpr/tutorial.md) · [how-to](gdpr/how-to/README.md) · [reference](gdpr/reference.md) · [explanation](gdpr/explanation.md) |
 
 See also: [Architecture overview](ARCHITECTURE.md)
 

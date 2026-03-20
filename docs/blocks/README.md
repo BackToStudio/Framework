@@ -19,6 +19,6 @@ $kernel->addExtension(new BlocksExtension());
 | Document | Type | Description |
 |---|---|---|
 | [Getting started](tutorial.md) | Tutorial | Register your first custom block and block style |
-| [Common tasks](how-to.md) | How-to | SVG inlining, multi-block styles, duplicate handling |
+| [Common tasks](how-to/README.md) | How-to | SVG inlining, multi-block styles, duplicate handling |
 | [API reference](reference.md) | Reference | Abstract classes, interfaces, registries, actions |
 | [Architecture](explanation.md) | Explanation | Registration flow, static vs dynamic blocks |

@@ -19,6 +19,6 @@ $kernel->addExtension(new AdminExtension());
 | Document | Type | Description |
 |---|---|---|
 | [Getting started](tutorial.md) | Tutorial | Create and register your first admin page |
-| [Common tasks](how-to.md) | How-to | Submenus, editor access, reusable blocks menu |
+| [Common tasks](how-to/README.md) | How-to | Submenus, editor access, reusable blocks menu |
 | [API reference](reference.md) | Reference | Interfaces, classes, compiler passes |
 | [Architecture](explanation.md) | Explanation | Hexagonal design, auto-configuration, registry pattern |

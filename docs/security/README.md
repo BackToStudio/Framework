@@ -13,6 +13,6 @@ The Security bundle wraps 40+ security rules behind the `SecurityRuleInterface` 
 | Document | Type | Description |
 |---|---|---|
 | [Getting started](tutorial.md) | Tutorial | Harden a plugin and verify results step by step |
-| [Common tasks](how-to.md) | How-to | Practical recipes for CSP, CORS, rate limiting, IP control, 2FA, and more |
+| [Common tasks](how-to/README.md) | How-to | Practical recipes for CSP, CORS, rate limiting, IP control, 2FA, and more |
 | [API reference](reference.md) | Reference | Complete class, hook, and configuration documentation |
 | [Architecture](explanation.md) | Explanation | Design decisions, defense-in-depth strategy, hook ordering |
