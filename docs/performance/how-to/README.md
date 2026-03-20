@@ -24,8 +24,6 @@ Practical recipes for common performance tasks.
 - [Disable head cleanup or emoji removal](./disable-head-cleanup-or-emoji-removal.md)
 - [Swap the page cache implementation](./swap-the-page-cache-implementation.md)
 - [Clean up WordPress dashboard widgets](./clean-up-wordpress-dashboard-widgets.md)
-- [Understand how unused CSS removal works](./understand-how-unused-css-removal-works.md)
 - [Schedule cache preloading on a timed interval](./schedule-cache-preloading-on-a-timed-interval.md)
 - [Tune cache preloading for your site size](./tune-cache-preloading-for-your-site-size.md)
 - [Run database cleanup and optimization](./run-database-cleanup-and-optimization.md)
-- [Configure WooCommerce-specific asset optimization](./configure-woocommerce-specific-asset-optimization.md)

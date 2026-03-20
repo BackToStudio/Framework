@@ -2,13 +2,13 @@
 
 *Explanation — Understanding-oriented*
 
-Ce document décrit l'architecture en couches du framework et les relations entre modules.
+This document describes the layered architecture of the framework and the relationships between modules.
 
 ---
 
-## Vue d'ensemble
+## Overview
 
-Le framework est organisé en **trois couches** qui suivent le principe de dépendance inversée : les couches hautes dépendent des couches basses, jamais l'inverse.
+The framework is organized into **three layers** following the dependency inversion principle: higher layers depend on lower layers, never the reverse.
 
 ```
 src/
@@ -44,71 +44,71 @@ src/
     └── Query/                       (BackTo\Framework\Query)
 ```
 
-Les bundles applicatifs vivent dans `src/Bundle/` (namespace `BackTo\Framework\Bundle\*`),
-à la manière des Symfony Bundles. Les couches Foundation et Domain Services restent
-à la racine de `src/` (namespace `BackTo\Framework\*`).
+Application bundles live in `src/Bundle/` (namespace `BackTo\Framework\Bundle\*`),
+similar to Symfony Bundles. The Foundation and Domain Services layers remain
+at the root of `src/` (namespace `BackTo\Framework\*`).
 
 ---
 
 ## Foundation
 
-La couche la plus basse. Fournit l'infrastructure technique que tout le reste du framework utilise. **Aucune logique métier WordPress** — uniquement des abstractions, des standards, et de la plomberie.
+The lowest layer. Provides the technical infrastructure that the rest of the framework uses. **No WordPress business logic** — only abstractions, standards, and plumbing.
 
-| Module | Rôle | Standards |
+| Module | Role | Standards |
 |---|---|---|
-| **Contracts** | Interfaces ports (HookDispatcher, ContentQuery, UserContext, etc.) | — |
-| **Http** | Client HTTP, Request/Response PSR-7 | PSR-7, PSR-18 |
-| **Cache** | Interfaces et stratégies de cache | PSR-16 |
-| **Clock** | Abstraction du temps (SystemClock, FrozenClock) | PSR-20 |
-| **Exception** | Exceptions framework | — |
-| **Query** | Value objects pour les requêtes (SortDirection, MetaCompare) | — |
-| **Hooks** | Registre de hooks, DI des adapters WordPress | — |
-| **Compose** | Kernel, extensions, container DI (Symfony DI scopé) | PSR-11 (scopé) |
-| **Cli** | Commandes WP-CLI | — |
+| **Contracts** | Port interfaces (HookDispatcher, ContentQuery, UserContext, etc.) | — |
+| **Http** | HTTP client, PSR-7 Request/Response | PSR-7, PSR-18 |
+| **Cache** | Cache interfaces and strategies | PSR-16 |
+| **Clock** | Time abstraction (SystemClock, FrozenClock) | PSR-20 |
+| **Exception** | Framework exceptions | — |
+| **Query** | Value objects for queries (SortDirection, MetaCompare) | — |
+| **Hooks** | Hook registry, DI for WordPress adapters | — |
+| **Compose** | Kernel, extensions, DI container (scoped Symfony DI) | PSR-11 (scoped) |
+| **Cli** | WP-CLI commands | — |
 
-**Règle** : un module Foundation ne dépend que d'autres modules Foundation ou de `Contracts/`.
+**Rule**: a Foundation module only depends on other Foundation modules or `Contracts/`.
 
 ---
 
 ## Domain Services
 
-Couche intermédiaire. Abstrait les concepts métier WordPress (post types, taxonomies, options, etc.) derrière des interfaces propres. Réutilisable par les modules applicatifs.
+Middle layer. Abstracts WordPress business concepts (post types, taxonomies, options, etc.) behind clean interfaces. Reusable by application modules.
 
-| Module | Rôle | Dépendances |
+| Module | Role | Dependencies |
 |---|---|---|
-| **PostType** | Enregistrement et gestion des Custom Post Types | Contracts, PostMeta, Query, Observability |
-| **Taxonomy** | Enregistrement des taxonomies | Contracts, Query, Observability |
-| **PostMeta** | Gestion des métadonnées de posts | Contracts |
-| **RestApi** | Enregistrement de routes REST | Contracts |
-| **Options** | Lecture/écriture des options WordPress | Contracts |
-| **Assets** | Gestion des scripts et styles | Contracts, Observability |
-| **Queue** | Cron scheduling et tâches asynchrones | Contracts, Cache |
-| **Observability** | Logging (PSR-3), métriques, health checks | Contracts, Cache |
+| **PostType** | Custom Post Type registration and management | Contracts, PostMeta, Query, Observability |
+| **Taxonomy** | Taxonomy registration | Contracts, Query, Observability |
+| **PostMeta** | Post metadata management | Contracts |
+| **RestApi** | REST route registration | Contracts |
+| **Options** | WordPress options read/write | Contracts |
+| **Assets** | Script and style management | Contracts, Observability |
+| **Queue** | Cron scheduling and async tasks | Contracts, Cache |
+| **Observability** | Logging (PSR-3), metrics, health checks | Contracts, Cache |
 
-**Règle** : un Domain Service dépend du Foundation et d'autres Domain Services, jamais d'un module applicatif.
+**Rule**: a Domain Service depends on Foundation and other Domain Services, never on an application module.
 
 ---
 
 ## Application Modules
 
-La couche la plus haute. Implémente des fonctionnalités concrètes pour les sites WordPress. C'est ici que vit la logique métier spécifique.
+The highest layer. Implements concrete features for WordPress sites. This is where specific business logic lives.
 
-| Module | Rôle | Dépendances clés |
+| Module | Role | Key dependencies |
 |---|---|---|
 | **Security** | Hardening, audit, 2FA, rate limiting, CORS, CSP | Cache, Observability, Options, Queue, RestApi, Admin |
 | **Performance** | Page cache, htaccess, preloading, minification | Cache, Http, Options, Queue |
-| **Seo** | Schema.org, providers Yoast/SEOPress, breadcrumbs | Contracts, Options |
-| **Admin** | Pages admin, menus, capabilities | Contracts |
-| **Theme** | Nettoyage head, text domain, hooks theme | Contracts, Plugin |
-| **Plugin** | Text domain, hooks plugin lifecycle | Contracts, Theme |
-| **Blocks** | Gutenberg blocks et block styles | Assets, Contracts |
-| **Gdpr** | Conformité RGPD | Contracts |
+| **Seo** | Schema.org, Yoast/SEOPress providers, breadcrumbs | Contracts, Options |
+| **Admin** | Admin pages, menus, capabilities | Contracts |
+| **Theme** | Head cleanup, text domain, theme hooks | Contracts, Plugin |
+| **Plugin** | Text domain, plugin lifecycle hooks | Contracts, Theme |
+| **Blocks** | Gutenberg blocks and block styles | Assets, Contracts |
+| **Gdpr** | GDPR compliance | Contracts |
 
-**Règle** : un module applicatif peut dépendre de tout ce qui est en dessous (Foundation + Domain Services) et d'autres modules applicatifs quand c'est justifié.
+**Rule**: an application module can depend on anything below it (Foundation + Domain Services) and on other application modules when justified.
 
 ---
 
-## Graphe de dépendances
+## Dependency graph
 
 ```
                          Contracts
@@ -132,15 +132,15 @@ La couche la plus haute. Implémente des fonctionnalités concrètes pour les si
 
 ---
 
-## Conformité PSR
+## PSR compliance
 
-| PSR | Standard | Module | Statut |
+| PSR | Standard | Module | Status |
 |---|---|---|---|
 | PSR-3 | Logger | Observability | `LoggerInterface extends Psr\Log\LoggerInterface` |
-| PSR-4 | Autoloading | (global) | Conforme |
-| PSR-7 | HTTP Message | Http | `Response`, `StringStream` implémentent PSR-7 |
-| PSR-11 | Container | Compose | Via Symfony DI (vendor-scopé) |
-| PSR-12 | Coding Style | (global) | PER-CS 2.0 (successeur de PSR-12) |
+| PSR-4 | Autoloading | (global) | Compliant |
+| PSR-7 | HTTP Message | Http | `Response`, `StringStream` implement PSR-7 |
+| PSR-11 | Container | Compose | Via Symfony DI (vendor-scoped) |
+| PSR-12 | Coding Style | (global) | PER-CS 2.0 (successor to PSR-12) |
 | PSR-16 | Simple Cache | Cache | `CacheInterface extends Psr\SimpleCache\CacheInterface` |
 | PSR-18 | HTTP Client | Http | `HttpClientInterface extends Psr\Http\Client\ClientInterface` |
 | PSR-20 | Clock | Clock | `ClockInterface extends Psr\Clock\ClockInterface` |
@@ -149,25 +149,25 @@ La couche la plus haute. Implémente des fonctionnalités concrètes pour les si
 
 ## Hexagonal Architecture (Ports & Adapters)
 
-Chaque module suit le pattern Hexagonal :
+Each module follows the Hexagonal pattern:
 
 ```
 src/ModuleName/
 ├── Contracts/           ← Ports (interfaces)
-├── Infrastructure/      ← Adapters WordPress (implémentations)
-├── Tests/               ← Tests unitaires
+├── Infrastructure/      ← WordPress adapters (implementations)
+├── Tests/               ← Unit tests
 ├── Hooks/               ← Hook classes (application layer)
 └── *.php                ← Domain/application logic
 ```
 
-- **Ports** (`Contracts/`) : interfaces que le code métier consomme
-- **Adapters** (`Infrastructure/`) : implémentations WordPress qui appellent les fonctions WP
-- Le code métier ne dépend jamais directement de WordPress — uniquement des ports
+- **Ports** (`Contracts/`): interfaces consumed by business code
+- **Adapters** (`Infrastructure/`): WordPress implementations that call WP functions
+- Business code never depends on WordPress directly — only on ports
 
-Exemple concret :
+Concrete example:
 
 ```php
-// Le code métier utilise le port
+// Business code uses the port
 class PreloadExecutor
 {
     public function __construct(
@@ -175,7 +175,7 @@ class PreloadExecutor
     ) {}
 }
 
-// L'adapter WordPress fournit l'implémentation
+// The WordPress adapter provides the implementation
 class WordPressHttpClient implements HttpClientInterface    // adapter
 {
     public function get(string $url, array $options = []): ResponseInterface
@@ -187,22 +187,22 @@ class WordPressHttpClient implements HttpClientInterface    // adapter
 
 ---
 
-## Convention de nommage
+## Naming conventions
 
-| Pattern | Signification | Exemple |
+| Pattern | Meaning | Example |
 |---|---|---|
-| `*Interface` | Port / contrat | `HttpClientInterface` |
-| `WordPress*` | Adapter WordPress | `WordPressHttpClient` |
-| `*Extension` | Module DI (enregistre services) | `SecurityExtension` |
-| `*Test` | Test unitaire | `ResponseTest` |
-| `Abstract*` | Classe de base partagée | `AbstractCache` |
+| `*Interface` | Port / contract | `HttpClientInterface` |
+| `WordPress*` | WordPress adapter | `WordPressHttpClient` |
+| `*Extension` | DI module (registers services) | `SecurityExtension` |
+| `*Test` | Unit test | `ResponseTest` |
+| `Abstract*` | Shared base class | `AbstractCache` |
 
 ---
 
-## Ajouter un nouveau module
+## Adding a new module
 
-1. Créer `src/MonModule/` avec la structure ci-dessus
-2. Créer `MonModuleExtension extends AbstractExtension` pour le DI
-3. Placer les interfaces dans `Contracts/`, les adapters WP dans `Infrastructure/`
-4. Vérifier la couche : ce module est-il Foundation, Domain Service ou Application ?
-5. Respecter les règles de dépendance de sa couche
+1. Create `src/MyModule/` with the structure above
+2. Create `MyModuleExtension extends AbstractExtension` for DI
+3. Place interfaces in `Contracts/`, WordPress adapters in `Infrastructure/`
+4. Determine the layer: is this module Foundation, Domain Service, or Application?
+5. Respect the dependency rules of its layer

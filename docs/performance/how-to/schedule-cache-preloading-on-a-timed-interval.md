@@ -10,7 +10,7 @@ namespace MyPlugin\Performance;
 use BackTo\Framework\Bundle\Performance\PreloadUrlCollector;
 use BackTo\Framework\Bundle\Performance\PreloadExecutor;
 use BackTo\Framework\Contracts\HookDispatcherInterface;
-use BackTo\Framework\Contracts\CronSchedulerInterface;
+use BackTo\Framework\Queue\Contracts\CronSchedulerInterface;
 
 final class ScheduledCacheWarmer
 {

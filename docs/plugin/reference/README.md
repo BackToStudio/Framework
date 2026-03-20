@@ -2,7 +2,7 @@
 
 *Reference — Information-oriented*
 
-Understanding the API reference of the Plugin bundle.
+Complete API documentation for of the Plugin bundle.
 
 ---
 

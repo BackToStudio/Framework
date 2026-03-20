@@ -14,7 +14,7 @@ $services->set('consent_category_functional', ConsentCategory::class)
         'Cookies for enhanced features like chat.',      // description
         false,                                           // required (user can opt out)
     ])
-    ->tag('gdpr.consent_category');
+    ->tag('wordpress.consent_category');
 
 $services->set('consent_category_performance', ConsentCategory::class)
     ->args([
@@ -23,7 +23,7 @@ $services->set('consent_category_performance', ConsentCategory::class)
         'Cookies that help us understand how visitors use the site.',
         false,
     ])
-    ->tag('gdpr.consent_category');
+    ->tag('wordpress.consent_category');
 ```
 
 Required categories are pre-checked and disabled in the banner (users cannot opt out).

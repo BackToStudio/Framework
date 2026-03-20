@@ -8,8 +8,7 @@
 
 namespace MyPlugin\Blocks;
 
-use BackTo\Framework\Bundle\Blocks\Actions\ReplaceImgBlockBySvgBlock;
-use BackTo\Framework\Bundle\Blocks\Actions\ReplaceImgTagBySvgTag;
+use BackTo\Framework\Assets\ReplaceImgTagBySvgTag;
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 
 final class ConditionalSvgInline

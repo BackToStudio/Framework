@@ -2,7 +2,7 @@
 
 *Reference — Information-oriented*
 
-Understanding the API reference of the GDPR bundle.
+Complete API documentation for of the GDPR bundle.
 
 ---
 

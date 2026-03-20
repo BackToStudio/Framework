@@ -2,7 +2,7 @@
 
 *Reference — Information-oriented*
 
-Understanding the API reference of the Admin bundle.
+Complete API documentation for of the Admin bundle.
 
 ---
 
@@ -11,5 +11,5 @@ Understanding the API reference of the Admin bundle.
 - [Interfaces](./interfaces.md)
 - [Classes](./classes.md)
 - [Infrastructure](./infrastructure.md)
-- [Compiler Pass](./compiler-pass.md)
+- [Compiler Passes](./compiler-pass.md)
 - [DI Extension](./di-extension.md)

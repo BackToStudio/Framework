@@ -2,7 +2,7 @@
 
 *Reference — Information-oriented*
 
-Understanding the API reference of the Blocks bundle.
+Complete API documentation for of the Blocks bundle.
 
 ---
 

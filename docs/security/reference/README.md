@@ -2,7 +2,7 @@
 
 *Reference — Information-oriented*
 
-Understanding the API reference of the Security bundle.
+Complete API documentation for of the Security bundle.
 
 ---
 
@@ -13,4 +13,4 @@ Understanding the API reference of the Security bundle.
 - [Two-factor authentication](./two-factor-authentication.md)
 - [REST API routes](./rest-api-routes.md)
 - [Contracts](./contracts.md)
-- [DI registration](./di-registration.md)
+- [DI Registration](./di-registration.md)

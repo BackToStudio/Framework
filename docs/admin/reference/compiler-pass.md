@@ -1,4 +1,4 @@
-# Compiler Pass
+# Compiler Passes
 
 ### `RegisterAdminPagePass`
 

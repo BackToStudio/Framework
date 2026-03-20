@@ -36,5 +36,5 @@ Register it:
 ```php
 $services->set(SegmentScript::class)
     ->args(['YOUR_WRITE_KEY'])
-    ->tag('gdpr.tracking_script');
+    ->tag('wordpress.tracking_script');
 ```
