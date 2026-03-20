@@ -1,38 +1,38 @@
-# Guides pratiques : Performance
+# Performance — How-to guides
 
-Recettes pour accomplir des taches specifiques avec le bundle Performance.
+*How-to — Task-oriented*
 
-## Configurer le TTL du cache de pages
+Practical recipes for common performance tuning tasks.
 
-Par defaut, les pages sont mises en cache pendant 3600 secondes (1 heure). Pour modifier cette duree :
+---
+
+## Configure the page cache TTL
+
+Pages are cached for 3600 seconds (1 hour) by default. To change the duration:
 
 ```php
+<?php
+
 use BackTo\Framework\Bundle\Performance\PerformanceConfigurator;
 
 return static function (PerformanceConfigurator $performance): void {
     $performance
         ->pageCacheEnabled(true)
-        ->pageCacheTtl(7200); // 2 heures
+        ->pageCacheTtl(7200); // 2 hours
 };
 ```
 
-Le TTL est verifie a la lecture du cache. Lorsqu'un fichier `.meta` indique une expiration depassee, le cache est automatiquement invalide et la page est regeneree lors de la prochaine visite.
+For sites with infrequently updated content, a longer TTL (e.g. `86400` for 24 hours) is safe. Auto-invalidation ensures content changes are reflected immediately regardless of TTL.
 
-> **Conseil** : Pour un site avec du contenu rarement modifie, un TTL eleve (86400 = 24h) est recommande. L'auto-invalidation garantit que les modifications de contenu sont immediatement prises en compte.
+---
 
-## Configurer les prefixes d'URL exclus du cache
+## Exclude URL prefixes from page caching
 
-Le `CacheableRequestChecker` exclut par defaut les prefixes suivants :
-
-- `/wp-admin`
-- `/wp-json`
-- `/wp-login.php`
-- `/wp-cron.php`
-- `/xmlrpc.php`
-
-Pour ajouter des prefixes personnalises, enregistrez un decorateur ou une definition de service dans votre extension :
+The `CacheableRequestChecker` excludes `/wp-admin`, `/wp-json`, `/wp-login.php`, `/wp-cron.php`, and `/xmlrpc.php` by default. To add custom prefixes, override the constructor argument in your extension:
 
 ```php
+<?php
+
 use BackTo\Framework\Bundle\Performance\CacheableRequestChecker;
 
 $containerBuilder->getDefinition(CacheableRequestChecker::class)
@@ -42,35 +42,57 @@ $containerBuilder->getDefinition(CacheableRequestChecker::class)
         '/wp-login.php',
         '/wp-cron.php',
         '/xmlrpc.php',
-        '/mon-espace-prive',
+        '/my-private-area',
         '/api/custom',
     ]);
 ```
 
-Le checker refuse egalement la mise en cache pour :
+---
 
-- Les requetes non-GET
-- Les utilisateurs connectes
-- Les requetes avec parametres de query string
-- Les pages d'administration
+## Enable cache preloading
 
-## Ajouter des resource hints (preconnect / preload)
+Cache preloading warms the cache in the background after content changes, so visitors always hit a warm cache:
+
+```php
+<?php
+
+use BackTo\Framework\Bundle\Performance\PerformanceConfigurator;
+
+return static function (PerformanceConfigurator $performance): void {
+    $performance
+        ->pageCacheEnabled(true)
+        ->cachePreloadEnabled(true)
+        ->cachePreloadDelay(5)       // seconds before preload fires
+        ->cachePreloadBatchSize(50); // max URLs per batch
+};
+```
+
+Preloading is triggered automatically on post save, publish, theme switch, and Customizer save.
+
+---
+
+## Add resource hints (preconnect, dns-prefetch, preload)
 
 ### Preconnect
 
-Le preconnect etablit une connexion anticipee vers un domaine tiers (DNS + TCP + TLS) :
+Establish early connections to third-party origins (DNS + TCP + TLS):
 
 ```php
-$performance->preconnect([
-    'https://fonts.googleapis.com',
-    'https://fonts.gstatic.com',
-    'https://cdn.example.com',
-]);
+<?php
+
+use BackTo\Framework\Bundle\Performance\PerformanceConfigurator;
+
+return static function (PerformanceConfigurator $performance): void {
+    $performance->preconnect([
+        'https://fonts.googleapis.com',
+        'https://fonts.gstatic.com',
+    ]);
+};
 ```
 
-### DNS Prefetch
+### DNS prefetch
 
-Le dns-prefetch effectue uniquement la resolution DNS, moins couteux que le preconnect :
+Resolve DNS only (lighter than preconnect):
 
 ```php
 $performance->dnsPrefetch([
@@ -81,157 +103,178 @@ $performance->dnsPrefetch([
 
 ### Preload
 
-Le preload force le chargement anticipe de ressources critiques. Chaque ressource necessite une URL, un type `as` et optionnellement un `type` MIME :
+Force early loading of critical resources. Each resource requires a URL and an `as` type. The `type` field is optional:
 
 ```php
 $performance->preload([
-    ['url' => '/wp-content/themes/mon-theme/fonts/custom.woff2', 'as' => 'font', 'type' => 'font/woff2'],
-    ['url' => '/wp-content/themes/mon-theme/css/critical.css', 'as' => 'style'],
-    ['url' => '/wp-content/themes/mon-theme/js/app.js', 'as' => 'script'],
+    ['url' => '/wp-content/themes/my-theme/fonts/custom.woff2', 'as' => 'font', 'type' => 'font/woff2'],
+    ['url' => '/wp-content/themes/my-theme/css/critical.css', 'as' => 'style'],
 ]);
 ```
 
-> **Note** : L'attribut `crossorigin` est automatiquement ajoute pour les types `font` et `fetch`.
+The `crossorigin` attribute is added automatically for `font` and `fetch` resources.
 
-## Optimiser les images (lazy-load, fetchpriority)
+---
 
-### Controler le nombre d'images sans lazy-load
+## Exclude scripts from deferral
 
-Par defaut, la premiere image (probablement l'element LCP) est exclue du lazy-load et recoit `fetchpriority="high"`. Pour exclure les N premieres images :
-
-```php
-$performance->lazyLoadSkipFirst(2); // Les 2 premieres images ne sont pas lazy-loaded
-```
-
-### Activer/desactiver le decodage asynchrone
-
-L'attribut `decoding="async"` est ajoute par defaut aux images d'attachment :
+By default, all frontend scripts receive the `defer` attribute except `jquery-core` and `jquery-migrate`. To exclude additional scripts:
 
 ```php
-$performance->addDecodingAsync(true);  // Actif par defaut
+<?php
+
+use BackTo\Framework\Bundle\Performance\PerformanceConfigurator;
+
+return static function (PerformanceConfigurator $performance): void {
+    $performance->deferExclude([
+        'jquery-core',
+        'jquery-migrate',
+        'my-critical-script',
+    ]);
+};
 ```
 
-### Activer/desactiver fetchpriority
+---
 
-L'attribut `fetchpriority="high"` est ajoute a la premiere image du contenu :
+## Enable HTML minification
+
+HTML minification is disabled by default. Enable it explicitly:
 
 ```php
-$performance->addFetchpriority(true);  // Actif par defaut
+$performance->minifyHtml(true);
 ```
 
-Lorsque `fetchpriority="high"` est applique, l'attribut `loading="lazy"` est automatiquement retire de cette image pour eviter tout conflit.
+This removes HTML comments, collapses whitespace between block-level tags, minifies inline CSS and JavaScript, and strips redundant `type` attributes. Content inside `<pre>`, `<code>`, and `<textarea>` is preserved.
 
-## Supprimer le CSS inutilise
+---
 
-La suppression du CSS inutilise analyse le HTML genere et retire les regles CSS des blocs `<style>` inline qui ne correspondent a aucun element de la page :
+## Enable unused CSS removal
+
+This strips CSS rules from inline `<style>` blocks whose selectors do not match any element in the page HTML:
 
 ```php
 $performance->removeUnusedCss(true);
 ```
 
-### Fonctionnement
+This is especially effective with block themes that emit per-block inline CSS. The `global-styles-inline-css` block is preserved by default. All `@-rules` (`@media`, `@keyframes`, `@font-face`, etc.) are always kept.
 
-1. Le HTML est intercepte via `ob_start` sur `template_redirect` (priorite 9, avant la minification)
-2. Les blocs `<style>` sont temporairement retires pour analyser le balisage pur
-3. `HtmlSelectorExtractor` extrait les classes, IDs et balises presentes dans le HTML
-4. `CssRuleFilter` parcourt chaque bloc `<style>` et ne conserve que les regles dont les selecteurs correspondent a des elements trouves
-5. Les blocs vides sont entierement supprimes
+---
 
-### Blocs preserves
+## Configure image optimization
 
-Le bloc `global-styles-inline-css` est preserve par defaut. Les `@-rules` (`@media`, `@supports`, `@keyframes`, `@import`, etc.) sont toujours conservees.
+### Control how many images skip lazy-loading
 
-## Limiter les revisions d'articles
-
-Pour limiter le nombre de revisions conservees par article :
+The first image (likely the LCP element) is excluded from lazy-loading and receives `fetchpriority="high"` by default. To adjust:
 
 ```php
-$performance->revisionsLimit(3); // Conserver 3 revisions max par article
+$performance->lazyLoadSkipFirst(2); // first 2 images are not lazy-loaded
 ```
 
-Le filtre `wp_revisions_to_keep` est utilise pour appliquer cette limite. La valeur par defaut est 5.
-
-## Nettoyer le tableau de bord
-
-Le `CleanDashboard` est automatiquement actif. Il supprime les widgets suivants du tableau de bord WordPress :
-
-- Liens entrants (`dashboard_incoming_links`)
-- Extensions (`dashboard_plugins`)
-- Actualites WordPress (`dashboard_primary`, `dashboard_secondary`)
-- Publication rapide (`dashboard_quick_press`)
-- Brouillons recents (`dashboard_recent_drafts`)
-- Panneau de bienvenue (`wp_welcome_panel`)
-
-Cette optimisation est toujours active et ne necessite aucune configuration.
-
-## Optimiser WooCommerce
-
-La suppression des assets WooCommerce sur les pages non-WC est activee par defaut :
+### Disable decoding="async"
 
 ```php
-$performance->woocommerceOptimize(true); // Actif par defaut
+$performance->addDecodingAsync(false);
 ```
 
-### Assets supprimes sur les pages non-WooCommerce
-
-**Styles :**
-- `woocommerce-general`
-- `woocommerce-layout`
-- `woocommerce-smallscreen`
-- `wc-blocks-style`
-
-**Scripts :**
-- `wc-cart-fragments`
-- `woocommerce`
-- `wc-add-to-cart`
-
-### Pages WooCommerce detectees
-
-Les assets sont conserves sur les pages suivantes :
-
-- Pages detectees par `is_woocommerce()`
-- Panier (`is_cart()`)
-- Commande (`is_checkout()`)
-- Mon compte (`is_account_page()`)
-
-> **Note** : Cette optimisation economise entre 200 et 500 Ko d'assets sur les pages qui n'utilisent pas WooCommerce. Elle n'est active que si la classe `WooCommerce` est chargee.
-
-## Configurer le Heartbeat
-
-### Desactiver le Heartbeat sur le frontend
-
-Par defaut, le Heartbeat est desactive sur le frontend pour economiser les requetes AJAX :
+### Disable fetchpriority="high"
 
 ```php
-$performance->heartbeatDisableFrontend(true); // Actif par defaut
+$performance->addFetchpriority(false);
 ```
 
-### Modifier l'intervalle admin
+---
 
-L'intervalle du Heartbeat dans l'administration est reduit a 60 secondes par defaut (contre 15 secondes nativement) :
+## Optimize WooCommerce assets
+
+WooCommerce asset removal is enabled by default. It dequeues WooCommerce styles and scripts on pages that are not WooCommerce pages (cart, checkout, account, product pages). This saves 200-500 KB per page load.
+
+To disable:
 
 ```php
-$performance->heartbeatAdminInterval(120); // 120 secondes
+$performance->woocommerceOptimize(false);
 ```
 
-## Exclure des scripts du defer
+---
 
-Certains scripts ne doivent pas etre differes (par exemple jQuery si des scripts inline en dependent). Utilisez `deferExclude` :
+## Configure the Heartbeat API
+
+### Disable Heartbeat on the frontend
 
 ```php
-$performance->deferExclude([
-    'jquery-core',
-    'jquery-migrate',
-    'mon-script-critique',
-]);
+$performance->heartbeatDisableFrontend(true); // enabled by default
 ```
 
-## Personnaliser le TTL des assets statiques
+### Change the admin interval
 
-Le TTL par defaut pour les assets statiques (CSS, JS, images, polices) dans le `.htaccess` est de 31 536 000 secondes (1 an) :
+The admin Heartbeat interval defaults to 60 seconds (WordPress default is 15):
 
 ```php
-$performance->htaccessStaticTtl(2592000); // 30 jours
+$performance->heartbeatAdminInterval(120); // 120 seconds
 ```
 
-> **Conseil** : Un TTL d'un an avec des noms de fichiers versionnes (hash dans le nom) est la strategie recommandee. Les fichiers HTML ne sont jamais mis en cache par le navigateur (`max-age=0`) car c'est le cache de pages serveur qui les gere.
+---
+
+## Customize .htaccess static asset TTL
+
+The default TTL for static assets (CSS, JS, images, fonts) in `.htaccess` is 31,536,000 seconds (1 year):
+
+```php
+$performance->htaccessStaticTtl(2592000); // 30 days
+```
+
+A one-year TTL with versioned filenames (hash in the filename) is the recommended strategy. HTML files are never browser-cached (`max-age=0`) because the server-side page cache manages them.
+
+---
+
+## Disable individual .htaccess optimizations
+
+Each `.htaccess` directive group can be toggled independently:
+
+```php
+$performance
+    ->htaccessGzip(false)          // disable gzip compression
+    ->htaccessBrowserCache(true)   // keep browser caching
+    ->htaccessRemoveEtags(true)    // keep ETag removal
+    ->htaccessKeepAlive(false);    // disable Keep-Alive
+```
+
+---
+
+## Limit post revisions
+
+```php
+$performance->revisionsLimit(3); // keep at most 3 revisions per post
+```
+
+The default is 5. This applies the `wp_revisions_to_keep` filter.
+
+---
+
+## Disable head cleanup or emoji removal
+
+These are enabled by default. To disable:
+
+```php
+$performance
+    ->cleanHead(false)
+    ->disableEmojis(false)
+    ->disableEmbeds(false)
+    ->disableXmlrpc(false);
+```
+
+---
+
+## Swap the page cache implementation
+
+To replace the filesystem-based cache with a custom implementation (e.g. Redis), override the DI binding:
+
+```php
+<?php
+
+use BackTo\Framework\Bundle\Performance\Contracts\PageCacheInterface;
+
+$containerBuilder->register(PageCacheInterface::class, MyRedisPageCache::class)
+    ->setAutowired(true);
+```
+
+Your implementation must implement `PageCacheInterface`.

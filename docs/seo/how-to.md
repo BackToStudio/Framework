@@ -1,18 +1,21 @@
-# Recettes SEO
+# SEO Bundle -- How-to guides
 
-Guides pratiques pour les cas d'utilisation courants du bundle SEO.
+*How-to -- Task-oriented*
+
+Practical recipes for common SEO bundle use cases.
 
 ---
 
-## Ajouter un schema personnalise pour un Custom Post Type
+## Add a schema for a custom post type
 
-Pour associer un generateur de schema a un CPT (par exemple `evenement`), creez un generateur et declarez-le dans la configuration.
+Create a generator class and register it in the configuration.
 
-### 1. Creer le generateur
+### 1. Create the generator
 
 ```php
-// src/Seo/EventSchemaGenerator.php
-namespace App\Seo;
+<?php
+
+namespace MyTheme\Seo;
 
 use BackTo\Framework\Contracts\ContentQueryInterface;
 use BackTo\Framework\Bundle\Seo\Schema;
@@ -47,51 +50,48 @@ final class EventSchemaGenerator
 }
 ```
 
-### 2. Enregistrer dans la configuration
+### 2. Register in configuration
 
 ```php
+<?php
+
 // config/seo.php
 return [
     'schema' => [
         'post_type_map' => [
-            'post'      => \BackTo\Framework\Bundle\Seo\Schema\Generator\ArticleSchemaGenerator::class,
-            'evenement' => \App\Seo\EventSchemaGenerator::class,
+            'post'  => \BackTo\Framework\Bundle\Seo\Schema\Generator\ArticleSchemaGenerator::class,
+            'event' => \MyTheme\Seo\EventSchemaGenerator::class,
         ],
     ],
 ];
 ```
 
-Le `PostTypeSchemaResolver` utilisera automatiquement votre generateur sur les pages singulaires du CPT `evenement`.
+The `PostTypeSchemaResolver` will automatically use your generator on singular pages of the `event` post type.
 
 ---
 
-## Creer un schema Product avec offres et avis
+## Add Product schema with offers and reviews
 
 ```php
+<?php
+
 use BackTo\Framework\Bundle\Seo\Schema;
 use BackTo\Framework\Bundle\Seo\Schema\SchemaManager;
 
 add_action('framework/seo/schema', function (SchemaManager $manager) {
     $product = Schema::product()
-        ->name('Casque Audio Pro')
-        ->description('Casque audio sans fil avec reduction de bruit active.')
-        ->image('https://example.com/images/casque.jpg')
-        ->sku('CASQUE-PRO-001')
+        ->name('Wireless Headphones')
+        ->description('Noise-cancelling wireless headphones with 30-hour battery life.')
+        ->image('https://example.com/images/headphones.jpg')
+        ->sku('WH-PRO-001')
         ->gtin13('3614271234567')
         ->brand(Schema::brand()->name('AudioTech'))
-        ->color('Noir')
         ->offers([
             Schema::offer()
                 ->price(199.99)
-                ->priceCurrency('EUR')
+                ->priceCurrency('USD')
                 ->availability('https://schema.org/InStock')
-                ->url('https://example.com/boutique/casque-pro')
-                ->validFrom('2025-01-01'),
-            Schema::offer()
-                ->price(179.99)
-                ->priceCurrency('EUR')
-                ->availability('https://schema.org/PreOrder')
-                ->category('Tarif early-bird'),
+                ->url('https://example.com/shop/headphones'),
         ])
         ->aggregateRating(
             Schema::aggregateRating()
@@ -101,17 +101,11 @@ add_action('framework/seo/schema', function (SchemaManager $manager) {
         )
         ->review([
             Schema::review()
-                ->author(Schema::person()->name('Marie Martin'))
+                ->author(Schema::person()->name('Alice Smith'))
                 ->reviewRating(Schema::rating()->ratingValue(5)->bestRating(5))
-                ->reviewBody('Excellent casque, le son est incroyable.')
+                ->reviewBody('Excellent sound quality.')
                 ->datePublished('2025-03-10')
-                ->itemReviewed(Schema::type('Product')->set('name', 'Casque Audio Pro')),
-            Schema::review()
-                ->author(Schema::person()->name('Paul Durand'))
-                ->reviewRating(Schema::rating()->ratingValue(4)->bestRating(5))
-                ->reviewBody('Tres bon rapport qualite-prix.')
-                ->datePublished('2025-02-28')
-                ->itemReviewed(Schema::type('Product')->set('name', 'Casque Audio Pro')),
+                ->itemReviewed(Schema::type('Product')->set('name', 'Wireless Headphones')),
         ]);
 
     $manager->add($product);
@@ -120,28 +114,25 @@ add_action('framework/seo/schema', function (SchemaManager $manager) {
 
 ---
 
-## Construire un schema FAQ
+## Add FAQ schema
 
 ```php
+<?php
+
 use BackTo\Framework\Bundle\Seo\Schema;
 use BackTo\Framework\Bundle\Seo\Schema\SchemaManager;
 
 add_action('framework/seo/schema', function (SchemaManager $manager) {
     $faq = Schema::faqPage()->mainEntity([
         Schema::question()
-            ->name('Quels sont les delais de livraison ?')
+            ->name('What are the shipping times?')
             ->acceptedAnswer(
-                Schema::answer()->text('La livraison standard prend 3 a 5 jours ouvrables en France metropolitaine.')
+                Schema::answer()->text('Standard shipping takes 3-5 business days.')
             ),
         Schema::question()
-            ->name('Puis-je retourner un produit ?')
+            ->name('Can I return a product?')
             ->acceptedAnswer(
-                Schema::answer()->text('Oui, vous disposez de 30 jours pour retourner un produit dans son emballage d\'origine.')
-            ),
-        Schema::question()
-            ->name('Proposez-vous un support technique ?')
-            ->acceptedAnswer(
-                Schema::answer()->text('Notre equipe support est disponible du lundi au vendredi de 9h a 18h par email et telephone.')
+                Schema::answer()->text('Yes, you have 30 days to return items in original packaging.')
             ),
     ]);
 
@@ -149,12 +140,16 @@ add_action('framework/seo/schema', function (SchemaManager $manager) {
 });
 ```
 
-### FAQ dynamique depuis des champs ACF
+### Dynamic FAQ from ACF fields
 
 ```php
+<?php
+
+use BackTo\Framework\Bundle\Seo\Schema;
+use BackTo\Framework\Bundle\Seo\Schema\SchemaManager;
+
 add_action('framework/seo/schema', function (SchemaManager $manager) {
-    $postId = get_the_ID();
-    $items = get_field('faq_items', $postId);
+    $items = get_field('faq_items', get_the_ID());
 
     if (empty($items)) {
         return;
@@ -163,7 +158,7 @@ add_action('framework/seo/schema', function (SchemaManager $manager) {
     $questions = array_map(fn (array $item) =>
         Schema::question()
             ->name($item['question'])
-            ->acceptedAnswer(Schema::answer()->text($item['reponse'])),
+            ->acceptedAnswer(Schema::answer()->text($item['answer'])),
         $items
     );
 
@@ -173,71 +168,73 @@ add_action('framework/seo/schema', function (SchemaManager $manager) {
 
 ---
 
-## Ajouter des breadcrumbs personnalises
+## Customize breadcrumbs
 
-Le framework genere automatiquement un `BreadcrumbList` via `WordPressBreadcrumbSchemaGenerator`. Pour le personnaliser, implementez `BreadcrumbSchemaGeneratorInterface` :
+Implement `BreadcrumbSchemaGeneratorInterface` to replace the default breadcrumb generation:
 
 ```php
-namespace App\Seo;
+<?php
+
+namespace MyTheme\Seo;
 
 use BackTo\Framework\Bundle\Seo\Contracts\BreadcrumbSchemaGeneratorInterface;
 use BackTo\Framework\Bundle\Seo\Schema;
 use BackTo\Framework\Bundle\Seo\Schema\SchemaType;
 
-final class CustomBreadcrumbGenerator implements BreadcrumbSchemaGeneratorInterface
+final class ShopBreadcrumbGenerator implements BreadcrumbSchemaGeneratorInterface
 {
     public function generate(): ?SchemaType
     {
-        // Exemple : breadcrumbs pour une boutique
         return Schema::breadcrumbList()->items([
-            Schema::listItem()->position(1)->name('Accueil')->url(home_url('/')),
-            Schema::listItem()->position(2)->name('Boutique')->url(home_url('/boutique/')),
+            Schema::listItem()->position(1)->name('Home')->url(home_url('/')),
+            Schema::listItem()->position(2)->name('Shop')->url(home_url('/shop/')),
             Schema::listItem()->position(3)->name(get_the_title()),
         ]);
     }
 }
 ```
 
-Enregistrez votre implementation dans le conteneur de services pour qu'elle remplace le generateur par defaut.
+Register your implementation in the DI container to override the default:
+
+```php
+<?php
+
+use BackTo\Framework\Bundle\Seo\Contracts\BreadcrumbSchemaGeneratorInterface;
+
+$containerBuilder->register(BreadcrumbSchemaGeneratorInterface::class, ShopBreadcrumbGenerator::class);
+```
 
 ---
 
-## Acceder aux liens sociaux dans les templates Twig
+## Access social links in Twig templates
 
-Le hook `AddSocialLinksToTimberContext` injecte les liens sociaux du plugin SEO actif dans le contexte Timber. Les cles disponibles sont : `facebook`, `twitter`, `instagram`, `linkedin`, `pinterest`, `youtube`.
+The bundle injects social links from the active SEO plugin (Yoast or SEOPress) into the Timber context. Available variables: `facebook`, `twitter`, `instagram`, `linkedin`, `pinterest`, `youtube`.
 
 ```twig
-{# templates/partials/social-links.twig #}
-<nav class="social-links" aria-label="Reseaux sociaux">
-    {% set socials = {
-        facebook: { icon: 'facebook', label: 'Facebook' },
-        twitter: { icon: 'twitter', label: 'Twitter' },
-        instagram: { icon: 'instagram', label: 'Instagram' },
-        linkedin: { icon: 'linkedin', label: 'LinkedIn' },
-        pinterest: { icon: 'pinterest', label: 'Pinterest' },
-        youtube: { icon: 'youtube', label: 'YouTube' },
-    } %}
-
-    {% for key, social in socials %}
-        {% set url = attribute(_context, key) %}
-        {% if url %}
-            <a href="{{ url }}" target="_blank" rel="noopener" aria-label="{{ social.label }}">
-                <svg class="icon icon-{{ social.icon }}"><use href="#icon-{{ social.icon }}"></use></svg>
-            </a>
-        {% endif %}
-    {% endfor %}
+<nav class="social-links" aria-label="Social media">
+    {% if facebook %}
+        <a href="{{ facebook }}" target="_blank" rel="noopener">Facebook</a>
+    {% endif %}
+    {% if twitter %}
+        <a href="{{ twitter }}" target="_blank" rel="noopener">Twitter</a>
+    {% endif %}
+    {% if instagram %}
+        <a href="{{ instagram }}" target="_blank" rel="noopener">Instagram</a>
+    {% endif %}
 </nav>
 ```
 
-Ces liens sont extraits automatiquement des reglages Yoast SEO (`wpseo_social`) ou SEOPress (`seopress_social_option_name`), sans que le template ait besoin de connaitre le plugin utilise.
+These links are extracted from Yoast's `wpseo_social` option or SEOPress's `seopress_social_option_name` option, without the template needing to know which plugin is installed.
 
 ---
 
-## Desactiver le schema natif du plugin SEO
+## Disable plugin-native schema output
 
-Par defaut, le framework desactive le schema JSON-LD genere par Yoast SEO et SEOPress pour eviter les doublons. Pour conserver le schema du plugin :
+By default, the framework disables JSON-LD output from Yoast SEO and SEOPress to prevent duplicates. To keep the plugin's schema:
 
 ```php
+<?php
+
 // config/seo.php
 return [
     'schema' => [
@@ -246,52 +243,36 @@ return [
 ];
 ```
 
-Filtres WordPress utilises en interne :
-
-| Plugin | Filtre | Valeur |
-|---|---|---|
-| Yoast SEO | `wpseo_json_ld_output` | `__return_empty_array` |
-| SEOPress | `seopress_schemas_auto_enabled` | `__return_false` |
-
 ---
 
-## Nettoyer l'empreinte Yoast
-
-Le framework supprime automatiquement les marqueurs de debug et informations de version Yoast SEO dans le HTML. Cela se fait via deux filtres :
-
-- `wpseo_debug_markers` -> `__return_false` (supprime les commentaires HTML `<!-- Yoast SEO ... -->`)
-- `wpseo_hide_version` -> `__return_true` (masque le numero de version)
-
-Cette action est geree par `CleanYoastFootprint` et est activee automatiquement. Aucune configuration n'est necessaire.
-
----
-
-## Ajouter un schema VideoObject
+## Add a VideoObject schema
 
 ```php
+<?php
+
 use BackTo\Framework\Bundle\Seo\Schema;
 use BackTo\Framework\Bundle\Seo\Schema\SchemaManager;
 
 add_action('framework/seo/schema', function (SchemaManager $manager) {
     $video = Schema::videoObject()
-        ->name('Presentation du produit')
-        ->description('Decouvrez notre nouveau produit en video.')
+        ->name('Product Overview')
+        ->description('A walkthrough of our latest product features.')
         ->thumbnailUrl('https://example.com/images/video-thumb.jpg')
-        ->uploadDate('2025-03-01T10:00:00+01:00')
+        ->uploadDate('2025-03-01T10:00:00+00:00')
         ->duration('PT5M30S')
-        ->contentUrl('https://example.com/videos/presentation.mp4')
+        ->contentUrl('https://example.com/videos/overview.mp4')
         ->embedUrl('https://www.youtube.com/embed/abc123')
         ->hasPart([
             Schema::clip()
                 ->name('Introduction')
                 ->startOffset(0)
                 ->endOffset(30)
-                ->url('https://example.com/videos/presentation.mp4?t=0'),
+                ->url('https://example.com/videos/overview.mp4?t=0'),
             Schema::clip()
-                ->name('Demonstration')
+                ->name('Demo')
                 ->startOffset(30)
                 ->endOffset(180)
-                ->url('https://example.com/videos/presentation.mp4?t=30'),
+                ->url('https://example.com/videos/overview.mp4?t=30'),
         ]);
 
     $manager->add($video);
@@ -300,13 +281,18 @@ add_action('framework/seo/schema', function (SchemaManager $manager) {
 
 ---
 
-## Creer un schema JobPosting
+## Add a JobPosting schema
 
 ```php
+<?php
+
+use BackTo\Framework\Bundle\Seo\Schema;
+use BackTo\Framework\Bundle\Seo\Schema\SchemaManager;
+
 add_action('framework/seo/schema', function (SchemaManager $manager) {
     $job = Schema::jobPosting()
-        ->title('Developpeur PHP Senior')
-        ->description('Nous recherchons un developpeur PHP senior pour rejoindre notre equipe...')
+        ->title('Senior PHP Developer')
+        ->description('We are looking for an experienced PHP developer...')
         ->datePosted('2025-03-01')
         ->validThrough('2025-06-01')
         ->employmentType('FULL_TIME')
@@ -319,17 +305,17 @@ add_action('framework/seo/schema', function (SchemaManager $manager) {
         ->jobLocation(
             Schema::place()->address(
                 Schema::postalAddress()
-                    ->streetAddress('10 Rue de la Paix')
-                    ->addressLocality('Paris')
-                    ->postalCode('75002')
-                    ->addressCountry('FR')
+                    ->streetAddress('123 Main Street')
+                    ->addressLocality('New York')
+                    ->postalCode('10001')
+                    ->addressCountry('US')
             )
         )
         ->baseSalary(
             Schema::monetaryAmount()
-                ->currency('EUR')
-                ->minValue(50000)
-                ->maxValue(70000)
+                ->currency('USD')
+                ->minValue(80000)
+                ->maxValue(120000)
         );
 
     $manager->add($job);
@@ -338,18 +324,56 @@ add_action('framework/seo/schema', function (SchemaManager $manager) {
 
 ---
 
-## Utiliser un type Schema.org generique
+## Use a generic schema type
 
-Pour un type Schema.org qui n'a pas de classe dediee, utilisez `Schema::type()` :
+For schema.org types that do not have a dedicated class, use `Schema::type()`:
 
 ```php
-$recipe = Schema::type('Recipe')
-    ->set('name', 'Tarte aux pommes')
-    ->set('author', Schema::person()->name('Chef Pierre'))
-    ->set('prepTime', 'PT30M')
-    ->set('cookTime', 'PT45M')
-    ->set('recipeYield', '8 parts')
-    ->set('recipeIngredient', ['6 pommes', '200g de sucre', '1 pate feuilletee']);
+<?php
 
-$manager->add($recipe);
+use BackTo\Framework\Bundle\Seo\Schema;
+use BackTo\Framework\Bundle\Seo\Schema\SchemaManager;
+
+add_action('framework/seo/schema', function (SchemaManager $manager) {
+    $recipe = Schema::type('Recipe')
+        ->set('name', 'Apple Pie')
+        ->set('author', Schema::person()->name('Chef Pierre'))
+        ->set('prepTime', 'PT30M')
+        ->set('cookTime', 'PT45M')
+        ->set('recipeYield', '8 servings')
+        ->set('recipeIngredient', ['6 apples', '200g sugar', '1 pie crust']);
+
+    $manager->add($recipe);
+});
 ```
+
+---
+
+## Configure SEO parameters
+
+Use the `SeoConfigurator` in your `config/seo.php` to adjust title separator and default robots directive:
+
+```php
+<?php
+
+// config/seo.php
+use BackTo\Framework\Bundle\Seo\SeoConfigurator;
+
+return static function (SeoConfigurator $seo): void {
+    $seo
+        ->titleSeparator('-')
+        ->robotsDefault('noindex, nofollow');
+};
+```
+
+---
+
+## Render schema in a Twig template
+
+The `SchemaManager` is available in the Timber context as `schema`. Use it to render JSON-LD at a specific location in your template instead of relying on `wp_head`:
+
+```twig
+{{ schema.render()|raw }}
+```
+
+Both mechanisms coexist: `InjectSchemaInHead` writes to `wp_head`, and `schema.render()` can be used in templates.

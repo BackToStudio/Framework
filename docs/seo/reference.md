@@ -1,122 +1,112 @@
-# Reference API du bundle SEO
+# SEO Bundle -- API Reference
 
-Reference technique complete du bundle SEO : factory, types, manager, interfaces, generateurs et hooks.
-
-**Namespace** : `BackTo\Framework\Bundle\Seo`
+*Reference -- Information-oriented*
 
 ---
 
-## Schema (factory statique)
+## `Schema` (static factory)
 
-`BackTo\Framework\Bundle\Seo\Schema`
+**Namespace:** `BackTo\Framework\Bundle\Seo`
 
-Classe `final` fournissant des methodes statiques pour instancier chaque type Schema.org.
+Final class providing static methods to instantiate each schema.org type.
 
-| Methode | Retour | Description |
+| Method | Return | Description |
 |---|---|---|
-| `organization()` | `Organization` | Organisation / entreprise |
-| `localBusiness()` | `LocalBusiness` | Commerce local |
-| `article()` | `Article` | Article de blog / presse |
-| `breadcrumbList()` | `BreadcrumbList` | Fil d'Ariane |
-| `listItem()` | `ListItem` | Element de liste (breadcrumb) |
-| `person()` | `Person` | Personne physique |
-| `postalAddress()` | `PostalAddress` | Adresse postale |
-| `webSite()` | `WebSite` | Site web |
+| `organization()` | `Organization` | Organization / company |
+| `localBusiness()` | `LocalBusiness` | Local business |
+| `article()` | `Article` | Blog / news article |
+| `breadcrumbList()` | `BreadcrumbList` | Breadcrumb trail |
+| `listItem()` | `ListItem` | Breadcrumb list element |
+| `person()` | `Person` | Person |
+| `postalAddress()` | `PostalAddress` | Postal address |
+| `webSite()` | `WebSite` | Website |
 | `imageObject()` | `ImageObject` | Image |
-| `searchAction()` | `SearchAction` | Action de recherche |
-| `event()` | `Event` | Evenement |
-| `course()` | `Course` | Formation / cours |
-| `courseInstance()` | `CourseInstance` | Session de formation |
-| `offer()` | `Offer` | Offre commerciale |
-| `place()` | `Place` | Lieu physique |
-| `virtualLocation()` | `VirtualLocation` | Lieu virtuel (URL) |
-| `geoCoordinates()` | `GeoCoordinates` | Coordonnees GPS |
-| `aggregateRating()` | `AggregateRating` | Note agregee |
-| `product()` | `Product` | Produit |
-| `brand()` | `Brand` | Marque |
-| `offerShippingDetails()` | `OfferShippingDetails` | Details de livraison |
-| `merchantReturnPolicy()` | `MerchantReturnPolicy` | Politique de retour |
-| `monetaryAmount()` | `MonetaryAmount` | Montant monetaire |
-| `review()` | `Review` | Avis |
-| `rating()` | `Rating` | Note |
+| `searchAction()` | `SearchAction` | Search action |
+| `event()` | `Event` | Event |
+| `course()` | `Course` | Course / training |
+| `courseInstance()` | `CourseInstance` | Course session |
+| `offer()` | `Offer` | Commercial offer |
+| `place()` | `Place` | Physical location |
+| `virtualLocation()` | `VirtualLocation` | Virtual location (URL) |
+| `geoCoordinates()` | `GeoCoordinates` | GPS coordinates |
+| `aggregateRating()` | `AggregateRating` | Aggregate rating |
+| `product()` | `Product` | Product |
+| `brand()` | `Brand` | Brand |
+| `offerShippingDetails()` | `OfferShippingDetails` | Shipping details |
+| `merchantReturnPolicy()` | `MerchantReturnPolicy` | Return policy |
+| `monetaryAmount()` | `MonetaryAmount` | Monetary amount |
+| `review()` | `Review` | Review |
+| `rating()` | `Rating` | Rating |
 | `videoObject()` | `VideoObject` | Video |
-| `clip()` | `Clip` | Extrait video (moment cle) |
-| `faqPage()` | `FAQPage` | Page FAQ |
+| `clip()` | `Clip` | Video clip (key moment) |
+| `faqPage()` | `FAQPage` | FAQ page |
 | `question()` | `Question` | Question (FAQ) |
-| `answer()` | `Answer` | Reponse (FAQ) |
-| `jobPosting()` | `JobPosting` | Offre d'emploi |
-| `type(string $type)` | `SchemaType` | Type generique par nom |
-| `ref(string $id)` | `SchemaRef` | Reference `@id` vers un autre noeud |
+| `answer()` | `Answer` | Answer (FAQ) |
+| `jobPosting()` | `JobPosting` | Job posting |
+| `type(string $type)` | `SchemaType` | Generic type by name |
+| `ref(string $id)` | `SchemaRef` | `@id` reference to another node |
 
 ---
 
-## SchemaType (classe de base)
+## `SchemaType`
 
-`BackTo\Framework\Bundle\Seo\Schema\SchemaType`
+**Namespace:** `BackTo\Framework\Bundle\Seo\Schema`
+**Implements:** `JsonSerializable`
 
-Classe de base pour tous les types Schema.org. Implemente `JsonSerializable`.
+Base class for all schema.org types.
 
-| Methode | Signature | Description |
+| Method | Signature | Description |
 |---|---|---|
-| `__construct` | `(string $type)` | Cree un schema avec le `@type` donne |
-| `set` | `(string $property, mixed $value): static` | Definit une propriete (chainage fluide) |
-| `id` | `(string $id): static` | Definit le `@id` du noeud |
-| `getType` | `(): string` | Retourne le `@type` |
-| `getProperties` | `(): array<string, mixed>` | Retourne toutes les proprietes |
-| `toArray` | `(): array<string, mixed>` | Convertit en tableau JSON-LD |
-| `validate` | `(): string[]` | Retourne les proprietes requises manquantes |
-| `isValid` | `(): bool` | `true` si toutes les proprietes requises sont presentes |
-| `jsonSerialize` | `(): mixed` | Serialisation JSON (appelle `toArray()`) |
-
-**Methode protegee** : `getRequiredProperties(): string[]` -- a surcharger dans les classes concretes pour declarer les proprietes requises par Google.
+| `set` | `(string $property, mixed $value): static` | Set any property (fluent) |
+| `id` | `(string $id): static` | Set the `@id` |
+| `getType` | `(): string` | Return the `@type` |
+| `getProperties` | `(): array<string, mixed>` | Return all properties |
+| `toArray` | `(): array<string, mixed>` | Convert to JSON-LD array |
+| `validate` | `(): string[]` | Return missing required properties |
+| `isValid` | `(): bool` | `true` if all required properties are present |
 
 ---
 
-## SchemaRef
+## `SchemaRef`
 
-`BackTo\Framework\Bundle\Seo\Schema\SchemaRef`
+**Namespace:** `BackTo\Framework\Bundle\Seo\Schema`
+**Implements:** `JsonSerializable`
 
-Reference vers un autre noeud du graphe JSON-LD par son `@id`. Implemente `JsonSerializable`.
+Reference to another node in the JSON-LD graph by `@id`.
 
-| Methode | Signature | Description |
+| Method | Signature | Description |
 |---|---|---|
-| `__construct` | `(string $id)` | Cree une reference |
-| `getId` | `(): string` | Retourne l'identifiant |
+| `getId` | `(): string` | Return the identifier |
 | `toArray` | `(): array{@id: string}` | `['@id' => '...']` |
 
-Usage : `Schema::ref('#organization')` produit `{"@id": "#organization"}`.
-
 ---
 
-## SchemaManager
+## `SchemaManager`
 
-`BackTo\Framework\Bundle\Seo\Schema\SchemaManager`
+**Namespace:** `BackTo\Framework\Bundle\Seo\Schema`
 
-Registre central des schemas. Collecte les `SchemaType` et les rend en JSON-LD.
+Central registry for structured data. Collects `SchemaType` instances and renders them as JSON-LD.
 
-| Methode | Signature | Description |
+| Method | Signature | Description |
 |---|---|---|
-| `add` | `(SchemaType $schema): self` | Ajoute un schema au registre |
-| `hasSchemas` | `(): bool` | `true` si au moins un schema est enregistre |
-| `getSchemas` | `(): SchemaType[]` | Retourne tous les schemas |
-| `validate` | `(): array<string, string[]>` | Valide tous les schemas, retourne les erreurs par type |
-| `toArray` | `(): array<int, array>` | Exporte en tableau de JSON-LD |
-| `render` | `(): string` | Genere la balise `<script type="application/ld+json">` |
+| `add` | `(SchemaType $schema): self` | Add a schema to the registry |
+| `hasSchemas` | `(): bool` | Whether any schemas are registered |
+| `getSchemas` | `(): SchemaType[]` | Return all registered schemas |
+| `validate` | `(): array<string, string[]>` | Validate all schemas, return errors by type |
+| `toArray` | `(): array<int, array>` | Export as array of JSON-LD data |
+| `render` | `(): string` | Render a `<script type="application/ld+json">` block |
 
-Comportement de `render()` :
-- 0 schemas : retourne une chaine vide
-- 1 schema : objet JSON-LD simple avec `@context`
-- 2+ schemas : objet avec `@context` et `@graph` contenant tous les schemas
+Render behavior: 0 schemas returns empty string, 1 schema returns a single JSON-LD object with `@context`, 2+ schemas returns an object with `@context` and `@graph`.
 
 ---
 
-## Les 31 types Schema.org
+## Schema types
 
-Chaque type herite de `SchemaType` et se trouve dans `BackTo\Framework\Bundle\Seo\Schema\Type\`.
+All types extend `SchemaType` and live in `BackTo\Framework\Bundle\Seo\Schema\Type\`.
 
-### AggregateRating
+### `AggregateRating`
 
-| Methode | Signature |
+| Method | Signature |
 |---|---|
 | `ratingValue` | `(float\|string $value): static` |
 | `bestRating` | `(float\|string $value): static` |
@@ -124,17 +114,17 @@ Chaque type herite de `SchemaType` et se trouve dans `BackTo\Framework\Bundle\Se
 | `ratingCount` | `(int $count): static` |
 | `reviewCount` | `(int $count): static` |
 
-### Answer
+### `Answer`
 
-| Methode | Signature |
+| Method | Signature |
 |---|---|
 | `text` | `(string $text): static` |
 
-### Article
+### `Article`
 
-Proprietes requises : `headline`, `author`, `datePublished`
+Required: `headline`, `author`, `datePublished`
 
-| Methode | Signature |
+| Method | Signature |
 |---|---|
 | `headline` | `(string $headline): static` |
 | `description` | `(string $description): static` |
@@ -149,36 +139,36 @@ Proprietes requises : `headline`, `author`, `datePublished`
 | `keywords` | `(array $keywords): static` |
 | `wordCount` | `(int $count): static` |
 
-### Brand
+### `Brand`
 
-| Methode | Signature |
+| Method | Signature |
 |---|---|
 | `name` | `(string $name): static` |
 | `url` | `(string $url): static` |
 | `logo` | `(string\|SchemaType $logo): static` |
 
-### BreadcrumbList
+### `BreadcrumbList`
 
-| Methode | Signature |
+| Method | Signature |
 |---|---|
 | `items` | `(SchemaType[] $items): static` |
 
-Definit `itemListElement` a partir d'un tableau de `ListItem`.
+Sets `itemListElement` from an array of `ListItem` instances.
 
-### Clip
+### `Clip`
 
-| Methode | Signature |
+| Method | Signature |
 |---|---|
 | `name` | `(string $name): static` |
 | `startOffset` | `(int $seconds): static` |
 | `endOffset` | `(int $seconds): static` |
 | `url` | `(string $url): static` |
 
-### Course
+### `Course`
 
-Proprietes requises : `name`, `description`, `provider`
+Required: `name`, `description`, `provider`
 
-| Methode | Signature |
+| Method | Signature |
 |---|---|
 | `name` | `(string $name): static` |
 | `description` | `(string $description): static` |
@@ -195,9 +185,9 @@ Proprietes requises : `name`, `description`, `provider`
 | `timeRequired` | `(string $duration): static` |
 | `aggregateRating` | `(SchemaType $rating): static` |
 
-### CourseInstance
+### `CourseInstance`
 
-| Methode | Signature |
+| Method | Signature |
 |---|---|
 | `courseMode` | `(string $mode): static` |
 | `startDate` | `(string $date): static` |
@@ -208,11 +198,11 @@ Proprietes requises : `name`, `description`, `provider`
 | `offers` | `(SchemaType\|array $offers): static` |
 | `courseSchedule` | `(SchemaType $schedule): static` |
 
-### Event
+### `Event`
 
-Proprietes requises : `name`, `startDate`, `location`
+Required: `name`, `startDate`, `location`
 
-| Methode | Signature |
+| Method | Signature |
 |---|---|
 | `name` | `(string $name): static` |
 | `description` | `(string $description): static` |
@@ -231,35 +221,35 @@ Proprietes requises : `name`, `startDate`, `location`
 | `inLanguage` | `(string $language): static` |
 | `isAccessibleForFree` | `(bool $free): static` |
 
-### FAQPage
+### `FAQPage`
 
-Proprietes requises : `mainEntity`
+Required: `mainEntity`
 
-| Methode | Signature |
+| Method | Signature |
 |---|---|
 | `mainEntity` | `(SchemaType[] $questions): static` |
 
-### GeoCoordinates
+### `GeoCoordinates`
 
-| Methode | Signature |
+| Method | Signature |
 |---|---|
 | `latitude` | `(float $latitude): static` |
 | `longitude` | `(float $longitude): static` |
 
-### ImageObject
+### `ImageObject`
 
-| Methode | Signature |
+| Method | Signature |
 |---|---|
 | `url` | `(string $url): static` |
 | `width` | `(int $width): static` |
 | `height` | `(int $height): static` |
 | `caption` | `(string $caption): static` |
 
-### JobPosting
+### `JobPosting`
 
-Proprietes requises : `title`, `description`, `datePosted`, `hiringOrganization`
+Required: `title`, `description`, `datePosted`, `hiringOrganization`
 
-| Methode | Signature |
+| Method | Signature |
 |---|---|
 | `title` | `(string $title): static` |
 | `description` | `(string $description): static` |
@@ -281,21 +271,21 @@ Proprietes requises : `title`, `description`, `datePosted`, `hiringOrganization`
 | `experienceRequirements` | `(string\|SchemaType $requirements): static` |
 | `educationRequirements` | `(string\|SchemaType $requirements): static` |
 
-### ListItem
+### `ListItem`
 
-| Methode | Signature |
+| Method | Signature |
 |---|---|
 | `position` | `(int $position): static` |
 | `name` | `(string $name): static` |
 | `url` | `(string $url): static` |
 
-Note : `url()` definit la propriete `item` dans le JSON-LD.
+Note: `url()` sets the `item` property in JSON-LD output.
 
-### LocalBusiness
+### `LocalBusiness`
 
-Proprietes requises : `name`, `address`
+Required: `name`, `address`
 
-| Methode | Signature |
+| Method | Signature |
 |---|---|
 | `name` | `(string $name): static` |
 | `url` | `(string $url): static` |
@@ -310,9 +300,9 @@ Proprietes requises : `name`, `address`
 | `geo` | `(SchemaType $geo): static` |
 | `sameAs` | `(array $urls): static` |
 
-### MerchantReturnPolicy
+### `MerchantReturnPolicy`
 
-| Methode | Signature |
+| Method | Signature |
 |---|---|
 | `applicableCountry` | `(string $country): static` |
 | `returnPolicyCategory` | `(string $category): static` |
@@ -320,20 +310,20 @@ Proprietes requises : `name`, `address`
 | `returnMethod` | `(string $method): static` |
 | `returnFees` | `(string $fees): static` |
 
-### MonetaryAmount
+### `MonetaryAmount`
 
-| Methode | Signature |
+| Method | Signature |
 |---|---|
 | `currency` | `(string $currency): static` |
 | `value` | `(float\|int\|SchemaType $value): static` |
 | `minValue` | `(float\|int $value): static` |
 | `maxValue` | `(float\|int $value): static` |
 
-### Offer
+### `Offer`
 
-Proprietes requises : `price`, `priceCurrency`
+Required: `price`, `priceCurrency`
 
-| Methode | Signature |
+| Method | Signature |
 |---|---|
 | `price` | `(string\|float\|int $price): static` |
 | `priceCurrency` | `(string $currency): static` |
@@ -343,17 +333,17 @@ Proprietes requises : `price`, `priceCurrency`
 | `validThrough` | `(string $date): static` |
 | `category` | `(string $category): static` |
 
-### OfferShippingDetails
+### `OfferShippingDetails`
 
-| Methode | Signature |
+| Method | Signature |
 |---|---|
 | `shippingRate` | `(SchemaType $rate): static` |
 | `shippingDestination` | `(SchemaType $destination): static` |
 | `deliveryTime` | `(SchemaType $time): static` |
 
-### Organization
+### `Organization`
 
-| Methode | Signature |
+| Method | Signature |
 |---|---|
 | `name` | `(string $name): static` |
 | `url` | `(string $url): static` |
@@ -364,9 +354,9 @@ Proprietes requises : `price`, `priceCurrency`
 | `telephone` | `(string $telephone): static` |
 | `address` | `(SchemaType $address): static` |
 
-### Person
+### `Person`
 
-| Methode | Signature |
+| Method | Signature |
 |---|---|
 | `name` | `(string $name): static` |
 | `url` | `(string $url): static` |
@@ -374,18 +364,18 @@ Proprietes requises : `price`, `priceCurrency`
 | `image` | `(string\|SchemaType $image): static` |
 | `sameAs` | `(array $urls): static` |
 
-### Place
+### `Place`
 
-| Methode | Signature |
+| Method | Signature |
 |---|---|
 | `name` | `(string $name): static` |
 | `address` | `(SchemaType\|string $address): static` |
 | `geo` | `(SchemaType $geo): static` |
 | `url` | `(string $url): static` |
 
-### PostalAddress
+### `PostalAddress`
 
-| Methode | Signature |
+| Method | Signature |
 |---|---|
 | `streetAddress` | `(string $street): static` |
 | `addressLocality` | `(string $locality): static` |
@@ -393,11 +383,11 @@ Proprietes requises : `price`, `priceCurrency`
 | `postalCode` | `(string $postalCode): static` |
 | `addressCountry` | `(string $country): static` |
 
-### Product
+### `Product`
 
-Proprietes requises : `name`, `image`, `offers`
+Required: `name`, `image`, `offers`
 
-| Methode | Signature |
+| Method | Signature |
 |---|---|
 | `name` | `(string $name): static` |
 | `description` | `(string $description): static` |
@@ -416,27 +406,27 @@ Proprietes requises : `name`, `image`, `offers`
 | `review` | `(SchemaType\|array $reviews): static` |
 | `category` | `(string $category): static` |
 
-### Question
+### `Question`
 
-| Methode | Signature |
+| Method | Signature |
 |---|---|
 | `name` | `(string $question): static` |
 | `acceptedAnswer` | `(SchemaType $answer): static` |
 | `suggestedAnswer` | `(array $answers): static` |
 
-### Rating
+### `Rating`
 
-| Methode | Signature |
+| Method | Signature |
 |---|---|
 | `ratingValue` | `(float\|string $value): static` |
 | `bestRating` | `(float\|string $value): static` |
 | `worstRating` | `(float\|string $value): static` |
 
-### Review
+### `Review`
 
-Proprietes requises : `itemReviewed`, `reviewRating`, `author`
+Required: `itemReviewed`, `reviewRating`, `author`
 
-| Methode | Signature |
+| Method | Signature |
 |---|---|
 | `itemReviewed` | `(SchemaType $item): static` |
 | `reviewRating` | `(SchemaType $rating): static` |
@@ -446,18 +436,18 @@ Proprietes requises : `itemReviewed`, `reviewRating`, `author`
 | `name` | `(string $name): static` |
 | `publisher` | `(SchemaType $publisher): static` |
 
-### SearchAction
+### `SearchAction`
 
-| Methode | Signature |
+| Method | Signature |
 |---|---|
 | `target` | `(string $urlTemplate): static` |
 | `queryInput` | `(string $input): static` |
 
-### VideoObject
+### `VideoObject`
 
-Proprietes requises : `name`, `thumbnailUrl`, `uploadDate`
+Required: `name`, `thumbnailUrl`, `uploadDate`
 
-| Methode | Signature |
+| Method | Signature |
 |---|---|
 | `name` | `(string $name): static` |
 | `description` | `(string $description): static` |
@@ -472,15 +462,15 @@ Proprietes requises : `name`, `thumbnailUrl`, `uploadDate`
 | `publication` | `(SchemaType $event): static` |
 | `regionsAllowed` | `(string\|array $regions): static` |
 
-### VirtualLocation
+### `VirtualLocation`
 
-| Methode | Signature |
+| Method | Signature |
 |---|---|
 | `url` | `(string $url): static` |
 
-### WebSite
+### `WebSite`
 
-| Methode | Signature |
+| Method | Signature |
 |---|---|
 | `name` | `(string $name): static` |
 | `url` | `(string $url): static` |
@@ -491,24 +481,23 @@ Proprietes requises : `name`, `thumbnailUrl`, `uploadDate`
 
 ---
 
-## Interfaces (Contracts)
+## Interfaces
 
-### SeoProviderInterface
+### `SeoProviderInterface`
 
-`BackTo\Framework\Bundle\Seo\Contracts\SeoProviderInterface`
+**Namespace:** `BackTo\Framework\Bundle\Seo\Contracts`
+**Extends:** `SocialLinksProviderInterface`, `MetaProviderInterface`
 
-Etend `SocialLinksProviderInterface` et `MetaProviderInterface`.
-
-| Methode | Signature | Description |
+| Method | Signature | Description |
 |---|---|---|
-| `getName` | `(): string` | Identifiant du plugin (`'yoast'`, `'seopress'`) |
-| `isActive` | `(): bool` | Le plugin SEO est-il actif ? |
+| `getName` | `(): string` | Plugin identifier (`'yoast'`, `'seopress'`) |
+| `isActive` | `(): bool` | Whether the SEO plugin is active |
 
-### MetaProviderInterface
+### `MetaProviderInterface`
 
-`BackTo\Framework\Bundle\Seo\Contracts\MetaProviderInterface`
+**Namespace:** `BackTo\Framework\Bundle\Seo\Contracts`
 
-| Methode | Signature |
+| Method | Signature |
 |---|---|
 | `getTitle` | `(?int $postId = null): ?string` |
 | `getDescription` | `(?int $postId = null): ?string` |
@@ -517,11 +506,11 @@ Etend `SocialLinksProviderInterface` et `MetaProviderInterface`.
 | `getOgDescription` | `(?int $postId = null): ?string` |
 | `getOgImageUrl` | `(?int $postId = null): ?string` |
 
-### SocialLinksProviderInterface
+### `SocialLinksProviderInterface`
 
-`BackTo\Framework\Bundle\Seo\Contracts\SocialLinksProviderInterface`
+**Namespace:** `BackTo\Framework\Bundle\Seo\Contracts`
 
-| Methode | Signature |
+| Method | Signature |
 |---|---|
 | `getFacebookUrl` | `(): ?string` |
 | `getTwitterUrl` | `(): ?string` |
@@ -531,228 +520,112 @@ Etend `SocialLinksProviderInterface` et `MetaProviderInterface`.
 | `getYouTubeUrl` | `(): ?string` |
 | `getSocialLinks` | `(): array<string, string\|null>` |
 
-### SchemaProviderInterface
+### `SchemaProviderInterface`
 
-`BackTo\Framework\Bundle\Seo\Contracts\SchemaProviderInterface`
+**Namespace:** `BackTo\Framework\Bundle\Seo\Contracts`
 
-| Methode | Signature |
+| Method | Signature |
 |---|---|
 | `registerSchemas` | `(SchemaManager $schemaManager): void` |
 
-### BreadcrumbSchemaGeneratorInterface
+### `BreadcrumbSchemaGeneratorInterface`
 
-`BackTo\Framework\Bundle\Seo\Contracts\BreadcrumbSchemaGeneratorInterface`
+**Namespace:** `BackTo\Framework\Bundle\Seo\Contracts`
 
-| Methode | Signature |
+| Method | Signature |
 |---|---|
 | `generate` | `(): ?SchemaType` |
 
 ---
 
+## Services
+
+### `SeoManager`
+
+**Namespace:** `BackTo\Framework\Bundle\Seo`
+
+Resolves the active SEO provider from registered providers.
+
+| Method | Signature | Description |
+|---|---|---|
+| `addProvider` | `(SeoProviderInterface $provider): self` | Add a provider |
+| `getProvider` | `(): ?SeoProviderInterface` | Return the first active provider |
+| `hasProvider` | `(): bool` | Whether an SEO plugin is active |
+| `getSocialLinks` | `(): array<string, string\|null>` | Social links from the active provider |
+
+### `SeoConfig`
+
+**Namespace:** `BackTo\Framework\Bundle\Seo`
+
+Loads configuration from the theme's `config/seo.php`.
+
+| Method | Signature | Description |
+|---|---|---|
+| `all` | `(): array` | Full configuration array |
+| `get` | `(string $key, mixed $default = null): mixed` | Value by dot notation |
+| `getPostTypeMap` | `(): array<string, class-string>` | Post type to generator mapping |
+| `shouldDisablePluginSchema` | `(): bool` | Whether to disable plugin schema (default: `true`) |
+
+### `SeoConfigurator`
+
+**Namespace:** `BackTo\Framework\Bundle\Seo`
+
+Fluent configurator for SEO container parameters.
+
+| Method | Signature | Description |
+|---|---|---|
+| `titleSeparator` | `(string $separator): self` | Title separator (default: `\|`) |
+| `robotsDefault` | `(string $robots): self` | Default robots directive (default: `index, follow`) |
+| `toParameters` | `(): array<string, mixed>` | Export as container parameters |
+
+### `PostTypeSchemaResolver`
+
+**Namespace:** `BackTo\Framework\Bundle\Seo\Schema\Generator`
+
+Resolves a schema generator for a given post type based on the `schema.post_type_map` configuration.
+
+| Method | Signature | Description |
+|---|---|---|
+| `addGenerator` | `(string $postType, object $generator): self` | Register a generator |
+| `supports` | `(string $postType): bool` | Whether a generator exists |
+| `resolve` | `(string $postType, ?int $postId = null): ?SchemaType` | Generate the schema |
+| `getGenerators` | `(): array<string, object>` | All registered generators |
+
+---
+
 ## Providers
 
-### YoastProvider
+### `YoastProvider`
 
-`BackTo\Framework\Bundle\Seo\Provider\YoastProvider`
+**Namespace:** `BackTo\Framework\Bundle\Seo\Provider`
+**Implements:** `SeoProviderInterface`
 
-Implemente `SeoProviderInterface`. Detecte `wordpress-seo/wp-seo.php`. Lit les options sociales depuis `wpseo_social` et les metadonnees depuis les post meta `_yoast_wpseo_*`.
+Detects `wordpress-seo/wp-seo.php`. Reads social options from `wpseo_social` and meta from `_yoast_wpseo_*` post meta keys.
 
-### SeoPressProvider
+### `SeoPressProvider`
 
-`BackTo\Framework\Bundle\Seo\Provider\SeoPressProvider`
+**Namespace:** `BackTo\Framework\Bundle\Seo\Provider`
+**Implements:** `SeoProviderInterface`
 
-Implemente `SeoProviderInterface`. Detecte `wp-seopress/seopress.php`. Lit les options sociales depuis `seopress_social_option_name` et les metadonnees depuis les post meta `_seopress_*`.
-
----
-
-## Generateurs
-
-### WebSiteSchemaGenerator
-
-`BackTo\Framework\Bundle\Seo\Schema\Generator\WebSiteSchemaGenerator`
-
-Genere un `WebSite` avec `@id` `{siteUrl}/#website`, lie a `#organization` via `publisher`, avec un `SearchAction`.
-
-### OrganizationSchemaGenerator
-
-`BackTo\Framework\Bundle\Seo\Schema\Generator\OrganizationSchemaGenerator`
-
-Genere un `Organization` avec `@id` `{siteUrl}/#organization`, le logo du theme (`custom_logo`) et les liens `sameAs` depuis le provider SEO.
-
-### ArticleSchemaGenerator
-
-`BackTo\Framework\Bundle\Seo\Schema\Generator\ArticleSchemaGenerator`
-
-Genere un `Article` pour les posts de type `post`. Inclut headline, auteur, dates, image a la une, description. Lie a `#website` et `#organization`.
-
-### PostTypeSchemaResolver
-
-`BackTo\Framework\Bundle\Seo\Schema\Generator\PostTypeSchemaResolver`
-
-Resout le generateur de schema pour un post type donne, selon le mapping `schema.post_type_map` du fichier `config/seo.php`.
-
-| Methode | Signature | Description |
-|---|---|---|
-| `addGenerator` | `(string $postType, object $generator): self` | Enregistre un generateur |
-| `supports` | `(string $postType): bool` | Un generateur existe-t-il ? |
-| `resolve` | `(string $postType, ?int $postId = null): ?SchemaType` | Genere le schema |
-| `getGenerators` | `(): array<string, object>` | Tous les generateurs |
-
-### WordPressBreadcrumbSchemaGenerator
-
-`BackTo\Framework\Bundle\Seo\Infrastructure\WordPressBreadcrumbSchemaGenerator`
-
-Implemente `BreadcrumbSchemaGeneratorInterface`. Construit un `BreadcrumbList` a partir du contexte WordPress (page, article, archive, taxonomie, auteur, recherche).
+Detects `wp-seopress/seopress.php`. Reads social options from `seopress_social_option_name` and meta from `_seopress_*` post meta keys.
 
 ---
 
-## SeoManager
+## Hooks
 
-`BackTo\Framework\Bundle\Seo\SeoManager`
+### WordPress hooks registered
 
-Resout le provider SEO actif parmi les providers enregistres.
-
-| Methode | Signature | Description |
-|---|---|---|
-| `addProvider` | `(SeoProviderInterface $provider): self` | Ajoute un provider |
-| `getProvider` | `(): ?SeoProviderInterface` | Retourne le premier provider actif |
-| `hasProvider` | `(): bool` | Un plugin SEO est-il actif ? |
-| `getSocialLinks` | `(): array<string, string\|null>` | Liens sociaux du provider actif |
-
----
-
-## SeoConfig
-
-`BackTo\Framework\Bundle\Seo\SeoConfig`
-
-Charge la configuration depuis `config/seo.php` du theme.
-
-| Methode | Signature | Description |
-|---|---|---|
-| `all` | `(): array` | Configuration complete |
-| `get` | `(string $key, mixed $default = null): mixed` | Valeur par notation pointee |
-| `getPostTypeMap` | `(): array<string, class-string>` | Mapping post type -> generateur |
-| `shouldDisablePluginSchema` | `(): bool` | Desactiver le schema du plugin ? (defaut : `true`) |
-
----
-
-## SeoConfigurator
-
-`BackTo\Framework\Bundle\Seo\SeoConfigurator`
-
-Configurateur fluide pour les parametres SEO du conteneur.
-
-| Methode | Signature | Description |
-|---|---|---|
-| `titleSeparator` | `(string $separator): self` | Separateur de titre (defaut : `\|`) |
-| `robotsDefault` | `(string $robots): self` | Directive robots par defaut (defaut : `index, follow`) |
-| `toParameters` | `(): array<string, mixed>` | Exporte les parametres |
-
----
-
-## SeoConfiguration
-
-`BackTo\Framework\Bundle\Seo\SeoConfiguration`
-
-Valeurs par defaut des parametres SEO.
-
-| Parametre | Valeur par defaut |
-|---|---|
-| `seo.title_separator` | `\|` |
-| `seo.robots_default` | `index, follow` |
-
----
-
-## Hooks et Actions
-
-### Hooks WordPress enregistres
-
-| Classe | Hook | Priorite | Description |
+| Class | Hook | Priority | Description |
 |---|---|---|---|
-| `RegisterDefaultSchemas` | `wp` | defaut | Enregistre WebSite, Organization, Article, BreadcrumbList |
-| `InjectSchemaInHead` | `wp_head` | 1 | Injecte le JSON-LD dans le `<head>` |
-| `AddSchemaToTimberContext` | `timber/context` | defaut | Ajoute `schema` (SchemaManager) au contexte Twig |
-| `AddSocialLinksToTimberContext` | `timber/context` | defaut | Ajoute `facebook`, `twitter`, etc. au contexte Twig |
-| `CleanYoastFootprint` | `wpseo_debug_markers`, `wpseo_hide_version` | defaut | Supprime les marqueurs Yoast |
-| `DisablePluginSchema` | `wpseo_json_ld_output` ou `seopress_schemas_auto_enabled` | defaut | Desactive le schema du plugin |
+| `RegisterDefaultSchemas` | `wp` | default | Registers WebSite, Organization, Article, BreadcrumbList |
+| `InjectSchemaInHead` | `wp_head` | 1 | Injects JSON-LD into `<head>` |
+| `AddSchemaToTimberContext` | `timber/context` | default | Adds `schema` (SchemaManager) to Twig context |
+| `AddSocialLinksToTimberContext` | `timber/context` | default | Adds `facebook`, `twitter`, etc. to Twig context |
+| `CleanYoastFootprint` | `wpseo_debug_markers`, `wpseo_hide_version` | default | Removes Yoast debug markers |
+| `DisablePluginSchema` | `wpseo_json_ld_output` or `seopress_schemas_auto_enabled` | default | Disables plugin schema output |
 
-### Action personnalisee
+### Custom action
 
-| Action | Parametres | Description |
+| Action | Parameters | Description |
 |---|---|---|
-| `framework/seo/schema` | `(SchemaManager $manager)` | Fired apres les schemas par defaut, permet d'ajouter des schemas personnalises |
-
----
-
-## Arborescence des fichiers
-
-```
-src/Bundle/Seo/
-├── Actions/
-│   ├── CleanYoastFootprint.php
-│   └── DisablePluginSchema.php
-├── Contracts/
-│   ├── BreadcrumbSchemaGeneratorInterface.php
-│   ├── MetaProviderInterface.php
-│   ├── SchemaProviderInterface.php
-│   ├── SeoProviderInterface.php
-│   └── SocialLinksProviderInterface.php
-├── Hooks/
-│   ├── AddSchemaToTimberContext.php
-│   ├── AddSocialLinksToTimberContext.php
-│   ├── InjectSchemaInHead.php
-│   └── RegisterDefaultSchemas.php
-├── Infrastructure/
-│   └── WordPressBreadcrumbSchemaGenerator.php
-├── Provider/
-│   ├── SeoPressProvider.php
-│   └── YoastProvider.php
-├── Schema/
-│   ├── Generator/
-│   │   ├── ArticleSchemaGenerator.php
-│   │   ├── BreadcrumbSchemaGenerator.php (deprecated)
-│   │   ├── OrganizationSchemaGenerator.php
-│   │   ├── PostTypeSchemaResolver.php
-│   │   └── WebSiteSchemaGenerator.php
-│   ├── Type/
-│   │   ├── AggregateRating.php
-│   │   ├── Answer.php
-│   │   ├── Article.php
-│   │   ├── Brand.php
-│   │   ├── BreadcrumbList.php
-│   │   ├── Clip.php
-│   │   ├── Course.php
-│   │   ├── CourseInstance.php
-│   │   ├── Event.php
-│   │   ├── FAQPage.php
-│   │   ├── GeoCoordinates.php
-│   │   ├── ImageObject.php
-│   │   ├── JobPosting.php
-│   │   ├── ListItem.php
-│   │   ├── LocalBusiness.php
-│   │   ├── MerchantReturnPolicy.php
-│   │   ├── MonetaryAmount.php
-│   │   ├── Offer.php
-│   │   ├── OfferShippingDetails.php
-│   │   ├── Organization.php
-│   │   ├── Person.php
-│   │   ├── Place.php
-│   │   ├── PostalAddress.php
-│   │   ├── Product.php
-│   │   ├── Question.php
-│   │   ├── Rating.php
-│   │   ├── Review.php
-│   │   ├── SearchAction.php
-│   │   ├── VideoObject.php
-│   │   ├── VirtualLocation.php
-│   │   └── WebSite.php
-│   ├── SchemaManager.php
-│   ├── SchemaRef.php
-│   └── SchemaType.php
-├── Schema.php
-├── SeoConfig.php
-├── SeoConfiguration.php
-├── SeoConfigurator.php
-├── SeoExtension.php
-└── SeoManager.php
-```
+| `framework/seo/schema` | `(SchemaManager $manager)` | Fired after default schemas are registered. Add custom schemas here. |

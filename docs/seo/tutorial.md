@@ -1,22 +1,20 @@
-# Tutoriel : Premiers pas avec le SEO
+# Getting started with the SEO Bundle
 
-Ce tutoriel vous guide pas a pas pour decouvrir les donnees structurees generees automatiquement, creer des schemas personnalises avec l'API fluide, et integrer votre plugin SEO.
+*Tutorial -- Learning-oriented*
 
-## Pre-requis
+This tutorial walks you through adding structured data to a blog post and validating it. By the end, you will have an Article schema rendered as JSON-LD in your page's `<head>` and confirmed valid with Google's Rich Results Test.
 
-- Un theme WordPress utilisant BackTo Framework
-- Yoast SEO ou SEOPress installe et active (optionnel, mais recommande)
+## Prerequisites
 
-## Etape 1 : Decouvrir les schemas auto-generes
+- A WordPress theme using the BackTo Framework
+- The framework's DI container configured (the SEO bundle is auto-wired)
+- A published blog post to work with
 
-Sans aucune configuration, le bundle SEO genere automatiquement quatre schemas sur chaque page :
+## Step 1: See what the bundle generates by default
 
-1. **WebSite** -- nom, URL et moteur de recherche interne du site
-2. **Organization** -- nom, logo et liens sociaux de l'entreprise
-3. **Article** -- titre, auteur, dates de publication/modification (sur les articles `post`)
-4. **BreadcrumbList** -- fil d'Ariane contextuel (pages, articles, archives, taxonomies)
+Without any configuration, the SEO bundle automatically generates four schemas on every page: WebSite, Organization, BreadcrumbList, and Article (on `post` pages).
 
-Ouvrez le code source de n'importe quelle page de votre site et cherchez la balise `<script type="application/ld+json">`. Vous verrez un objet JSON contenant un `@graph` avec plusieurs noeuds lies par des `@id` :
+Open your blog post in a browser, view the page source, and search for `application/ld+json`. You will find a `<script>` block containing a JSON-LD `@graph`:
 
 ```json
 {
@@ -25,228 +23,129 @@ Ouvrez le code source de n'importe quelle page de votre site et cherchez la bali
     {
       "@type": "WebSite",
       "@id": "https://example.com/#website",
-      "name": "Mon Site",
-      "url": "https://example.com/",
-      "publisher": { "@id": "https://example.com/#organization" },
-      "potentialAction": {
-        "@type": "SearchAction",
-        "target": "https://example.com/?s={search_term_string}",
-        "query-input": "required name=search_term_string"
-      }
+      "name": "My Site",
+      "url": "https://example.com/"
     },
     {
       "@type": "Organization",
       "@id": "https://example.com/#organization",
-      "name": "Mon Site",
-      "url": "https://example.com/",
-      "logo": "https://example.com/wp-content/uploads/logo.png",
-      "sameAs": [
-        "https://facebook.com/monsite",
-        "https://twitter.com/monsite"
-      ]
+      "name": "My Site",
+      "url": "https://example.com/"
     },
     {
       "@type": "Article",
-      "@id": "https://example.com/mon-article/#article",
-      "headline": "Mon premier article",
+      "@id": "https://example.com/my-post/#article",
+      "headline": "My Post Title",
       "datePublished": "2025-01-15T10:00:00+00:00",
-      "author": { "@type": "Person", "name": "Jean Dupont" },
-      "isPartOf": { "@id": "https://example.com/#website" },
-      "publisher": { "@id": "https://example.com/#organization" }
+      "author": { "@type": "Person", "name": "Jane Doe" }
     },
     {
       "@type": "BreadcrumbList",
       "itemListElement": [
-        { "@type": "ListItem", "position": 1, "name": "Accueil", "item": "https://example.com/" },
-        { "@type": "ListItem", "position": 2, "name": "Blog", "item": "https://example.com/blog/" },
-        { "@type": "ListItem", "position": 3, "name": "Mon premier article" }
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://example.com/" },
+        { "@type": "ListItem", "position": 2, "name": "My Post Title" }
       ]
     }
   ]
 }
 ```
 
-Les noeuds se referencent mutuellement via `@id` : l'Article pointe vers le WebSite (`isPartOf`) et l'Organization (`publisher`) sans dupliquer les donnees.
+The nodes reference each other via `@id` -- the Article points to the WebSite and Organization without duplicating their data.
 
-## Etape 2 : Creer un schema personnalise avec l'API fluide
+## Step 2: Add a custom schema via the hook
 
-La classe `Schema` est une factory statique qui expose une methode pour chaque type Schema.org. Chaque methode retourne un objet avec une API fluide (chainage de methodes).
+The bundle fires a `framework/seo/schema` action after registering its default schemas. Hook into it to add your own.
 
-Ajoutez un schema Product en vous connectant au hook `framework/seo/schema` :
+Create a file in your theme's `src/` directory:
 
 ```php
+<?php
+
+namespace MyTheme\Seo;
+
 use BackTo\Framework\Bundle\Seo\Schema;
 use BackTo\Framework\Bundle\Seo\Schema\SchemaManager;
+use BackTo\Framework\Contracts\HookDispatcherInterface;
+use BackTo\Framework\Contracts\Hooks;
 
-add_action('framework/seo/schema', function (SchemaManager $manager) {
-    $product = Schema::product()
-        ->name('T-shirt BackTo')
-        ->description('Un t-shirt en coton bio avec le logo BackTo.')
-        ->image('https://example.com/images/tshirt.jpg')
-        ->sku('BT-TSHIRT-001')
-        ->brand(Schema::brand()->name('BackTo'))
-        ->offers(
-            Schema::offer()
-                ->price(29.90)
-                ->priceCurrency('EUR')
-                ->availability('https://schema.org/InStock')
-                ->url('https://example.com/boutique/tshirt')
-        );
+final class AddFaqSchema implements Hooks
+{
+    public function __construct(
+        private readonly HookDispatcherInterface $hookDispatcher,
+    ) {}
 
-    $manager->add($product);
-});
-```
+    public function hooks(): void
+    {
+        $this->hookDispatcher->addAction('framework/seo/schema', [$this, 'register']);
+    }
 
-Rechargez la page et verifiez le JSON-LD : un noeud `Product` apparait dans le `@graph`, avec un `Offer` imbrique et une `Brand`.
+    public function register(SchemaManager $manager): void
+    {
+        $faq = Schema::faqPage()->mainEntity([
+            Schema::question()
+                ->name('What is the return policy?')
+                ->acceptedAnswer(
+                    Schema::answer()->text('You have 30 days to return any item in its original packaging.')
+                ),
+            Schema::question()
+                ->name('Do you offer free shipping?')
+                ->acceptedAnswer(
+                    Schema::answer()->text('Yes, free shipping on all orders over $50.')
+                ),
+        ]);
 
-### Comprendre l'API fluide
-
-Chaque type Schema.org dispose de methodes dediees correspondant aux proprietes Schema.org :
-
-```php
-// Methodes dediees avec auto-completion IDE
-Schema::article()
-    ->headline('Mon titre')
-    ->author(Schema::person()->name('Jean'))
-    ->datePublished('2025-01-15T10:00:00+00:00');
-
-// Methode generique set() pour toute propriete
-Schema::article()
-    ->set('headline', 'Mon titre')
-    ->set('copyrightYear', 2025);
-```
-
-La methode `set(string $property, mixed $value)` permet d'ajouter n'importe quelle propriete Schema.org, meme celles qui n'ont pas de methode dediee.
-
-### Imbriquer des schemas
-
-Les schemas peuvent etre imbriques librement :
-
-```php
-Schema::event()
-    ->name('Conference BackTo')
-    ->startDate('2025-06-15T09:00:00+02:00')
-    ->location(
-        Schema::place()
-            ->name('Palais des Congres')
-            ->address(
-                Schema::postalAddress()
-                    ->streetAddress('2 Place de la Porte Maillot')
-                    ->addressLocality('Paris')
-                    ->postalCode('75017')
-                    ->addressCountry('FR')
-            )
-    )
-    ->organizer(Schema::organization()->name('BackTo'));
-```
-
-### References croisees avec @id
-
-Pour relier des schemas sans les dupliquer, utilisez `Schema::ref()` :
-
-```php
-Schema::article()
-    ->id('https://example.com/article/#article')
-    ->headline('Mon article')
-    ->set('publisher', Schema::ref('https://example.com/#organization'));
-```
-
-Cela produit `"publisher": { "@id": "https://example.com/#organization" }`, qui pointe vers le noeud Organization deja present dans le `@graph`.
-
-## Etape 3 : Integrer Yoast SEO ou SEOPress
-
-Le framework detecte automatiquement le plugin SEO actif et expose ses donnees via une interface unifiee.
-
-### Donnees automatiquement extraites
-
-Lorsque Yoast SEO ou SEOPress est actif :
-
-- Les **liens sociaux** (Facebook, Twitter, Instagram, LinkedIn, Pinterest, YouTube) sont injectes dans le contexte Timber et utilises pour le `sameAs` de l'Organization
-- Le **schema natif du plugin est desactive** pour eviter les doublons (configurable)
-- L'**empreinte Yoast** (commentaires HTML de version) est nettoyee
-
-### Acceder aux metadonnees SEO dans Twig
-
-Les liens sociaux sont disponibles directement dans le contexte Timber :
-
-```twig
-{% if facebook %}
-    <a href="{{ facebook }}">Facebook</a>
-{% endif %}
-{% if twitter %}
-    <a href="{{ twitter }}">Twitter</a>
-{% endif %}
-{% if instagram %}
-    <a href="{{ instagram }}">Instagram</a>
-{% endif %}
-```
-
-Le SchemaManager est egalement accessible :
-
-```twig
-{# Afficher le JSON-LD dans le template (alternative a l'injection automatique dans wp_head) #}
-{{ schema.render()|raw }}
-```
-
-### Configuration
-
-Creez un fichier `config/seo.php` dans votre theme pour personnaliser le comportement :
-
-```php
-// config/seo.php
-return [
-    'schema' => [
-        // Associer un generateur de schema a chaque post type
-        'post_type_map' => [
-            'post' => \BackTo\Framework\Bundle\Seo\Schema\Generator\ArticleSchemaGenerator::class,
-        ],
-        // Desactiver le schema natif du plugin SEO (true par defaut)
-        'disable_plugin_schema' => true,
-    ],
-];
-```
-
-### Configurer le separateur de titre
-
-Utilisez le `SeoConfigurator` pour ajuster les parametres SEO :
-
-```php
-// config/seo.php (format alternatif avec configurateur)
-use BackTo\Framework\Bundle\Seo\SeoConfigurator;
-
-return static function (SeoConfigurator $seo): void {
-    $seo
-        ->titleSeparator('-')
-        ->robotsDefault('index, follow');
-};
-```
-
-## Etape 4 : Valider vos schemas
-
-Chaque type Schema.org declare ses proprietes requises selon les specifications Google. Vous pouvez valider un schema avant de l'enregistrer :
-
-```php
-$product = Schema::product()
-    ->name('T-shirt')
-    ->description('Un t-shirt');
-
-$missing = $product->validate();
-// ['image', 'offers'] -- proprietes manquantes pour les resultats enrichis Google
-
-if ($product->isValid()) {
-    $manager->add($product);
+        $manager->add($faq);
+    }
 }
 ```
 
-Vous pouvez aussi valider l'ensemble des schemas enregistres :
+Because `AddFaqSchema` implements `Hooks`, the framework auto-discovers it. Reload the page and check the source -- a `FAQPage` node now appears in the `@graph`.
+
+## Step 3: Validate the output
+
+The bundle includes built-in validation against Google's required properties. Try it in your schema hook:
 
 ```php
-$errors = $manager->validate();
-// ['Product' => ['image', 'offers'], 'Article' => ['author']]
+public function register(SchemaManager $manager): void
+{
+    $faq = Schema::faqPage()->mainEntity([
+        Schema::question()
+            ->name('What is the return policy?')
+            ->acceptedAnswer(
+                Schema::answer()->text('30-day returns.')
+            ),
+    ]);
+
+    $missing = $faq->validate(); // [] -- all required properties present
+
+    $manager->add($faq);
+}
 ```
 
-## Prochaines etapes
+For external validation, copy the full JSON-LD output from your page source and paste it into [Google's Rich Results Test](https://search.google.com/test/rich-results). The FAQPage should appear as eligible for rich results.
 
-- Consultez les [recettes](how-to.md) pour des cas concrets (FAQ, breadcrumbs, Product avec avis)
-- Explorez la [reference API](reference.md) pour la liste complete des 31 types et leurs proprietes
-- Lisez l'[explication de l'architecture](explanation.md) pour comprendre le pipeline de generation et le pattern `@graph`
+## Step 4: Validate all schemas at once
+
+The `SchemaManager` can validate every registered schema in a single call:
+
+```php
+public function register(SchemaManager $manager): void
+{
+    $manager->add(Schema::faqPage()->mainEntity([
+        Schema::question()
+            ->name('How does it work?')
+            ->acceptedAnswer(Schema::answer()->text('Like this.')),
+    ]));
+
+    $errors = $manager->validate();
+    // [] -- empty array means all schemas are valid
+}
+```
+
+If a schema is missing required properties, `validate()` returns them keyed by type: `['Product' => ['image', 'offers']]`.
+
+## Next steps
+
+- See [Common tasks](how-to.md) for practical recipes (Product schema, custom breadcrumbs, social links in Twig)
+- See [API reference](reference.md) for the complete list of schema types and their methods
+- See [Architecture](explanation.md) to understand the `@graph` design and generation pipeline
