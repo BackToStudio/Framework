@@ -1,226 +1,123 @@
-# Explication : Architecture du bundle Performance
-
-Ce document explique les choix de conception et le fonctionnement interne des principaux mecanismes du bundle Performance.
-
-## Flux du cache de pages
-
-Le cache de pages suit un cycle en cinq phases : **servir**, **capturer**, **stocker**, **invalider** et **precharger**.
-
-### Phase 1 : Servir (ServePageCache)
-
-Le hook `init` est enregistre a la priorite 0, la plus haute possible. C'est le tout premier code execute dans le cycle de vie WordPress apres le bootstrap.
-
-```
-Requete HTTP
-    |
-    v
-[init priorite 0] → CacheableRequestChecker.isCacheable() ?
-    |                       |
-    | non                   | oui
-    v                       v
-(flux normal WP)      RequestUrlResolver.getCurrentUrl()
-                            |
-                            v
-                      PageCacheInterface.get(url)
-                            |
-                    --------+--------
-                    |               |
-                    v               v
-                  null           HTML cache
-               (MISS)             (HIT)
-                    |               |
-                    v               v
-            (flux normal)    header("X-Page-Cache: HIT")
-                             echo $html
-                             exit
-```
-
-L'appel a `exit` court-circuite l'integralite du cycle WordPress. Le temps de reponse passe de centaines de millisecondes a quelques millisecondes, car ni la base de donnees ni le theme ne sont charges.
-
-### Phase 2 : Capturer (output buffering)
-
-Si le cache est vide (MISS), le flux WordPress s'execute normalement. Sur `template_redirect`, un output buffer est demarre via `ob_start`. Les pages 404 et les resultats de recherche sont exclues car leur contenu est trop variable pour etre cache efficacement.
-
-### Phase 3 : Stocker (captureOutput)
+# Performance — Architecture & Design
 
-Le callback de l'output buffer recoit le HTML complet a la fin du rendu. Avant de le stocker, deux verifications sont effectuees :
-
-1. Le HTML n'est pas vide
-2. Le HTML ne contient pas `Fatal error` (pour eviter de cacher des pages d'erreur PHP)
-
-Le fichier HTML est ecrit sur le disque avec un commentaire horodatage. Un fichier `.meta` associe contient l'URL originale, le timestamp de creation et le timestamp d'expiration (`time() + $ttl`).
-
-### Phase 4 : Invalider (InvalidatePageCache)
-
-L'invalidation est granulaire. Lorsqu'un article est modifie, seul son cache est supprime via le permalink. Un flush complet est declenche dans trois cas :
+*Explanation — Understanding-oriented*
 
-- **Changement de statut publication/depublication** : les archives, menus et listes d'articles changent
-- **Changement de theme** : tout le rendu HTML est potentiellement different
-- **Sauvegarde du Customizer** : les styles et la mise en page peuvent avoir change
+---
 
-Pour les commentaires, l'article parent est identifie via `ContentQueryInterface::getComment()` et son cache est invalide.
-
-### Phase 5 : Precharger (PreloadPageCache)
-
-Apres l'invalidation, le cache est froid. Le preloading le rechauffe proactivement via WP-Cron.
-
-```
-save_post / transition_post_status
-    |
-    v
-schedulePostPreload(postId)
-    |
-    v
-CronScheduler.scheduleSingle(
-    'btf_preload_page_cache',
-    time() + delay,
-    [postId]
-)
-    |
-    v
-CronScheduler.spawn()  ← declenche WP-Cron immediatement
-    |
-    v
-[cron execute]
-    |
-    v
-PreloadUrlCollector.getPostRelatedUrls(postId)
-    → permalink de l'article
-    → page d'accueil
-    → page du blog
-    → archive du post type
-    → archives de taxonomies (categories, tags)
-    → page auteur
-    → archives par date (annee, mois)
-    |
-    v
-PreloadExecutor.preload(urls)
-    → requetes HTTP non-bloquantes en loopback
-    → header X-Cache-Preload: 1
-    → chaque requete declenche ServePageCache
-      qui genere et stocke le HTML
-```
+## Why a performance bundle in a WordPress framework?
 
-Le delai configurable (`$delay`, defaut 5 secondes) evite de surcharger le serveur immediatement apres une sauvegarde. La taille de lot (`$batchSize`, defaut 50) limite le nombre d'URLs preloadees en une seule execution.
+WordPress loads its full stack on every request: database connections, theme files, plugin hooks, and template rendering. For anonymous visitors viewing published content, most of this work produces identical output. The Performance bundle short-circuits this by caching the rendered HTML and serving it before WordPress boots.
 
-Pour un preload complet (changement de theme, Customizer), `getSiteUrls()` collecte les articles recents, les pages, les archives de categories et les tags les plus populaires.
+Beyond caching, WordPress ships with features that most sites never use (emoji scripts, oEmbed, XML-RPC, Heartbeat on the frontend). Each adds kilobytes of JavaScript and CSS, plus server-side overhead. The bundle removes these by default, opting for a "clean slate" approach where developers explicitly re-enable what they need.
 
-### Logique du CacheableRequestChecker
+---
 
-Le `CacheableRequestChecker` determine l'eligibilite d'une requete au cache selon une cascade de regles eliminatoires :
+## Page cache lifecycle
 
-```
-1. isAdmin() ?              → NON cacheable (page d'administration)
-2. method !== 'GET' ?       → NON cacheable (POST, PUT, DELETE...)
-3. isLoggedIn() ?           → NON cacheable (contenu personnalise)
-4. hasQueryParams() ?       → NON cacheable (resultats variables)
-5. URL commence par un
-   prefixe exclu ?          → NON cacheable (/wp-admin, /wp-json, etc.)
-6. Aucune exclusion         → CACHEABLE
-```
+The page cache operates in five phases: **serve**, **capture**, **store**, **invalidate**, and **preload**.
 
-L'ordre des verifications est optimise : les conditions les moins couteuses (admin, methode) sont testees en premier. La verification de l'utilisateur connecte est plus couteuse car elle implique la lecture d'un cookie de session.
+### Serve (early exit)
 
-Les prefixes exclus par defaut (`/wp-admin`, `/wp-json`, `/wp-login.php`, `/wp-cron.php`, `/xmlrpc.php`) couvrent tous les endpoints non-frontend de WordPress. Ils sont configurables via l'injection de dependances.
+`ServePageCache` hooks into `init` at priority 0 — the earliest possible point after WordPress bootstraps. If the request is cacheable and a cached file exists, the HTML is sent directly and PHP execution stops with `exit`. The response time drops from hundreds of milliseconds to single-digit milliseconds because neither the database nor the theme is loaded.
 
-### Resolution d'URL (RequestUrlResolver)
+### Capture (output buffering)
 
-La cle de cache est une URL canonique construite a partir de la requete courante :
+On a cache miss, WordPress renders the page normally. At `template_redirect`, output buffering starts via `ob_start`. Pages that should not be cached (404s, search results) are excluded at this stage.
 
-1. Le schema est determine par `isSecure()` (HTTPS ou HTTP)
-2. Le host est valide contre le `site_url` configure pour empecher le cache poisoning via l'en-tete `Host`
-3. La query string est supprimee (les requetes avec parametres ne sont pas cachees)
+### Store (write to disk)
 
-Cette normalisation garantit qu'une meme page produit toujours la meme cle de cache, meme si les en-tetes HTTP varient.
+When the output buffer flushes at shutdown, the callback receives the complete HTML. Two safety checks run before storing: the HTML must not be empty and must not contain `Fatal error` (to avoid caching PHP error pages). The cached file is written alongside a `.meta` file containing the original URL, creation timestamp, and expiry timestamp.
 
-## Pipeline de minification HTML
+### Invalidate (granular + full flush)
 
-La minification HTML est orchestree par `WordPressHtmlOptimizer`, qui delegue aux minificateurs specialises `CssMinifier` et `JsMinifier`.
+When a post is saved, only that post's cached page is invalidated via its permalink. A full cache flush is triggered in three cases: a post transitions to or from `publish` status (archives and listings change), the theme is switched (all HTML output changes), or the Customizer is saved (layout and styles may change). Comment changes invalidate the parent post's cache.
 
-### Strategie de preservation
+### Preload (background warming)
 
-Le defi principal de la minification HTML est de ne pas alterer le contenu semantique. La strategie adoptee est une approche **extract-process-restore** :
+After invalidation, the cache is cold. `PreloadPageCache` schedules a WP-Cron event (with a configurable delay, default 5 seconds) that sends non-blocking loopback HTTP requests to the affected URLs. Each request triggers the normal serve-capture-store cycle, warming the cache before the next visitor arrives.
 
-1. **Extraction** : Les blocs sensibles (`<pre>`, `<code>`, `<textarea>`, `<style>`, `<script>`) sont remplaces par des placeholders (`<!--PRESERVED_0-->`, `<!--PRESERVED_1-->`, etc.)
-2. **Traitement** : Le HTML restant est minifie agressivement (suppression commentaires, reduction espaces)
-3. **Restauration** : Les placeholders sont remplaces par le contenu original (pre/code/textarea) ou le contenu minifie (style/script)
+For post-level changes, `PreloadUrlCollector` gathers not just the post permalink but also the home page, blog page, post type archive, taxonomy archives, author page, and date archives. For site-wide changes (theme switch, Customizer save), it collects recent posts, pages, categories, and popular tags up to the configured batch size.
 
-Cette approche garantit que :
-- Le contenu pre-formatte conserve ses espaces et retours a la ligne
-- Les chaines JavaScript ne sont pas corrompues par la reduction d'espaces
-- Les selecteurs CSS ne sont pas alteres
+---
 
-### Minification CSS inline (CssMinifier)
+## CacheableRequestChecker design
 
-Le `CssMinifier` applique une serie de transformations regex sur le CSS :
+The checker applies an elimination cascade to determine if a request should be cached:
 
-1. Suppression des commentaires CSS (`/* ... */`)
-2. Reduction des espaces multiples en un seul espace
-3. Suppression des espaces autour de `{ } ; : , > ~ +`
-4. Suppression du dernier `;` avant `}`
-5. Reduction de `0px` en `0` (toutes les unites : px, em, rem, %, vh, vw, etc.)
-6. Reduction de `0.5` en `.5`
-7. Reduction des couleurs hexadecimales : `#aabbcc` en `#abc`
+1. **Admin page** — not cacheable (personalized UI)
+2. **Non-GET method** — not cacheable (state-changing requests)
+3. **Logged-in user** — not cacheable (personalized content like admin bar)
+4. **Query parameters** — not cacheable (variable output)
+5. **Excluded URL prefix** — not cacheable (WordPress internals)
 
-### Minification JavaScript inline (JsMinifier)
+The order is deliberate: cheap checks (admin flag, HTTP method) run first. The logged-in check is more expensive because it reads session cookies.
 
-Le `JsMinifier` utilise une approche conservative pour eviter de casser le code :
+---
 
-1. **Extraction des chaines** : Les littieraux entre guillemets sont extraits et remplaces par des placeholders (`\x00STR_0\x00`). Cela protege les chaines contenant des operateurs ou des mots-cles.
-2. **Suppression des commentaires** : Commentaires mono-ligne (`//`) et multi-ligne (`/* */`), sauf les commentaires de licence (`/*! */`).
-3. **Reduction des espaces** : Espaces et tabulations reduits, lignes vides supprimees.
-4. **Suppression des espaces autour des operateurs** : `{ } ; , = : ? < > ! & | + - * / ^ ~ % ( )`
-5. **Restauration des espaces apres les mots-cles** : `var`, `let`, `const`, `return`, `typeof`, `instanceof`, `new`, `function`, `class`, etc.
-6. **Restauration des chaines** : Les placeholders sont remplaces par les litteraux originaux.
+## URL canonicalization
 
-Les scripts JSON-LD (`type="application/ld+json"`), les importmaps (`type="importmap"`) et les scripts de type `application/json` ne sont pas minifies car ils contiennent des donnees structurees, pas du code executable.
+The `RequestUrlResolver` builds the cache key by normalizing the current request URL. The host is validated against the configured `site_url` to prevent cache poisoning via a spoofed `Host` header. Query strings are stripped (requests with query parameters are never cached). This ensures that the same page always produces the same cache key regardless of HTTP header variations.
 
-### Distinction entre balises de bloc et inline
+---
 
-Le minificateur distingue les elements de bloc (ou les espaces entre balises fermantes et ouvrantes sont insignifiants) des elements inline (ou un espace peut etre significatif). Les espaces entre balises de bloc sont entierement supprimes (`></div><div>`) tandis que les espaces entre balises inline sont reduits a un seul espace (`> <`).
+## HTML minification pipeline
 
-## Approche du tree-shaking CSS
+`WordPressHtmlOptimizer` uses an **extract-process-restore** strategy to minify HTML without breaking content:
 
-Le tree-shaking CSS est une technique qui supprime les regles CSS dont les selecteurs ne correspondent a aucun element du HTML. L'implementation suit une architecture en trois classes, respectant le principe de responsabilite unique :
+1. **Extract** — `<pre>`, `<code>`, `<textarea>`, `<style>`, and `<script>` blocks are replaced with placeholders (`<!--PRESERVED_0-->`, etc.)
+2. **Process** — The remaining HTML is aggressively minified: comments removed, whitespace between block-level elements collapsed, multiple spaces reduced
+3. **Restore** — Placeholders are replaced with original content (for preserved blocks) or minified content (for style/script blocks)
 
-### 1. HtmlSelectorExtractor
+### Block vs. inline whitespace
 
-Analyse le HTML (sans les blocs `<style>`) et extrait trois types d'identifiants :
+The minifier distinguishes block-level elements (where inter-tag whitespace is insignificant) from inline elements (where a space may be meaningful). Whitespace between block-level tags like `</div><div>` is removed entirely. Whitespace between inline elements is collapsed to a single space to preserve text flow.
 
-- **Classes** : via l'attribut `class="..."` (chaque classe est separee)
-- **IDs** : via l'attribut `id="..."`
-- **Balises** : chaque balise HTML ouverte (`<div>`, `<p>`, `<span>`, etc.)
+### Inline CSS and JavaScript
 
-Le resultat est une structure de donnees avec trois maps `array<string, true>` pour des lookups en O(1).
+`CssMinifier` handles inline `<style>` blocks: removes comments, collapses whitespace, strips spaces around CSS punctuation, shortens hex colors (`#aabbcc` to `#abc`), and removes zero units (`0px` to `0`).
 
-### 2. SelectorMatcher
+`JsMinifier` handles inline `<script>` blocks with a conservative approach: string literals are extracted before processing to prevent corruption, comments are removed (except license comments `/*! */`), and keyword spacing is restored after whitespace collapse. JSON-LD, importmaps, and `application/json` scripts are left untouched because they contain structured data, not executable code.
 
-Determine si un selecteur CSS est "utilise" dans le HTML. Les regles de correspondance sont volontairement conservatrices pour eviter les faux positifs (supprimer du CSS necessaire) :
+---
 
-- **Selecteurs universels** (`*`, `:root`, `html`, `body`) : toujours conserves
-- **Custom properties** (`--variable`) : toujours conservees
-- **Selecteurs multiples** (`a, .b, #c`) : conserves si au moins un sous-selecteur correspond
-- **Selecteurs composes** (`.foo.bar`) : toutes les classes doivent etre presentes dans le HTML
-- **Selecteurs descendants** (`.parent .child`) : seul le sujet (le dernier element) est verifie
-- **Pseudo-classes et pseudo-elements** (`:hover`, `::before`) : ignores pour le matching (l'element de base est verifie)
+## Unused CSS removal (tree-shaking)
 
-Cette approche privilegie la precision au detriment de l'agressivite. Il est preferable de conserver quelques regles inutiles plutot que de supprimer une regle necessaire qui causerait un defaut visuel.
+The unused CSS removal feature analyzes the rendered HTML and strips CSS rules from inline `<style>` blocks whose selectors do not match any element on the page. This is implemented across three single-responsibility classes.
 
-### 3. CssRuleFilter
+### HtmlSelectorExtractor
 
-Parcourt le CSS regle par regle et applique `SelectorMatcher::isSelectorUsed()` a chaque selecteur. Les `@-rules` (`@media`, `@supports`, `@keyframes`, `@font-face`, `@import`, `@charset`) sont toujours conservees, car leur suppression pourrait casser des declarations critiques dans des contextes conditionnels.
+Scans the HTML markup (with style blocks removed) and builds three lookup maps: classes, IDs, and tag names. Each map uses `array<string, true>` for O(1) lookups.
 
-Le parsing CSS est fait manuellement (sans regex) avec un compteur de profondeur d'accolades pour gerer correctement les blocs imbriques (`@media { .class { ... } }`).
+### SelectorMatcher
 
-### Priorite d'execution
+Determines if a CSS selector is "used" with deliberately conservative rules:
 
-`RemoveUnusedCss` est enregistre a la priorite 9 sur `template_redirect`, tandis que `MinifyHtml` utilise la priorite par defaut (10). Cela garantit que le tree-shaking CSS s'execute en premier sur le HTML brut, puis la minification reduit l'ensemble du resultat.
+- **Universal selectors** (`*`, `:root`, `html`, `body`): always kept
+- **CSS custom properties** (`--variable`): always kept
+- **Comma-separated selectors** (`a, .b, #c`): kept if any sub-selector matches
+- **Compound selectors** (`.foo.bar`): all classes must be present
+- **Descendant selectors** (`.parent .child`): only the subject (last element) is checked
+- **Pseudo-classes and pseudo-elements** (`:hover`, `::before`): stripped before matching
 
-## Strategie des directives .htaccess
+This approach favors keeping a few unnecessary rules over accidentally removing a needed one that would cause a visual defect.
 
-### Approche par marqueurs
+### CssRuleFilter
 
-Les directives sont injectees dans le `.htaccess` via la fonction WordPress `insert_with_markers()`, qui gere un bloc delimite par :
+Iterates through CSS rules and applies `SelectorMatcher` to each selector. All `@-rules` (`@media`, `@supports`, `@keyframes`, `@font-face`, `@import`, `@charset`) are always preserved because removing them could break conditional declarations or nested rules.
+
+CSS parsing uses manual brace-depth tracking rather than regex to correctly handle nested blocks like `@media { .class { ... } }`.
+
+### Execution order
+
+`RemoveUnusedCss` runs at priority 9 on `template_redirect`. `MinifyHtml` runs at the default priority 10. This ensures tree-shaking processes the raw HTML first, then minification compresses the result.
+
+---
+
+## .htaccess directive strategy
+
+### Marker-based injection
+
+Directives are written to `.htaccess` using WordPress's `insert_with_markers()`, which manages a delimited block:
 
 ```
 # BEGIN BackTo Performance
@@ -228,47 +125,28 @@ Les directives sont injectees dans le `.htaccess` via la fonction WordPress `ins
 # END BackTo Performance
 ```
 
-Cette approche garantit que :
-- Les directives du framework ne perturbent pas celles de WordPress ou d'autres plugins
-- Les mises a jour ecrasent uniquement le bloc BackTo Performance
-- La desactivation du plugin supprime proprement les directives
+This ensures the framework's directives do not interfere with WordPress core or other plugins. Updates overwrite only the BackTo Performance block. Deactivation removes the block cleanly.
 
-### Modules Apache cibles
+### Apache modules
 
-Chaque groupe de directives est encapsule dans un `<IfModule>` pour une degradation gracieuse sur les serveurs ou le module n'est pas disponible :
+Each directive group is wrapped in `<IfModule>` for graceful degradation on servers where the module is unavailable:
 
-**`mod_deflate`** : Compression gzip des ressources textuelles. Les fichiers deja compresses (images, videos, polices woff2) sont exclus via `SetEnvIfNoCase` pour eviter une double compression.
+- **`mod_deflate`** — Gzip compression for text-based resources. Already-compressed formats (images, video, woff2) are excluded via `SetEnvIfNoCase` to avoid double compression.
+- **`mod_expires`** — Browser caching with differentiated TTLs. HTML gets TTL 0 (managed by the server-side page cache). Static assets get a configurable TTL (default 1 year). Dynamic data formats (JSON, XML) get TTL 0.
+- **`mod_headers`** — `Cache-Control: public, max-age=..., immutable` for static assets (the `immutable` flag prevents conditional requests). ETag removal to avoid unnecessary revalidation. `Connection: keep-alive` for persistent connections.
 
-**`mod_expires`** : Cache navigateur avec des TTL differencies :
-- HTML : TTL 0 (le cache de pages serveur gere ce cas)
-- Assets statiques (CSS, JS, images, polices) : TTL configurable (defaut 1 an)
-- Donnees (JSON, XML) : TTL 0 (reponses dynamiques)
+### Write optimization
 
-**`mod_headers`** : Trois utilisations :
-1. `Cache-Control: public, max-age=..., immutable` pour les assets statiques (l'option `immutable` evite les requetes conditionnelles)
-2. `Cache-Control: no-cache, no-store, must-revalidate` pour HTML et donnees
-3. Suppression de l'en-tete `ETag` pour eviter les revalidations inutiles
-4. `Connection: keep-alive` pour les connexions persistantes
+Writing to `.htaccess` is expensive (read, parse, write). To avoid redundant writes on every `admin_init`, an MD5 hash of the current directives is stored as a WordPress transient (key: `backto_htaccess_hash`, TTL: 24 hours). The file is only rewritten when the hash changes, meaning subsequent admin page loads trigger no file I/O as long as the configuration remains stable.
 
-### Optimisation des ecritures
+---
 
-L'ecriture dans le `.htaccess` est une operation couteuse (lecture, parsing, ecriture). Pour eviter des ecritures redondantes a chaque `admin_init`, un hash MD5 des directives est stocke comme transient WordPress (cle : `backto_htaccess_hash`, TTL : 24h).
+## Port architecture
 
-Le flux est :
+The bundle follows the Hexagonal Architecture pattern used throughout the framework. Three port interfaces (`PageCacheInterface`, `HtmlOptimizerInterface`, `DatabaseOptimizerInterface`) separate domain logic from WordPress-specific implementations. This means:
 
-```
-admin_init
-    |
-    v
-buildDirectives() → calcul MD5
-    |
-    v
-MD5 identique au transient stocke ?
-    |           |
-    | oui       | non
-    v           v
-  (skip)    insert_with_markers()
-            storeDirectivesHash()
-```
+- Hook classes depend on interfaces, not concrete adapters
+- The filesystem page cache can be swapped for Redis or Memcached without changing any hook
+- Unit tests can mock the interfaces without WordPress running
 
-Cela signifie qu'apres le premier chargement admin, les requetes suivantes ne declenchent aucune ecriture fichier tant que la configuration ne change pas.
+The port bindings are registered in `PerformanceExtension`, which maps each interface to its WordPress adapter.
