@@ -10,7 +10,10 @@
   "require": {
     "php": ">=8.2",
     "psr/http-client": "^1.0",
-    "psr/http-message": "^2.0"
+    "psr/http-message": "^2.0",
+    "psr/log": "^3.0",
+    "psr/simple-cache": "^3.0",
+    "psr/clock": "^1.0"
   },
   "replace": {
     "backto/admin": "self.version",

@@ -9,92 +9,109 @@ use PHPUnit\Framework\TestCase;
 
 class WordPressLoggerTest extends TestCase
 {
+    private string $logFile;
+    private string|false $originalErrorLog;
+
+    protected function setUp(): void
+    {
+        $this->logFile = tempnam(sys_get_temp_dir(), 'btf_log_');
+        $this->originalErrorLog = ini_set('error_log', $this->logFile);
+    }
+
+    protected function tearDown(): void
+    {
+        if ($this->originalErrorLog !== false) {
+            ini_set('error_log', $this->originalErrorLog);
+        }
+        if (file_exists($this->logFile)) {
+            unlink($this->logFile);
+        }
+    }
+
+    private function getLogOutput(): string
+    {
+        return file_exists($this->logFile) ? file_get_contents($this->logFile) : '';
+    }
+
+    private function getLogLines(): array
+    {
+        $content = $this->getLogOutput();
+
+        return $content !== '' ? array_filter(explode("\n", trim($content))) : [];
+    }
+
     public function testLogInterpolatesContext(): void
     {
         $logger = new WordPressLogger('debug', 'Test');
-        $output = [];
 
-        \set_error_handler(static function (int $errno, string $errstr) use (&$output): bool {
-            $output[] = $errstr;
-            return true;
-        });
+        $logger->error('User {user} failed login', ['user' => 'alice']);
 
-        try {
-            $logger->error('User {user} failed login', ['user' => 'alice']);
-        } finally {
-            \restore_error_handler();
-        }
-
-        $this->assertCount(1, $output);
-        $this->assertStringContainsString('User alice failed login', $output[0]);
-        $this->assertStringContainsString('Test.ERROR', $output[0]);
+        $output = $this->getLogOutput();
+        $this->assertStringContainsString('User alice failed login', $output);
+        $this->assertStringContainsString('Test.ERROR', $output);
     }
 
     public function testMinLevelFiltersMessages(): void
     {
         $logger = new WordPressLogger('error', 'Test');
-        $output = [];
 
-        \set_error_handler(static function (int $errno, string $errstr) use (&$output): bool {
-            $output[] = $errstr;
-            return true;
-        });
+        $logger->debug('should be filtered');
+        $logger->info('should be filtered');
+        $logger->warning('should be filtered');
+        $logger->error('should pass');
+        $logger->critical('should pass');
 
-        try {
-            $logger->debug('should be filtered');
-            $logger->info('should be filtered');
-            $logger->warning('should be filtered');
-            $logger->error('should pass');
-            $logger->critical('should pass');
-        } finally {
-            \restore_error_handler();
-        }
-
-        $this->assertCount(2, $output);
+        $lines = $this->getLogLines();
+        $this->assertCount(2, $lines);
     }
 
     public function testAppendsExtraContextAsJson(): void
     {
         $logger = new WordPressLogger('debug', 'Test');
-        $output = [];
 
-        \set_error_handler(static function (int $errno, string $errstr) use (&$output): bool {
-            $output[] = $errstr;
-            return true;
-        });
+        $logger->info('Event occurred', ['type' => 'login', 'ip' => '127.0.0.1']);
 
-        try {
-            $logger->info('Event occurred', ['type' => 'login', 'ip' => '127.0.0.1']);
-        } finally {
-            \restore_error_handler();
-        }
-
-        $this->assertStringContainsString('"type":"login"', $output[0]);
+        $output = $this->getLogOutput();
+        $this->assertStringContainsString('"type":"login"', $output);
     }
 
     public function testAllLevelMethodsWork(): void
     {
         $logger = new WordPressLogger('debug');
-        $count = 0;
 
-        \set_error_handler(static function () use (&$count): bool {
-            $count++;
-            return true;
-        });
+        $logger->emergency('test');
+        $logger->alert('test');
+        $logger->critical('test');
+        $logger->error('test');
+        $logger->warning('test');
+        $logger->notice('test');
+        $logger->info('test');
+        $logger->debug('test');
 
-        try {
-            $logger->emergency('test');
-            $logger->alert('test');
-            $logger->critical('test');
-            $logger->error('test');
-            $logger->warning('test');
-            $logger->notice('test');
-            $logger->info('test');
-            $logger->debug('test');
-        } finally {
-            \restore_error_handler();
-        }
+        $lines = $this->getLogLines();
+        $this->assertCount(8, $lines);
+    }
 
-        $this->assertSame(8, $count);
+    public function testImplementsPsr3Interface(): void
+    {
+        $logger = new WordPressLogger();
+        $this->assertInstanceOf(\Psr\Log\LoggerInterface::class, $logger);
+    }
+
+    public function testAcceptsStringableMessage(): void
+    {
+        $logger = new WordPressLogger('debug', 'Test');
+
+        $stringable = new class implements \Stringable {
+            public function __toString(): string
+            {
+                return 'stringable message';
+            }
+        };
+
+        $logger->info($stringable);
+
+        $output = $this->getLogOutput();
+        $this->assertStringContainsString('stringable message', $output);
     }
 }

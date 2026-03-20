@@ -75,6 +75,12 @@
         <testsuite name="http">
             <directory>src/Http/Tests</directory>
         </testsuite>
+        <testsuite name="clock">
+            <directory>src/Clock/Tests</directory>
+        </testsuite>
+        <testsuite name="observability">
+            <directory>src/Observability/Tests</directory>
+        </testsuite>
         <testsuite name="query">
             <directory>src/Query/Tests</directory>
         </testsuite>

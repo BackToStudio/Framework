@@ -12,47 +12,47 @@ use BackTo\Framework\Observability\Contracts\LoggerInterface;
 final class NullLogger implements LoggerInterface
 {
     /** @param array<string, mixed> $context */
-    public function emergency(string $message, array $context = []): void
+    public function emergency(string|\Stringable $message, array $context = []): void
     {
     }
 
     /** @param array<string, mixed> $context */
-    public function alert(string $message, array $context = []): void
+    public function alert(string|\Stringable $message, array $context = []): void
     {
     }
 
     /** @param array<string, mixed> $context */
-    public function critical(string $message, array $context = []): void
+    public function critical(string|\Stringable $message, array $context = []): void
     {
     }
 
     /** @param array<string, mixed> $context */
-    public function error(string $message, array $context = []): void
+    public function error(string|\Stringable $message, array $context = []): void
     {
     }
 
     /** @param array<string, mixed> $context */
-    public function warning(string $message, array $context = []): void
+    public function warning(string|\Stringable $message, array $context = []): void
     {
     }
 
     /** @param array<string, mixed> $context */
-    public function notice(string $message, array $context = []): void
+    public function notice(string|\Stringable $message, array $context = []): void
     {
     }
 
     /** @param array<string, mixed> $context */
-    public function info(string $message, array $context = []): void
+    public function info(string|\Stringable $message, array $context = []): void
     {
     }
 
     /** @param array<string, mixed> $context */
-    public function debug(string $message, array $context = []): void
+    public function debug(string|\Stringable $message, array $context = []): void
     {
     }
 
     /** @param array<string, mixed> $context */
-    public function log(mixed $level, string $message, array $context = []): void
+    public function log(mixed $level, string|\Stringable $message, array $context = []): void
     {
     }
 }

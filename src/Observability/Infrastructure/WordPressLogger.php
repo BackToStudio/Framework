@@ -35,55 +35,55 @@ final class WordPressLogger implements LoggerInterface
     }
 
     /** @param array<string, mixed> $context */
-    public function emergency(string $message, array $context = []): void
+    public function emergency(string|\Stringable $message, array $context = []): void
     {
         $this->log('emergency', $message, $context);
     }
 
     /** @param array<string, mixed> $context */
-    public function alert(string $message, array $context = []): void
+    public function alert(string|\Stringable $message, array $context = []): void
     {
         $this->log('alert', $message, $context);
     }
 
     /** @param array<string, mixed> $context */
-    public function critical(string $message, array $context = []): void
+    public function critical(string|\Stringable $message, array $context = []): void
     {
         $this->log('critical', $message, $context);
     }
 
     /** @param array<string, mixed> $context */
-    public function error(string $message, array $context = []): void
+    public function error(string|\Stringable $message, array $context = []): void
     {
         $this->log('error', $message, $context);
     }
 
     /** @param array<string, mixed> $context */
-    public function warning(string $message, array $context = []): void
+    public function warning(string|\Stringable $message, array $context = []): void
     {
         $this->log('warning', $message, $context);
     }
 
     /** @param array<string, mixed> $context */
-    public function notice(string $message, array $context = []): void
+    public function notice(string|\Stringable $message, array $context = []): void
     {
         $this->log('notice', $message, $context);
     }
 
     /** @param array<string, mixed> $context */
-    public function info(string $message, array $context = []): void
+    public function info(string|\Stringable $message, array $context = []): void
     {
         $this->log('info', $message, $context);
     }
 
     /** @param array<string, mixed> $context */
-    public function debug(string $message, array $context = []): void
+    public function debug(string|\Stringable $message, array $context = []): void
     {
         $this->log('debug', $message, $context);
     }
 
     /** @param array<string, mixed> $context */
-    public function log(mixed $level, string $message, array $context = []): void
+    public function log(mixed $level, string|\Stringable $message, array $context = []): void
     {
         $levelStr = (string) $level;
 
@@ -91,10 +91,11 @@ final class WordPressLogger implements LoggerInterface
             return;
         }
 
-        $interpolated = $this->interpolate($message, $context);
+        $messageStr = (string) $message;
+        $interpolated = $this->interpolate($messageStr, $context);
         $formatted = \sprintf('[%s] %s.%s: %s', \gmdate('Y-m-d H:i:s'), $this->channel, \strtoupper($levelStr), $interpolated);
 
-        if ($context !== [] && !$this->allContextKeysUsedInMessage($message, $context)) {
+        if ($context !== [] && !$this->allContextKeysUsedInMessage($messageStr, $context)) {
             $formatted .= ' ' . \json_encode($context, \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE);
         }
 

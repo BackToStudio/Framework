@@ -60,6 +60,11 @@ final class ObservableHookDispatcher implements HookDispatcherInterface
         $this->inner->removeFilter($hookName, $callback, $priority);
     }
 
+    public function doAction(string $hookName, mixed ...$args): void
+    {
+        $this->inner->doAction($hookName, ...$args);
+    }
+
     public function applyFilters(string $hookName, mixed $value, mixed ...$args): mixed
     {
         return $this->inner->applyFilters($hookName, $value, ...$args);
