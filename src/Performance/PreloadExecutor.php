@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Performance;
 
-use BackTo\Framework\Contracts\HttpClientInterface;
+use BackTo\Framework\Http\Contracts\HttpClientInterface;
 use BackTo\Framework\Performance\Contracts\PageCacheInterface;
 
 /**
