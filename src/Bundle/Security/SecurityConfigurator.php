@@ -94,6 +94,61 @@ final class SecurityConfigurator implements ModuleConfiguratorInterface
         return $this;
     }
 
+    public function autoUpdateMajorCore(bool $enabled): self
+    {
+        $this->overrides['security.auto_update_major_core'] = $enabled;
+
+        return $this;
+    }
+
+    public function autoUpdateMinorCore(bool $enabled): self
+    {
+        $this->overrides['security.auto_update_minor_core'] = $enabled;
+
+        return $this;
+    }
+
+    public function autoUpdatePlugins(bool $enabled): self
+    {
+        $this->overrides['security.auto_update_plugins'] = $enabled;
+
+        return $this;
+    }
+
+    public function autoUpdateThemes(bool $enabled): self
+    {
+        $this->overrides['security.auto_update_themes'] = $enabled;
+
+        return $this;
+    }
+
+    public function autoUpdateTranslations(bool $enabled): self
+    {
+        $this->overrides['security.auto_update_translations'] = $enabled;
+
+        return $this;
+    }
+
+    /**
+     * @param string[] $basenames Plugin basenames (e.g. 'akismet/akismet.php')
+     */
+    public function autoUpdateAllowedPlugins(array $basenames): self
+    {
+        $this->overrides['security.auto_update_allowed_plugins'] = $basenames;
+
+        return $this;
+    }
+
+    /**
+     * @param string[] $slugs Theme directory names
+     */
+    public function autoUpdateAllowedThemes(array $slugs): self
+    {
+        $this->overrides['security.auto_update_allowed_themes'] = $slugs;
+
+        return $this;
+    }
+
     /**
      * @return array<string, mixed>
      */

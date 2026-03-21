@@ -136,3 +136,7 @@ Retrieve metrics: `$collector->getMetrics()` returns count, total_ms, avg_ms per
 |-------|-----------------|
 | `ContainerHealthCheck` | DI container compiled and fresh |
 | `CacheHealthCheck` | Cache read/write operational |
+| `DatabaseHealthCheck` | DB connectivity, query performance, table existence |
+| `SmtpHealthCheck` | Email delivery via wp_mail() (rate-limited, cached 1h) |
+| `MonitorQueueHealth` | Queue pending/running/failed job counts |
+| `SecurityHealthCheck` | Security rules active, file editor, PHP version |

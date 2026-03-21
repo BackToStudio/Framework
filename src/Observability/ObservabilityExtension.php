@@ -25,6 +25,10 @@ use BackTo\Framework\Observability\Infrastructure\WordPressMetricStore;
 use BackTo\Framework\Observability\Remediation\CacheRemediation;
 use BackTo\Framework\Observability\Remediation\DatabaseRemediation;
 use BackTo\Framework\Observability\Remediation\QueueRemediation;
+use BackTo\Framework\Observability\HealthCheck\DatabaseConnectionInterface;
+use BackTo\Framework\Observability\HealthCheck\SmtpHealthCheckEnvironment;
+use BackTo\Framework\Observability\Infrastructure\WordPressDatabaseConnection;
+use BackTo\Framework\Observability\Infrastructure\WordPressSmtpHealthCheckEnvironment;
 use BackTo\Framework\Observability\RestApi\MetricHistoryRoute;
 use BackTo\Framework\Observability\RestApi\MetricsRoute;
 use BackToVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -106,6 +110,14 @@ final class ObservabilityExtension extends AbstractExtension
         $containerBuilder->register(DatabaseRemediation::class)
             ->setAutowired(true)
             ->addTag('observability.remediation');
+
+        // Database health check port binding
+        $containerBuilder->register(DatabaseConnectionInterface::class, WordPressDatabaseConnection::class);
+        $containerBuilder->setAlias(WordPressDatabaseConnection::class, DatabaseConnectionInterface::class);
+
+        // SMTP health check port binding
+        $containerBuilder->register(SmtpHealthCheckEnvironment::class, WordPressSmtpHealthCheckEnvironment::class);
+        $containerBuilder->setAlias(WordPressSmtpHealthCheckEnvironment::class, SmtpHealthCheckEnvironment::class);
 
         // Trend analyzer
         $containerBuilder->register(TrendAnalyzer::class)

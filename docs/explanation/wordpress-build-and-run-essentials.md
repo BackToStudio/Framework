@@ -175,6 +175,8 @@ BUILD (Creation/Refonte)                    RUN (Suivi/Evolution)
 
 **Couverture BackTo Framework :**
 - `Observability/` — PSR-3 logging, metriques, health checks avec statuts (Healthy/Degraded/Unhealthy)
+- Health checks : Container, Cache, Database (connectivite + perf), SMTP (envoi mail), Queue, Security
+- Uptime : Documentation guide UptimeRobot/Uptime Kuma (voir `docs/how-to/configure-uptime-monitoring.md`)
 
 ### 2. Securite continue
 
@@ -200,6 +202,11 @@ BUILD (Creation/Refonte)                    RUN (Suivi/Evolution)
 | **WordPress Core** | Mises a jour mineures auto, majeures manuelles apres test |
 | **PHP** | Suivre les versions supportees (actuellement 8.2+) |
 | **Dependances** | `composer outdated`, alertes de securite Dependabot/Snyk |
+
+**Couverture BackTo Framework :**
+- `Security/Hardening/AutoUpdatePolicy` — Controle granulaire des MAJ auto (core majeur/mineur, plugins, themes, traductions)
+- Configuration via `SecurityConfigurator` : `autoUpdateMajorCore()`, `autoUpdatePlugins()`, allowlists par plugin/theme
+- Voir `docs/security/how-to/configure-auto-update-policy.md`
 
 ### 4. Performance continue
 
@@ -283,14 +290,14 @@ BUILD (Creation/Refonte)                    RUN (Suivi/Evolution)
 
 | Pilier Run | Module(s) | Couverture |
 |---|---|---|
-| Monitoring | Observability | Bonne |
+| Monitoring | Observability (6 health checks, MetricStore, AlertDispatcher, TrendAnalyzer, REST API, CLI, Dashboard) | Excellente |
 | Securite continue | Security | Excellente |
-| Mises a jour | (process, hors framework) | N/A |
-| Performance continue | Performance, Cache | Bonne |
+| Mises a jour | Security/AutoUpdatePolicy + SecurityConfigurator (controle MAJ auto core/plugins/themes/translations) | Bonne |
+| Performance continue | Performance, Cache, Observability (CacheMetrics, DatabaseRemediation, SlowQueryMonitor) | Excellente |
 | Sauvegardes | (infrastructure, hors framework) | N/A |
 | Gestion de contenu | Admin, Blocks | Bonne |
 | Evolution fonctionnelle | Architecture 3 couches + CI + Tests | Excellente |
-| Documentation | docs/ (Diataxis) | Excellente |
+| Documentation | docs/ (Diataxis) + guide uptime monitoring | Excellente |
 
 ---
 

@@ -37,6 +37,13 @@ final class SecurityConfiguration
             'security.disable_file_editor' => true,
             'security.two_factor_enabled' => false,
             'security.two_factor_issuer' => 'WordPress',
+            'security.auto_update_major_core' => false,
+            'security.auto_update_minor_core' => true,
+            'security.auto_update_plugins' => false,
+            'security.auto_update_themes' => false,
+            'security.auto_update_translations' => true,
+            'security.auto_update_allowed_plugins' => [],
+            'security.auto_update_allowed_themes' => [],
         ];
     }
 
