@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Cache\Strategy;
 
-use BackTo\Framework\Cache\Contracts\TransientCleanerInterface;
-use BackTo\Framework\Cache\Contracts\TransientStoreInterface;
+use BackTo\Framework\Cache\Contracts\CacheCleanerInterface;
+use BackTo\Framework\Cache\Contracts\CacheStoreInterface;
 use DateInterval;
 
 /**
@@ -18,16 +18,16 @@ use DateInterval;
 final class TransientCache extends AbstractCache
 {
     private readonly string $prefix;
-    private readonly TransientCleanerInterface $transientCleaner;
-    private readonly TransientStoreInterface $transientStore;
+    private readonly CacheCleanerInterface $cacheCleaner;
+    private readonly CacheStoreInterface $cacheStore;
 
     public function __construct(
-        TransientCleanerInterface $transientCleaner,
-        TransientStoreInterface $transientStore,
+        CacheCleanerInterface $cacheCleaner,
+        CacheStoreInterface $cacheStore,
         string $prefix = 'btf_',
     ) {
-        $this->transientCleaner = $transientCleaner;
-        $this->transientStore = $transientStore;
+        $this->cacheCleaner = $cacheCleaner;
+        $this->cacheStore = $cacheStore;
         $this->prefix = $prefix;
     }
 
@@ -35,7 +35,7 @@ final class TransientCache extends AbstractCache
     {
         $this->validateKey($key);
 
-        $value = $this->transientStore->get($this->prefixKey($key));
+        $value = $this->cacheStore->get($this->prefixKey($key));
 
         if ($value === false) {
             return $default;
@@ -54,7 +54,7 @@ final class TransientCache extends AbstractCache
             return $this->delete($key);
         }
 
-        return $this->transientStore->set(
+        return $this->cacheStore->set(
             $this->prefixKey($key),
             serialize($value),
             $seconds ?? 0
@@ -65,19 +65,19 @@ final class TransientCache extends AbstractCache
     {
         $this->validateKey($key);
 
-        return $this->transientStore->delete($this->prefixKey($key));
+        return $this->cacheStore->delete($this->prefixKey($key));
     }
 
     public function clear(): bool
     {
-        return $this->transientCleaner->clearByPrefix($this->prefix);
+        return $this->cacheCleaner->clearByPrefix($this->prefix);
     }
 
     public function has(string $key): bool
     {
         $this->validateKey($key);
 
-        return $this->transientStore->get($this->prefixKey($key)) !== false;
+        return $this->cacheStore->get($this->prefixKey($key)) !== false;
     }
 
     /**

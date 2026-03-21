@@ -18,7 +18,7 @@ class TermSpecificationTest extends TestCase
     private function createQueryBuilder(): TermQueryBuilder
     {
         return new TermQueryBuilder(
-            $this->createMock(TermFactory::class),
+            new TermFactory(),
             $this->createMock(TermQueryGatewayInterface::class),
         );
     }

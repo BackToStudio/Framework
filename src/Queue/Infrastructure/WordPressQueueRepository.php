@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Queue\Infrastructure;
 
+use BackTo\Framework\Contracts\DatabaseConnectionInterface;
 use BackTo\Framework\Queue\Contracts\QueueRepositoryInterface;
 use BackTo\Framework\Queue\Entity\Job;
 use BackTo\Framework\Queue\Entity\JobStatus;
@@ -11,25 +12,26 @@ use BackTo\Framework\Queue\Factory\JobFactory;
 
 /**
  * WordPress adapter for queue persistence using a custom database table.
+ *
+ * Delegates all database access through DatabaseConnectionInterface,
+ * eliminating direct coupling to the global $wpdb.
  */
 final class WordPressQueueRepository implements QueueRepositoryInterface
 {
     private readonly JobFactory $factory;
+    private readonly DatabaseConnectionInterface $db;
     private readonly string $table;
 
-    public function __construct(JobFactory $factory)
+    public function __construct(JobFactory $factory, DatabaseConnectionInterface $db)
     {
-        global $wpdb;
-
         $this->factory = $factory;
-        $this->table = $wpdb->prefix . 'backto_queue_jobs';
+        $this->db = $db;
+        $this->table = $db->prefix() . 'backto_queue_jobs';
     }
 
     public function createTable(): void
     {
-        global $wpdb;
-
-        $charset = $wpdb->get_charset_collate();
+        $charset = $this->db->charsetCollate();
 
         $sql = "CREATE TABLE IF NOT EXISTS {$this->table} (
             id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -63,19 +65,15 @@ final class WordPressQueueRepository implements QueueRepositoryInterface
 
     public function dropTable(): void
     {
-        global $wpdb;
-
-        $wpdb->query("DROP TABLE IF EXISTS {$this->table}");
+        $this->db->query("DROP TABLE IF EXISTS {$this->table}");
     }
 
     public function enqueue(Job $job): int
     {
-        global $wpdb;
-
         $payloadJson = \wp_json_encode($job->getPayload()) ?: '[]';
         $payloadHash = $job->getPayloadHash() ?: \md5($payloadJson);
 
-        $wpdb->insert(
+        $this->db->insert(
             $this->table,
             [
                 'job_key' => $job->getKey(),
@@ -92,20 +90,16 @@ final class WordPressQueueRepository implements QueueRepositoryInterface
             ['%s', '%s', '%s', '%s', '%s', '%d', '%d', '%d', '%s', '%s']
         );
 
-        return (int) $wpdb->insert_id;
+        return $this->db->lastInsertId();
     }
 
     public function claimNextPending(string $group = 'default'): ?Job
     {
-        global $wpdb;
-
         $now = \gmdate('Y-m-d H:i:s');
         $claimToken = \bin2hex(\random_bytes(16));
 
-        // Atomic claim: UPDATE with WHERE ensures only one worker gets the job.
-        // The unique claim_token prevents ambiguity when retrieving the claimed job.
-        $updated = $wpdb->query(
-            $wpdb->prepare(
+        $updated = $this->db->query(
+            $this->db->prepare(
                 "UPDATE {$this->table}
                  SET status = %s, claimed_at = %s, claim_token = %s
                  WHERE status = %s
@@ -126,28 +120,23 @@ final class WordPressQueueRepository implements QueueRepositoryInterface
             return null;
         }
 
-        // Retrieve by unique claim_token — no ambiguity even with concurrent workers.
-        $row = $wpdb->get_row(
-            $wpdb->prepare(
+        $row = $this->db->getRow(
+            $this->db->prepare(
                 "SELECT * FROM {$this->table} WHERE claim_token = %s LIMIT 1",
                 $claimToken
-            ),
-            ARRAY_A
+            )
         );
 
         if ($row === null) {
             return null;
         }
 
-        /** @var array<string, mixed> $row */
         return $this->factory->fromRow($row);
     }
 
     public function markCompleted(int $jobId): void
     {
-        global $wpdb;
-
-        $wpdb->update(
+        $this->db->update(
             $this->table,
             [
                 'status' => JobStatus::Completed->value,
@@ -162,10 +151,8 @@ final class WordPressQueueRepository implements QueueRepositoryInterface
 
     public function markFailed(int $jobId, string $errorMessage): void
     {
-        global $wpdb;
-
-        $wpdb->query(
-            $wpdb->prepare(
+        $this->db->query(
+            $this->db->prepare(
                 "UPDATE {$this->table}
                  SET status = %s, last_error = %s, claim_token = '', attempts = attempts + 1
                  WHERE id = %d",
@@ -178,77 +165,57 @@ final class WordPressQueueRepository implements QueueRepositoryInterface
 
     public function release(int $jobId): void
     {
-        global $wpdb;
-
-        $wpdb->update(
-            $this->table,
-            [
-                'status' => JobStatus::Pending->value,
-                'claimed_at' => null,
-                'claim_token' => '',
-            ],
-            ['id' => $jobId],
-            ['%s', null, '%s'],
-            ['%d']
+        $this->db->query(
+            $this->db->prepare(
+                "UPDATE {$this->table}
+                 SET status = %s, claimed_at = NULL, claim_token = ''
+                 WHERE id = %d",
+                JobStatus::Pending->value,
+                $jobId
+            )
         );
     }
 
     public function find(int $jobId): ?Job
     {
-        global $wpdb;
-
-        $row = $wpdb->get_row(
-            $wpdb->prepare("SELECT * FROM {$this->table} WHERE id = %d", $jobId),
-            ARRAY_A
+        $row = $this->db->getRow(
+            $this->db->prepare("SELECT * FROM {$this->table} WHERE id = %d", $jobId)
         );
 
         if ($row === null) {
             return null;
         }
 
-        /** @var array<string, mixed> $row */
         return $this->factory->fromRow($row);
     }
 
-    
     public function findByStatus(JobStatus $status, int $limit = 20, int $offset = 0): array
     {
-        global $wpdb;
-
-        $rows = $wpdb->get_results(
-            $wpdb->prepare(
+        $rows = $this->db->getResults(
+            $this->db->prepare(
                 "SELECT * FROM {$this->table} WHERE status = %s ORDER BY created_at DESC LIMIT %d OFFSET %d",
                 $status->value,
                 $limit,
                 $offset
-            ),
-            ARRAY_A
+            )
         );
-
-        if (!\is_array($rows)) {
-            return [];
-        }
 
         return \array_map(fn (array $row): Job => $this->factory->fromRow($row), $rows);
     }
 
     public function countByStatus(JobStatus $status): int
     {
-        global $wpdb;
-
-        return (int) $wpdb->get_var(
-            $wpdb->prepare("SELECT COUNT(*) FROM {$this->table} WHERE status = %s", $status->value)
+        return (int) $this->db->getVar(
+            $this->db->prepare("SELECT COUNT(*) FROM {$this->table} WHERE status = %s", $status->value)
         );
     }
 
     public function cleanup(int $olderThanSeconds = 86400): int
     {
-        global $wpdb;
-
         $cutoff = \gmdate('Y-m-d H:i:s', \time() - $olderThanSeconds);
 
-        return (int) $wpdb->query(
-            $wpdb->prepare(
+        return (int) $this->db->query(
+            $this->db->prepare(
                 "DELETE FROM {$this->table} WHERE status = %s AND completed_at < %s",
                 JobStatus::Completed->value,
                 $cutoff
@@ -258,12 +225,10 @@ final class WordPressQueueRepository implements QueueRepositoryInterface
 
     public function cleanupFailed(int $olderThanSeconds = 604800): int
     {
-        global $wpdb;
-
         $cutoff = \gmdate('Y-m-d H:i:s', \time() - $olderThanSeconds);
 
-        return (int) $wpdb->query(
-            $wpdb->prepare(
+        return (int) $this->db->query(
+            $this->db->prepare(
                 "DELETE FROM {$this->table}
                  WHERE status = %s AND attempts >= max_retries AND updated_at < %s",
                 JobStatus::Failed->value,
@@ -274,9 +239,7 @@ final class WordPressQueueRepository implements QueueRepositoryInterface
 
     public function cancel(int $jobId): void
     {
-        global $wpdb;
-
-        $wpdb->update(
+        $this->db->update(
             $this->table,
             ['status' => JobStatus::Cancelled->value],
             ['id' => $jobId, 'status' => JobStatus::Pending->value],
@@ -287,12 +250,10 @@ final class WordPressQueueRepository implements QueueRepositoryInterface
 
     public function rescueStuck(int $timeoutSeconds = 300): int
     {
-        global $wpdb;
-
         $cutoff = \gmdate('Y-m-d H:i:s', \time() - $timeoutSeconds);
 
-        return (int) $wpdb->query(
-            $wpdb->prepare(
+        return (int) $this->db->query(
+            $this->db->prepare(
                 "UPDATE {$this->table}
                  SET status = %s, claimed_at = NULL, claim_token = ''
                  WHERE status = %s AND claimed_at < %s",
@@ -305,10 +266,8 @@ final class WordPressQueueRepository implements QueueRepositoryInterface
 
     public function hasPendingDuplicate(string $jobKey, string $payloadHash): bool
     {
-        global $wpdb;
-
-        $count = (int) $wpdb->get_var(
-            $wpdb->prepare(
+        $count = (int) $this->db->getVar(
+            $this->db->prepare(
                 "SELECT COUNT(*) FROM {$this->table}
                  WHERE job_key = %s AND payload_hash = %s AND status = %s",
                 $jobKey,
@@ -320,23 +279,14 @@ final class WordPressQueueRepository implements QueueRepositoryInterface
         return $count > 0;
     }
 
-    
     public function getActiveGroups(): array
     {
-        global $wpdb;
-
-        $groups = $wpdb->get_col(
-            $wpdb->prepare(
+        return $this->db->getCol(
+            $this->db->prepare(
                 "SELECT DISTINCT job_group FROM {$this->table} WHERE status IN (%s, %s)",
                 JobStatus::Pending->value,
                 JobStatus::Running->value
             )
         );
-
-        if (!\is_array($groups)) {
-            return [];
-        }
-
-        return $groups;
     }
 }

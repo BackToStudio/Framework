@@ -6,8 +6,8 @@ namespace BackTo\Framework\Cache\Tests;
 
 use BackTo\Framework\Cache\Contracts\CacheInterface;
 use BackTo\Framework\Cache\Contracts\InvalidArgumentException;
-use BackTo\Framework\Cache\Contracts\TransientCleanerInterface;
-use BackTo\Framework\Cache\Contracts\TransientStoreInterface;
+use BackTo\Framework\Cache\Contracts\CacheCleanerInterface;
+use BackTo\Framework\Cache\Contracts\CacheStoreInterface;
 use BackTo\Framework\Cache\Strategy\TransientCache;
 use PHPUnit\Framework\TestCase;
 
@@ -19,13 +19,13 @@ use PHPUnit\Framework\TestCase;
  */
 class TransientCacheTest extends TestCase
 {
-    private TransientCleanerInterface $cleaner;
-    private TransientStoreInterface $store;
+    private CacheCleanerInterface $cleaner;
+    private CacheStoreInterface $store;
 
     protected function setUp(): void
     {
-        $this->cleaner = $this->createMock(TransientCleanerInterface::class);
-        $this->store = $this->createMock(TransientStoreInterface::class);
+        $this->cleaner = $this->createMock(CacheCleanerInterface::class);
+        $this->store = $this->createMock(CacheStoreInterface::class);
     }
 
     public function testImplementsCacheInterface(): void

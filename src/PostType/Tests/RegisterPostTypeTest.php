@@ -69,12 +69,16 @@ class RegisterPostTypeTest extends TestCase
         $this->registerPostType->registerCustomPostTypes();
     }
 
-    public function testActivateCallsFlushRewriteRules(): void
+    public function testActivationHandlerCallsFlushRewriteRules(): void
     {
         $this->registrar->expects($this->once())->method('flushRewriteRules');
         $this->registrar->method('exists')->willReturn(false);
 
-        $this->registerPostType->activate();
+        $handler = new \BackTo\Framework\PostType\PostTypeActivationHandler(
+            $this->registerPostType,
+            $this->registrar,
+        );
+        $handler->activate();
     }
 
     public function testAddReturnsFluentInterface(): void

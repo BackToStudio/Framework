@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Bundle\Security\Tests;
 
-use BackTo\Framework\Cache\Contracts\TransientStoreInterface;
+use BackTo\Framework\Cache\Contracts\CacheStoreInterface;
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
 use BackTo\Framework\Options\Contracts\OptionsRepositoryInterface;
@@ -21,7 +21,7 @@ class SecurityNotifierTest extends TestCase
     private MailerInterface $mailer;
     private OptionsRepositoryInterface $options;
     private ClientIpResolverInterface $ipResolver;
-    private TransientStoreInterface $transientStore;
+    private CacheStoreInterface $transientStore;
     private SecurityNotifier $notifier;
 
     /** @var array<int, array{to: string, subject: string, body: string}> */
@@ -53,7 +53,7 @@ class SecurityNotifierTest extends TestCase
         $this->ipResolver->method('getClientIp')->willReturn('127.0.0.1');
 
         $this->transientData = [];
-        $this->transientStore = $this->createMock(TransientStoreInterface::class);
+        $this->transientStore = $this->createMock(CacheStoreInterface::class);
         $this->transientStore->method('get')
             ->willReturnCallback(fn (string $key) => $this->transientData[$key] ?? false);
         $this->transientStore->method('set')

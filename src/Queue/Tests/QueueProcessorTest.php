@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Queue\Tests;
 
-use BackTo\Framework\Cache\Contracts\TransientStoreInterface;
+use BackTo\Framework\Cache\Contracts\CacheStoreInterface;
 use BackTo\Framework\Queue\Contracts\JobInterface;
 use BackTo\Framework\Queue\Contracts\QueueRepositoryInterface;
 use BackTo\Framework\Queue\Factory\JobFactory;
@@ -17,14 +17,14 @@ class QueueProcessorTest extends TestCase
 {
     private QueueRepositoryInterface $repository;
     private QueueRegistry $registry;
-    private TransientStoreInterface $transientStore;
+    private CacheStoreInterface $transientStore;
     private QueueProcessor $processor;
 
     protected function setUp(): void
     {
         $this->repository = $this->createMock(QueueRepositoryInterface::class);
         $this->registry = new QueueRegistry();
-        $this->transientStore = $this->createMock(TransientStoreInterface::class);
+        $this->transientStore = $this->createMock(CacheStoreInterface::class);
 
         $worker = new QueueWorker(
             $this->repository,

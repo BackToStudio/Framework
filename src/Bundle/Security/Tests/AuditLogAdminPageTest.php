@@ -266,12 +266,7 @@ class AuditLogAdminPageTest extends TestCase
         ]);
 
         $responseEmitter = $this->createMock(ResponseEmitterInterface::class);
-        $exporter = new class ($this->repository, $responseEmitter) extends AuditLogCsvExporter {
-            protected function sendCsvHeaders(): void
-            {
-                // No-op in tests
-            }
-        };
+        $exporter = new AuditLogCsvExporter($this->repository, $responseEmitter);
 
         ob_start();
         $exporter->export([]);

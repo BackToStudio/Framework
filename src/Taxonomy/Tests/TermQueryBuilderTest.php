@@ -15,7 +15,7 @@ class TermQueryBuilderTest extends TestCase
 {
     private function createQueryBuilder(): TermQueryBuilder
     {
-        $factory = $this->createMock(TermFactory::class);
+        $factory = new TermFactory();
         $gateway = $this->createMock(TermQueryGatewayInterface::class);
         return new TermQueryBuilder($factory, $gateway);
     }

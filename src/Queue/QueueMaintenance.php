@@ -9,7 +9,7 @@ use BackTo\Framework\Queue\Contracts\QueueMaintenanceInterface;
 /**
  * Handles queue maintenance tasks: rescuing stuck jobs and cleaning up old ones.
  */
-class QueueMaintenance
+final class QueueMaintenance
 {
     private const STUCK_TIMEOUT = 300;
     private const COMPLETED_TTL = 86400;

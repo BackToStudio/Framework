@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Queue;
 
-use BackTo\Framework\Cache\Contracts\TransientStoreInterface;
+use BackTo\Framework\Cache\Contracts\CacheStoreInterface;
 
 /**
  * Processes all queue groups with a transient-based lock to prevent overlap.
  */
-class QueueProcessor
+final class QueueProcessor
 {
     private const LOCK_KEY = 'backto_queue_lock';
     private const LOCK_TIMEOUT = 300;
@@ -17,18 +17,18 @@ class QueueProcessor
     private readonly QueueWorker $worker;
     private readonly QueueRegistry $registry;
     private readonly Contracts\QueueQueryInterface $repository;
-    private readonly TransientStoreInterface $transientStore;
+    private readonly CacheStoreInterface $cacheStore;
 
     public function __construct(
         QueueWorker $worker,
         QueueRegistry $registry,
         Contracts\QueueQueryInterface $repository,
-        TransientStoreInterface $transientStore,
+        CacheStoreInterface $cacheStore,
     ) {
         $this->worker = $worker;
         $this->registry = $registry;
         $this->repository = $repository;
-        $this->transientStore = $transientStore;
+        $this->cacheStore = $cacheStore;
     }
 
     /**
@@ -79,7 +79,7 @@ class QueueProcessor
     protected function acquireLock(): bool
     {
         // Check if lock is already held.
-        $existing = $this->transientStore->get(self::LOCK_KEY);
+        $existing = $this->cacheStore->get(self::LOCK_KEY);
 
         if ($existing !== false && $existing !== null) {
             return false;
@@ -88,13 +88,13 @@ class QueueProcessor
         // Acquire the lock. This is not fully atomic with WordPress transients,
         // but the check-then-set window is small. For truly concurrent environments,
         // a database-level advisory lock would be required.
-        $this->transientStore->set(self::LOCK_KEY, \getmypid() ?: 1, self::LOCK_TIMEOUT);
+        $this->cacheStore->set(self::LOCK_KEY, \getmypid() ?: 1, self::LOCK_TIMEOUT);
 
         return true;
     }
 
     protected function releaseLock(): void
     {
-        $this->transientStore->delete(self::LOCK_KEY);
+        $this->cacheStore->delete(self::LOCK_KEY);
     }
 }

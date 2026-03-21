@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\PostType\Tests;
 
+use BackTo\Framework\Contracts\LoggerInterface;
 use BackTo\Framework\PostMeta\ValueObject\MetaKey;
 use BackTo\Framework\PostType\Contracts\PostQueryGatewayInterface;
 use BackTo\Framework\PostType\Entity\PostStatus;
@@ -24,8 +25,9 @@ class PostSpecificationTest extends TestCase
 {
     private function createQueryBuilder(): PostQueryBuilder
     {
+        $logger = $this->createMock(LoggerInterface::class);
         return new PostQueryBuilder(
-            $this->createMock(PostFactory::class),
+            new PostFactory($logger),
             $this->createMock(PostQueryGatewayInterface::class),
         );
     }

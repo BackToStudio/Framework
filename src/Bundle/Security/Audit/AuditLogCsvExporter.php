@@ -4,30 +4,30 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Bundle\Security\Audit;
 
-use BackTo\Framework\Cache\Contracts\TransientStoreInterface;
+use BackTo\Framework\Cache\Contracts\CacheStoreInterface;
 use BackTo\Framework\Contracts\ResponseEmitterInterface;
 use BackTo\Framework\Bundle\Security\Contracts\AuditLogRepositoryInterface;
 
 /**
  * Exports audit log events to CSV format.
  */
-class AuditLogCsvExporter
+final class AuditLogCsvExporter
 {
     private const EXPORT_LIMIT = 10000;
     private const EXPORT_COOLDOWN_SECONDS = 60;
 
     private readonly AuditLogRepositoryInterface $repository;
     private readonly ResponseEmitterInterface $responseEmitter;
-    private readonly ?TransientStoreInterface $transientStore;
+    private readonly ?CacheStoreInterface $cacheStore;
 
     public function __construct(
         AuditLogRepositoryInterface $repository,
         ResponseEmitterInterface $responseEmitter,
-        ?TransientStoreInterface $transientStore = null,
+        ?CacheStoreInterface $cacheStore = null,
     ) {
         $this->repository = $repository;
         $this->responseEmitter = $responseEmitter;
-        $this->transientStore = $transientStore;
+        $this->cacheStore = $cacheStore;
     }
 
     /**
@@ -56,16 +56,16 @@ class AuditLogCsvExporter
 
     public function canExport(): bool
     {
-        if ($this->transientStore === null) {
+        if ($this->cacheStore === null) {
             return true;
         }
 
-        return $this->transientStore->get('backto_audit_export_lock') === false;
+        return $this->cacheStore->get('backto_audit_export_lock') === false;
     }
 
     public function markExported(): void
     {
-        $this->transientStore?->set('backto_audit_export_lock', '1', self::EXPORT_COOLDOWN_SECONDS);
+        $this->cacheStore?->set('backto_audit_export_lock', '1', self::EXPORT_COOLDOWN_SECONDS);
     }
 
     /**

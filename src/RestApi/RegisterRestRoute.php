@@ -9,7 +9,7 @@ use BackTo\Framework\Contracts\Hooks;
 use BackTo\Framework\Contracts\UserContextInterface;
 use BackTo\Framework\RestApi\Contracts\RestRouteRegistrarInterface;
 
-class RegisterRestRoute implements Hooks
+final class RegisterRestRoute implements Hooks
 {
     private readonly RestRouteRegistry $registry;
     private readonly RestRouteRegistrarInterface $registrar;

@@ -17,20 +17,20 @@ final class Post implements PostInterface
     use HasSlug;
     use HasParentId;
 
-    protected string $title = '';
+    private string $title = '';
 
-    protected string $author = '';
+    private string $author = '';
 
-    protected PostStatus $status = PostStatus::Draft;
+    private PostStatus $status = PostStatus::Draft;
 
-    protected string $content = '';
-    protected string $excerpt = '';
+    private string $content = '';
+    private string $excerpt = '';
 
-    protected string $postType = '';
+    private string $postType = '';
 
-    protected ?DateTimeInterface $publishedAt = null;
+    private ?DateTimeInterface $publishedAt = null;
 
-    protected ?DateTimeInterface $modifiedAt = null;
+    private ?DateTimeInterface $modifiedAt = null;
 
     public function getTitle(): string
     {
