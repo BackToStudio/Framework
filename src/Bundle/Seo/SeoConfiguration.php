@@ -29,6 +29,13 @@ final class SeoConfiguration
         return [
             'seo.title_separator' => '|',
             'seo.robots_default' => 'index, follow',
+            'seo.sitemap_enabled' => true,
+            'seo.sitemap_users_enabled' => false,
+            'seo.sitemap_excluded_post_types' => [],
+            'seo.sitemap_excluded_taxonomies' => [],
+            'seo.sitemap_excluded_post_ids' => [],
+            'seo.sitemap_excluded_term_ids' => [],
+            'seo.sitemap_max_urls' => 2000,
         ];
     }
 
