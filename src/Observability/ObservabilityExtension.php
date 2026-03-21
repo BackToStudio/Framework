@@ -25,6 +25,8 @@ use BackTo\Framework\Observability\Infrastructure\WordPressMetricStore;
 use BackTo\Framework\Observability\Remediation\CacheRemediation;
 use BackTo\Framework\Observability\Remediation\DatabaseRemediation;
 use BackTo\Framework\Observability\Remediation\QueueRemediation;
+use BackTo\Framework\Observability\RestApi\MetricHistoryRoute;
+use BackTo\Framework\Observability\RestApi\MetricsRoute;
 use BackToVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
 use BackToVendor\Symfony\Component\DependencyInjection\Reference;
 
@@ -35,7 +37,7 @@ final class ObservabilityExtension extends AbstractExtension
         return [
             'dir' => __DIR__,
             'namespace' => 'BackTo\\Framework\\Observability\\',
-            'exclude' => '{DependencyInjection,Tests,Contracts,Infrastructure,HealthCheck,Alert,Dashboard,Remediation}',
+            'exclude' => '{DependencyInjection,Tests,Contracts,Infrastructure,HealthCheck,Alert,Dashboard,Remediation,RestApi}',
         ];
     }
 
@@ -105,6 +107,10 @@ final class ObservabilityExtension extends AbstractExtension
             ->setAutowired(true)
             ->addTag('observability.remediation');
 
+        // Trend analyzer
+        $containerBuilder->register(TrendAnalyzer::class)
+            ->setAutowired(true);
+
         // Cache metrics decorator
         $containerBuilder->register(CacheMetricsDecorator::class)
             ->setAutowired(true);
@@ -114,12 +120,26 @@ final class ObservabilityExtension extends AbstractExtension
             ->setAutowired(true)
             ->addMethodCall('setCacheMetricsDecorator', [new Reference(CacheMetricsDecorator::class)]);
 
-        // Dashboard page (excluded from auto-discovery)
-        $containerBuilder->register(Dashboard\OperationsDashboardRenderer::class);
+        // Dashboard widgets (excluded from auto-discovery)
+        $containerBuilder->register(Dashboard\Widget\HealthCheckWidget::class);
+        $containerBuilder->register(Dashboard\Widget\QueueStatusWidget::class);
+        $containerBuilder->register(Dashboard\Widget\CacheMetricsWidget::class);
+        $containerBuilder->register(Dashboard\Widget\SecurityAlertsWidget::class)
+            ->setAutowired(true);
+        $containerBuilder->register(Dashboard\OperationsDashboardRenderer::class)
+            ->setAutowired(true);
         $containerBuilder->register(Dashboard\OperationsDashboardPage::class)
             ->setAutowired(true)
             ->addTag('wordpress.admin_page')
             ->addTag('wordpress.hook');
+
+        // REST API routes (excluded from auto-discovery)
+        $containerBuilder->register(MetricsRoute::class)
+            ->setAutowired(true)
+            ->addTag('wordpress.rest_route');
+        $containerBuilder->register(MetricHistoryRoute::class)
+            ->setAutowired(true)
+            ->addTag('wordpress.rest_route');
     }
 
     public function getDefaultConfiguration(): array

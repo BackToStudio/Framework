@@ -16,11 +16,14 @@ if (!\class_exists('WP_CLI')) {
     return;
 }
 
+use BackTo\Framework\Cli\Command\HealthCheckCommand;
+use BackTo\Framework\Cli\Command\MaintenanceCommand;
 use BackTo\Framework\Cli\Command\MakePostTypeCommand;
 use BackTo\Framework\Cli\Command\MakeTaxonomyCommand;
 use BackTo\Framework\Cli\Command\MakeBlockCommand;
 use BackTo\Framework\Cli\Command\MakeHookCommand;
 use BackTo\Framework\Cli\Command\MakeRestRouteCommand;
+use BackTo\Framework\Cli\Command\QueueStatusCommand;
 
 WP_CLI::add_command('make:post-type', MakePostTypeCommand::class, [
     'shortdesc' => 'Generate a PostType class.',
@@ -72,5 +75,31 @@ WP_CLI::add_command('make:rest-route', MakeRestRouteCommand::class, [
         ['type' => 'assoc', 'name' => 'dir', 'description' => 'Output directory', 'optional' => true, 'default' => '.'],
         ['type' => 'assoc', 'name' => 'route-namespace', 'description' => 'REST API namespace', 'optional' => true, 'default' => 'app/v1'],
         ['type' => 'flag', 'name' => 'force', 'description' => 'Overwrite existing file', 'optional' => true],
+    ],
+]);
+
+// --- Operations commands ---
+
+WP_CLI::add_command('backto:health', HealthCheckCommand::class, [
+    'shortdesc' => 'Run all health checks and display results.',
+    'synopsis' => [
+        ['type' => 'assoc', 'name' => 'format', 'description' => 'Output format', 'optional' => true, 'default' => 'table', 'options' => ['table', 'json', 'csv']],
+    ],
+]);
+
+WP_CLI::add_command('backto:queue', QueueStatusCommand::class, [
+    'shortdesc' => 'Display queue status overview.',
+    'synopsis' => [
+        ['type' => 'assoc', 'name' => 'format', 'description' => 'Output format', 'optional' => true, 'default' => 'table', 'options' => ['table', 'json', 'csv']],
+    ],
+]);
+
+WP_CLI::add_command('backto:maintenance', MaintenanceCommand::class, [
+    'shortdesc' => 'Run maintenance tasks (DB cleanup, queue rescue, metric purge).',
+    'synopsis' => [
+        ['type' => 'flag', 'name' => 'db-only', 'description' => 'Only run database cleanup', 'optional' => true],
+        ['type' => 'flag', 'name' => 'purge-metrics', 'description' => 'Purge old metrics', 'optional' => true],
+        ['type' => 'assoc', 'name' => 'days', 'description' => 'Days to retain for metric purge', 'optional' => true, 'default' => '30'],
+        ['type' => 'flag', 'name' => 'optimize-tables', 'description' => 'Run OPTIMIZE TABLE', 'optional' => true],
     ],
 ]);
