@@ -1,14 +1,15 @@
 # How to Use the Cache System
 
-The Cache module provides three strategies, all compatible with [PSR-16 SimpleCache](https://www.php-fig.org/psr/psr-16/).
+The Cache module provides four strategies, all compatible with [PSR-16 SimpleCache](https://www.php-fig.org/psr/psr-16/).
 
 ## Choose a strategy
 
 | Strategy | Persistence | Best for |
 |----------|-------------|----------|
 | `MemoryCache` | Request only | Unit tests, short computations |
-| `TransientCache` | Database (wp_options) | WordPress-native caching |
+| `TransientCache` | Database (wp_options) | WordPress-native caching (default) |
 | `FilesystemCache` | Disk | Large payloads, no DB overhead |
+| `RedisCache` | Redis server | Production sites, high traffic, shared cache |
 
 ## Use MemoryCache
 
@@ -46,6 +47,54 @@ $cache->set('key', $largeData, 86400); // 24 hours
 ```
 
 Values are serialized to disk using Symfony Filesystem.
+
+## Use RedisCache
+
+Redis provides persistent, high-performance caching shared across requests and servers.
+
+### Configure via CacheConfigurator (recommended)
+
+In your `config/cache.php`:
+
+```php
+use BackTo\Framework\Cache\CacheConfigurator;
+
+return static function (CacheConfigurator $cache): void {
+    $cache->redis('127.0.0.1', 6379, '', 0);
+    // Or with full control:
+    // $cache
+    //     ->strategy('redis')
+    //     ->redisHost('redis.internal')
+    //     ->redisPort(6379)
+    //     ->redisPassword('secret')
+    //     ->redisDatabase(1)
+    //     ->redisPrefix('mysite_');
+};
+```
+
+### Requirements
+
+- PHP extension `ext-redis` (phpredis) must be installed
+- Redis server running and reachable
+
+### Health check
+
+When Redis is configured, `RedisHealthCheck` is automatically registered. It checks:
+- Ping connectivity
+- Memory usage (degraded if > 90% of maxmemory)
+- Exposes redis_version, connected_clients, used_memory in metadata
+
+### Available configuration parameters
+
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `cache.strategy` | `transient` | Active strategy: `transient`, `redis`, `filesystem`, `memory` |
+| `cache.redis.host` | `127.0.0.1` | Redis server host |
+| `cache.redis.port` | `6379` | Redis server port |
+| `cache.redis.password` | `''` | Redis AUTH password |
+| `cache.redis.database` | `0` | Redis database index |
+| `cache.redis.timeout` | `2.0` | Connection timeout (seconds) |
+| `cache.redis.prefix` | `btf_` | Key prefix for namespace isolation |
 
 ## DateInterval TTL
 
@@ -98,12 +147,7 @@ class MyService
 }
 ```
 
-Bind the desired strategy in your `config/services.php`:
-
-```php
-$services->set(CacheInterface::class, TransientCache::class)
-    ->arg('$prefix', 'mytheme_');
-```
+The active strategy is selected via the `cache.strategy` parameter (see Redis section above). The framework automatically aliases `CacheInterface` to the chosen implementation.
 
 ## Invalid keys
 

@@ -29,6 +29,13 @@ final class CacheConfiguration
         return [
             'cache.ttl' => 3600,
             'cache.enabled' => true,
+            'cache.strategy' => 'transient',
+            'cache.redis.host' => '127.0.0.1',
+            'cache.redis.port' => 6379,
+            'cache.redis.password' => '',
+            'cache.redis.database' => 0,
+            'cache.redis.timeout' => 2.0,
+            'cache.redis.prefix' => 'btf_',
         ];
     }
 
