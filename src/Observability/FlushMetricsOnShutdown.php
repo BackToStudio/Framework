@@ -4,20 +4,24 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Observability;
 
+use BackTo\Framework\Cache\CacheMetricsDecorator;
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
 use BackTo\Framework\Observability\Infrastructure\WordPressMetricStore;
 
 /**
- * Flushes the metric store write buffer on WordPress shutdown.
+ * Flushes all metric buffers on WordPress shutdown.
  *
- * Ensures all in-memory metrics accumulated during the request
- * are persisted in a single database write at the end of the lifecycle.
+ * Ensures both the CacheMetricsDecorator counters and the MetricStore
+ * write buffer are persisted in a single lifecycle event.
+ * CacheMetricsDecorator is flushed first (it writes to MetricStore),
+ * then MetricStore persists everything to the database.
  */
 final class FlushMetricsOnShutdown implements Hooks
 {
     private readonly WordPressMetricStore $metricStore;
     private readonly HookDispatcherInterface $hookDispatcher;
+    private ?CacheMetricsDecorator $cacheMetrics = null;
 
     public function __construct(
         WordPressMetricStore $metricStore,
@@ -27,6 +31,11 @@ final class FlushMetricsOnShutdown implements Hooks
         $this->hookDispatcher = $hookDispatcher;
     }
 
+    public function setCacheMetricsDecorator(CacheMetricsDecorator $cacheMetrics): void
+    {
+        $this->cacheMetrics = $cacheMetrics;
+    }
+
     public function hooks(): void
     {
         $this->hookDispatcher->addAction('shutdown', [$this, 'flush'], 999);
@@ -34,6 +43,10 @@ final class FlushMetricsOnShutdown implements Hooks
 
     public function flush(): void
     {
+        if ($this->cacheMetrics !== null) {
+            $this->cacheMetrics->flushMetrics();
+        }
+
         $this->metricStore->flush();
     }
 }

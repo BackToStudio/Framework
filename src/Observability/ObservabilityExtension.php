@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Observability;
 
+use BackTo\Framework\Cache\CacheMetricsDecorator;
 use BackTo\Framework\Compose\AbstractExtension;
 use BackTo\Framework\Observability\Alert\AlertDispatcher;
 use BackTo\Framework\Observability\Alert\EmailAlertChannel;
@@ -15,11 +16,17 @@ use BackTo\Framework\Contracts\HealthCheckInterface;
 use BackTo\Framework\Contracts\LoggerInterface;
 use BackTo\Framework\Observability\Contracts\MetricStoreInterface;
 use BackTo\Framework\Observability\Contracts\PerformanceCollectorInterface;
+use BackTo\Framework\Observability\Contracts\RemediationInterface;
 use BackTo\Framework\Observability\DependencyInjection\Compiler\RegisterAlertChannelPass;
 use BackTo\Framework\Observability\DependencyInjection\Compiler\RegisterHealthCheckPass;
+use BackTo\Framework\Observability\DependencyInjection\Compiler\RegisterRemediationPass;
 use BackTo\Framework\Observability\Infrastructure\WordPressLogger;
 use BackTo\Framework\Observability\Infrastructure\WordPressMetricStore;
+use BackTo\Framework\Observability\Remediation\CacheRemediation;
+use BackTo\Framework\Observability\Remediation\DatabaseRemediation;
+use BackTo\Framework\Observability\Remediation\QueueRemediation;
 use BackToVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
+use BackToVendor\Symfony\Component\DependencyInjection\Reference;
 
 final class ObservabilityExtension extends AbstractExtension
 {
@@ -28,7 +35,7 @@ final class ObservabilityExtension extends AbstractExtension
         return [
             'dir' => __DIR__,
             'namespace' => 'BackTo\\Framework\\Observability\\',
-            'exclude' => '{DependencyInjection,Tests,Contracts,Infrastructure,HealthCheck,Alert,Dashboard}',
+            'exclude' => '{DependencyInjection,Tests,Contracts,Infrastructure,HealthCheck,Alert,Dashboard,Remediation}',
         ];
     }
 
@@ -44,6 +51,11 @@ final class ObservabilityExtension extends AbstractExtension
             ->addTag('observability.alert_channel');
         $containerBuilder->addCompilerPass(new RegisterAlertChannelPass());
 
+        // Auto-remediation handlers
+        $containerBuilder->registerForAutoconfiguration(RemediationInterface::class)
+            ->addTag('observability.remediation');
+        $containerBuilder->addCompilerPass(new RegisterRemediationPass());
+
         // Logger
         $containerBuilder->register(LoggerInterface::class, WordPressLogger::class);
         $containerBuilder->setAlias(WordPressLogger::class, LoggerInterface::class);
@@ -56,6 +68,12 @@ final class ObservabilityExtension extends AbstractExtension
         // Performance collector
         $containerBuilder->register(PerformanceCollectorInterface::class, PerformanceCollector::class);
         $containerBuilder->setAlias(PerformanceCollector::class, PerformanceCollectorInterface::class);
+
+        // Query monitor (slow query detection)
+        $containerBuilder->register(Contracts\QueryMonitorInterface::class, Infrastructure\WordPressQueryMonitor::class);
+        $containerBuilder->setAlias(Infrastructure\WordPressQueryMonitor::class, Contracts\QueryMonitorInterface::class);
+        $containerBuilder->register(SlowQueryMonitor::class)
+            ->setAutowired(true);
 
         // Metric store
         $containerBuilder->register(MetricStoreInterface::class, WordPressMetricStore::class);
@@ -74,9 +92,27 @@ final class ObservabilityExtension extends AbstractExtension
             ->setAutowired(true)
             ->addTag('observability.alert_channel');
 
-        // Flush metric buffer on shutdown
-        $containerBuilder->register(FlushMetricsOnShutdown::class)
+        // Auto-remediation
+        $containerBuilder->register(AutoRemediation::class)
             ->setAutowired(true);
+        $containerBuilder->register(QueueRemediation::class)
+            ->setAutowired(true)
+            ->addTag('observability.remediation');
+        $containerBuilder->register(CacheRemediation::class)
+            ->setAutowired(true)
+            ->addTag('observability.remediation');
+        $containerBuilder->register(DatabaseRemediation::class)
+            ->setAutowired(true)
+            ->addTag('observability.remediation');
+
+        // Cache metrics decorator
+        $containerBuilder->register(CacheMetricsDecorator::class)
+            ->setAutowired(true);
+
+        // Flush metric buffer on shutdown (cache metrics + metric store)
+        $containerBuilder->register(FlushMetricsOnShutdown::class)
+            ->setAutowired(true)
+            ->addMethodCall('setCacheMetricsDecorator', [new Reference(CacheMetricsDecorator::class)]);
 
         // Dashboard page (excluded from auto-discovery)
         $containerBuilder->register(Dashboard\OperationsDashboardRenderer::class);

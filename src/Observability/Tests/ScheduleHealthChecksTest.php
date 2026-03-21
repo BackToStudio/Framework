@@ -7,6 +7,7 @@ namespace BackTo\Framework\Observability\Tests;
 use BackTo\Framework\Contracts\HealthCheckInterface;
 use BackTo\Framework\Contracts\HealthCheckResult;
 use BackTo\Framework\Contracts\HookDispatcherInterface;
+use BackTo\Framework\Observability\AutoRemediation;
 use BackTo\Framework\Observability\Contracts\AlertDispatcherInterface;
 use BackTo\Framework\Observability\Contracts\MetricStoreInterface;
 use BackTo\Framework\Observability\HealthCheckRegistry;
@@ -16,6 +17,17 @@ use PHPUnit\Framework\TestCase;
 
 final class ScheduleHealthChecksTest extends TestCase
 {
+    private AutoRemediation $autoRemediation;
+
+    protected function setUp(): void
+    {
+        $this->autoRemediation = new AutoRemediation(
+            $this->createMock(\BackTo\Framework\Contracts\LoggerInterface::class),
+            $this->createMock(AlertDispatcherInterface::class),
+            $this->createMock(MetricStoreInterface::class),
+        );
+    }
+
     public function test_run_checks_records_metrics_and_alerts_on_unhealthy(): void
     {
         $healthyCheck = $this->createMock(HealthCheckInterface::class);
@@ -31,7 +43,6 @@ final class ScheduleHealthChecksTest extends TestCase
         $registry->add($unhealthyCheck);
 
         $metricStore = $this->createMock(MetricStoreInterface::class);
-        // Expect metric recordings: health_check.db, health_check.cache, health_check.score
         $metricStore->expects($this->exactly(3))
             ->method('record');
 
@@ -49,6 +60,7 @@ final class ScheduleHealthChecksTest extends TestCase
             $alertDispatcher,
             $hookDispatcher,
             $cronScheduler,
+            $this->autoRemediation,
         );
 
         $scheduler->runChecks();
@@ -78,6 +90,7 @@ final class ScheduleHealthChecksTest extends TestCase
             $alertDispatcher,
             $hookDispatcher,
             $cronScheduler,
+            $this->autoRemediation,
         );
 
         $scheduler->runChecks();
@@ -102,6 +115,7 @@ final class ScheduleHealthChecksTest extends TestCase
             $alertDispatcher,
             $hookDispatcher,
             $cronScheduler,
+            $this->autoRemediation,
         );
 
         $scheduler->ensureScheduled();

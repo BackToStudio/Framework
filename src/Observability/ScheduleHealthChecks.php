@@ -28,6 +28,7 @@ final class ScheduleHealthChecks implements Hooks
     private readonly AlertDispatcherInterface $alertDispatcher;
     private readonly HookDispatcherInterface $hookDispatcher;
     private readonly CronSchedulerInterface $cronScheduler;
+    private readonly AutoRemediation $autoRemediation;
 
     public function __construct(
         HealthCheckRegistry $registry,
@@ -35,12 +36,14 @@ final class ScheduleHealthChecks implements Hooks
         AlertDispatcherInterface $alertDispatcher,
         HookDispatcherInterface $hookDispatcher,
         CronSchedulerInterface $cronScheduler,
+        AutoRemediation $autoRemediation,
     ) {
         $this->registry = $registry;
         $this->metricStore = $metricStore;
         $this->alertDispatcher = $alertDispatcher;
         $this->hookDispatcher = $hookDispatcher;
         $this->cronScheduler = $cronScheduler;
+        $this->autoRemediation = $autoRemediation;
     }
 
     public function hooks(): void
@@ -93,6 +96,11 @@ final class ScheduleHealthChecks implements Hooks
                 \sprintf('%d health check(s) degraded', \count($degraded)),
                 ['checks' => $degraded],
             );
+        }
+
+        // Attempt auto-remediation for any non-healthy results
+        if ($unhealthy !== [] || $degraded !== []) {
+            $this->autoRemediation->process($results);
         }
     }
 
