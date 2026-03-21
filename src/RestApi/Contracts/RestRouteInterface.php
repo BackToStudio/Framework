@@ -21,14 +21,13 @@ interface RestRouteInterface extends HookInterface
     public function getMethods(): array;
 
     /**
-     * Handle the REST request and return a response array or object.
+     * Handle the REST request and return a response.
      *
-     * The infrastructure adapter wraps WP_REST_Request/Response transparently.
-     *
-     * @param mixed $request The request object (WP_REST_Request at runtime)
-     * @return mixed The response (WP_REST_Response or array at runtime)
+     * Implementations receive a framework RestRequest and must return
+     * a framework RestResponse. The infrastructure layer handles
+     * conversion to/from WordPress types (WP_REST_Request / WP_REST_Response).
      */
-    public function handle(mixed $request): mixed;
+    public function handle(RestRequest $request): RestResponse;
 
     public function getPermissionCallback(): ?callable;
 }

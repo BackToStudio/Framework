@@ -69,6 +69,7 @@ class RegisterRestRouteTest extends TestCase
                 '/items',
                 $this->callback(function (array $args) {
                     return $args['methods'] === ['GET']
+                        && $args['callback'] instanceof \Closure
                         && is_array($args['permission_callback'])
                         && $args['permission_callback'][1] === 'requireAuthentication';
                 }),
@@ -99,7 +100,8 @@ class RegisterRestRouteTest extends TestCase
                 'myplugin/v1',
                 '/items',
                 $this->callback(function (array $args) use ($callback) {
-                    return $args['permission_callback'] === $callback;
+                    return $args['callback'] instanceof \Closure
+                        && $args['permission_callback'] === $callback;
                 }),
             );
 

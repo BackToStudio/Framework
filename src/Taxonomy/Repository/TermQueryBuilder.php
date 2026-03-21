@@ -7,10 +7,9 @@ namespace BackTo\Framework\Taxonomy\Repository;
 use BackTo\Framework\Query\MetaCompare;
 use BackTo\Framework\Query\SortDirection;
 use BackTo\Framework\Taxonomy\Contracts\TermInterface;
+use BackTo\Framework\Taxonomy\Contracts\TermQueryGatewayInterface;
 use BackTo\Framework\Taxonomy\Factory\TermFactory;
 use BackTo\Framework\Taxonomy\Specification\TermSpecification;
-
-use function get_terms;
 
 final class TermQueryBuilder
 {
@@ -18,10 +17,12 @@ final class TermQueryBuilder
     private array $args = [];
 
     private readonly TermFactory $factory;
+    private readonly TermQueryGatewayInterface $gateway;
 
-    public function __construct(TermFactory $factory)
+    public function __construct(TermFactory $factory, TermQueryGatewayInterface $gateway)
     {
         $this->factory = $factory;
+        $this->gateway = $gateway;
     }
 
     public function matching(TermSpecification $specification): self
@@ -136,18 +137,14 @@ final class TermQueryBuilder
         return $this;
     }
 
-    
+
     public function get(): array
     {
         $defaults = [
             'hide_empty' => false,
         ];
 
-        $wpTerms = get_terms(array_merge($defaults, $this->args));
-
-        if ($wpTerms instanceof \WP_Error) {
-            return [];
-        }
+        $wpTerms = $this->gateway->queryTerms(array_merge($defaults, $this->args));
 
         return $this->factory->createFromTerms($wpTerms);
     }
@@ -162,15 +159,11 @@ final class TermQueryBuilder
 
     public function count(): int
     {
-        $this->args['fields'] = 'count';
         $defaults = [
             'hide_empty' => false,
         ];
 
-        /** @var string|int $count */
-        $count = get_terms(array_merge($defaults, $this->args));
-
-        return (int) $count;
+        return $this->gateway->countTerms(array_merge($defaults, $this->args));
     }
 
     /**

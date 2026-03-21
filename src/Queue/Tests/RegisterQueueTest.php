@@ -4,15 +4,21 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Queue\Tests;
 
-use BackTo\Framework\Cache\Contracts\TransientStoreInterface;
+use BackTo\Framework\Cache\Contracts\CacheStoreInterface;
 use BackTo\Framework\Contracts\ActivationHooks;
 use BackTo\Framework\Contracts\DeactivationHooks;
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
 use BackTo\Framework\Queue\Contracts\CronSchedulerInterface;
+use BackTo\Framework\Queue\Contracts\QueueJobStorageInterface;
+use BackTo\Framework\Queue\Contracts\QueueMaintenanceInterface;
+use BackTo\Framework\Queue\Contracts\QueueQueryInterface;
 use BackTo\Framework\Queue\Contracts\QueueSchemaInterface;
 use BackTo\Framework\Queue\QueueMaintenance;
 use BackTo\Framework\Queue\QueueProcessor;
+use BackTo\Framework\Queue\Factory\JobFactory;
+use BackTo\Framework\Queue\QueueRegistry;
+use BackTo\Framework\Queue\QueueWorker;
 use BackTo\Framework\Queue\RegisterQueue;
 use PHPUnit\Framework\TestCase;
 
@@ -21,9 +27,7 @@ class RegisterQueueTest extends TestCase
     private QueueSchemaInterface $repository;
     private HookDispatcherInterface $hookDispatcher;
     private CronSchedulerInterface $cronScheduler;
-    private TransientStoreInterface $transientStore;
-    private QueueProcessor $processor;
-    private QueueMaintenance $maintenance;
+    private CacheStoreInterface $cacheStore;
     private RegisterQueue $registerQueue;
 
     protected function setUp(): void
@@ -31,17 +35,25 @@ class RegisterQueueTest extends TestCase
         $this->repository = $this->createMock(QueueSchemaInterface::class);
         $this->hookDispatcher = $this->createMock(HookDispatcherInterface::class);
         $this->cronScheduler = $this->createMock(CronSchedulerInterface::class);
-        $this->transientStore = $this->createMock(TransientStoreInterface::class);
-        $this->processor = $this->createMock(QueueProcessor::class);
-        $this->maintenance = $this->createMock(QueueMaintenance::class);
+        $this->cacheStore = $this->createMock(CacheStoreInterface::class);
+
+        // Build real final instances with mocked interfaces (final classes cannot be mocked)
+        $jobStorage = $this->createMock(QueueJobStorageInterface::class);
+        $queryInterface = $this->createMock(QueueQueryInterface::class);
+        $maintenanceInterface = $this->createMock(QueueMaintenanceInterface::class);
+
+        $registry = new QueueRegistry();
+        $worker = new QueueWorker($jobStorage, $registry, new JobFactory());
+        $processor = new QueueProcessor($worker, $registry, $queryInterface, $this->cacheStore);
+        $maintenance = new QueueMaintenance($maintenanceInterface);
 
         $this->registerQueue = new RegisterQueue(
             $this->repository,
-            $this->processor,
-            $this->maintenance,
+            $processor,
+            $maintenance,
             $this->hookDispatcher,
             $this->cronScheduler,
-            $this->transientStore,
+            $this->cacheStore,
         );
     }
 

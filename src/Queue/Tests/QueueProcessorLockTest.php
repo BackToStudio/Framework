@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Queue\Tests;
 
-use BackTo\Framework\Cache\Contracts\TransientStoreInterface;
+use BackTo\Framework\Cache\Contracts\CacheStoreInterface;
 use BackTo\Framework\Queue\Contracts\QueueQueryInterface;
 use BackTo\Framework\Queue\QueueProcessor;
 use BackTo\Framework\Queue\QueueRegistry;
@@ -20,7 +20,7 @@ class QueueProcessorLockTest extends TestCase
 {
     public function testLockIsExplicitlyCheckedBeforeAcquire(): void
     {
-        $store = $this->createMock(TransientStoreInterface::class);
+        $store = $this->createMock(CacheStoreInterface::class);
 
         // Simulate lock already held — get() returns a PID
         $store->method('get')->willReturn(12345);
@@ -40,7 +40,7 @@ class QueueProcessorLockTest extends TestCase
     public function testLockReleasedAfterProcessing(): void
     {
         $storeData = [];
-        $store = $this->createMock(TransientStoreInterface::class);
+        $store = $this->createMock(CacheStoreInterface::class);
 
         $store->method('get')
             ->willReturnCallback(fn (string $key) => $storeData[$key] ?? false);
@@ -72,7 +72,7 @@ class QueueProcessorLockTest extends TestCase
     public function testLockReleasedEvenOnException(): void
     {
         $storeData = [];
-        $store = $this->createMock(TransientStoreInterface::class);
+        $store = $this->createMock(CacheStoreInterface::class);
 
         $store->method('get')
             ->willReturnCallback(fn (string $key) => $storeData[$key] ?? false);

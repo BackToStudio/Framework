@@ -12,7 +12,7 @@ use DateTimeImmutable;
 use Exception;
 use WP_Post;
 
-class PostFactory
+final class PostFactory
 {
     private readonly LoggerInterface $logger;
 

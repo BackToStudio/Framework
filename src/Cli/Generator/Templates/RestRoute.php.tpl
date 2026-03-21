@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace {{namespace}};
 
+use BackTo\Framework\RestApi\Contracts\RestRequest;
+use BackTo\Framework\RestApi\Contracts\RestResponse;
 use BackTo\Framework\RestApi\Contracts\RestRouteInterface;
-use WP_REST_Response;
 
 class {{className}} implements RestRouteInterface
 {
@@ -27,9 +28,9 @@ class {{className}} implements RestRouteInterface
         return ['GET'];
     }
 
-    public function handle(mixed $request): mixed
+    public function handle(RestRequest $request): RestResponse
     {
-        return new WP_REST_Response(['message' => 'Hello from {{className}}'], 200);
+        return new RestResponse(['message' => 'Hello from {{className}}'], 200);
     }
 
     public function getPermissionCallback(): ?callable

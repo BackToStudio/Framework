@@ -5,16 +5,8 @@ declare(strict_types=1);
 namespace BackTo\Framework\Cache\Contracts;
 
 /**
- * Port interface for WordPress transient operations.
- *
- * Abstracts get_transient / set_transient / delete_transient
- * so that application-layer code does not call WordPress functions directly.
+ * @deprecated Use CacheStoreInterface instead. Will be removed in 5.0.
  */
-interface TransientStoreInterface
+interface TransientStoreInterface extends CacheStoreInterface
 {
-    public function get(string $key): mixed;
-
-    public function set(string $key, mixed $value, int $expiration = 0): bool;
-
-    public function delete(string $key): bool;
 }

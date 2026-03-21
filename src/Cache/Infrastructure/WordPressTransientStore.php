@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Cache\Infrastructure;
 
-use BackTo\Framework\Cache\Contracts\TransientStoreInterface;
+use BackTo\Framework\Cache\Contracts\CacheStoreInterface;
 
 use function delete_transient;
 use function get_transient;
 use function set_transient;
 
 /**
- * WordPress adapter for transient storage.
+ * WordPress adapter for cache storage backed by WordPress transients.
  */
-final class WordPressTransientStore implements TransientStoreInterface
+final class WordPressTransientStore implements CacheStoreInterface
 {
     public function get(string $key): mixed
     {

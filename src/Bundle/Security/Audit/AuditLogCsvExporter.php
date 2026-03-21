@@ -4,26 +4,30 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Bundle\Security\Audit;
 
-use BackTo\Framework\Cache\Contracts\TransientStoreInterface;
+use BackTo\Framework\Cache\Contracts\CacheStoreInterface;
+use BackTo\Framework\Contracts\ResponseEmitterInterface;
 use BackTo\Framework\Bundle\Security\Contracts\AuditLogRepositoryInterface;
 
 /**
  * Exports audit log events to CSV format.
  */
-class AuditLogCsvExporter
+final class AuditLogCsvExporter
 {
     private const EXPORT_LIMIT = 10000;
     private const EXPORT_COOLDOWN_SECONDS = 60;
 
     private readonly AuditLogRepositoryInterface $repository;
-    private readonly ?TransientStoreInterface $transientStore;
+    private readonly ResponseEmitterInterface $responseEmitter;
+    private readonly ?CacheStoreInterface $cacheStore;
 
     public function __construct(
         AuditLogRepositoryInterface $repository,
-        ?TransientStoreInterface $transientStore = null,
+        ResponseEmitterInterface $responseEmitter,
+        ?CacheStoreInterface $cacheStore = null,
     ) {
         $this->repository = $repository;
-        $this->transientStore = $transientStore;
+        $this->responseEmitter = $responseEmitter;
+        $this->cacheStore = $cacheStore;
     }
 
     /**
@@ -41,19 +45,10 @@ class AuditLogCsvExporter
             return;
         }
 
-        fputcsv($output, ['Timestamp', 'Event', 'Severity', 'Context']);
+        fputcsv($output, self::csvHeader());
 
         foreach ($events as $event) {
-            $timestamp = (int) ($event['timestamp'] ?? 0);
-            $context = $event['context'] ?? [];
-            $contextStr = is_array($context) ? (string) json_encode($context) : '';
-
-            fputcsv($output, [
-                gmdate('Y-m-d H:i:s', $timestamp),
-                (string) ($event['event'] ?? ''),
-                (string) ($event['severity'] ?? ''),
-                $contextStr,
-            ]);
+            fputcsv($output, self::formatRow($event));
         }
 
         fclose($output);
@@ -61,22 +56,50 @@ class AuditLogCsvExporter
 
     public function canExport(): bool
     {
-        if ($this->transientStore === null) {
+        if ($this->cacheStore === null) {
             return true;
         }
 
-        return $this->transientStore->get('backto_audit_export_lock') === false;
+        return $this->cacheStore->get('backto_audit_export_lock') === false;
     }
 
     public function markExported(): void
     {
-        $this->transientStore?->set('backto_audit_export_lock', '1', self::EXPORT_COOLDOWN_SECONDS);
+        $this->cacheStore?->set('backto_audit_export_lock', '1', self::EXPORT_COOLDOWN_SECONDS);
+    }
+
+    /**
+     * @return string[]
+     */
+    public static function csvHeader(): array
+    {
+        return ['Timestamp', 'Event', 'Severity', 'Context'];
+    }
+
+    /**
+     * Format a single audit event into a CSV row.
+     *
+     * @param array<string, mixed> $event
+     * @return string[]
+     */
+    public static function formatRow(array $event): array
+    {
+        $timestamp = (int) ($event['timestamp'] ?? 0);
+        $context = $event['context'] ?? [];
+        $contextStr = is_array($context) ? (string) json_encode($context) : '';
+
+        return [
+            gmdate('Y-m-d H:i:s', $timestamp),
+            (string) ($event['event'] ?? ''),
+            (string) ($event['severity'] ?? ''),
+            $contextStr,
+        ];
     }
 
     protected function sendCsvHeaders(): void
     {
-        header('Content-Type: text/csv; charset=utf-8');
-        header('Content-Disposition: attachment; filename="audit-log-' . gmdate('Y-m-d') . '.csv"');
+        $this->responseEmitter->sendHeader('Content-Type: text/csv; charset=utf-8');
+        $this->responseEmitter->sendHeader('Content-Disposition: attachment; filename="audit-log-' . gmdate('Y-m-d') . '.csv"');
     }
 
     /**

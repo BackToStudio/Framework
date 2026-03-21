@@ -7,11 +7,14 @@ namespace BackTo\Framework\Bundle\Security\Hardening;
 use BackTo\Framework\Contracts\ActivationHooks;
 use BackTo\Framework\Contracts\Hooks;
 use BackTo\Framework\Contracts\HookDispatcherInterface;
+use BackTo\Framework\Bundle\Security\Contracts\FileWriterInterface;
 use BackTo\Framework\Bundle\Security\Contracts\SecurityRuleInterface;
+use BackTo\Framework\Bundle\Security\Infrastructure\NativeFileWriter;
 
 class DirectoryProtection implements Hooks, ActivationHooks, SecurityRuleInterface
 {
     private readonly HookDispatcherInterface $hookDispatcher;
+    private readonly FileWriterInterface $fileWriter;
 
     private const HTACCESS_CONTENT = <<<'HTACCESS'
 # Disable directory browsing
@@ -42,9 +45,12 @@ HTACCESS;
 
     private const INDEX_CONTENT = "<?php\n// Silence is golden.\n";
 
-    public function __construct(HookDispatcherInterface $hookDispatcher)
-    {
+    public function __construct(
+        HookDispatcherInterface $hookDispatcher,
+        ?FileWriterInterface $fileWriter = null,
+    ) {
         $this->hookDispatcher = $hookDispatcher;
+        $this->fileWriter = $fileWriter ?? new NativeFileWriter();
     }
 
     public function getName(): string
@@ -91,19 +97,11 @@ HTACCESS;
 
     protected function writeProtectionFile(string $path, string $content): bool
     {
-        if (file_exists($path)) {
+        if ($this->fileWriter->exists($path)) {
             return true;
         }
 
-        $dir = dirname($path);
-
-        if (!is_dir($dir)) {
-            return false;
-        }
-
-        $result = file_put_contents($path, $content);
-
-        return $result !== false;
+        return $this->fileWriter->write($path, $content);
     }
 
     protected function getUploadDir(): ?string

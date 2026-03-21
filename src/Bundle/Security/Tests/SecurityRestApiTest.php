@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Bundle\Security\Tests;
 
+use BackTo\Framework\Bundle\Admin\Contracts\CapabilityManagerInterface;
 use BackTo\Framework\RestApi\Contracts\RestRouteInterface;
 use BackTo\Framework\Bundle\Security\Contracts\AuditLogRepositoryInterface;
 use BackTo\Framework\Bundle\Security\RestApi\SecurityAuditLogRoute;
@@ -16,10 +17,17 @@ use PHPUnit\Framework\TestCase;
 
 class SecurityRestApiTest extends TestCase
 {
+    private CapabilityManagerInterface $capabilityManager;
+
+    protected function setUp(): void
+    {
+        $this->capabilityManager = $this->createMock(CapabilityManagerInterface::class);
+    }
+
     public function testAuditLogRouteImplementsRestRouteInterface(): void
     {
         $repository = $this->createMock(AuditLogRepositoryInterface::class);
-        $route = new SecurityAuditLogRoute($repository);
+        $route = new SecurityAuditLogRoute($repository, $this->capabilityManager);
 
         $this->assertInstanceOf(RestRouteInterface::class, $route);
     }
@@ -27,7 +35,7 @@ class SecurityRestApiTest extends TestCase
     public function testAuditLogRouteConfig(): void
     {
         $repository = $this->createMock(AuditLogRepositoryInterface::class);
-        $route = new SecurityAuditLogRoute($repository);
+        $route = new SecurityAuditLogRoute($repository, $this->capabilityManager);
 
         $this->assertSame('backto/v1', $route->getNamespace());
         $this->assertSame('/security/audit-log', $route->getRoute());
@@ -38,7 +46,7 @@ class SecurityRestApiTest extends TestCase
     public function testHealthRouteImplementsRestRouteInterface(): void
     {
         $healthCheck = $this->createMock(SecurityHealthCheck::class);
-        $route = new SecurityHealthRoute($healthCheck);
+        $route = new SecurityHealthRoute($healthCheck, $this->capabilityManager);
 
         $this->assertInstanceOf(RestRouteInterface::class, $route);
     }
@@ -46,7 +54,7 @@ class SecurityRestApiTest extends TestCase
     public function testHealthRouteConfig(): void
     {
         $healthCheck = $this->createMock(SecurityHealthCheck::class);
-        $route = new SecurityHealthRoute($healthCheck);
+        $route = new SecurityHealthRoute($healthCheck, $this->capabilityManager);
 
         $this->assertSame('backto/v1', $route->getNamespace());
         $this->assertSame('/security/health', $route->getRoute());
@@ -58,7 +66,7 @@ class SecurityRestApiTest extends TestCase
     {
         $integrityMonitor = $this->createMock(FileIntegrityMonitor::class);
         $malwareScanner = $this->createMock(MalwareScanner::class);
-        $route = new SecurityScanRoute($integrityMonitor, $malwareScanner);
+        $route = new SecurityScanRoute($integrityMonitor, $malwareScanner, $this->capabilityManager);
 
         $this->assertInstanceOf(RestRouteInterface::class, $route);
     }
@@ -67,7 +75,7 @@ class SecurityRestApiTest extends TestCase
     {
         $integrityMonitor = $this->createMock(FileIntegrityMonitor::class);
         $malwareScanner = $this->createMock(MalwareScanner::class);
-        $route = new SecurityScanRoute($integrityMonitor, $malwareScanner);
+        $route = new SecurityScanRoute($integrityMonitor, $malwareScanner, $this->capabilityManager);
 
         $this->assertSame('backto/v1', $route->getNamespace());
         $this->assertSame('/security/scan', $route->getRoute());
@@ -83,9 +91,9 @@ class SecurityRestApiTest extends TestCase
         $malwareScanner = $this->createMock(MalwareScanner::class);
 
         $routes = [
-            new SecurityAuditLogRoute($repository),
-            new SecurityHealthRoute($healthCheck),
-            new SecurityScanRoute($integrityMonitor, $malwareScanner),
+            new SecurityAuditLogRoute($repository, $this->capabilityManager),
+            new SecurityHealthRoute($healthCheck, $this->capabilityManager),
+            new SecurityScanRoute($integrityMonitor, $malwareScanner, $this->capabilityManager),
         ];
 
         foreach ($routes as $route) {

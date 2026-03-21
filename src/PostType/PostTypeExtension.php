@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace BackTo\Framework\PostType;
 
 use BackTo\Framework\Compose\AbstractExtension;
+use BackTo\Framework\PostType\Contracts\PostQueryGatewayInterface;
 use BackTo\Framework\PostType\Contracts\PostTypeInterface;
 use BackTo\Framework\PostType\Contracts\PostTypeRegistrarInterface;
 use BackTo\Framework\PostType\DependencyInjection\Compiler\RegisterPostTypePass;
+use BackTo\Framework\PostType\Infrastructure\WordPressPostQueryGateway;
 use BackTo\Framework\PostType\Infrastructure\WordPressPostTypeRegistrar;
 use BackToVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -31,6 +33,9 @@ final class PostTypeExtension extends AbstractExtension
 
         $containerBuilder->register(PostTypeRegistrarInterface::class, WordPressPostTypeRegistrar::class);
         $containerBuilder->setAlias(WordPressPostTypeRegistrar::class, PostTypeRegistrarInterface::class);
+
+        $containerBuilder->register(PostQueryGatewayInterface::class, WordPressPostQueryGateway::class);
+        $containerBuilder->setAlias(WordPressPostQueryGateway::class, PostQueryGatewayInterface::class);
     }
 
     public function getDefaultConfiguration(): array

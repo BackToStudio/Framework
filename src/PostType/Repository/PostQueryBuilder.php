@@ -6,13 +6,12 @@ namespace BackTo\Framework\PostType\Repository;
 
 use BackTo\Framework\PostMeta\ValueObject\MetaKey;
 use BackTo\Framework\PostType\Contracts\PostInterface;
+use BackTo\Framework\PostType\Contracts\PostQueryGatewayInterface;
 use BackTo\Framework\PostType\Entity\PostStatus;
 use BackTo\Framework\PostType\Factory\PostFactory;
 use BackTo\Framework\PostType\Specification\PostSpecification;
 use BackTo\Framework\Query\MetaCompare;
 use BackTo\Framework\Query\SortDirection;
-
-use function get_posts;
 
 final class PostQueryBuilder
 {
@@ -20,10 +19,12 @@ final class PostQueryBuilder
     private array $args = [];
 
     private readonly PostFactory $factory;
+    private readonly PostQueryGatewayInterface $gateway;
 
-    public function __construct(PostFactory $factory)
+    public function __construct(PostFactory $factory, PostQueryGatewayInterface $gateway)
     {
         $this->factory = $factory;
+        $this->gateway = $gateway;
     }
 
     public function matching(PostSpecification $specification): self
@@ -162,7 +163,7 @@ final class PostQueryBuilder
         return $this->addTaxQuery($taxonomy, 'name', $names);
     }
 
-    
+
     public function get(): array
     {
         $defaults = [
@@ -170,7 +171,7 @@ final class PostQueryBuilder
             'post_status' => 'publish',
         ];
 
-        $wpPosts = get_posts(array_merge($defaults, $this->args));
+        $wpPosts = $this->gateway->queryPosts(array_merge($defaults, $this->args));
 
         return $this->factory->createFromPosts($wpPosts);
     }
@@ -191,7 +192,7 @@ final class PostQueryBuilder
             'post_status' => 'publish',
         ];
 
-        $wpPosts = get_posts(array_merge($defaults, $this->args));
+        $wpPosts = $this->gateway->queryPosts(array_merge($defaults, $this->args));
 
         return count($wpPosts);
     }

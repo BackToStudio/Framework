@@ -90,10 +90,20 @@ class CommentSpamProtection implements Hooks, SecurityRuleInterface
 
     public function renderHoneypot(): void
     {
-        echo '<div style="position:absolute;left:-9999px;height:0;width:0;overflow:hidden;" aria-hidden="true">';
-        echo '<label for="' . $this->escapeAttr($this->honeypotFieldName) . '">Leave empty</label>';
-        echo '<input type="text" name="' . $this->escapeAttr($this->honeypotFieldName) . '" value="" tabindex="-1" autocomplete="off" />';
-        echo '</div>';
+        echo $this->buildHoneypotHtml();
+    }
+
+    /**
+     * Build the honeypot hidden field HTML.
+     */
+    public function buildHoneypotHtml(): string
+    {
+        $field = $this->escapeAttr($this->honeypotFieldName);
+
+        return '<div style="position:absolute;left:-9999px;height:0;width:0;overflow:hidden;" aria-hidden="true">'
+            . '<label for="' . $field . '">Leave empty</label>'
+            . '<input type="text" name="' . $field . '" value="" tabindex="-1" autocomplete="off" />'
+            . '</div>';
     }
 
     /**

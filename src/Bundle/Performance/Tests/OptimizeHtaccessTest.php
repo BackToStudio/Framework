@@ -2,400 +2,415 @@
 
 declare(strict_types=1);
 
-namespace BackTo\Framework\Bundle\Performance\Tests;
-
-use BackTo\Framework\Cache\Contracts\TransientStoreInterface;
-use BackTo\Framework\Contracts\ActivationHooks;
-use BackTo\Framework\Contracts\HookDispatcherInterface;
-use BackTo\Framework\Contracts\Hooks;
-use BackTo\Framework\Bundle\Performance\Hooks\Server\OptimizeHtaccess;
-use PHPUnit\Framework\TestCase;
-
 /**
- * Testable subclass to control .htaccess path and marker writing.
+ * Stub WordPress functions in the global namespace so OptimizeHtaccess
+ * can be tested without a running WordPress installation.
  */
-class TestableOptimizeHtaccess extends OptimizeHtaccess
-{
-    private ?string $htaccessPath = null;
 
-    /** @var array<string, array{marker: string, lines: string[]}> */
-    private array $markerCalls = [];
+namespace {
+    if (!function_exists('get_home_path')) {
+        function get_home_path(): string
+        {
+            return OptimizeHtaccessTestState::$homePath;
+        }
+    }
 
-    public function setHtaccessPath(?string $path): void
-    {
-        $this->htaccessPath = $path;
+    if (!function_exists('insert_with_markers')) {
+        /**
+         * @param string[] $lines
+         */
+        function insert_with_markers(string $path, string $marker, array $lines): bool
+        {
+            OptimizeHtaccessTestState::$markerCalls[$path] = ['marker' => $marker, 'lines' => $lines];
+            return true;
+        }
     }
 
     /**
-     * @return array<string, array{marker: string, lines: string[]}>
+     * Shared mutable state for the WP function stubs above.
      */
-    public function getMarkerCalls(): array
+    class OptimizeHtaccessTestState
     {
-        return $this->markerCalls;
-    }
+        public static string $homePath = '';
+        /** @var array<string, array{marker: string, lines: string[]}> */
+        public static array $markerCalls = [];
 
-    protected function getHtaccessPath(): ?string
-    {
-        return $this->htaccessPath;
-    }
-
-    protected function insertWithMarkers(string $path, string $marker, array $lines): bool
-    {
-        $this->markerCalls[$path] = ['marker' => $marker, 'lines' => $lines];
-
-        return true;
+        public static function reset(): void
+        {
+            self::$homePath = '';
+            self::$markerCalls = [];
+        }
     }
 }
 
-class OptimizeHtaccessTest extends TestCase
-{
-    private HookDispatcherInterface $hookDispatcher;
-    private TransientStoreInterface $transientStore;
+namespace BackTo\Framework\Bundle\Performance\Tests {
 
-    protected function setUp(): void
+    use BackTo\Framework\Cache\Contracts\CacheStoreInterface;
+    use BackTo\Framework\Contracts\ActivationHooks;
+    use BackTo\Framework\Contracts\HookDispatcherInterface;
+    use BackTo\Framework\Contracts\Hooks;
+    use BackTo\Framework\Bundle\Performance\Hooks\Server\OptimizeHtaccess;
+    use OptimizeHtaccessTestState;
+    use PHPUnit\Framework\TestCase;
+
+    class OptimizeHtaccessTest extends TestCase
     {
-        $this->hookDispatcher = $this->createMock(HookDispatcherInterface::class);
-        $this->transientStore = $this->createMock(TransientStoreInterface::class);
-    }
+        private HookDispatcherInterface $hookDispatcher;
+        private CacheStoreInterface $transientStore;
 
-    public function testImplementsRequiredInterfaces(): void
-    {
-        $hook = new OptimizeHtaccess($this->hookDispatcher, $this->transientStore);
+        protected function setUp(): void
+        {
+            $this->hookDispatcher = $this->createMock(HookDispatcherInterface::class);
+            $this->transientStore = $this->createMock(CacheStoreInterface::class);
+            OptimizeHtaccessTestState::reset();
+        }
 
-        $this->assertInstanceOf(Hooks::class, $hook);
-        $this->assertInstanceOf(ActivationHooks::class, $hook);
-    }
+        protected function tearDown(): void
+        {
+            OptimizeHtaccessTestState::reset();
+        }
 
-    public function testMarkerConstant(): void
-    {
-        $this->assertSame('BackTo Performance', OptimizeHtaccess::MARKER);
-    }
+        public function testImplementsRequiredInterfaces(): void
+        {
+            $hook = new OptimizeHtaccess($this->hookDispatcher, $this->transientStore);
 
-    public function testHooksRegistersAdminInit(): void
-    {
-        $this->hookDispatcher->expects($this->once())
-            ->method('addAction')
-            ->with('admin_init', $this->anything());
+            $this->assertInstanceOf(Hooks::class, $hook);
+            $this->assertInstanceOf(ActivationHooks::class, $hook);
+        }
 
-        $hook = new OptimizeHtaccess($this->hookDispatcher, $this->transientStore);
-        $hook->hooks();
-    }
+        public function testMarkerConstant(): void
+        {
+            $this->assertSame('BackTo Performance', OptimizeHtaccess::MARKER);
+        }
 
-    public function testBuildDirectivesIncludesAllSectionsbyDefault(): void
-    {
-        $hook = new OptimizeHtaccess($this->hookDispatcher, $this->transientStore);
-        $lines = $hook->buildDirectives();
-        $content = implode("\n", $lines);
+        public function testHooksRegistersAdminInit(): void
+        {
+            $this->hookDispatcher->expects($this->once())
+                ->method('addAction')
+                ->with('admin_init', $this->anything());
 
-        $this->assertStringContainsString('mod_deflate', $content);
-        $this->assertStringContainsString('mod_expires', $content);
-        $this->assertStringContainsString('ETag', $content);
-        $this->assertStringContainsString('keep-alive', $content);
-    }
+            $hook = new OptimizeHtaccess($this->hookDispatcher, $this->transientStore);
+            $hook->hooks();
+        }
 
-    public function testBuildDirectivesGzipOnly(): void
-    {
-        $hook = new OptimizeHtaccess(
-            $this->hookDispatcher,
-            $this->transientStore,
-            gzip: true,
-            browserCache: false,
-            removeEtags: false,
-            keepAlive: false
-        );
-        $lines = $hook->buildDirectives();
-        $content = implode("\n", $lines);
+        public function testBuildDirectivesIncludesAllSectionsbyDefault(): void
+        {
+            $hook = new OptimizeHtaccess($this->hookDispatcher, $this->transientStore);
+            $lines = $hook->buildDirectives();
+            $content = implode("\n", $lines);
 
-        $this->assertStringContainsString('mod_deflate', $content);
-        $this->assertStringNotContainsString('mod_expires', $content);
-        $this->assertStringNotContainsString('ETag', $content);
-        $this->assertStringNotContainsString('keep-alive', $content);
-    }
+            $this->assertStringContainsString('mod_deflate', $content);
+            $this->assertStringContainsString('mod_expires', $content);
+            $this->assertStringContainsString('ETag', $content);
+            $this->assertStringContainsString('keep-alive', $content);
+        }
 
-    public function testBuildDirectivesBrowserCacheOnly(): void
-    {
-        $hook = new OptimizeHtaccess(
-            $this->hookDispatcher,
-            $this->transientStore,
-            gzip: false,
-            browserCache: true,
-            removeEtags: false,
-            keepAlive: false
-        );
-        $lines = $hook->buildDirectives();
-        $content = implode("\n", $lines);
+        public function testBuildDirectivesGzipOnly(): void
+        {
+            $hook = new OptimizeHtaccess(
+                $this->hookDispatcher,
+                $this->transientStore,
+                gzip: true,
+                browserCache: false,
+                removeEtags: false,
+                keepAlive: false
+            );
+            $lines = $hook->buildDirectives();
+            $content = implode("\n", $lines);
 
-        $this->assertStringNotContainsString('mod_deflate', $content);
-        $this->assertStringContainsString('mod_expires', $content);
-        $this->assertStringContainsString('Cache-Control', $content);
-    }
+            $this->assertStringContainsString('mod_deflate', $content);
+            $this->assertStringNotContainsString('mod_expires', $content);
+            $this->assertStringNotContainsString('ETag', $content);
+            $this->assertStringNotContainsString('keep-alive', $content);
+        }
 
-    public function testBuildDirectivesEtagOnly(): void
-    {
-        $hook = new OptimizeHtaccess(
-            $this->hookDispatcher,
-            $this->transientStore,
-            gzip: false,
-            browserCache: false,
-            removeEtags: true,
-            keepAlive: false
-        );
-        $lines = $hook->buildDirectives();
-        $content = implode("\n", $lines);
+        public function testBuildDirectivesBrowserCacheOnly(): void
+        {
+            $hook = new OptimizeHtaccess(
+                $this->hookDispatcher,
+                $this->transientStore,
+                gzip: false,
+                browserCache: true,
+                removeEtags: false,
+                keepAlive: false
+            );
+            $lines = $hook->buildDirectives();
+            $content = implode("\n", $lines);
 
-        $this->assertStringContainsString('ETag', $content);
-        $this->assertStringContainsString('FileETag None', $content);
-    }
+            $this->assertStringNotContainsString('mod_deflate', $content);
+            $this->assertStringContainsString('mod_expires', $content);
+            $this->assertStringContainsString('Cache-Control', $content);
+        }
 
-    public function testBuildDirectivesKeepAliveOnly(): void
-    {
-        $hook = new OptimizeHtaccess(
-            $this->hookDispatcher,
-            $this->transientStore,
-            gzip: false,
-            browserCache: false,
-            removeEtags: false,
-            keepAlive: true
-        );
-        $lines = $hook->buildDirectives();
-        $content = implode("\n", $lines);
+        public function testBuildDirectivesEtagOnly(): void
+        {
+            $hook = new OptimizeHtaccess(
+                $this->hookDispatcher,
+                $this->transientStore,
+                gzip: false,
+                browserCache: false,
+                removeEtags: true,
+                keepAlive: false
+            );
+            $lines = $hook->buildDirectives();
+            $content = implode("\n", $lines);
 
-        $this->assertStringContainsString('keep-alive', $content);
-        $this->assertStringNotContainsString('mod_deflate', $content);
-    }
+            $this->assertStringContainsString('ETag', $content);
+            $this->assertStringContainsString('FileETag None', $content);
+        }
 
-    public function testBuildDirectivesAllDisabledReturnsEmpty(): void
-    {
-        $hook = new OptimizeHtaccess(
-            $this->hookDispatcher,
-            $this->transientStore,
-            gzip: false,
-            browserCache: false,
-            removeEtags: false,
-            keepAlive: false
-        );
+        public function testBuildDirectivesKeepAliveOnly(): void
+        {
+            $hook = new OptimizeHtaccess(
+                $this->hookDispatcher,
+                $this->transientStore,
+                gzip: false,
+                browserCache: false,
+                removeEtags: false,
+                keepAlive: true
+            );
+            $lines = $hook->buildDirectives();
+            $content = implode("\n", $lines);
 
-        $this->assertSame([], $hook->buildDirectives());
-    }
+            $this->assertStringContainsString('keep-alive', $content);
+            $this->assertStringNotContainsString('mod_deflate', $content);
+        }
 
-    public function testGzipDirectivesIncludeAllMimeTypes(): void
-    {
-        $hook = new OptimizeHtaccess(
-            $this->hookDispatcher,
-            $this->transientStore,
-            gzip: true,
-            browserCache: false,
-            removeEtags: false,
-            keepAlive: false
-        );
-        $content = implode("\n", $hook->buildDirectives());
+        public function testBuildDirectivesAllDisabledReturnsEmpty(): void
+        {
+            $hook = new OptimizeHtaccess(
+                $this->hookDispatcher,
+                $this->transientStore,
+                gzip: false,
+                browserCache: false,
+                removeEtags: false,
+                keepAlive: false
+            );
 
-        $this->assertStringContainsString('text/html', $content);
-        $this->assertStringContainsString('text/css', $content);
-        $this->assertStringContainsString('application/javascript', $content);
-        $this->assertStringContainsString('application/json', $content);
-        $this->assertStringContainsString('application/ld+json', $content);
-        $this->assertStringContainsString('image/svg+xml', $content);
-        $this->assertStringContainsString('font/ttf', $content);
-        $this->assertStringContainsString('font/otf', $content);
-    }
+            $this->assertSame([], $hook->buildDirectives());
+        }
 
-    public function testGzipExcludesAlreadyCompressedFormats(): void
-    {
-        $hook = new OptimizeHtaccess(
-            $this->hookDispatcher,
-            $this->transientStore,
-            gzip: true,
-            browserCache: false,
-            removeEtags: false,
-            keepAlive: false
-        );
-        $content = implode("\n", $hook->buildDirectives());
+        public function testGzipDirectivesIncludeAllMimeTypes(): void
+        {
+            $hook = new OptimizeHtaccess(
+                $this->hookDispatcher,
+                $this->transientStore,
+                gzip: true,
+                browserCache: false,
+                removeEtags: false,
+                keepAlive: false
+            );
+            $content = implode("\n", $hook->buildDirectives());
 
-        $this->assertStringContainsString('no-gzip', $content);
-        $this->assertStringContainsString('woff2', $content);
-    }
+            $this->assertStringContainsString('text/html', $content);
+            $this->assertStringContainsString('text/css', $content);
+            $this->assertStringContainsString('application/javascript', $content);
+            $this->assertStringContainsString('application/json', $content);
+            $this->assertStringContainsString('application/ld+json', $content);
+            $this->assertStringContainsString('image/svg+xml', $content);
+            $this->assertStringContainsString('font/ttf', $content);
+            $this->assertStringContainsString('font/otf', $content);
+        }
 
-    public function testBrowserCacheUsesCustomTtl(): void
-    {
-        $hook = new OptimizeHtaccess(
-            $this->hookDispatcher,
-            $this->transientStore,
-            gzip: false,
-            browserCache: true,
-            removeEtags: false,
-            keepAlive: false,
-            staticTtl: 86400
-        );
-        $content = implode("\n", $hook->buildDirectives());
+        public function testGzipExcludesAlreadyCompressedFormats(): void
+        {
+            $hook = new OptimizeHtaccess(
+                $this->hookDispatcher,
+                $this->transientStore,
+                gzip: true,
+                browserCache: false,
+                removeEtags: false,
+                keepAlive: false
+            );
+            $content = implode("\n", $hook->buildDirectives());
 
-        $this->assertStringContainsString('access plus 86400 seconds', $content);
-        $this->assertStringContainsString('max-age=86400', $content);
-        $this->assertStringNotContainsString('31536000', $content);
-    }
+            $this->assertStringContainsString('no-gzip', $content);
+            $this->assertStringContainsString('woff2', $content);
+        }
 
-    public function testBrowserCacheHtmlNotCached(): void
-    {
-        $hook = new OptimizeHtaccess(
-            $this->hookDispatcher,
-            $this->transientStore,
-            gzip: false,
-            browserCache: true,
-            removeEtags: false,
-            keepAlive: false
-        );
-        $content = implode("\n", $hook->buildDirectives());
+        public function testBrowserCacheUsesCustomTtl(): void
+        {
+            $hook = new OptimizeHtaccess(
+                $this->hookDispatcher,
+                $this->transientStore,
+                gzip: false,
+                browserCache: true,
+                removeEtags: false,
+                keepAlive: false,
+                staticTtl: 86400
+            );
+            $content = implode("\n", $hook->buildDirectives());
 
-        $this->assertStringContainsString('text/html "access plus 0 seconds"', $content);
-        $this->assertStringContainsString('no-cache, no-store, must-revalidate', $content);
-    }
+            $this->assertStringContainsString('access plus 86400 seconds', $content);
+            $this->assertStringContainsString('max-age=86400', $content);
+            $this->assertStringNotContainsString('31536000', $content);
+        }
 
-    public function testBrowserCacheIncludesModernFormats(): void
-    {
-        $hook = new OptimizeHtaccess(
-            $this->hookDispatcher,
-            $this->transientStore,
-            gzip: false,
-            browserCache: true,
-            removeEtags: false,
-            keepAlive: false
-        );
-        $content = implode("\n", $hook->buildDirectives());
+        public function testBrowserCacheHtmlNotCached(): void
+        {
+            $hook = new OptimizeHtaccess(
+                $this->hookDispatcher,
+                $this->transientStore,
+                gzip: false,
+                browserCache: true,
+                removeEtags: false,
+                keepAlive: false
+            );
+            $content = implode("\n", $hook->buildDirectives());
 
-        $this->assertStringContainsString('image/webp', $content);
-        $this->assertStringContainsString('image/avif', $content);
-        $this->assertStringContainsString('font/woff2', $content);
-        $this->assertStringContainsString('immutable', $content);
-    }
+            $this->assertStringContainsString('text/html "access plus 0 seconds"', $content);
+            $this->assertStringContainsString('no-cache, no-store, must-revalidate', $content);
+        }
 
-    public function testBrowserCacheJsonNotCached(): void
-    {
-        $hook = new OptimizeHtaccess(
-            $this->hookDispatcher,
-            $this->transientStore,
-            gzip: false,
-            browserCache: true,
-            removeEtags: false,
-            keepAlive: false
-        );
-        $content = implode("\n", $hook->buildDirectives());
+        public function testBrowserCacheIncludesModernFormats(): void
+        {
+            $hook = new OptimizeHtaccess(
+                $this->hookDispatcher,
+                $this->transientStore,
+                gzip: false,
+                browserCache: true,
+                removeEtags: false,
+                keepAlive: false
+            );
+            $content = implode("\n", $hook->buildDirectives());
 
-        $this->assertStringContainsString('application/json "access plus 0 seconds"', $content);
-    }
+            $this->assertStringContainsString('image/webp', $content);
+            $this->assertStringContainsString('image/avif', $content);
+            $this->assertStringContainsString('font/woff2', $content);
+            $this->assertStringContainsString('immutable', $content);
+        }
 
-    public function testApplyDirectivesWritesToHtaccess(): void
-    {
-        $this->transientStore->method('get')->willReturn(null);
+        public function testBrowserCacheJsonNotCached(): void
+        {
+            $hook = new OptimizeHtaccess(
+                $this->hookDispatcher,
+                $this->transientStore,
+                gzip: false,
+                browserCache: true,
+                removeEtags: false,
+                keepAlive: false
+            );
+            $content = implode("\n", $hook->buildDirectives());
 
-        $hook = new TestableOptimizeHtaccess($this->hookDispatcher, $this->transientStore);
-        $hook->setHtaccessPath('/var/www/html/.htaccess');
+            $this->assertStringContainsString('application/json "access plus 0 seconds"', $content);
+        }
 
-        $hook->applyDirectives();
+        public function testApplyDirectivesWritesToHtaccess(): void
+        {
+            $this->transientStore->method('get')->willReturn(null);
 
-        $calls = $hook->getMarkerCalls();
-        $this->assertArrayHasKey('/var/www/html/.htaccess', $calls);
-        $this->assertSame('BackTo Performance', $calls['/var/www/html/.htaccess']['marker']);
-        $this->assertNotEmpty($calls['/var/www/html/.htaccess']['lines']);
-    }
+            OptimizeHtaccessTestState::$homePath = '/var/www/html';
 
-    public function testApplyDirectivesSkipsNullPath(): void
-    {
-        $hook = new TestableOptimizeHtaccess($this->hookDispatcher, $this->transientStore);
-        $hook->setHtaccessPath(null);
+            $hook = new OptimizeHtaccess($this->hookDispatcher, $this->transientStore);
+            $hook->applyDirectives();
 
-        $hook->applyDirectives();
+            $calls = OptimizeHtaccessTestState::$markerCalls;
+            $this->assertArrayHasKey('/var/www/html/.htaccess', $calls);
+            $this->assertSame('BackTo Performance', $calls['/var/www/html/.htaccess']['marker']);
+            $this->assertNotEmpty($calls['/var/www/html/.htaccess']['lines']);
+        }
 
-        $this->assertEmpty($hook->getMarkerCalls());
-    }
+        public function testApplyDirectivesSkipsNullPath(): void
+        {
+            OptimizeHtaccessTestState::$homePath = '';
 
-    public function testRemoveDirectivesWritesEmptyLines(): void
-    {
-        $hook = new TestableOptimizeHtaccess($this->hookDispatcher, $this->transientStore);
-        $hook->setHtaccessPath('/var/www/html/.htaccess');
+            $hook = new OptimizeHtaccess($this->hookDispatcher, $this->transientStore);
+            $hook->applyDirectives();
 
-        $hook->removeDirectives();
+            $this->assertEmpty(OptimizeHtaccessTestState::$markerCalls);
+        }
 
-        $calls = $hook->getMarkerCalls();
-        $this->assertArrayHasKey('/var/www/html/.htaccess', $calls);
-        $this->assertSame([], $calls['/var/www/html/.htaccess']['lines']);
-    }
+        public function testRemoveDirectivesWritesEmptyLines(): void
+        {
+            OptimizeHtaccessTestState::$homePath = '/var/www/html';
 
-    public function testRemoveDirectivesSkipsNullPath(): void
-    {
-        $hook = new TestableOptimizeHtaccess($this->hookDispatcher, $this->transientStore);
-        $hook->setHtaccessPath(null);
+            $hook = new OptimizeHtaccess($this->hookDispatcher, $this->transientStore);
+            $hook->removeDirectives();
 
-        $hook->removeDirectives();
+            $calls = OptimizeHtaccessTestState::$markerCalls;
+            $this->assertArrayHasKey('/var/www/html/.htaccess', $calls);
+            $this->assertSame([], $calls['/var/www/html/.htaccess']['lines']);
+        }
 
-        $this->assertEmpty($hook->getMarkerCalls());
-    }
+        public function testRemoveDirectivesSkipsNullPath(): void
+        {
+            OptimizeHtaccessTestState::$homePath = '';
 
-    public function testActivateCallsApplyDirectives(): void
-    {
-        $this->transientStore->method('get')->willReturn(null);
+            $hook = new OptimizeHtaccess($this->hookDispatcher, $this->transientStore);
+            $hook->removeDirectives();
 
-        $hook = new TestableOptimizeHtaccess($this->hookDispatcher, $this->transientStore);
-        $hook->setHtaccessPath('/var/www/html/.htaccess');
+            $this->assertEmpty(OptimizeHtaccessTestState::$markerCalls);
+        }
 
-        $hook->activate();
+        public function testActivateCallsApplyDirectives(): void
+        {
+            $this->transientStore->method('get')->willReturn(null);
 
-        $calls = $hook->getMarkerCalls();
-        $this->assertArrayHasKey('/var/www/html/.htaccess', $calls);
-        $this->assertNotEmpty($calls['/var/www/html/.htaccess']['lines']);
-    }
+            OptimizeHtaccessTestState::$homePath = '/var/www/html';
 
-    public function testApplyDirectivesAllDisabledSkipsWrite(): void
-    {
-        $hook = new TestableOptimizeHtaccess(
-            $this->hookDispatcher,
-            $this->transientStore,
-            gzip: false,
-            browserCache: false,
-            removeEtags: false,
-            keepAlive: false
-        );
-        $hook->setHtaccessPath('/var/www/html/.htaccess');
+            $hook = new OptimizeHtaccess($this->hookDispatcher, $this->transientStore);
+            $hook->activate();
 
-        $hook->applyDirectives();
+            $calls = OptimizeHtaccessTestState::$markerCalls;
+            $this->assertArrayHasKey('/var/www/html/.htaccess', $calls);
+            $this->assertNotEmpty($calls['/var/www/html/.htaccess']['lines']);
+        }
 
-        // No lines to write -> no call
-        $this->assertEmpty($hook->getMarkerCalls());
-    }
+        public function testApplyDirectivesAllDisabledSkipsWrite(): void
+        {
+            OptimizeHtaccessTestState::$homePath = '/var/www/html';
 
-    public function testApplyDirectivesSkipsRedundantWrite(): void
-    {
-        $hook = new OptimizeHtaccess($this->hookDispatcher, $this->transientStore);
-        $lines = $hook->buildDirectives();
-        $expectedHash = md5(implode("\n", $lines));
+            $hook = new OptimizeHtaccess(
+                $this->hookDispatcher,
+                $this->transientStore,
+                gzip: false,
+                browserCache: false,
+                removeEtags: false,
+                keepAlive: false
+            );
 
-        // TransientStore returns the same hash -> skip write
-        $this->transientStore->method('get')->willReturn($expectedHash);
+            $hook->applyDirectives();
 
-        $testable = new TestableOptimizeHtaccess($this->hookDispatcher, $this->transientStore);
-        $testable->setHtaccessPath('/var/www/html/.htaccess');
-        $testable->applyDirectives();
+            // No lines to write -> no call
+            $this->assertEmpty(OptimizeHtaccessTestState::$markerCalls);
+        }
 
-        $this->assertEmpty($testable->getMarkerCalls());
-    }
+        public function testApplyDirectivesSkipsRedundantWrite(): void
+        {
+            $hook = new OptimizeHtaccess($this->hookDispatcher, $this->transientStore);
+            $lines = $hook->buildDirectives();
+            $expectedHash = md5(implode("\n", $lines));
 
-    public function testApplyDirectivesStoresHashAfterWrite(): void
-    {
-        $this->transientStore->method('get')->willReturn(null);
-        $this->transientStore->expects($this->once())
-            ->method('set')
-            ->with('backto_htaccess_hash', $this->isType('string'), 86400);
+            // TransientStore returns the same hash -> skip write
+            $this->transientStore->method('get')->willReturn($expectedHash);
 
-        $hook = new TestableOptimizeHtaccess($this->hookDispatcher, $this->transientStore);
-        $hook->setHtaccessPath('/var/www/html/.htaccess');
+            OptimizeHtaccessTestState::$homePath = '/var/www/html';
 
-        $hook->applyDirectives();
-    }
+            $hook2 = new OptimizeHtaccess($this->hookDispatcher, $this->transientStore);
+            $hook2->applyDirectives();
 
-    public function testDefaultStaticTtlIsOneYear(): void
-    {
-        $hook = new OptimizeHtaccess($this->hookDispatcher, $this->transientStore);
-        $content = implode("\n", $hook->buildDirectives());
+            $this->assertEmpty(OptimizeHtaccessTestState::$markerCalls);
+        }
 
-        $this->assertStringContainsString('31536000', $content);
+        public function testApplyDirectivesStoresHashAfterWrite(): void
+        {
+            $this->transientStore->method('get')->willReturn(null);
+            $this->transientStore->expects($this->once())
+                ->method('set')
+                ->with('backto_htaccess_hash', $this->isType('string'), 86400);
+
+            OptimizeHtaccessTestState::$homePath = '/var/www/html';
+
+            $hook = new OptimizeHtaccess($this->hookDispatcher, $this->transientStore);
+            $hook->applyDirectives();
+        }
+
+        public function testDefaultStaticTtlIsOneYear(): void
+        {
+            $hook = new OptimizeHtaccess($this->hookDispatcher, $this->transientStore);
+            $content = implode("\n", $hook->buildDirectives());
+
+            $this->assertStringContainsString('31536000', $content);
+        }
     }
 }

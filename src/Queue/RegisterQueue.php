@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Queue;
 
-use BackTo\Framework\Cache\Contracts\TransientStoreInterface;
+use BackTo\Framework\Cache\Contracts\CacheStoreInterface;
 use BackTo\Framework\Contracts\ActivationHooks;
 use BackTo\Framework\Contracts\DeactivationHooks;
 use BackTo\Framework\Contracts\HookDispatcherInterface;
@@ -32,7 +32,7 @@ final class RegisterQueue implements Hooks, ActivationHooks, DeactivationHooks
     private readonly QueueMaintenance $maintenance;
     private readonly HookDispatcherInterface $hookDispatcher;
     private readonly CronSchedulerInterface $cronScheduler;
-    private readonly TransientStoreInterface $transientStore;
+    private readonly CacheStoreInterface $cacheStore;
 
     public function __construct(
         QueueSchemaInterface $repository,
@@ -40,14 +40,14 @@ final class RegisterQueue implements Hooks, ActivationHooks, DeactivationHooks
         QueueMaintenance $maintenance,
         HookDispatcherInterface $hookDispatcher,
         CronSchedulerInterface $cronScheduler,
-        TransientStoreInterface $transientStore,
+        CacheStoreInterface $cacheStore,
     ) {
         $this->repository = $repository;
         $this->processor = $processor;
         $this->maintenance = $maintenance;
         $this->hookDispatcher = $hookDispatcher;
         $this->cronScheduler = $cronScheduler;
-        $this->transientStore = $transientStore;
+        $this->cacheStore = $cacheStore;
     }
 
     public function activate(): void
@@ -64,7 +64,7 @@ final class RegisterQueue implements Hooks, ActivationHooks, DeactivationHooks
     public function uninstall(): void
     {
         $this->repository->dropTable();
-        $this->transientStore->delete(self::LOCK_KEY);
+        $this->cacheStore->delete(self::LOCK_KEY);
     }
 
     public function hooks(): void

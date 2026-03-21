@@ -4,15 +4,19 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\WordPress;
 
+use BackTo\Framework\Bundle\Plugin\Contracts\TextDomainLoaderInterface;
+use BackTo\Framework\Bundle\Plugin\Infrastructure\WordPressTextDomainLoader;
 use BackTo\Framework\Compose\AbstractExtension;
 use BackTo\Framework\Contracts\ContentQueryInterface;
 use BackTo\Framework\Contracts\EscaperInterface;
 use BackTo\Framework\Contracts\NonceManagerInterface;
 use BackTo\Framework\Contracts\PluginCheckerInterface;
 use BackTo\Framework\Contracts\QueryContextInterface;
+use BackTo\Framework\Contracts\ResponseEmitterInterface;
 use BackTo\Framework\Contracts\ScriptManagerInterface;
 use BackTo\Framework\Contracts\SiteContextInterface;
 use BackTo\Framework\Contracts\UserContextInterface;
+use BackTo\Framework\Http\NativeResponseEmitter;
 use BackTo\Framework\WordPress\Infrastructure\WordPressContentQuery;
 use BackTo\Framework\WordPress\Infrastructure\WordPressEscaper;
 use BackTo\Framework\WordPress\Infrastructure\WordPressNonceManager;
@@ -62,6 +66,12 @@ final class WordPressExtension extends AbstractExtension
 
         $containerBuilder->register(PluginCheckerInterface::class, WordPressPluginChecker::class);
         $containerBuilder->setAlias(WordPressPluginChecker::class, PluginCheckerInterface::class);
+
+        $containerBuilder->register(ResponseEmitterInterface::class, NativeResponseEmitter::class);
+        $containerBuilder->setAlias(NativeResponseEmitter::class, ResponseEmitterInterface::class);
+
+        $containerBuilder->register(TextDomainLoaderInterface::class, WordPressTextDomainLoader::class);
+        $containerBuilder->setAlias(WordPressTextDomainLoader::class, TextDomainLoaderInterface::class);
     }
 
     public function getDefaultConfiguration(): array

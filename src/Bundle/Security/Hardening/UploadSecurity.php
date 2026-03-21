@@ -6,11 +6,14 @@ namespace BackTo\Framework\Bundle\Security\Hardening;
 
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
+use BackTo\Framework\Bundle\Security\Contracts\FileContentReaderInterface;
 use BackTo\Framework\Bundle\Security\Contracts\SecurityRuleInterface;
+use BackTo\Framework\Bundle\Security\Infrastructure\NativeFileContentReader;
 
 final class UploadSecurity implements Hooks, SecurityRuleInterface
 {
     private readonly HookDispatcherInterface $hookDispatcher;
+    private readonly FileContentReaderInterface $fileReader;
 
     /** @var array<string, string> */
     private const MAGIC_BYTES = [
@@ -40,9 +43,12 @@ final class UploadSecurity implements Hooks, SecurityRuleInterface
         'asp', 'aspx', 'jsp', 'jspx',
     ];
 
-    public function __construct(HookDispatcherInterface $hookDispatcher)
-    {
+    public function __construct(
+        HookDispatcherInterface $hookDispatcher,
+        ?FileContentReaderInterface $fileReader = null,
+    ) {
         $this->hookDispatcher = $hookDispatcher;
+        $this->fileReader = $fileReader ?? new NativeFileContentReader();
     }
 
     public function getName(): string
@@ -149,22 +155,15 @@ final class UploadSecurity implements Hooks, SecurityRuleInterface
             return true; // No magic bytes to check for this extension
         }
 
-        $fileSize = @filesize($filePath);
+        $fileSize = $this->fileReader->fileSize($filePath);
 
-        if ($fileSize === false || $fileSize === 0) {
+        if ($fileSize === null || $fileSize === 0) {
             return false; // Empty files cannot be validated
         }
 
-        $handle = fopen($filePath, 'rb');
+        $bytes = $this->fileReader->readBytes($filePath, 8);
 
-        if ($handle === false) {
-            return false;
-        }
-
-        $bytes = fread($handle, 8);
-        fclose($handle);
-
-        if ($bytes === false) {
+        if ($bytes === null) {
             return false;
         }
 
@@ -186,9 +185,9 @@ final class UploadSecurity implements Hooks, SecurityRuleInterface
      */
     public function isSvgSafe(string $filePath): bool
     {
-        $content = file_get_contents($filePath);
+        $content = $this->fileReader->readAll($filePath);
 
-        if ($content === false) {
+        if ($content === null) {
             return false;
         }
 
