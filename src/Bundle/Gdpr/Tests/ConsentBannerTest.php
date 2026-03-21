@@ -26,7 +26,6 @@ class ConsentBannerTest extends TestCase
         $dataBuilder = new BannerDataBuilder($this->categoryRegistry, $this->consentStorage);
         $this->banner = new ConsentBanner(
             $this->categoryRegistry,
-            $this->consentStorage,
             new ConsentBannerRenderer(),
             $dataBuilder,
         );

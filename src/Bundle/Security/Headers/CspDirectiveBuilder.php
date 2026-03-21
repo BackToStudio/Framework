@@ -33,6 +33,9 @@ final class CspDirectiveBuilder
         $this->directives = self::DEFAULT_DIRECTIVES;
     }
 
+    /**
+     * @param string|string[] $value
+     */
     public function addDirective(string $directive, string|array $value): self
     {
         $values = is_array($value) ? $value : [$value];

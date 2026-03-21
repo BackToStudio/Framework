@@ -4,14 +4,10 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Bundle\Gdpr;
 
-use BackTo\Framework\Bundle\Gdpr\Contracts\ConsentCategoryInterface;
-use BackTo\Framework\Bundle\Gdpr\Contracts\ConsentStorageInterface;
-
-final class ConsentBanner
+class ConsentBanner
 {
     public function __construct(
         private readonly ConsentCategoryRegistry $categoryRegistry,
-        private readonly ConsentStorageInterface $consentStorage,
         private readonly ConsentBannerRenderer $renderer,
         private readonly BannerDataBuilder $dataBuilder,
     ) {
