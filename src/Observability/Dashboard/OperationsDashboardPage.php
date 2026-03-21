@@ -17,7 +17,7 @@ use BackTo\Framework\Queue\Entity\JobStatus;
  * into a unified operations view. Delegates all HTML rendering to
  * {@see OperationsDashboardRenderer}.
  */
-class OperationsDashboardPage implements AdminPageInterface
+final class OperationsDashboardPage implements AdminPageInterface
 {
     private const MENU_POSITION = 3;
     private const SUMMARY_WINDOW = 86400; // 24 hours
@@ -31,12 +31,12 @@ class OperationsDashboardPage implements AdminPageInterface
         HealthCheckRegistry $healthCheckRegistry,
         QueueQueryInterface $queueQuery,
         MetricStoreInterface $metricStore,
-        ?OperationsDashboardRenderer $renderer = null,
+        OperationsDashboardRenderer $renderer,
     ) {
         $this->healthCheckRegistry = $healthCheckRegistry;
         $this->queueQuery = $queueQuery;
         $this->metricStore = $metricStore;
-        $this->renderer = $renderer ?? new OperationsDashboardRenderer();
+        $this->renderer = $renderer;
     }
 
     public function getPageTitle(): string

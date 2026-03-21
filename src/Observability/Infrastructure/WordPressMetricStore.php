@@ -7,51 +7,63 @@ namespace BackTo\Framework\Observability\Infrastructure;
 use BackTo\Framework\Observability\Contracts\MetricStoreInterface;
 
 /**
- * WordPress options-based metric store.
+ * WordPress options-based metric store with in-memory write buffer.
  *
- * Stores metrics as a serialized array in a single WordPress option,
- * partitioned by day for efficient purging. Suitable for low-to-medium
- * volume metrics (dashboards, health checks, queue depth).
+ * All write operations (record, increment) are buffered in memory
+ * and only persisted to the database when flush() is called.
+ * Read operations (latest, history, summary) merge the buffer with
+ * persisted data so callers always see a consistent view.
  *
- * For high-volume metrics, a custom table implementation should be used.
+ * Call flush() once at shutdown to persist all buffered metrics
+ * in a single get_option + update_option roundtrip.
+ *
+ * Suitable for low-to-medium volume metrics (dashboards, health checks,
+ * queue depth). For high-volume metrics, a custom table implementation
+ * should be used.
  */
 final class WordPressMetricStore implements MetricStoreInterface
 {
     private const OPTION_KEY = 'backto_metrics';
     private const MAX_ENTRIES_PER_METRIC = 1000;
 
+    /** @var array<string, array<int, array{value: float, type: string, tags: array<string, string>, recorded_at: int}>> */
+    private array $buffer = [];
+
+    private bool $dirty = false;
+
     public function record(string $name, float $value, string $type = 'gauge', array $tags = []): void
     {
-        $metrics = $this->load();
-
-        if (!isset($metrics[$name])) {
-            $metrics[$name] = [];
+        if (!isset($this->buffer[$name])) {
+            $this->buffer[$name] = [];
         }
 
-        $metrics[$name][] = [
+        $this->buffer[$name][] = [
             'value' => $value,
             'type' => $type,
             'tags' => $tags,
             'recorded_at' => \time(),
         ];
 
-        // Cap per-metric entries to prevent unbounded growth
-        if (\count($metrics[$name]) > self::MAX_ENTRIES_PER_METRIC) {
-            $metrics[$name] = \array_slice($metrics[$name], -self::MAX_ENTRIES_PER_METRIC);
-        }
-
-        $this->save($metrics);
+        $this->dirty = true;
     }
 
     public function increment(string $name, float $amount = 1.0, array $tags = []): void
     {
-        $metrics = $this->load();
         $current = 0.0;
 
-        if (isset($metrics[$name]) && $metrics[$name] !== []) {
-            $last = end($metrics[$name]);
+        // Check buffer first, then persisted data
+        if (isset($this->buffer[$name]) && $this->buffer[$name] !== []) {
+            $last = end($this->buffer[$name]);
             if ($last['type'] === 'counter') {
                 $current = $last['value'];
+            }
+        } else {
+            $persisted = $this->load();
+            if (isset($persisted[$name]) && $persisted[$name] !== []) {
+                $last = end($persisted[$name]);
+                if ($last['type'] === 'counter') {
+                    $current = $last['value'];
+                }
             }
         }
 
@@ -60,13 +72,13 @@ final class WordPressMetricStore implements MetricStoreInterface
 
     public function latest(string $name): ?array
     {
-        $metrics = $this->load();
+        $merged = $this->getMerged();
 
-        if (!isset($metrics[$name]) || $metrics[$name] === []) {
+        if (!isset($merged[$name]) || $merged[$name] === []) {
             return null;
         }
 
-        $last = end($metrics[$name]);
+        $last = end($merged[$name]);
 
         return [
             'value' => $last['value'],
@@ -77,15 +89,15 @@ final class WordPressMetricStore implements MetricStoreInterface
 
     public function history(string $name, int $since, int $until = 0): array
     {
-        $metrics = $this->load();
+        $merged = $this->getMerged();
         $until = $until > 0 ? $until : \time();
 
-        if (!isset($metrics[$name])) {
+        if (!isset($merged[$name])) {
             return [];
         }
 
         $results = [];
-        foreach ($metrics[$name] as $entry) {
+        foreach ($merged[$name] as $entry) {
             if ($entry['recorded_at'] >= $since && $entry['recorded_at'] <= $until) {
                 $results[] = [
                     'name' => $name,
@@ -102,10 +114,10 @@ final class WordPressMetricStore implements MetricStoreInterface
 
     public function summary(int $since): array
     {
-        $metrics = $this->load();
+        $merged = $this->getMerged();
         $summaries = [];
 
-        foreach ($metrics as $name => $entries) {
+        foreach ($merged as $name => $entries) {
             $values = [];
             foreach ($entries as $entry) {
                 if ($entry['recorded_at'] >= $since) {
@@ -131,6 +143,9 @@ final class WordPressMetricStore implements MetricStoreInterface
 
     public function purge(int $days = 30): int
     {
+        // Flush buffer first so purge operates on complete data
+        $this->flush();
+
         $metrics = $this->load();
         $cutoff = \time() - ($days * 86400);
         $purged = 0;
@@ -151,6 +166,72 @@ final class WordPressMetricStore implements MetricStoreInterface
         $this->save($metrics);
 
         return $purged;
+    }
+
+    /**
+     * Persist all buffered metrics to the database in a single write.
+     *
+     * Safe to call multiple times — no-op when the buffer is clean.
+     */
+    public function flush(): void
+    {
+        if (!$this->dirty) {
+            return;
+        }
+
+        $metrics = $this->load();
+
+        foreach ($this->buffer as $name => $entries) {
+            if (!isset($metrics[$name])) {
+                $metrics[$name] = [];
+            }
+
+            foreach ($entries as $entry) {
+                $metrics[$name][] = $entry;
+            }
+
+            // Cap per-metric entries to prevent unbounded growth
+            if (\count($metrics[$name]) > self::MAX_ENTRIES_PER_METRIC) {
+                $metrics[$name] = \array_slice($metrics[$name], -self::MAX_ENTRIES_PER_METRIC);
+            }
+        }
+
+        $this->save($metrics);
+        $this->buffer = [];
+        $this->dirty = false;
+    }
+
+    /**
+     * @return bool Whether there are unflushed metrics in the buffer.
+     */
+    public function isDirty(): bool
+    {
+        return $this->dirty;
+    }
+
+    /**
+     * Merge persisted data with the in-memory buffer for reads.
+     *
+     * @return array<string, array<int, array{value: float, type: string, tags: array<string, string>, recorded_at: int}>>
+     */
+    private function getMerged(): array
+    {
+        $persisted = $this->load();
+
+        if ($this->buffer === []) {
+            return $persisted;
+        }
+
+        foreach ($this->buffer as $name => $entries) {
+            if (!isset($persisted[$name])) {
+                $persisted[$name] = [];
+            }
+            foreach ($entries as $entry) {
+                $persisted[$name][] = $entry;
+            }
+        }
+
+        return $persisted;
     }
 
     /**

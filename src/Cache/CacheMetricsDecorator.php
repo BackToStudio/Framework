@@ -33,10 +33,8 @@ final class CacheMetricsDecorator implements CacheInterface
 
         if ($value === $default) {
             $this->misses++;
-            $this->metricStore->increment('cache.misses');
         } else {
             $this->hits++;
-            $this->metricStore->increment('cache.hits');
         }
 
         return $value;
@@ -82,6 +80,12 @@ final class CacheMetricsDecorator implements CacheInterface
      *
      * Call this at shutdown to persist the request-level hit rate.
      */
+    /**
+     * Flush in-request counters to the metric store as a snapshot.
+     *
+     * Persists hit/miss counts and computed hit rate in a single batch.
+     * Call this once at shutdown — not per-request — to avoid DB churn.
+     */
     public function flushMetrics(): void
     {
         $total = $this->hits + $this->misses;
@@ -91,6 +95,8 @@ final class CacheMetricsDecorator implements CacheInterface
         }
 
         $hitRate = \round(($this->hits / $total) * 100, 1);
+        $this->metricStore->increment('cache.hits', (float) $this->hits);
+        $this->metricStore->increment('cache.misses', (float) $this->misses);
         $this->metricStore->record('cache.hit_rate', $hitRate, 'gauge');
         $this->metricStore->record('cache.requests', (float) $total, 'counter');
     }

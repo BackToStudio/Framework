@@ -22,13 +22,14 @@ final class CacheMetricsDecoratorTest extends TestCase
         $this->decorator = new CacheMetricsDecorator($this->inner, $this->metricStore);
     }
 
-    public function test_records_hit_on_cache_hit(): void
+    public function test_tracks_hit_in_memory_without_db_call(): void
     {
         $this->inner->method('get')->willReturn('cached_value');
 
-        $this->metricStore->expects($this->once())
-            ->method('increment')
-            ->with('cache.hits');
+        $this->metricStore->expects($this->never())
+            ->method('increment');
+        $this->metricStore->expects($this->never())
+            ->method('record');
 
         $result = $this->decorator->get('key');
 
@@ -37,13 +38,14 @@ final class CacheMetricsDecoratorTest extends TestCase
         $this->assertSame(0, $this->decorator->getMisses());
     }
 
-    public function test_records_miss_on_cache_miss(): void
+    public function test_tracks_miss_in_memory_without_db_call(): void
     {
         $this->inner->method('get')->willReturn(null);
 
-        $this->metricStore->expects($this->once())
-            ->method('increment')
-            ->with('cache.misses');
+        $this->metricStore->expects($this->never())
+            ->method('increment');
+        $this->metricStore->expects($this->never())
+            ->method('record');
 
         $result = $this->decorator->get('key');
 
@@ -82,7 +84,7 @@ final class CacheMetricsDecoratorTest extends TestCase
         $this->assertTrue($this->decorator->has('key'));
     }
 
-    public function test_flush_metrics_records_hit_rate(): void
+    public function test_flush_persists_counters_and_hit_rate(): void
     {
         // Simulate 3 hits and 1 miss
         $this->inner->method('get')
@@ -93,16 +95,21 @@ final class CacheMetricsDecoratorTest extends TestCase
         $this->decorator->get('k3');
         $this->decorator->get('k4');
 
+        // flushMetrics should persist: 2x increment (hits, misses) + 2x record (hit_rate, requests)
+        $this->metricStore->expects($this->exactly(2))
+            ->method('increment');
         $this->metricStore->expects($this->exactly(2))
             ->method('record');
 
         $this->decorator->flushMetrics();
     }
 
-    public function test_flush_metrics_skips_when_no_requests(): void
+    public function test_flush_skips_when_no_requests(): void
     {
         $this->metricStore->expects($this->never())
             ->method('record');
+        $this->metricStore->expects($this->never())
+            ->method('increment');
 
         $this->decorator->flushMetrics();
     }

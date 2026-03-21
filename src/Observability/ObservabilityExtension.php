@@ -74,6 +74,11 @@ final class ObservabilityExtension extends AbstractExtension
             ->setAutowired(true)
             ->addTag('observability.alert_channel');
 
+        // Flush metric buffer on shutdown
+        $containerBuilder->register(FlushMetricsOnShutdown::class)
+            ->setAutowired(true)
+            ->addTag('wordpress.hook');
+
         // Dashboard page (excluded from auto-discovery)
         $containerBuilder->register(Dashboard\OperationsDashboardRenderer::class);
         $containerBuilder->register(Dashboard\OperationsDashboardPage::class)
