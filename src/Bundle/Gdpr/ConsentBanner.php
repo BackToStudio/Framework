@@ -13,6 +13,7 @@ final class ConsentBanner
         private readonly ConsentCategoryRegistry $categoryRegistry,
         private readonly ConsentStorageInterface $consentStorage,
         private readonly ConsentBannerRenderer $renderer,
+        private readonly BannerDataBuilder $dataBuilder,
     ) {
     }
 
@@ -24,14 +25,9 @@ final class ConsentBanner
             return '';
         }
 
-        $categoriesJson = json_encode(
-            $this->buildCategoriesData($categories),
-            JSON_THROW_ON_ERROR | JSON_HEX_TAG | JSON_HEX_AMP
-        );
-
-        $consentGiven = $this->consentStorage->isConsentGiven();
-        $currentConsent = json_encode($this->consentStorage->getConsent(), JSON_THROW_ON_ERROR | JSON_HEX_TAG);
-        $consentGivenJs = $consentGiven ? 'true' : 'false';
+        $categoriesJson = $this->dataBuilder->getCategoriesJson();
+        $consentGivenJs = $this->dataBuilder->getConsentGivenJs();
+        $currentConsent = $this->dataBuilder->getCurrentConsentJson();
 
         $checkboxesHtml = $this->renderer->renderCheckboxes($categories);
         $css = $this->renderer->getCss();
@@ -72,24 +68,5 @@ final class ConsentBanner
         {$js}
         </script>
         HTML;
-    }
-
-    /**
-     * @param ConsentCategoryInterface[] $categories
-     * @return array<int, array{key: string, label: string, required: bool}>
-     */
-    private function buildCategoriesData(array $categories): array
-    {
-        $data = [];
-
-        foreach ($categories as $category) {
-            $data[] = [
-                'key' => $category->getKey(),
-                'label' => $category->getLabel(),
-                'required' => $category->isRequired(),
-            ];
-        }
-
-        return $data;
     }
 }

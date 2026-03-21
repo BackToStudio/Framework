@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Bundle\Gdpr\Tests;
 
+use BackTo\Framework\Bundle\Gdpr\BannerDataBuilder;
 use BackTo\Framework\Bundle\Gdpr\ConsentBanner;
 use BackTo\Framework\Bundle\Gdpr\ConsentBannerRenderer;
 use BackTo\Framework\Bundle\Gdpr\ConsentCategoryRegistry;
@@ -22,10 +23,12 @@ class ConsentBannerTest extends TestCase
     {
         $this->categoryRegistry = new ConsentCategoryRegistry();
         $this->consentStorage = $this->createMock(ConsentStorageInterface::class);
+        $dataBuilder = new BannerDataBuilder($this->categoryRegistry, $this->consentStorage);
         $this->banner = new ConsentBanner(
             $this->categoryRegistry,
             $this->consentStorage,
             new ConsentBannerRenderer(),
+            $dataBuilder,
         );
     }
 

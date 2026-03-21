@@ -6,8 +6,10 @@ namespace BackTo\Framework\Bundle\Admin;
 
 use BackTo\Framework\Contracts\AdminPageInterface;
 use BackTo\Framework\Bundle\Admin\Contracts\AdminPageRegistrarInterface;
+use BackTo\Framework\Bundle\Admin\Contracts\CapabilityManagerInterface;
 use BackTo\Framework\Bundle\Admin\DependencyInjection\Compiler\RegisterAdminPagePass;
 use BackTo\Framework\Bundle\Admin\Infrastructure\WordPressAdminPageRegistrar;
+use BackTo\Framework\Bundle\Admin\Infrastructure\WordPressCapabilityManager;
 use BackTo\Framework\Compose\AbstractExtension;
 use BackToVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -31,6 +33,9 @@ final class AdminExtension extends AbstractExtension
 
         $containerBuilder->register(AdminPageRegistrarInterface::class, WordPressAdminPageRegistrar::class);
         $containerBuilder->setAlias(WordPressAdminPageRegistrar::class, AdminPageRegistrarInterface::class);
+
+        $containerBuilder->register(CapabilityManagerInterface::class, WordPressCapabilityManager::class);
+        $containerBuilder->setAlias(WordPressCapabilityManager::class, CapabilityManagerInterface::class);
     }
 
     public function getDefaultConfiguration(): array
