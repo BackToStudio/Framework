@@ -7,6 +7,7 @@ namespace BackTo\Framework\Bundle\Security\Audit;
 use BackTo\Framework\Contracts\AdminPageInterface;
 use BackTo\Framework\Contracts\NonceManagerInterface;
 use BackTo\Framework\Contracts\RequestContextInterface;
+use BackTo\Framework\Contracts\ResponseEmitterInterface;
 use BackTo\Framework\Bundle\Security\AuditLog\AuditLogRenderer;
 use BackTo\Framework\Bundle\Security\Contracts\AuditLogRepositoryInterface;
 use BackTo\Framework\Bundle\Security\Contracts\AuditLogSeverity;
@@ -34,13 +35,15 @@ class AuditLogAdminPage implements AdminPageInterface
         AuditLogRepositoryInterface $repository,
         RequestContextInterface $requestContext,
         NonceManagerInterface $nonceManager,
+        ?ResponseEmitterInterface $responseEmitter = null,
         ?AuditLogCsvExporter $csvExporter = null,
         ?AuditLogRenderer $renderer = null,
     ) {
         $this->repository = $repository;
         $this->requestContext = $requestContext;
         $this->nonceManager = $nonceManager;
-        $this->csvExporter = $csvExporter ?? new AuditLogCsvExporter($repository);
+        $responseEmitter ??= new \BackTo\Framework\Http\NativeResponseEmitter();
+        $this->csvExporter = $csvExporter ?? new AuditLogCsvExporter($repository, $responseEmitter);
         $this->renderer = $renderer ?? new AuditLogRenderer($nonceManager);
     }
 

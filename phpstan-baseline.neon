@@ -115,54 +115,6 @@ parameters:
 			path: src/Bundle/Performance/Hooks/Cache/PreloadPageCache.php
 
 		-
-			message: '#^Method BackTo\\Framework\\Bundle\\Performance\\Infrastructure\\WordPressDatabaseOptimizer\:\:deleteAutoDrafts\(\) has parameter \$wpdb with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: src/Bundle/Performance/Infrastructure/WordPressDatabaseOptimizer.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Bundle\\Performance\\Infrastructure\\WordPressDatabaseOptimizer\:\:deleteExcessRevisions\(\) has parameter \$wpdb with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: src/Bundle/Performance/Infrastructure/WordPressDatabaseOptimizer.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Bundle\\Performance\\Infrastructure\\WordPressDatabaseOptimizer\:\:deleteExpiredTransients\(\) has parameter \$wpdb with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: src/Bundle/Performance/Infrastructure/WordPressDatabaseOptimizer.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Bundle\\Performance\\Infrastructure\\WordPressDatabaseOptimizer\:\:deleteOrphanedCommentMeta\(\) has parameter \$wpdb with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: src/Bundle/Performance/Infrastructure/WordPressDatabaseOptimizer.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Bundle\\Performance\\Infrastructure\\WordPressDatabaseOptimizer\:\:deleteOrphanedPostMeta\(\) has parameter \$wpdb with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: src/Bundle/Performance/Infrastructure/WordPressDatabaseOptimizer.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Bundle\\Performance\\Infrastructure\\WordPressDatabaseOptimizer\:\:deleteSpamComments\(\) has parameter \$wpdb with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: src/Bundle/Performance/Infrastructure/WordPressDatabaseOptimizer.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Bundle\\Performance\\Infrastructure\\WordPressDatabaseOptimizer\:\:deleteTrashedComments\(\) has parameter \$wpdb with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: src/Bundle/Performance/Infrastructure/WordPressDatabaseOptimizer.php
-
-		-
-			message: '#^Method BackTo\\Framework\\Bundle\\Performance\\Infrastructure\\WordPressDatabaseOptimizer\:\:deleteTrashedPosts\(\) has parameter \$wpdb with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: src/Bundle/Performance/Infrastructure/WordPressDatabaseOptimizer.php
-
-		-
 			message: '#^Access to an undefined property object\:\:\$ID\.$#'
 			identifier: property.notFound
 			count: 2

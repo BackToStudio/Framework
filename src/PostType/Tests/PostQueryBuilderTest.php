@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\PostType\Tests;
 
+use BackTo\Framework\Contracts\LoggerInterface;
+use BackTo\Framework\PostType\Contracts\PostQueryGatewayInterface;
 use BackTo\Framework\PostType\Factory\PostFactory;
 use BackTo\Framework\Query\MetaCompare;
 use BackTo\Framework\PostType\Repository\PostQueryBuilder;
@@ -14,8 +16,10 @@ class PostQueryBuilderTest extends TestCase
 {
     private function createQueryBuilder(): PostQueryBuilder
     {
-        $factory = $this->createMock(PostFactory::class);
-        return new PostQueryBuilder($factory);
+        $logger = $this->createMock(LoggerInterface::class);
+        $factory = new PostFactory($logger);
+        $gateway = $this->createMock(PostQueryGatewayInterface::class);
+        return new PostQueryBuilder($factory, $gateway);
     }
 
     public function testPostType(): void

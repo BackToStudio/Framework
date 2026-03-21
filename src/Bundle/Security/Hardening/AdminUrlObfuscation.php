@@ -7,6 +7,7 @@ namespace BackTo\Framework\Bundle\Security\Hardening;
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
 use BackTo\Framework\Contracts\RequestContextInterface;
+use BackTo\Framework\Contracts\ResponseEmitterInterface;
 use BackTo\Framework\Contracts\UserContextInterface;
 use BackTo\Framework\Contracts\LoggerInterface;
 use BackTo\Framework\Bundle\Security\Contracts\ClientIpResolverInterface;
@@ -29,8 +30,10 @@ class AdminUrlObfuscation implements Hooks, SecurityRuleInterface
     private readonly RequestContextInterface $requestContext;
     private readonly ClientIpResolverInterface $ipResolver;
     private readonly UserContextInterface $userContext;
+    private readonly ResponseEmitterInterface $responseEmitter;
 
     private string $loginSlug = '';
+    private ?LoginUrlFilter $urlFilter = null;
 
     public function __construct(
         HookDispatcherInterface $hookDispatcher,
@@ -38,12 +41,14 @@ class AdminUrlObfuscation implements Hooks, SecurityRuleInterface
         RequestContextInterface $requestContext,
         ClientIpResolverInterface $ipResolver,
         UserContextInterface $userContext,
+        ResponseEmitterInterface $responseEmitter,
     ) {
         $this->hookDispatcher = $hookDispatcher;
         $this->logger = $logger;
         $this->requestContext = $requestContext;
         $this->ipResolver = $ipResolver;
         $this->userContext = $userContext;
+        $this->responseEmitter = $responseEmitter;
     }
 
     public function getName(): string
@@ -67,6 +72,7 @@ class AdminUrlObfuscation implements Hooks, SecurityRuleInterface
     public function setLoginSlug(string $slug): self
     {
         $this->loginSlug = trim($slug, '/');
+        $this->urlFilter = new LoginUrlFilter($this->loginSlug);
 
         return $this;
     }
@@ -112,21 +118,22 @@ class AdminUrlObfuscation implements Hooks, SecurityRuleInterface
 
     public function filterLoginUrl(string $loginUrl, string $redirect): string
     {
-        return str_replace('wp-login.php', $this->loginSlug, $loginUrl);
+        return $this->getUrlFilter()->filterLoginUrl($loginUrl, $redirect);
     }
 
     public function filterLogoutUrl(string $logoutUrl, string $redirect): string
     {
-        return str_replace('wp-login.php', $this->loginSlug, $logoutUrl);
+        return $this->getUrlFilter()->filterLogoutUrl($logoutUrl, $redirect);
     }
 
     public function filterSiteUrl(string $url, string $path, string $scheme): string
     {
-        if (str_contains($path, 'wp-login.php')) {
-            return str_replace('wp-login.php', $this->loginSlug, $url);
-        }
+        return $this->getUrlFilter()->filterSiteUrl($url, $path, $scheme);
+    }
 
-        return $url;
+    private function getUrlFilter(): LoginUrlFilter
+    {
+        return $this->urlFilter ??= new LoginUrlFilter($this->loginSlug);
     }
 
     /**
@@ -167,14 +174,16 @@ class AdminUrlObfuscation implements Hooks, SecurityRuleInterface
     {
         if (defined('ABSPATH')) {
             require_once ABSPATH . 'wp-login.php';
-            exit;
+            $this->responseEmitter->terminate();
         }
     }
 
     protected function send404(): void
     {
-        status_header(404);
-        nocache_headers();
+        $this->responseEmitter->setStatusCode(404);
+        $this->responseEmitter->sendHeader('Cache-Control: no-cache, must-revalidate, max-age=0');
+        $this->responseEmitter->sendHeader('Pragma: no-cache');
+        $this->responseEmitter->sendHeader('Expires: Wed, 11 Jan 1984 05:00:00 GMT');
 
         if (function_exists('get_query_template')) {
             $template = get_query_template('404');
@@ -184,6 +193,6 @@ class AdminUrlObfuscation implements Hooks, SecurityRuleInterface
             }
         }
 
-        exit;
+        $this->responseEmitter->terminate();
     }
 }

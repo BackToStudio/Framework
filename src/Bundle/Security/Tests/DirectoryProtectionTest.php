@@ -7,23 +7,29 @@ namespace BackTo\Framework\Bundle\Security\Tests;
 use BackTo\Framework\Contracts\ActivationHooks;
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
+use BackTo\Framework\Bundle\Security\Contracts\FileWriterInterface;
 use BackTo\Framework\Bundle\Security\Contracts\SecurityRuleInterface;
 use BackTo\Framework\Bundle\Security\Hardening\DirectoryProtection;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Testable subclass to control upload dir and file writing.
+ * In-memory FileWriter for testing.
  */
-class TestableDirectoryProtection extends DirectoryProtection
+class InMemoryFileWriter implements FileWriterInterface
 {
-    private ?string $uploadDir = null;
-
     /** @var array<string, string> */
-    private array $writtenFiles = [];
+    private array $files = [];
 
-    public function setUploadDir(?string $dir): void
+    public function write(string $path, string $content): bool
     {
-        $this->uploadDir = $dir;
+        $this->files[$path] = $content;
+
+        return true;
+    }
+
+    public function exists(string $path): bool
+    {
+        return isset($this->files[$path]);
     }
 
     /**
@@ -31,29 +37,25 @@ class TestableDirectoryProtection extends DirectoryProtection
      */
     public function getWrittenFiles(): array
     {
-        return $this->writtenFiles;
+        return $this->files;
+    }
+}
+
+/**
+ * Testable subclass to control upload dir.
+ */
+class TestableDirectoryProtection extends DirectoryProtection
+{
+    private ?string $uploadDir = null;
+
+    public function setUploadDir(?string $dir): void
+    {
+        $this->uploadDir = $dir;
     }
 
     protected function getUploadDir(): ?string
     {
         return $this->uploadDir;
-    }
-
-    protected function writeProtectionFile(string $path, string $content): bool
-    {
-        if (file_exists($path)) {
-            return true;
-        }
-
-        $dir = dirname($path);
-
-        if (!is_dir($dir)) {
-            return false;
-        }
-
-        $this->writtenFiles[$path] = $content;
-
-        return true;
     }
 }
 
@@ -91,33 +93,30 @@ class DirectoryProtectionTest extends TestCase
 
     public function testEnsureProtectionWritesFiles(): void
     {
-        $tmpDir = sys_get_temp_dir() . '/backto_test_uploads_' . bin2hex(random_bytes(4));
-        mkdir($tmpDir, 0755, true);
-
         $dispatcher = $this->createMock(HookDispatcherInterface::class);
-        $rule = new TestableDirectoryProtection($dispatcher);
-        $rule->setUploadDir($tmpDir);
+        $fileWriter = new InMemoryFileWriter();
+        $rule = new TestableDirectoryProtection($dispatcher, $fileWriter);
+        $rule->setUploadDir('/var/www/uploads');
 
         $rule->ensureProtection();
 
-        $written = $rule->getWrittenFiles();
-        $this->assertArrayHasKey($tmpDir . '/.htaccess', $written);
-        $this->assertArrayHasKey($tmpDir . '/index.php', $written);
-        $this->assertStringContainsString('Options -Indexes', $written[$tmpDir . '/.htaccess']);
-        $this->assertStringContainsString('Silence is golden', $written[$tmpDir . '/index.php']);
-
-        rmdir($tmpDir);
+        $written = $fileWriter->getWrittenFiles();
+        $this->assertArrayHasKey('/var/www/uploads/.htaccess', $written);
+        $this->assertArrayHasKey('/var/www/uploads/index.php', $written);
+        $this->assertStringContainsString('Options -Indexes', $written['/var/www/uploads/.htaccess']);
+        $this->assertStringContainsString('Silence is golden', $written['/var/www/uploads/index.php']);
     }
 
     public function testEnsureProtectionSkipsNullUploadDir(): void
     {
         $dispatcher = $this->createMock(HookDispatcherInterface::class);
-        $rule = new TestableDirectoryProtection($dispatcher);
+        $fileWriter = new InMemoryFileWriter();
+        $rule = new TestableDirectoryProtection($dispatcher, $fileWriter);
         $rule->setUploadDir(null);
 
         $rule->ensureProtection();
 
-        $this->assertEmpty($rule->getWrittenFiles());
+        $this->assertEmpty($fileWriter->getWrittenFiles());
     }
 
     public function testGetProtectedPaths(): void
@@ -144,17 +143,13 @@ class DirectoryProtectionTest extends TestCase
 
     public function testActivateCallsEnsureProtection(): void
     {
-        $tmpDir = sys_get_temp_dir() . '/backto_test_uploads_' . bin2hex(random_bytes(4));
-        mkdir($tmpDir, 0755, true);
-
         $dispatcher = $this->createMock(HookDispatcherInterface::class);
-        $rule = new TestableDirectoryProtection($dispatcher);
-        $rule->setUploadDir($tmpDir);
+        $fileWriter = new InMemoryFileWriter();
+        $rule = new TestableDirectoryProtection($dispatcher, $fileWriter);
+        $rule->setUploadDir('/var/www/uploads');
 
         $rule->activate();
 
-        $this->assertNotEmpty($rule->getWrittenFiles());
-
-        rmdir($tmpDir);
+        $this->assertNotEmpty($fileWriter->getWrittenFiles());
     }
 }

@@ -10,7 +10,7 @@ use BackTo\Framework\Taxonomy\Contracts\TermInterface;
 use BackTo\Framework\Taxonomy\Entity\Term;
 use WP_Term;
 
-class TermFactory
+final class TermFactory
 {
 
     public function create(WP_Term $wpTerm): TermInterface

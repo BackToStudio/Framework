@@ -16,6 +16,9 @@ use BackTo\Framework\Bundle\Seo\Schema\SchemaManager;
 /**
  * Register default schemas (WebSite, Organization, post type schema, Breadcrumb)
  * and fire the 'framework/seo/schema' action for theme customization.
+ *
+ * This class is a pure orchestrator — all generation and condition logic
+ * is delegated to the injected generators and the {@see PostTypeSchemaResolver}.
  */
 final class RegisterDefaultSchemas implements Hooks
 {
@@ -55,7 +58,11 @@ final class RegisterDefaultSchemas implements Hooks
         $this->schemaManager->add($this->webSiteGenerator->generate());
         $this->schemaManager->add($this->organizationGenerator->generate());
 
-        $this->registerPostTypeSchema();
+        $postTypeSchema = $this->postTypeResolver->resolveFromContext($this->queryContext);
+
+        if ($postTypeSchema !== null) {
+            $this->schemaManager->add($postTypeSchema);
+        }
 
         $breadcrumb = $this->breadcrumbGenerator->generate();
 
@@ -77,24 +84,5 @@ final class RegisterDefaultSchemas implements Hooks
          * @param SchemaManager $schemaManager The schema manager instance.
          */
         $this->hookDispatcher->doAction('framework/seo/schema', $this->schemaManager);
-    }
-
-    private function registerPostTypeSchema(): void
-    {
-        if (!$this->queryContext->isSingular()) {
-            return;
-        }
-
-        $post = $this->queryContext->getQueriedObject();
-
-        if (!$post instanceof \WP_Post) {
-            return;
-        }
-
-        $schema = $this->postTypeResolver->resolve($post->post_type, $post->ID);
-
-        if ($schema !== null) {
-            $this->schemaManager->add($schema);
-        }
     }
 }

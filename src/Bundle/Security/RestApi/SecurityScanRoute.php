@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Bundle\Security\RestApi;
 
+use BackTo\Framework\Bundle\Admin\Contracts\CapabilityManagerInterface;
+use BackTo\Framework\RestApi\Contracts\RestRequest;
+use BackTo\Framework\RestApi\Contracts\RestResponse;
 use BackTo\Framework\RestApi\Contracts\RestRouteInterface;
 use BackTo\Framework\Bundle\Security\Audit\FileIntegrityMonitor;
 use BackTo\Framework\Bundle\Security\Audit\MalwareScanner;
-use WP_REST_Response;
 
 /**
  * REST endpoint to trigger and retrieve security scan results.
@@ -18,13 +20,16 @@ final class SecurityScanRoute implements RestRouteInterface
 {
     private readonly FileIntegrityMonitor $integrityMonitor;
     private readonly MalwareScanner $malwareScanner;
+    private readonly CapabilityManagerInterface $capabilityManager;
 
     public function __construct(
         FileIntegrityMonitor $integrityMonitor,
         MalwareScanner $malwareScanner,
+        CapabilityManagerInterface $capabilityManager,
     ) {
         $this->integrityMonitor = $integrityMonitor;
         $this->malwareScanner = $malwareScanner;
+        $this->capabilityManager = $capabilityManager;
     }
 
     public function getNamespace(): string
@@ -37,13 +42,13 @@ final class SecurityScanRoute implements RestRouteInterface
         return '/security/scan';
     }
 
-    
+
     public function getMethods(): array
     {
         return ['GET'];
     }
 
-    public function handle(mixed $request): mixed
+    public function handle(RestRequest $request): RestResponse
     {
         $integrityResult = $this->integrityMonitor->check();
         $malwareResult = $this->malwareScanner->scan();
@@ -52,7 +57,7 @@ final class SecurityScanRoute implements RestRouteInterface
             && $integrityResult['missing'] === []
             && $integrityResult['added'] === [];
 
-        return new WP_REST_Response([
+        return new RestResponse([
             'file_integrity' => [
                 'status' => $integrityClean ? 'clean' : 'alert',
                 'modified' => $integrityResult['modified'],
@@ -69,6 +74,6 @@ final class SecurityScanRoute implements RestRouteInterface
 
     public function getPermissionCallback(): ?callable
     {
-        return static fn (): bool => current_user_can('manage_options');
+        return fn (): bool => $this->capabilityManager->currentUserCan('manage_options');
     }
 }

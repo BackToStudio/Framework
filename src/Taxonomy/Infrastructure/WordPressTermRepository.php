@@ -7,21 +7,23 @@ namespace BackTo\Framework\Taxonomy\Infrastructure;
 use BackTo\Framework\Exception\TermNotFoundException;
 use BackTo\Framework\Query\SortDirection;
 use BackTo\Framework\Taxonomy\Contracts\TermInterface;
+use BackTo\Framework\Taxonomy\Contracts\TermQueryGatewayInterface;
 use BackTo\Framework\Taxonomy\Contracts\TermRepositoryInterface;
 use BackTo\Framework\Taxonomy\Factory\TermFactory;
 use BackTo\Framework\Taxonomy\Repository\TermQueryBuilder;
 use WP_Term;
 
 use function get_term;
-use function get_terms;
 
 class WordPressTermRepository implements TermRepositoryInterface
 {
     protected readonly TermFactory $factory;
+    protected readonly TermQueryGatewayInterface $gateway;
 
-    public function __construct(TermFactory $factory)
+    public function __construct(TermFactory $factory, TermQueryGatewayInterface $gateway)
     {
         $this->factory = $factory;
+        $this->gateway = $gateway;
     }
 
     public function find(int $id, string $taxonomy = 'category'): TermInterface
@@ -41,7 +43,7 @@ class WordPressTermRepository implements TermRepositoryInterface
      */
     public function findAll(array $options = []): array
     {
-        $wpTerms = get_terms(
+        $wpTerms = $this->gateway->queryTerms(
             array_merge(
                 [
                     'taxonomy' => 'category',
@@ -50,10 +52,6 @@ class WordPressTermRepository implements TermRepositoryInterface
                 $options
             )
         );
-
-        if ($wpTerms instanceof \WP_Error) {
-            return [];
-        }
 
         return $this->factory->createFromTerms($wpTerms);
     }
@@ -80,6 +78,6 @@ class WordPressTermRepository implements TermRepositoryInterface
 
     public function query(): TermQueryBuilder
     {
-        return new TermQueryBuilder($this->factory);
+        return new TermQueryBuilder($this->factory, $this->gateway);
     }
 }

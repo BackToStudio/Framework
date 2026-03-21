@@ -4,14 +4,13 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\PostType;
 
-use BackTo\Framework\Contracts\ActivationHooks;
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
 use BackTo\Framework\Exception\FrameworkException;
 use BackTo\Framework\Contracts\LoggerInterface;
 use BackTo\Framework\PostType\Contracts\PostTypeRegistrarInterface;
 
-final class RegisterPostType implements Hooks, ActivationHooks
+final class RegisterPostType implements Hooks
 {
     private readonly PostTypeRegistry $registry;
     private readonly PostTypeFactory $factory;
@@ -31,12 +30,6 @@ final class RegisterPostType implements Hooks, ActivationHooks
         $this->registrar = $registrar;
         $this->hookDispatcher = $hookDispatcher;
         $this->logger = $logger;
-    }
-
-    public function activate(): void
-    {
-        $this->registerCustomPostTypes();
-        $this->registrar->flushRewriteRules();
     }
 
     public function hooks(): void

@@ -7,70 +7,27 @@ namespace BackTo\Framework\Bundle\Security\Tests;
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
 use BackTo\Framework\Contracts\RequestContextInterface;
-use BackTo\Framework\Contracts\ResponseEmitterInterface;
 use BackTo\Framework\Bundle\Security\Contracts\CorsManagerInterface;
 use BackTo\Framework\Bundle\Security\Contracts\SecurityRuleInterface;
 use BackTo\Framework\Bundle\Security\Headers\CorsManager;
 use PHPUnit\Framework\TestCase;
 
-class TestableCorsManager extends CorsManager
-{
-    private string $requestOrigin = '';
-    private bool $isPreflight = false;
-    public bool $exitCalled = false;
-
-    /** @var array<string, string> */
-    public array $sentHeaderValues = [];
-
-    public function setRequestOrigin(string $origin): void
-    {
-        $this->requestOrigin = $origin;
-    }
-
-    public function setPreflight(bool $isPreflight): void
-    {
-        $this->isPreflight = $isPreflight;
-    }
-
-    protected function getRequestOrigin(): string
-    {
-        return $this->requestOrigin;
-    }
-
-    protected function isPreflightRequest(): bool
-    {
-        return $this->isPreflight;
-    }
-
-    protected function headersSent(): bool
-    {
-        return false;
-    }
-
-    protected function sendHeaders(string $origin): void
-    {
-        $this->sentHeaderValues = $this->buildHeaders($origin);
-    }
-
-    protected function exitPreflight(): void
-    {
-        $this->exitCalled = true;
-    }
-}
-
+/**
+ * @see FakeResponseEmitterForCorsTest defined in CorsPreflightHandlerTest.php
+ */
 class CorsManagerTest extends TestCase
 {
     private HookDispatcherInterface $dispatcher;
     private RequestContextInterface $requestContext;
-    private ResponseEmitterInterface $responseEmitter;
-    private TestableCorsManager $cors;
+    private FakeResponseEmitterForCorsTest $responseEmitter;
+    private CorsManager $cors;
 
     protected function setUp(): void
     {
         $this->dispatcher = $this->createMock(HookDispatcherInterface::class);
         $this->requestContext = $this->createMock(RequestContextInterface::class);
-        $this->responseEmitter = $this->createMock(ResponseEmitterInterface::class);
-        $this->cors = new TestableCorsManager($this->dispatcher, $this->requestContext, $this->responseEmitter);
+        $this->responseEmitter = new FakeResponseEmitterForCorsTest();
+        $this->cors = new CorsManager($this->dispatcher, $this->requestContext, $this->responseEmitter);
     }
 
     public function testImplementsRequiredInterfaces(): void
@@ -208,47 +165,52 @@ class CorsManagerTest extends TestCase
         $this->assertArrayNotHasKey('Access-Control-Allow-Credentials', $headers);
     }
 
-    public function testHandleCorsPreflightExits(): void
+    public function testHandleCorsPreflightSendsStatusAndTerminates(): void
     {
         $this->cors->addAllowedOrigin('https://example.com');
-        $this->cors->setRequestOrigin('https://example.com');
-        $this->cors->setPreflight(true);
+        $this->requestContext->method('server')->with('HTTP_ORIGIN')->willReturn('https://example.com');
+        $this->requestContext->method('getMethod')->willReturn('OPTIONS');
 
-        $this->cors->handleCors();
+        try {
+            $this->cors->handleCors();
+        } catch (\RuntimeException) {
+            // terminate() throws — expected
+        }
 
-        $this->assertTrue($this->cors->exitCalled);
+        $this->assertSame(200, $this->responseEmitter->statusCode);
+        $this->assertTrue($this->responseEmitter->terminated);
     }
 
-    public function testHandleCorsNonPreflightDoesNotExit(): void
+    public function testHandleCorsNonPreflightDoesNotTerminate(): void
     {
         $this->cors->addAllowedOrigin('https://example.com');
-        $this->cors->setRequestOrigin('https://example.com');
-        $this->cors->setPreflight(false);
+        $this->requestContext->method('server')->with('HTTP_ORIGIN')->willReturn('https://example.com');
+        $this->requestContext->method('getMethod')->willReturn('GET');
 
         $this->cors->handleCors();
 
-        $this->assertFalse($this->cors->exitCalled);
+        $this->assertFalse($this->responseEmitter->terminated);
     }
 
     public function testHandleCorsIgnoresDisallowedOrigin(): void
     {
         $this->cors->addAllowedOrigin('https://example.com');
-        $this->cors->setRequestOrigin('https://evil.com');
-        $this->cors->setPreflight(true);
+        $this->requestContext->method('server')->with('HTTP_ORIGIN')->willReturn('https://evil.com');
+        $this->requestContext->method('getMethod')->willReturn('OPTIONS');
 
         $this->cors->handleCors();
 
-        $this->assertFalse($this->cors->exitCalled);
+        $this->assertFalse($this->responseEmitter->terminated);
     }
 
     public function testHandleCorsIgnoresEmptyOrigin(): void
     {
         $this->cors->addAllowedOrigin('https://example.com');
-        $this->cors->setRequestOrigin('');
+        $this->requestContext->method('server')->with('HTTP_ORIGIN')->willReturn('');
 
         $this->cors->handleCors();
 
-        $this->assertFalse($this->cors->exitCalled);
+        $this->assertFalse($this->responseEmitter->terminated);
     }
 
     public function testFluentInterface(): void

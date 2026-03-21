@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Bundle\Security\Audit;
 
-use BackTo\Framework\Cache\Contracts\TransientStoreInterface;
+use BackTo\Framework\Cache\Contracts\CacheStoreInterface;
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
 use BackTo\Framework\Options\Contracts\OptionsRepositoryInterface;
@@ -40,7 +40,7 @@ final class SecurityNotifier implements Hooks, SecurityRuleInterface, SecurityNo
     private readonly OptionsRepositoryInterface $options;
     private readonly ClientIpResolverInterface $ipResolver;
     private readonly SecurityAlertFormatter $formatter;
-    private readonly TransientStoreInterface $transientStore;
+    private readonly CacheStoreInterface $cacheStore;
 
     /** @var string[] */
     private array $recipients = [];
@@ -70,7 +70,7 @@ final class SecurityNotifier implements Hooks, SecurityRuleInterface, SecurityNo
         MailerInterface $mailer,
         OptionsRepositoryInterface $options,
         ClientIpResolverInterface $ipResolver,
-        TransientStoreInterface $transientStore,
+        CacheStoreInterface $cacheStore,
         ?SecurityAlertFormatter $formatter = null,
         array $criticalEvents = [],
     ) {
@@ -78,7 +78,7 @@ final class SecurityNotifier implements Hooks, SecurityRuleInterface, SecurityNo
         $this->mailer = $mailer;
         $this->options = $options;
         $this->ipResolver = $ipResolver;
-        $this->transientStore = $transientStore;
+        $this->cacheStore = $cacheStore;
         $this->formatter = $formatter ?? new SecurityAlertFormatter($options);
         $this->criticalEvents = $criticalEvents !== [] ? $criticalEvents : self::DEFAULT_CRITICAL_EVENTS;
     }
@@ -176,8 +176,8 @@ final class SecurityNotifier implements Hooks, SecurityRuleInterface, SecurityNo
         $ip = $this->ipResolver->getClientIp();
         $key = self::FAILED_LOGIN_TRANSIENT_PREFIX . md5($ip);
 
-        $count = (int) ($this->transientStore->get($key) ?: 0) + 1;
-        $this->transientStore->set($key, $count, self::FAILED_LOGIN_WINDOW);
+        $count = (int) ($this->cacheStore->get($key) ?: 0) + 1;
+        $this->cacheStore->set($key, $count, self::FAILED_LOGIN_WINDOW);
 
         if ($count === $this->failedLoginThreshold) {
             $this->notify('login_failed_threshold', AuditLogSeverity::Warning->value, [

@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Bundle\Security\RestApi;
 
+use BackTo\Framework\Bundle\Admin\Contracts\CapabilityManagerInterface;
+use BackTo\Framework\RestApi\Contracts\RestRequest;
+use BackTo\Framework\RestApi\Contracts\RestResponse;
 use BackTo\Framework\RestApi\Contracts\RestRouteInterface;
 use BackTo\Framework\Bundle\Security\Contracts\AuditLogRepositoryInterface;
-use WP_REST_Response;
 
 /**
  * REST endpoint to retrieve security audit log events.
@@ -16,10 +18,14 @@ use WP_REST_Response;
 final class SecurityAuditLogRoute implements RestRouteInterface
 {
     private readonly AuditLogRepositoryInterface $repository;
+    private readonly CapabilityManagerInterface $capabilityManager;
 
-    public function __construct(AuditLogRepositoryInterface $repository)
-    {
+    public function __construct(
+        AuditLogRepositoryInterface $repository,
+        CapabilityManagerInterface $capabilityManager,
+    ) {
         $this->repository = $repository;
+        $this->capabilityManager = $capabilityManager;
     }
 
     public function getNamespace(): string
@@ -32,33 +38,33 @@ final class SecurityAuditLogRoute implements RestRouteInterface
         return '/security/audit-log';
     }
 
-    
+
     public function getMethods(): array
     {
         return ['GET'];
     }
 
-    public function handle(mixed $request): mixed
+    public function handle(RestRequest $request): RestResponse
     {
         $filters = [];
 
-        $event = $request->get_param('event');
+        $event = $request->getParam('event');
         if (is_string($event) && $event !== '') {
             $filters['event'] = $event;
         }
 
-        $severity = $request->get_param('severity');
+        $severity = $request->getParam('severity');
         if (is_string($severity) && $severity !== '') {
             $filters['severity'] = $severity;
         }
 
-        $perPage = max(1, min(100, (int) ($request->get_param('per_page') ?? 50)));
-        $page = max(1, (int) ($request->get_param('page') ?? 1));
+        $perPage = max(1, min(100, (int) ($request->getParam('per_page') ?? 50)));
+        $page = max(1, (int) ($request->getParam('page') ?? 1));
         $offset = ($page - 1) * $perPage;
 
         $events = $this->repository->getEvents($filters, $perPage, $offset);
 
-        return new WP_REST_Response([
+        return new RestResponse([
             'events' => $events,
             'page' => $page,
             'per_page' => $perPage,
@@ -67,6 +73,6 @@ final class SecurityAuditLogRoute implements RestRouteInterface
 
     public function getPermissionCallback(): ?callable
     {
-        return static fn (): bool => current_user_can('manage_options');
+        return fn (): bool => $this->capabilityManager->currentUserCan('manage_options');
     }
 }

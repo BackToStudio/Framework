@@ -6,21 +6,23 @@ namespace BackTo\Framework\PostType\Infrastructure;
 
 use BackTo\Framework\Exception\PostNotFoundException;
 use BackTo\Framework\PostType\Contracts\PostInterface;
+use BackTo\Framework\PostType\Contracts\PostQueryGatewayInterface;
 use BackTo\Framework\PostType\Contracts\PostRepositoryInterface;
 use BackTo\Framework\PostType\Factory\PostFactory;
 use BackTo\Framework\PostType\Repository\PostQueryBuilder;
 use BackTo\Framework\Query\SortDirection;
 
 use function get_post;
-use function get_posts;
 
 class WordPressPostRepository implements PostRepositoryInterface
 {
     protected readonly PostFactory $factory;
+    protected readonly PostQueryGatewayInterface $gateway;
 
-    public function __construct(PostFactory $factory)
+    public function __construct(PostFactory $factory, PostQueryGatewayInterface $gateway)
     {
         $this->factory = $factory;
+        $this->gateway = $gateway;
     }
 
     public function find(int $id): PostInterface
@@ -43,7 +45,7 @@ class WordPressPostRepository implements PostRepositoryInterface
         $defaultArgs = [
             'numberposts' => -1,
         ];
-        $wpPosts = get_posts(array_merge($defaultArgs, $args));
+        $wpPosts = $this->gateway->queryPosts(array_merge($defaultArgs, $args));
 
         return $this->factory->createFromPosts($wpPosts);
     }
@@ -74,6 +76,6 @@ class WordPressPostRepository implements PostRepositoryInterface
 
     public function query(): PostQueryBuilder
     {
-        return new PostQueryBuilder($this->factory);
+        return new PostQueryBuilder($this->factory, $this->gateway);
     }
 }

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Observability;
 
-use BackTo\Framework\Cache\Contracts\TransientStoreInterface;
+use BackTo\Framework\Cache\Contracts\CacheStoreInterface;
 use BackTo\Framework\Contracts\HealthCheckStatus;
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
@@ -27,12 +27,12 @@ final class SystemNoticeManager implements Hooks
 
     private readonly HealthCheckRegistry $registry;
     private readonly HookDispatcherInterface $hookDispatcher;
-    private readonly TransientStoreInterface $transientStore;
+    private readonly CacheStoreInterface $transientStore;
 
     public function __construct(
         HealthCheckRegistry $registry,
         HookDispatcherInterface $hookDispatcher,
-        TransientStoreInterface $transientStore,
+        CacheStoreInterface $transientStore,
     ) {
         $this->registry = $registry;
         $this->hookDispatcher = $hookDispatcher;
