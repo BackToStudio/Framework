@@ -7,38 +7,26 @@ namespace BackTo\Framework\Bundle\Security\Tests;
 use BackTo\Framework\Contracts\HookDispatcherInterface;
 use BackTo\Framework\Contracts\Hooks;
 use BackTo\Framework\Contracts\RequestContextInterface;
-use BackTo\Framework\Contracts\ResponseEmitterInterface;
 use BackTo\Framework\Bundle\Security\Contracts\CorsManagerInterface;
 use BackTo\Framework\Bundle\Security\Contracts\SecurityRuleInterface;
 use BackTo\Framework\Bundle\Security\Headers\CorsManager;
 use PHPUnit\Framework\TestCase;
 
-class FakeResponseEmitterForCorsManagerTest implements ResponseEmitterInterface
-{
-    public int $statusCode = 0;
-    public bool $terminated = false;
-    /** @var string[] */
-    public array $headers = [];
-
-    public function sendHeader(string $header): void { $this->headers[] = $header; }
-    public function removeHeader(string $name): void {}
-    public function setStatusCode(int $code): void { $this->statusCode = $code; }
-    public function headersSent(): bool { return false; }
-    public function terminate(): never { $this->terminated = true; throw new \RuntimeException('terminated'); }
-}
-
+/**
+ * @see FakeResponseEmitterForCorsTest defined in CorsPreflightHandlerTest.php
+ */
 class CorsManagerTest extends TestCase
 {
     private HookDispatcherInterface $dispatcher;
     private RequestContextInterface $requestContext;
-    private FakeResponseEmitterForCorsManagerTest $responseEmitter;
+    private FakeResponseEmitterForCorsTest $responseEmitter;
     private CorsManager $cors;
 
     protected function setUp(): void
     {
         $this->dispatcher = $this->createMock(HookDispatcherInterface::class);
         $this->requestContext = $this->createMock(RequestContextInterface::class);
-        $this->responseEmitter = new FakeResponseEmitterForCorsManagerTest();
+        $this->responseEmitter = new FakeResponseEmitterForCorsTest();
         $this->cors = new CorsManager($this->dispatcher, $this->requestContext, $this->responseEmitter);
     }
 
@@ -177,7 +165,7 @@ class CorsManagerTest extends TestCase
         $this->assertArrayNotHasKey('Access-Control-Allow-Credentials', $headers);
     }
 
-    public function testHandleCorsPreflightSendsStatusCode(): void
+    public function testHandleCorsPreflightSendsStatusAndTerminates(): void
     {
         $this->cors->addAllowedOrigin('https://example.com');
         $this->requestContext->method('server')->with('HTTP_ORIGIN')->willReturn('https://example.com');
@@ -186,13 +174,14 @@ class CorsManagerTest extends TestCase
         try {
             $this->cors->handleCors();
         } catch (\RuntimeException) {
-            // terminate() throws — expected in test environment
+            // terminate() throws — expected
         }
 
         $this->assertSame(200, $this->responseEmitter->statusCode);
+        $this->assertTrue($this->responseEmitter->terminated);
     }
 
-    public function testHandleCorsNonPreflightDoesNotSendStatusCode(): void
+    public function testHandleCorsNonPreflightDoesNotTerminate(): void
     {
         $this->cors->addAllowedOrigin('https://example.com');
         $this->requestContext->method('server')->with('HTTP_ORIGIN')->willReturn('https://example.com');
@@ -200,7 +189,7 @@ class CorsManagerTest extends TestCase
 
         $this->cors->handleCors();
 
-        $this->assertSame(0, $this->responseEmitter->statusCode);
+        $this->assertFalse($this->responseEmitter->terminated);
     }
 
     public function testHandleCorsIgnoresDisallowedOrigin(): void
@@ -211,7 +200,7 @@ class CorsManagerTest extends TestCase
 
         $this->cors->handleCors();
 
-        $this->assertSame(0, $this->responseEmitter->statusCode);
+        $this->assertFalse($this->responseEmitter->terminated);
     }
 
     public function testHandleCorsIgnoresEmptyOrigin(): void
@@ -221,7 +210,7 @@ class CorsManagerTest extends TestCase
 
         $this->cors->handleCors();
 
-        $this->assertSame(0, $this->responseEmitter->statusCode);
+        $this->assertFalse($this->responseEmitter->terminated);
     }
 
     public function testFluentInterface(): void
