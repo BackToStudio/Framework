@@ -87,6 +87,9 @@
         <testsuite name="gdpr">
             <directory>src/Bundle/Gdpr/Tests</directory>
         </testsuite>
+        <testsuite name="validation">
+            <directory>src/Validation/Tests</directory>
+        </testsuite>
     </testsuites>
 
     <coverage cacheDirectory=".phpunit.cache/code-coverage">

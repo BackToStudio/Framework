@@ -32,6 +32,7 @@ use BackTo\Framework\Bundle\Security\SecurityExtension;
 use BackTo\Framework\Bundle\Seo\SeoConfigurator;
 use BackTo\Framework\Bundle\Seo\SeoExtension;
 use BackTo\Framework\Taxonomy\TaxonomyExtension;
+use BackTo\Framework\Validation\ValidationExtension;
 use BackTo\Framework\WordPress\WordPressExtension;
 use Exception;
 use LogicException;
@@ -241,6 +242,7 @@ trait WordPressContainer
             new SeoExtension(),
             new AdminExtension(),
             new OptionsExtension(),
+            new ValidationExtension(),
             new RestApiExtension(),
             new ObservabilityExtension(),
             new SecurityExtension(),

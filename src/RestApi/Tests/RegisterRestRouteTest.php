@@ -11,6 +11,7 @@ use BackTo\Framework\RestApi\Contracts\RestRouteInterface;
 use BackTo\Framework\RestApi\Contracts\RestRouteRegistrarInterface;
 use BackTo\Framework\RestApi\RegisterRestRoute;
 use BackTo\Framework\RestApi\RestRouteRegistry;
+use BackTo\Framework\Validation\Validator;
 use PHPUnit\Framework\TestCase;
 
 class RegisterRestRouteTest extends TestCase
@@ -33,6 +34,7 @@ class RegisterRestRouteTest extends TestCase
             $registrar ?? $this->createMock(RestRouteRegistrarInterface::class),
             $this->hookDispatcher,
             $this->userContext,
+            new Validator(),
         );
     }
 
