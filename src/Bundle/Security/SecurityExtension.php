@@ -22,6 +22,7 @@ use BackTo\Framework\Bundle\Security\Contracts\MailerInterface;
 use BackTo\Framework\Bundle\Security\Contracts\SecurityNotifierInterface;
 use BackTo\Framework\Bundle\Security\Contracts\SecurityRuleInterface;
 use BackTo\Framework\Bundle\Security\Contracts\SubresourceIntegrityInterface;
+use BackTo\Framework\Bundle\Security\DependencyInjection\Compiler\ConfigureAutoUpdatePolicyPass;
 use BackTo\Framework\Bundle\Security\DependencyInjection\Compiler\RegisterSecurityRulePass;
 use BackTo\Framework\Bundle\Security\Headers\ContentSecurityPolicyManager;
 use BackTo\Framework\Bundle\Security\Headers\CorsManager;
@@ -124,6 +125,7 @@ final class SecurityExtension extends AbstractExtension
             ->addTag('wordpress.security_rule');
 
         $containerBuilder->addCompilerPass(new RegisterSecurityRulePass());
+        $containerBuilder->addCompilerPass(new ConfigureAutoUpdatePolicyPass());
 
         $this->registerPortBindings($containerBuilder);
     }

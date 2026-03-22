@@ -59,6 +59,50 @@ The `AddSocialLinksToTimberContext` hook is auto-registered. It adds social link
 {% endif %}
 ```
 
+## Configure WordPress sitemaps
+
+The framework provides fine-grained control over WordPress native sitemaps (wp-sitemap.xml, available since WP 5.5).
+
+Configure via `config/seo.php`:
+
+```php
+use BackTo\Framework\Bundle\Seo\SeoConfigurator;
+
+return static function (SeoConfigurator $seo): void {
+    $seo
+        ->sitemapEnabled(true)                              // Enable/disable sitemaps globally
+        ->sitemapUsersEnabled(false)                        // Exclude user/author sitemaps
+        ->sitemapExcludePostTypes(['attachment', 'revision']) // Exclude post types
+        ->sitemapExcludeTaxonomies(['post_tag', 'post_format']) // Exclude taxonomies
+        ->sitemapExcludePostIds([42, 99])                   // Exclude specific posts
+        ->sitemapExcludeTermIds([5])                        // Exclude specific terms
+        ->sitemapMaxUrls(1000);                             // Max URLs per sitemap page
+};
+```
+
+### Default configuration
+
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `seo.sitemap_enabled` | `true` | Master switch for sitemaps |
+| `seo.sitemap_users_enabled` | `false` | User/author sitemaps (disabled by default for privacy) |
+| `seo.sitemap_excluded_post_types` | `[]` | Post type keys to exclude |
+| `seo.sitemap_excluded_taxonomies` | `[]` | Taxonomy slugs to exclude |
+| `seo.sitemap_excluded_post_ids` | `[]` | Specific post IDs to exclude |
+| `seo.sitemap_excluded_term_ids` | `[]` | Specific term IDs to exclude |
+| `seo.sitemap_max_urls` | `2000` | Max URLs per sitemap page (WP default) |
+
+### WordPress filters used
+
+The `ConfigureSitemaps` hook uses native WordPress filters:
+- `wp_sitemaps_enabled` — disable sitemaps entirely
+- `wp_sitemaps_post_types` — filter included post types
+- `wp_sitemaps_taxonomies` — filter included taxonomies
+- `wp_sitemaps_add_provider` — remove user sitemap provider
+- `wp_sitemaps_max_urls` — control pagination
+- `wp_sitemaps_posts_query_args` — exclude specific posts
+- `wp_sitemaps_taxonomies_query_args` — exclude specific terms
+
 ## Clean Yoast footprint
 
 The `CleanYoastFootprint` hook is auto-registered. It removes Yoast debug markers and version numbers from your HTML output.

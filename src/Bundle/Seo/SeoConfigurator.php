@@ -37,6 +37,67 @@ final class SeoConfigurator implements ModuleConfiguratorInterface
         return $this;
     }
 
+    public function sitemapEnabled(bool $enabled): self
+    {
+        $this->overrides['seo.sitemap_enabled'] = $enabled;
+
+        return $this;
+    }
+
+    public function sitemapUsersEnabled(bool $enabled): self
+    {
+        $this->overrides['seo.sitemap_users_enabled'] = $enabled;
+
+        return $this;
+    }
+
+    /**
+     * @param string[] $postTypes Post type keys to exclude (e.g. ['attachment', 'revision'])
+     */
+    public function sitemapExcludePostTypes(array $postTypes): self
+    {
+        $this->overrides['seo.sitemap_excluded_post_types'] = $postTypes;
+
+        return $this;
+    }
+
+    /**
+     * @param string[] $taxonomies Taxonomy slugs to exclude (e.g. ['post_tag'])
+     */
+    public function sitemapExcludeTaxonomies(array $taxonomies): self
+    {
+        $this->overrides['seo.sitemap_excluded_taxonomies'] = $taxonomies;
+
+        return $this;
+    }
+
+    /**
+     * @param int[] $postIds Specific post IDs to exclude
+     */
+    public function sitemapExcludePostIds(array $postIds): self
+    {
+        $this->overrides['seo.sitemap_excluded_post_ids'] = $postIds;
+
+        return $this;
+    }
+
+    /**
+     * @param int[] $termIds Specific term IDs to exclude
+     */
+    public function sitemapExcludeTermIds(array $termIds): self
+    {
+        $this->overrides['seo.sitemap_excluded_term_ids'] = $termIds;
+
+        return $this;
+    }
+
+    public function sitemapMaxUrls(int $maxUrls): self
+    {
+        $this->overrides['seo.sitemap_max_urls'] = $maxUrls;
+
+        return $this;
+    }
+
     /**
      * @return array<string, mixed>
      */

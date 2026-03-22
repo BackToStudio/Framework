@@ -6,6 +6,7 @@ namespace BackTo\Framework\Cache;
 
 use BackTo\Framework\Cache\Contracts\CacheCleanerInterface;
 use BackTo\Framework\Cache\Contracts\CacheStoreInterface;
+use BackTo\Framework\Cache\DependencyInjection\Compiler\SelectCacheStrategyPass;
 use BackTo\Framework\Cache\Infrastructure\WordPressTransientCleaner;
 use BackTo\Framework\Cache\Infrastructure\WordPressTransientStore;
 use BackTo\Framework\Compose\AbstractExtension;
@@ -18,7 +19,7 @@ final class CacheExtension extends AbstractExtension
         return [
             'dir' => __DIR__,
             'namespace' => 'BackTo\\Framework\\Cache\\',
-            'exclude' => '{Tests,Contracts,Infrastructure}',
+            'exclude' => '{Tests,Contracts,Infrastructure,DependencyInjection}',
         ];
     }
 
@@ -29,6 +30,8 @@ final class CacheExtension extends AbstractExtension
 
         $containerBuilder->register(CacheStoreInterface::class, WordPressTransientStore::class);
         $containerBuilder->setAlias(WordPressTransientStore::class, CacheStoreInterface::class);
+
+        $containerBuilder->addCompilerPass(new SelectCacheStrategyPass());
     }
 
     public function getDefaultConfiguration(): array
