@@ -41,6 +41,10 @@ final class Response implements ResponseInterface
         private readonly string $protocolVersion = '1.1',
         private readonly string $reasonPhrase = '',
     ) {
+        if ($statusCode < 100 || $statusCode > 599) {
+            throw new \InvalidArgumentException(\sprintf('Invalid HTTP status code: %d.', $statusCode));
+        }
+
         $this->body = $body instanceof StreamInterface ? $body : new StringStream($body);
 
         $normalizedHeaders = [];

@@ -92,6 +92,12 @@ final class UploadSecurity implements Hooks, SecurityRuleInterface
      */
     public function validateUpload(array $file): array
     {
+        if (!isset($file['name'], $file['tmp_name'], $file['error'])) {
+            $file['error'] = 'Invalid file upload structure.';
+
+            return $file;
+        }
+
         if ($file['error'] !== UPLOAD_ERR_OK) {
             return $file;
         }

@@ -45,6 +45,10 @@ final class WordPressHttpClient implements HttpClientInterface
 
     public function request(string $method, string $url, array $options = []): ResponseInterface
     {
+        if ($url === '' || \filter_var($url, \FILTER_VALIDATE_URL) === false) {
+            throw new \InvalidArgumentException(\sprintf('Invalid URL: "%s".', $url));
+        }
+
         $args = $this->buildArgs($method, $options);
 
         $wpResponse = \wp_remote_request($url, $args);
@@ -93,7 +97,7 @@ final class WordPressHttpClient implements HttpClientInterface
     private function toResponse(mixed $wpResponse): ResponseInterface
     {
         if ($wpResponse instanceof \WP_Error) {
-            return new Response(0, [], $wpResponse->get_error_message());
+            return new Response(502, [], $wpResponse->get_error_message());
         }
 
         $statusCode = (int) \wp_remote_retrieve_response_code($wpResponse);

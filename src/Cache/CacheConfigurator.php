@@ -61,6 +61,10 @@ final class CacheConfigurator implements ModuleConfiguratorInterface
 
     public function redisHost(string $host): self
     {
+        if (\trim($host) === '') {
+            throw new \InvalidArgumentException('Redis host cannot be empty.');
+        }
+
         $this->overrides['cache.redis.host'] = $host;
 
         return $this;

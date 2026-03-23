@@ -38,6 +38,10 @@ class WordPressPostMetaRepository implements PostMetaRepositoryInterface
 
     public function get(int $postId, string $metaKey, bool $single = true): PostMetaInterface
     {
+        if ($postId <= 0) {
+            throw new \InvalidArgumentException(\sprintf('Post ID must be positive, got %d.', $postId));
+        }
+
         $postMetaValue = get_post_meta($postId, $metaKey, $single);
         return $this->factory->create($postId, $metaKey, $postMetaValue);
     }

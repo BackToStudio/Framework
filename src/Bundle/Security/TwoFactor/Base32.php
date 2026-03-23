@@ -49,7 +49,7 @@ final class Base32
             $index = strpos(self::ALPHABET, $char);
 
             if ($index === false) {
-                continue;
+                throw new \InvalidArgumentException(\sprintf('Invalid Base32 character: "%s".', $char));
             }
 
             $binary .= str_pad(decbin((int) $index), 5, '0', STR_PAD_LEFT);
