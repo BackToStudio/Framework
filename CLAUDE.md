@@ -23,9 +23,20 @@ ModuleName/
 - **Port bindings**: register interface → implementation in `register()`, then alias
 - **Autoconfiguration**: tag services by interface (e.g. `RestRouteInterface` → `wordpress.rest_route`)
 
-## Validation Rules
+## Fail Fast / Early Return
 
-**Every user-facing input must be validated before use.** This applies to:
+**Reject invalid state as early as possible.** Don't let bad data propagate through layers — detect it at the boundary and stop immediately. This applies everywhere: constructors, setters, method entry points, request handlers.
+
+- **Constructors and setters**: validate arguments upfront, throw `\InvalidArgumentException` on invalid input. An object must never exist in an invalid state.
+- **Methods**: check preconditions at the top and return early (or throw) before doing any work. Don't nest valid logic inside deep conditionals — invert the condition, bail out, then proceed with the happy path.
+- **Request handling**: validate input before processing. Invalid REST requests must be rejected with a 400 before reaching the handler logic.
+- **Configuration**: invalid config must crash at boot time, not cause silent failures in production.
+
+This applies concretely to:
+
+### Input Validation
+
+**Every user-facing input must be validated before use.**
 
 ### REST API Routes
 - Routes accepting parameters MUST implement `ValidatedRestRouteInterface` and declare `rules()` returning constraint arrays
