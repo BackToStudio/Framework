@@ -66,6 +66,10 @@ final class PerformanceConfigurator implements ModuleConfiguratorInterface
 
     public function heartbeatAdminInterval(int $seconds): self
     {
+        if ($seconds < 15) {
+            throw new \InvalidArgumentException('Heartbeat interval must be at least 15 seconds.');
+        }
+
         $this->overrides['performance.heartbeat.admin_interval'] = $seconds;
 
         return $this;
@@ -101,6 +105,10 @@ final class PerformanceConfigurator implements ModuleConfiguratorInterface
 
     public function lazyLoadSkipFirst(int $count): self
     {
+        if ($count < 0) {
+            throw new \InvalidArgumentException('Lazy load skip count must be zero or positive.');
+        }
+
         $this->overrides['performance.lazy_load_skip_first'] = $count;
 
         return $this;
@@ -199,6 +207,10 @@ final class PerformanceConfigurator implements ModuleConfiguratorInterface
 
     public function pageCacheTtl(int $seconds): self
     {
+        if ($seconds < 0) {
+            throw new \InvalidArgumentException('Page cache TTL must be zero or positive.');
+        }
+
         $this->overrides['performance.page_cache.ttl'] = $seconds;
 
         return $this;
@@ -268,6 +280,10 @@ final class PerformanceConfigurator implements ModuleConfiguratorInterface
 
     public function htaccessStaticTtl(int $seconds): self
     {
+        if ($seconds < 0) {
+            throw new \InvalidArgumentException('Htaccess static TTL must be zero or positive.');
+        }
+
         $this->overrides['performance.htaccess.static_ttl'] = $seconds;
 
         return $this;

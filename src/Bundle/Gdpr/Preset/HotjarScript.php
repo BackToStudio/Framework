@@ -8,9 +8,15 @@ use BackTo\Framework\Bundle\Gdpr\Contracts\TrackingScriptInterface;
 
 final class HotjarScript implements TrackingScriptInterface
 {
+    /**
+     * @param string $siteId Hotjar numeric site ID.
+     */
     public function __construct(
         private readonly string $siteId,
     ) {
+        if (\preg_match('/^\d+$/', $siteId) !== 1) {
+            throw new \InvalidArgumentException(\sprintf('Invalid Hotjar site ID: "%s". Must be numeric.', $siteId));
+        }
     }
 
     public function getHandle(): string

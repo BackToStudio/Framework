@@ -8,9 +8,15 @@ use BackTo\Framework\Bundle\Gdpr\Contracts\TrackingScriptInterface;
 
 final class GoogleTagManagerScript implements TrackingScriptInterface
 {
+    /**
+     * @param string $containerId GTM container ID (e.g. "GTM-XXXXXXX").
+     */
     public function __construct(
         private readonly string $containerId,
     ) {
+        if (\preg_match('/^GTM-[A-Z0-9]+$/i', $containerId) !== 1) {
+            throw new \InvalidArgumentException(\sprintf('Invalid GTM container ID: "%s".', $containerId));
+        }
     }
 
     public function getHandle(): string

@@ -32,6 +32,10 @@ final class RestApiConfigurator implements ModuleConfiguratorInterface
 
     public function defaultPerPage(int $perPage): self
     {
+        if ($perPage < 1 || $perPage > 100) {
+            throw new \InvalidArgumentException(\sprintf('Default per-page must be between 1 and 100, got %d.', $perPage));
+        }
+
         $this->overrides['rest_api.default_per_page'] = $perPage;
 
         return $this;
