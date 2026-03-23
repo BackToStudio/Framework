@@ -38,7 +38,7 @@ final class CommentCleanup implements CleanupStrategyInterface
         $comments = $db->prefix() . 'comments';
 
         return (int) $db->query(
-            "DELETE FROM {$comments} WHERE comment_approved = '{$this->status}'"
+            $db->prepare("DELETE FROM {$comments} WHERE comment_approved = %s", $this->status)
         );
     }
 }
