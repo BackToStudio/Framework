@@ -25,6 +25,10 @@ final class RestApiConfigurator implements ModuleConfiguratorInterface
 
     public function defaultNamespace(string $namespace): self
     {
+        if ($namespace === '') {
+            throw new \InvalidArgumentException('REST API default namespace cannot be empty.');
+        }
+
         $this->overrides['rest_api.default_namespace'] = $namespace;
 
         return $this;

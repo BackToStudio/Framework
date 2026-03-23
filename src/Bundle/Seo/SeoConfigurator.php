@@ -93,6 +93,10 @@ final class SeoConfigurator implements ModuleConfiguratorInterface
 
     public function sitemapMaxUrls(int $maxUrls): self
     {
+        if ($maxUrls < 1 || $maxUrls > 50000) {
+            throw new \InvalidArgumentException(\sprintf('Sitemap max URLs must be between 1 and 50000, got %d.', $maxUrls));
+        }
+
         $this->overrides['seo.sitemap_max_urls'] = $maxUrls;
 
         return $this;

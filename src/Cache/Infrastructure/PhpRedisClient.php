@@ -32,6 +32,22 @@ final class PhpRedisClient implements RedisClientInterface
         float $timeout = 2.0,
         private readonly string $prefix = '',
     ) {
+        if ($host === '') {
+            throw new \InvalidArgumentException('Redis host cannot be empty.');
+        }
+
+        if ($port < 1 || $port > 65535) {
+            throw new \InvalidArgumentException(\sprintf('Redis port must be between 1 and 65535, got %d.', $port));
+        }
+
+        if ($database < 0) {
+            throw new \InvalidArgumentException(\sprintf('Redis database index must be non-negative, got %d.', $database));
+        }
+
+        if ($timeout <= 0.0) {
+            throw new \InvalidArgumentException('Redis connection timeout must be positive.');
+        }
+
         $this->redis = new \Redis();
         $this->redis->connect($host, $port, $timeout);
 

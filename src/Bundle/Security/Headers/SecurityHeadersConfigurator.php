@@ -52,10 +52,14 @@ class SecurityHeadersConfigurator implements Hooks, SecurityRuleInterface
         ResponseEmitterInterface $responseEmitter,
         string $environment = 'production',
     ) {
+        if (!isset(self::ENVIRONMENT_PRESETS[$environment])) {
+            throw new \InvalidArgumentException(\sprintf('Invalid environment "%s". Allowed: %s.', $environment, implode(', ', array_keys(self::ENVIRONMENT_PRESETS))));
+        }
+
         $this->hookDispatcher = $hookDispatcher;
         $this->responseEmitter = $responseEmitter;
         $this->environment = $environment;
-        $this->headers = self::ENVIRONMENT_PRESETS[$environment] ?? self::ENVIRONMENT_PRESETS['production'];
+        $this->headers = self::ENVIRONMENT_PRESETS[$environment];
     }
 
     public function getName(): string

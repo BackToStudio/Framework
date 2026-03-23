@@ -182,6 +182,10 @@ final class PerformanceConfigurator implements ModuleConfiguratorInterface
 
     public function revisionsLimit(int $limit): self
     {
+        if ($limit < 0) {
+            throw new \InvalidArgumentException(\sprintf('Revisions limit must be non-negative, got %d.', $limit));
+        }
+
         $this->overrides['performance.revisions_limit'] = $limit;
 
         return $this;
@@ -220,6 +224,10 @@ final class PerformanceConfigurator implements ModuleConfiguratorInterface
 
     public function dbCleanupRevisionsLimit(int $limit): self
     {
+        if ($limit < 0) {
+            throw new \InvalidArgumentException(\sprintf('DB cleanup revisions limit must be non-negative, got %d.', $limit));
+        }
+
         $this->overrides['performance.db_cleanup.revisions_limit'] = $limit;
 
         return $this;
@@ -236,6 +244,10 @@ final class PerformanceConfigurator implements ModuleConfiguratorInterface
 
     public function cachePreloadDelay(int $seconds): self
     {
+        if ($seconds < 0) {
+            throw new \InvalidArgumentException(\sprintf('Cache preload delay must be non-negative, got %d.', $seconds));
+        }
+
         $this->overrides['performance.cache_preload.delay'] = $seconds;
 
         return $this;
@@ -243,6 +255,10 @@ final class PerformanceConfigurator implements ModuleConfiguratorInterface
 
     public function cachePreloadBatchSize(int $size): self
     {
+        if ($size < 1) {
+            throw new \InvalidArgumentException(\sprintf('Cache preload batch size must be at least 1, got %d.', $size));
+        }
+
         $this->overrides['performance.cache_preload.batch_size'] = $size;
 
         return $this;

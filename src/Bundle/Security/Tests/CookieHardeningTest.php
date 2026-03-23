@@ -141,10 +141,11 @@ class CookieHardeningTest extends TestCase
         $this->assertSame('Lax', $this->hardening->getSameSite());
     }
 
-    public function testSetSameSiteIgnoresInvalidValues(): void
+    public function testSetSameSiteThrowsOnInvalidValues(): void
     {
+        $this->expectException(\InvalidArgumentException::class);
+
         $this->hardening->setSameSite('Invalid');
-        $this->assertSame('Lax', $this->hardening->getSameSite());
     }
 
     public function testForceSecureReturnsTrueWhenEnabled(): void

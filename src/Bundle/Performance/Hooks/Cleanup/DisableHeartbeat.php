@@ -30,6 +30,10 @@ final class DisableHeartbeat implements Hooks
         bool $disableFrontend = true,
         int $adminInterval = 60
     ) {
+        if ($adminInterval < 15) {
+            throw new \InvalidArgumentException(\sprintf('Heartbeat admin interval must be at least 15 seconds, got %d.', $adminInterval));
+        }
+
         $this->hookDispatcher = $hookDispatcher;
         $this->queryContext = $queryContext;
         $this->scriptManager = $scriptManager;

@@ -97,6 +97,10 @@ final class SecurityConfigurator implements ModuleConfiguratorInterface
 
     public function twoFactorIssuer(string $issuer): self
     {
+        if ($issuer === '') {
+            throw new \InvalidArgumentException('Two-factor issuer cannot be empty.');
+        }
+
         $this->overrides['security.two_factor_issuer'] = $issuer;
 
         return $this;

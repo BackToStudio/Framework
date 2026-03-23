@@ -26,6 +26,10 @@ final class PasswordPolicy implements Hooks, SecurityRuleInterface
         bool $requireNumber = true,
         bool $requireSpecialChar = true,
     ) {
+        if ($minLength < 1) {
+            throw new \InvalidArgumentException(\sprintf('Password minimum length must be at least 1, got %d.', $minLength));
+        }
+
         $this->hookDispatcher = $hookDispatcher;
         $this->requestContext = $requestContext;
         $this->minLength = $minLength;

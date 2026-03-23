@@ -20,6 +20,10 @@ final class SessionManager implements Hooks, SecurityRuleInterface
         RequestContextInterface $requestContext,
         int $maxSessions = 1,
     ) {
+        if ($maxSessions < 1) {
+            throw new \InvalidArgumentException(\sprintf('Max sessions must be at least 1, got %d.', $maxSessions));
+        }
+
         $this->hookDispatcher = $hookDispatcher;
         $this->requestContext = $requestContext;
         $this->maxSessions = $maxSessions;

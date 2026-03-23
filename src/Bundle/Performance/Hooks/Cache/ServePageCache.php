@@ -42,6 +42,10 @@ final class ServePageCache implements Hooks
         ResponseEmitterInterface $responseEmitter,
         int $ttl = 3600,
     ) {
+        if ($ttl < 0) {
+            throw new \InvalidArgumentException(\sprintf('Page cache TTL must be non-negative, got %d.', $ttl));
+        }
+
         $this->hookDispatcher = $hookDispatcher;
         $this->pageCache = $pageCache;
         $this->requestChecker = $requestChecker;

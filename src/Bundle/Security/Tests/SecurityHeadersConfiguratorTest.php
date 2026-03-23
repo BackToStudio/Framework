@@ -80,12 +80,11 @@ class SecurityHeadersConfiguratorTest extends TestCase
         $this->assertSame('no-referrer-when-downgrade', $headers['Referrer-Policy']);
     }
 
-    public function testUnknownEnvironmentFallsToProduction(): void
+    public function testUnknownEnvironmentThrows(): void
     {
-        $configurator = new TestableSecurityHeadersConfigurator($this->dispatcher, $this->responseEmitter, 'unknown');
-        $headers = $configurator->getHeaders();
+        $this->expectException(\InvalidArgumentException::class);
 
-        $this->assertStringContainsString('max-age=31536000', $headers['Strict-Transport-Security']);
+        new TestableSecurityHeadersConfigurator($this->dispatcher, $this->responseEmitter, 'unknown');
     }
 
     public function testGetEnvironment(): void

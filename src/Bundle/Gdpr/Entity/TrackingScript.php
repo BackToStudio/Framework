@@ -22,6 +22,10 @@ final class TrackingScript implements TrackingScriptInterface
             throw new \InvalidArgumentException('Tracking script handle cannot be empty.');
         }
 
+        if ($categoryKey === '') {
+            throw new \InvalidArgumentException('Tracking script category key cannot be empty.');
+        }
+
         if ($source === '') {
             throw new \InvalidArgumentException('Tracking script source cannot be empty.');
         }

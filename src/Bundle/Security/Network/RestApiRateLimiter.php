@@ -57,6 +57,10 @@ class RestApiRateLimiter implements Hooks, SecurityRuleInterface
 
     public function setDefaultLimit(int $limit): self
     {
+        if ($limit < 1) {
+            throw new \InvalidArgumentException(\sprintf('Rate limit must be at least 1, got %d.', $limit));
+        }
+
         $this->defaultLimit = $limit;
 
         return $this;
@@ -64,6 +68,10 @@ class RestApiRateLimiter implements Hooks, SecurityRuleInterface
 
     public function setDefaultWindow(int $seconds): self
     {
+        if ($seconds < 1) {
+            throw new \InvalidArgumentException(\sprintf('Rate window must be at least 1 second, got %d.', $seconds));
+        }
+
         $this->defaultWindow = $seconds;
 
         return $this;

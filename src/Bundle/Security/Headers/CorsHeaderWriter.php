@@ -71,6 +71,10 @@ final class CorsHeaderWriter
 
     public function setMaxAge(int $seconds): self
     {
+        if ($seconds < 0) {
+            throw new \InvalidArgumentException(\sprintf('CORS max-age must be non-negative, got %d.', $seconds));
+        }
+
         $this->maxAge = $seconds;
 
         return $this;

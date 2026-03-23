@@ -11,6 +11,9 @@ final class GoogleAdsScript implements TrackingScriptInterface
     public function __construct(
         private readonly string $conversionId,
     ) {
+        if (!\preg_match('/^[A-Z0-9]+-[A-Z0-9]+$/i', $conversionId)) {
+            throw new \InvalidArgumentException(\sprintf('Invalid Google Ads conversion ID: "%s".', $conversionId));
+        }
     }
 
     public function getHandle(): string

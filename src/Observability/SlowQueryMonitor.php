@@ -41,6 +41,10 @@ final class SlowQueryMonitor implements Hooks
         HookDispatcherInterface $hookDispatcher,
         float $thresholdMs = self::DEFAULT_THRESHOLD_MS,
     ) {
+        if ($thresholdMs <= 0.0) {
+            throw new \InvalidArgumentException('Slow query threshold must be positive.');
+        }
+
         $this->queryMonitor = $queryMonitor;
         $this->metricStore = $metricStore;
         $this->alertDispatcher = $alertDispatcher;

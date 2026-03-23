@@ -14,6 +14,13 @@ final class ConsentCategory implements ConsentCategoryInterface
         private string $description = '',
         private bool $required = false,
     ) {
+        if ($key === '') {
+            throw new \InvalidArgumentException('Consent category key cannot be empty.');
+        }
+
+        if ($label === '') {
+            throw new \InvalidArgumentException('Consent category label cannot be empty.');
+        }
     }
 
     public function getKey(): string
