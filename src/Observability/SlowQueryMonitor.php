@@ -55,6 +55,10 @@ final class SlowQueryMonitor implements Hooks
 
     public function hooks(): void
     {
+        if (!$this->isSaveQueriesEnabled()) {
+            return;
+        }
+
         $this->hookDispatcher->addAction('shutdown', [$this, 'analyze'], 998);
     }
 
@@ -111,5 +115,10 @@ final class SlowQueryMonitor implements Hooks
                 $stats['total_time_ms'],
             ));
         }
+    }
+
+    protected function isSaveQueriesEnabled(): bool
+    {
+        return \defined('SAVEQUERIES') && SAVEQUERIES;
     }
 }

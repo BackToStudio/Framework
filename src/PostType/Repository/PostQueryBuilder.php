@@ -167,7 +167,7 @@ final class PostQueryBuilder
     public function get(): array
     {
         $defaults = [
-            'numberposts' => -1,
+            'numberposts' => 100,
             'post_status' => 'publish',
         ];
 

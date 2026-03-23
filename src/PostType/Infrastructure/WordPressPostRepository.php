@@ -43,7 +43,7 @@ class WordPressPostRepository implements PostRepositoryInterface
     public function findAll(array $args = []): array
     {
         $defaultArgs = [
-            'numberposts' => -1,
+            'numberposts' => 100,
         ];
         $wpPosts = $this->gateway->queryPosts(array_merge($defaultArgs, $args));
 

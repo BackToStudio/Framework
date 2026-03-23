@@ -14,7 +14,13 @@ use BackTo\Framework\Cache\Contracts\RedisClientInterface;
  */
 final class PhpRedisClient implements RedisClientInterface
 {
-    private \Redis $redis;
+    private ?\Redis $redis = null;
+
+    private readonly string $host;
+    private readonly int $port;
+    private readonly string $password;
+    private readonly int $database;
+    private readonly float $timeout;
 
     /**
      * @param string $host     Redis host (default: 127.0.0.1)
@@ -48,21 +54,34 @@ final class PhpRedisClient implements RedisClientInterface
             throw new \InvalidArgumentException('Redis connection timeout must be positive.');
         }
 
-        $this->redis = new \Redis();
-        $this->redis->connect($host, $port, $timeout);
+        $this->host = $host;
+        $this->port = $port;
+        $this->password = $password;
+        $this->database = $database;
+        $this->timeout = $timeout;
+    }
 
-        if ($password !== '') {
-            $this->redis->auth($password);
+    private function connection(): \Redis
+    {
+        if ($this->redis === null) {
+            $this->redis = new \Redis();
+            $this->redis->connect($this->host, $this->port, $this->timeout);
+
+            if ($this->password !== '') {
+                $this->redis->auth($this->password);
+            }
+
+            if ($this->database !== 0) {
+                $this->redis->select($this->database);
+            }
         }
 
-        if ($database !== 0) {
-            $this->redis->select($database);
-        }
+        return $this->redis;
     }
 
     public function get(string $key): ?string
     {
-        $value = $this->redis->get($this->prefix . $key);
+        $value = $this->connection()->get($this->prefix . $key);
 
         return $value === false ? null : (string) $value;
     }
@@ -72,20 +91,20 @@ final class PhpRedisClient implements RedisClientInterface
         $prefixed = $this->prefix . $key;
 
         if ($ttl > 0) {
-            return $this->redis->setex($prefixed, $ttl, $value);
+            return $this->connection()->setex($prefixed, $ttl, $value);
         }
 
-        return $this->redis->set($prefixed, $value);
+        return $this->connection()->set($prefixed, $value);
     }
 
     public function del(string $key): bool
     {
-        return $this->redis->del($this->prefix . $key) > 0;
+        return $this->connection()->del($this->prefix . $key) > 0;
     }
 
     public function exists(string $key): bool
     {
-        return (bool) $this->redis->exists($this->prefix . $key);
+        return (bool) $this->connection()->exists($this->prefix . $key);
     }
 
     public function flushByPrefix(string $prefix): bool
@@ -94,10 +113,10 @@ final class PhpRedisClient implements RedisClientInterface
         $iterator = null;
 
         do {
-            $keys = $this->redis->scan($iterator, $pattern, 100);
+            $keys = $this->connection()->scan($iterator, $pattern, 100);
 
             if ($keys !== false && $keys !== []) {
-                $this->redis->del(...$keys);
+                $this->connection()->del(...$keys);
             }
         } while ($iterator > 0);
 
@@ -107,7 +126,7 @@ final class PhpRedisClient implements RedisClientInterface
     public function ping(): bool
     {
         try {
-            return $this->redis->ping() !== false;
+            return $this->connection()->ping() !== false;
         } catch (\Throwable) {
             return false;
         }
@@ -115,7 +134,7 @@ final class PhpRedisClient implements RedisClientInterface
 
     public function info(): array
     {
-        $info = $this->redis->info();
+        $info = $this->connection()->info();
 
         if (!\is_array($info)) {
             return [];

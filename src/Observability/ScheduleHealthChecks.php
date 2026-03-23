@@ -48,7 +48,7 @@ final class ScheduleHealthChecks implements Hooks
 
     public function hooks(): void
     {
-        $this->hookDispatcher->addAction('init', [$this, 'ensureScheduled']);
+        $this->hookDispatcher->addAction('admin_init', [$this, 'ensureScheduled']);
         $this->hookDispatcher->addAction(self::CRON_HOOK, [$this, 'runChecks']);
     }
 

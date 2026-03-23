@@ -21,6 +21,9 @@ final class HookBasedDomainEventDispatcher implements DomainEventDispatcherInter
 {
     private readonly HookDispatcherInterface $hookDispatcher;
 
+    /** @var array<class-string, string> */
+    private static array $eventNameCache = [];
+
     public function __construct(HookDispatcherInterface $hookDispatcher)
     {
         $this->hookDispatcher = $hookDispatcher;
@@ -41,9 +44,15 @@ final class HookBasedDomainEventDispatcher implements DomainEventDispatcherInter
      */
     private static function resolveEventName(DomainEventInterface $event): string
     {
+        $class = $event::class;
+
+        if (isset(self::$eventNameCache[$class])) {
+            return self::$eventNameCache[$class];
+        }
+
         $className = (new \ReflectionClass($event))->getShortName();
         $snakeCase = strtolower((string) preg_replace('/[A-Z]/', '_$0', lcfirst($className)));
 
-        return 'backto.domain_event.' . $snakeCase;
+        return self::$eventNameCache[$class] = 'backto.domain_event.' . $snakeCase;
     }
 }

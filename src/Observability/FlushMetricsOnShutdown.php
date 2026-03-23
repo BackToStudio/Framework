@@ -43,6 +43,10 @@ final class FlushMetricsOnShutdown implements Hooks
 
     public function flush(): void
     {
+        if (!$this->metricStore->isDirty() && $this->cacheMetrics === null) {
+            return;
+        }
+
         if ($this->cacheMetrics !== null) {
             $this->cacheMetrics->flushMetrics();
         }
