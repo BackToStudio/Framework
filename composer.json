@@ -26,6 +26,7 @@
     "backto/event-dispatcher": "self.version",
     "backto/exception": "self.version",
     "backto/hooks": "self.version",
+    "backto/lock": "self.version",
     "backto/observability": "self.version",
     "backto/options-resolver": "self.version",
     "backto/options": "self.version",

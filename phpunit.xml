@@ -96,6 +96,9 @@
         <testsuite name="options-resolver">
             <directory>src/OptionsResolver/Tests</directory>
         </testsuite>
+        <testsuite name="lock">
+            <directory>src/Lock/Tests</directory>
+        </testsuite>
     </testsuites>
 
     <coverage cacheDirectory=".phpunit.cache/code-coverage">

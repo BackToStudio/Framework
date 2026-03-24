@@ -16,6 +16,7 @@ use BackTo\Framework\Contracts\RegistryInterface;
 use BackTo\Framework\EventDispatcher\EventDispatcherExtension;
 use BackTo\Framework\Hooks\HooksExtension;
 use BackTo\Framework\Http\HttpExtension;
+use BackTo\Framework\Lock\LockExtension;
 use BackTo\Framework\Hooks\Contracts\HookRegistryInterface;
 use BackTo\Framework\Observability\ObservabilityConfigurator;
 use BackTo\Framework\OptionsResolver\OptionsResolverExtension;
@@ -241,6 +242,7 @@ trait WordPressContainer
             new TaxonomyExtension(),
             new PostMetaExtension(),
             new CacheExtension(),
+            new LockExtension(),
             new SeoExtension(),
             new AdminExtension(),
             new OptionsExtension(),
