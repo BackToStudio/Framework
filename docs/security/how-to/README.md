@@ -30,3 +30,4 @@ Practical recipes for common security tasks.
 - [Sanitize user input safely](./sanitize-user-input-safely.md)
 - [Escape output in the right context](./escape-output-in-the-right-context.md)
 - [Manage nonces for CSRF protection](./manage-nonces-for-csrf-protection.md)
+- [Protect against bot traffic](./protect-against-bot-traffic.md)

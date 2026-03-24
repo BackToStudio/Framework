@@ -16,3 +16,4 @@ Understanding the architecture and design of the Security bundle.
 - [Audit trail design](./audit-trail-design.md)
 - [Why generic login error messages?](./why-generic-login-error-messages.md)
 - [Session management trade-offs](./session-management-trade-offs.md)
+- [Bot protection strategy](./bot-protection-strategy.md)
