@@ -18,6 +18,7 @@ use BackTo\Framework\Hooks\HooksExtension;
 use BackTo\Framework\Http\HttpExtension;
 use BackTo\Framework\Hooks\Contracts\HookRegistryInterface;
 use BackTo\Framework\Observability\ObservabilityConfigurator;
+use BackTo\Framework\OptionsResolver\OptionsResolverExtension;
 use BackTo\Framework\Observability\ObservabilityExtension;
 use BackTo\Framework\Options\OptionsExtension;
 use BackTo\Framework\PostMeta\PostMetaExtension;
@@ -243,6 +244,7 @@ trait WordPressContainer
             new SeoExtension(),
             new AdminExtension(),
             new OptionsExtension(),
+            new OptionsResolverExtension(),
             new EventDispatcherExtension(),
             new ValidationExtension(),
             new RestApiExtension(),

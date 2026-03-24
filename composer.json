@@ -27,6 +27,7 @@
     "backto/exception": "self.version",
     "backto/hooks": "self.version",
     "backto/observability": "self.version",
+    "backto/options-resolver": "self.version",
     "backto/options": "self.version",
     "backto/plugin": "self.version",
     "backto/post-meta": "self.version",

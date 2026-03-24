@@ -93,6 +93,9 @@
         <testsuite name="event-dispatcher">
             <directory>src/EventDispatcher/Tests</directory>
         </testsuite>
+        <testsuite name="options-resolver">
+            <directory>src/OptionsResolver/Tests</directory>
+        </testsuite>
     </testsuites>
 
     <coverage cacheDirectory=".phpunit.cache/code-coverage">
