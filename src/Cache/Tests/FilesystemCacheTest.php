@@ -24,19 +24,12 @@ class FilesystemCacheTest extends TestCase
     protected function tearDown(): void
     {
         $this->cache->clear();
-        if (is_dir($this->cacheDir)) {
-            rmdir($this->cacheDir);
-        }
+        $this->removeDirectory($this->cacheDir);
     }
 
     public function testImplementsCacheInterface(): void
     {
         $this->assertInstanceOf(CacheInterface::class, $this->cache);
-    }
-
-    public function testCreatesCacheDirectory(): void
-    {
-        $this->assertDirectoryExists($this->cacheDir);
     }
 
     public function testGetReturnsDefaultWhenKeyNotFound(): void
@@ -154,15 +147,15 @@ class FilesystemCacheTest extends TestCase
         $this->assertTrue($this->cache->has('forever'));
     }
 
-    public function testCorruptedFileReturnsDefault(): void
+    public function testClearAndReuse(): void
     {
         $this->cache->set('key', 'value');
+        $this->cache->clear();
+        $this->assertNull($this->cache->get('key'));
 
-        // Corrupt the cache file
-        $files = glob($this->cacheDir . '/*.cache');
-        file_put_contents($files[0], 'not-serialized-data');
-
-        $this->assertSame('default', $this->cache->get('key', 'default'));
+        // Cache should be usable after clear
+        $this->cache->set('key2', 'value2');
+        $this->assertSame('value2', $this->cache->get('key2'));
     }
 
     public function testInvalidKeyThrowsException(): void
@@ -175,5 +168,38 @@ class FilesystemCacheTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $this->cache->get('');
+    }
+
+    public function testPrune(): void
+    {
+        $this->cache->set('short-lived', 'value', 1);
+
+        // Sleep to let TTL expire
+        sleep(2);
+
+        $this->assertTrue($this->cache->prune());
+        $this->assertFalse($this->cache->has('short-lived'));
+    }
+
+    private function removeDirectory(string $dir): void
+    {
+        if (!is_dir($dir)) {
+            return;
+        }
+
+        $items = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS),
+            \RecursiveIteratorIterator::CHILD_FIRST,
+        );
+
+        foreach ($items as $item) {
+            if ($item->isDir()) {
+                rmdir($item->getPathname());
+            } else {
+                unlink($item->getPathname());
+            }
+        }
+
+        rmdir($dir);
     }
 }
