@@ -23,6 +23,7 @@
     "backto/cli": "self.version",
     "backto/compose": "self.version",
     "backto/contracts": "self.version",
+    "backto/event-dispatcher": "self.version",
     "backto/exception": "self.version",
     "backto/hooks": "self.version",
     "backto/observability": "self.version",

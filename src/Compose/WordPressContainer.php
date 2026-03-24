@@ -13,6 +13,7 @@ use BackTo\Framework\Cache\CacheExtension;
 use BackTo\Framework\Compose\DependencyInjection\Compiler\ResolveInstanceOfConditionalPassWithVendorPrefix;
 use BackTo\Framework\Contracts\ExtensionInterface;
 use BackTo\Framework\Contracts\RegistryInterface;
+use BackTo\Framework\EventDispatcher\EventDispatcherExtension;
 use BackTo\Framework\Hooks\HooksExtension;
 use BackTo\Framework\Http\HttpExtension;
 use BackTo\Framework\Hooks\Contracts\HookRegistryInterface;
@@ -242,6 +243,7 @@ trait WordPressContainer
             new SeoExtension(),
             new AdminExtension(),
             new OptionsExtension(),
+            new EventDispatcherExtension(),
             new ValidationExtension(),
             new RestApiExtension(),
             new ObservabilityExtension(),

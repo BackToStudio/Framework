@@ -90,6 +90,9 @@
         <testsuite name="validation">
             <directory>src/Validation/Tests</directory>
         </testsuite>
+        <testsuite name="event-dispatcher">
+            <directory>src/EventDispatcher/Tests</directory>
+        </testsuite>
     </testsuites>
 
     <coverage cacheDirectory=".phpunit.cache/code-coverage">
