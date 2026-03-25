@@ -23,6 +23,7 @@ use BackTo\Framework\Cli\Command\MakeTaxonomyCommand;
 use BackTo\Framework\Cli\Command\MakeBlockCommand;
 use BackTo\Framework\Cli\Command\MakeHookCommand;
 use BackTo\Framework\Cli\Command\MakeRestRouteCommand;
+use BackTo\Framework\Cli\Command\GenerateServerConfigCommand;
 use BackTo\Framework\Cli\Command\QueueStatusCommand;
 
 WP_CLI::add_command('make:post-type', MakePostTypeCommand::class, [
@@ -101,5 +102,16 @@ WP_CLI::add_command('backto:maintenance', MaintenanceCommand::class, [
         ['type' => 'flag', 'name' => 'purge-metrics', 'description' => 'Purge old metrics', 'optional' => true],
         ['type' => 'assoc', 'name' => 'days', 'description' => 'Days to retain for metric purge', 'optional' => true, 'default' => '30'],
         ['type' => 'flag', 'name' => 'optimize-tables', 'description' => 'Run OPTIMIZE TABLE', 'optional' => true],
+    ],
+]);
+
+WP_CLI::add_command('backto:generate-server-config', GenerateServerConfigCommand::class, [
+    'shortdesc' => 'Generate Nginx/Apache bot protection configuration.',
+    'synopsis' => [
+        ['type' => 'assoc', 'name' => 'server', 'description' => 'Web server type (nginx, apache, both)', 'optional' => true, 'default' => 'nginx', 'options' => ['nginx', 'apache', 'both']],
+        ['type' => 'assoc', 'name' => 'output', 'description' => 'Output mode (stdout, file)', 'optional' => true, 'default' => 'stdout', 'options' => ['stdout', 'file']],
+        ['type' => 'assoc', 'name' => 'dir', 'description' => 'Output directory when using --output=file', 'optional' => true, 'default' => '.'],
+        ['type' => 'assoc', 'name' => 'blocked-ips', 'description' => 'Comma-separated IPs/CIDRs to block', 'optional' => true],
+        ['type' => 'assoc', 'name' => 'extra-bots', 'description' => 'Additional User-Agent names to block', 'optional' => true],
     ],
 ]);

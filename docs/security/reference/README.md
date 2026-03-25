@@ -14,3 +14,4 @@ Complete API documentation for of the Security bundle.
 - [REST API routes](./rest-api-routes.md)
 - [Contracts](./contracts.md)
 - [DI Registration](./di-registration.md)
+- [ServerConfigGenerator](./server-config-generator.md)
