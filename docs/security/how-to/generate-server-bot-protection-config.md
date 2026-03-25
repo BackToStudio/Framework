@@ -1,5 +1,7 @@
 # Generate server bot protection configuration
 
+*How-to — Task-oriented*
+
 The `ServerConfigGenerator` produces Nginx and Apache configuration snippets that block bot traffic at the web-server level, before PHP is invoked. This eliminates the overhead of launching PHP processes for malicious requests.
 
 ## Configure via config/security.php
@@ -79,7 +81,7 @@ This creates `backto-bot-protection.conf` (Nginx) or `.htaccess-bot-protection` 
 
 ### Override config via CLI flags
 
-CLI flags override the configuration for a single generation. This is useful for testing or one-off additions:
+CLI flags override the configuration for a single generation. Useful for testing or one-off additions:
 
 ```bash
 # Add extra bots beyond the configured list
@@ -146,6 +148,7 @@ The configuration is the single source of truth. The generated server config alw
 
 ## See also
 
-- [Protect against bot traffic](./protect-against-bot-traffic.md) — full multi-layer protection strategy
-- [Customize REST API rate limiting](./customize-rest-api-rate-limiting.md) — application-level rate limiting
-- [Set up IP access control](./set-up-ip-access-control.md) — application-level IP blocking
+- [Protect against bots with Nginx](./protect-against-bots-nginx.md)
+- [Protect against bots with Apache](./protect-against-bots-apache.md)
+- [Configure application bot protection](./configure-application-bot-protection.md)
+- [ServerConfigGenerator — Reference](../reference/server-config-generator.md)

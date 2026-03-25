@@ -1,33 +1,33 @@
-# Proteger un site contre les bots avec Nginx
+# Protect against bots with Nginx
 
-*How-to — Oriente tache*
+*How-to — Task-oriented*
 
-Ce guide couvre la mise en place d'une protection anti-bots complete sur un serveur Nginx, de l'infrastructure au serveur web.
+This guide covers setting up full bot protection on an Nginx server, from infrastructure to web server to application.
 
-## Prerequis
+## Prerequisites
 
-- Acces root/sudo au serveur Nginx
-- Un site WordPress utilisant le BackTo Framework avec le Security Bundle active
-- (Recommande) Un compte Cloudflare ou un CDN equivalent
+- Root/sudo access to the Nginx server
+- A WordPress site using the BackTo Framework with the Security Bundle enabled
+- (Recommended) A Cloudflare account or equivalent CDN
 
-## Etape 1 : Activer la protection au niveau CDN
+## Step 1: Enable CDN-level protection
 
-La methode la plus efficace. Le trafic est bloque avant d'atteindre votre serveur.
+The most effective method. Traffic is blocked before reaching your server.
 
-1. Passez votre domaine sous Cloudflare (proxy active, icone orange).
-2. Activez **Bot Fight Mode** dans Security > Bots.
-3. Creez une regle de rate limiting dans Security > WAF > Rate limiting rules :
-   - Si les requetes d'une meme IP depassent **60 par minute** → **Block**.
-4. Creez des regles de firewall pour bloquer les bots de scraping connus :
-   - Condition : `User-Agent contains "SemrushBot" OR "AhrefsBot" OR "DotBot"`
-   - Action : **Block**
-5. Configurez une Page Rule pour mettre en cache les pages publiques :
-   - URL : `example.com/*`
-   - Cache Level : Cache Everything, Edge Cache TTL : 2 heures
+1. Put your domain behind Cloudflare (proxy enabled, orange cloud icon).
+2. Enable **Bot Fight Mode** in Security > Bots.
+3. Create a rate limiting rule in Security > WAF > Rate limiting rules:
+   - If requests from the same IP exceed **60 per minute** → **Block**.
+4. Create firewall rules to block known scraping bots:
+   - Condition: `User-Agent contains "SemrushBot" OR "AhrefsBot" OR "DotBot"`
+   - Action: **Block**
+5. Set up a Page Rule to cache public pages:
+   - URL: `example.com/*`
+   - Cache Level: Cache Everything, Edge Cache TTL: 2 hours
 
-## Etape 2 : Generer la configuration Nginx via le Security Bundle
+## Step 2: Generate the Nginx configuration via the Security Bundle
 
-Le Security Bundle genere la configuration Nginx a partir de vos parametres dans `config/security.php` :
+The Security Bundle generates Nginx configuration from your `config/security.php` parameters:
 
 ```php
 <?php
@@ -50,32 +50,32 @@ return static function (SecurityConfigurator $security): void {
 };
 ```
 
-Generez le fichier de configuration :
+Generate the configuration file:
 
 ```bash
 wp backto:generate-server-config --server=nginx --output=file --dir=/etc/nginx/conf.d
 ```
 
-Cela cree `/etc/nginx/conf.d/backto-bot-protection.conf`.
+This creates `/etc/nginx/conf.d/backto-bot-protection.conf`.
 
-### Integrer dans la configuration Nginx
+### Include in the Nginx configuration
 
-Le fichier genere contient deux sections. La premiere (les `limit_req_zone`) doit etre dans le bloc `http {}`. La seconde (les `location`, `if`, `deny`) dans le bloc `server {}` :
+The generated file contains two sections. The first (`limit_req_zone` directives) must go in the `http {}` block. The second (`location`, `if`, `deny` directives) goes in the `server {}` block:
 
 ```nginx
-# /etc/nginx/nginx.conf — bloc http {}
+# /etc/nginx/nginx.conf — http {} block
 http {
     include /etc/nginx/conf.d/backto-bot-protection.conf;
-    # ... reste de la config
+    # ... rest of config
 }
 ```
 
-Ou, si vous preferez separer :
+Or, if you prefer to separate them:
 
 ```nginx
-# /etc/nginx/nginx.conf — bloc http {}
+# /etc/nginx/nginx.conf — http {} block
 http {
-    # Zones de rate limiting
+    # Rate limiting zones
     limit_req_zone $binary_remote_addr zone=backto_global:10m rate=10r/s;
     limit_req_zone $binary_remote_addr zone=backto_sensitive:10m rate=2r/s;
     limit_conn_zone $binary_remote_addr zone=backto_conn:10m;
@@ -85,9 +85,9 @@ http {
 ```
 
 ```nginx
-# /etc/nginx/sites-available/example.com — bloc server {}
+# /etc/nginx/sites-available/example.com — server {} block
 server {
-    # Bloquer les User-Agents de bots
+    # Block known bot User-Agents
     if ($http_user_agent ~* (SemrushBot|AhrefsBot|DotBot|MJ12bot|BLEXBot|PetalBot|DataForSeoBot|GPTBot|CCBot)) {
         return 403;
     }
@@ -111,19 +111,19 @@ server {
 }
 ```
 
-Validez et rechargez :
+Validate and reload:
 
 ```bash
 sudo nginx -t && sudo systemctl reload nginx
 ```
 
-### Configuration manuelle (sans le generateur)
+### Manual configuration (without the generator)
 
-Si vous ne souhaitez pas utiliser le generateur, copiez la configuration ci-dessus directement dans vos fichiers Nginx.
+If you do not want to use the generator, copy the configuration above directly into your Nginx files.
 
-## Etape 3 : Installer fail2ban pour bannir les recidivistes
+## Step 3: Install fail2ban to ban repeat offenders
 
-Creez un filtre qui detecte les IP bloquees dans les logs Nginx :
+Create a filter that detects blocked IPs in Nginx logs:
 
 ```bash
 sudo tee /etc/fail2ban/filter.d/wordpress-bot.conf > /dev/null << 'EOF'
@@ -133,7 +133,7 @@ ignoreregex =
 EOF
 ```
 
-Ajoutez la jail :
+Add the jail:
 
 ```bash
 sudo tee -a /etc/fail2ban/jail.local > /dev/null << 'EOF'
@@ -153,13 +153,13 @@ EOF
 sudo systemctl restart fail2ban
 ```
 
-Toute IP generant plus de 30 requetes bloquees en 1 minute est bannie 1 heure au niveau du pare-feu (iptables).
+Any IP generating more than 30 blocked requests within 1 minute is banned for 1 hour at the firewall level (iptables).
 
-## Etape 4 : Configurer la couche applicative
+## Step 4: Configure the application layer
 
-Voir [Configurer la protection applicative contre les bots](./configure-application-bot-protection.md).
+See [Configure application bot protection](./configure-application-bot-protection.md).
 
-## Etape 5 : Ajuster PHP-FPM
+## Step 5: Tune PHP-FPM
 
 ```ini
 ; /etc/php/8.2/fpm/pool.d/www.conf
@@ -177,25 +177,25 @@ sudo systemctl reload php8.2-fpm
 ## Verification
 
 ```bash
-# Verifier les 403/429 dans les logs Nginx
+# Check for 403/429 in Nginx logs
 grep -c " 403 " /var/log/nginx/access.log
 grep -c " 429 " /var/log/nginx/access.log
 
-# IP bannies par fail2ban
+# IPs banned by fail2ban
 sudo fail2ban-client status wordpress-bot
 
-# Processus PHP actifs
+# Active PHP processes
 ps aux | grep php-fpm | wc -l
 
-# Tester le rate limiting (doit renvoyer 429 apres la limite)
+# Test rate limiting (should return 429 after the limit)
 for i in $(seq 1 35); do
     curl -s -o /dev/null -w "%{http_code}\n" https://example.com/wp-json/wp/v2/posts
 done
 ```
 
-## Voir aussi
+## See also
 
-- [Proteger un site contre les bots avec Apache](./protect-against-bots-apache.md)
-- [Configurer la protection applicative contre les bots](./configure-application-bot-protection.md)
-- [Generer la configuration serveur](./generate-server-bot-protection-config.md)
-- [Strategie de protection contre les bots (explication)](../explanation/bot-protection-strategy.md)
+- [Protect against bots with Apache](./protect-against-bots-apache.md)
+- [Configure application bot protection](./configure-application-bot-protection.md)
+- [Generate server bot protection config](./generate-server-bot-protection-config.md)
+- [Bot protection strategy (explanation)](../explanation/bot-protection-strategy.md)

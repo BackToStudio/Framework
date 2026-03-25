@@ -2,40 +2,40 @@
 
 `BackTo\Framework\Bundle\Security\Network\ServerConfigGenerator`
 
-Genere des fichiers de configuration Nginx et Apache pour bloquer le trafic de bots au niveau du serveur web, avant l'invocation de PHP.
+Generates Nginx and Apache configuration files to block bot traffic at the web-server level, before PHP is invoked.
 
-## Injection DI
+## DI registration
 
-Le service est enregistre automatiquement par le Security Bundle. Ses setters sont appeles par le `ConfigureServerConfigGeneratorPass` a partir des parametres `security.bot_protection.*`.
+The service is registered automatically by the Security Bundle. Its setters are called by the `ConfigureServerConfigGeneratorPass` compiler pass from the `security.bot_protection.*` container parameters.
 
-## Methodes publiques
+## Public methods
 
 ### Configuration
 
-| Methode | Description |
+| Method | Description |
 |---|---|
-| `setBlockedUserAgents(string[])` | Remplace la liste des User-Agents bloques |
-| `addBlockedUserAgents(string[])` | Ajoute des User-Agents a la liste existante |
-| `setBlockedIps(string[])` | Definit les IP/CIDR a bloquer |
-| `setSensitiveEndpoints(string[])` | Definit les URI avec rate limiting renforce |
-| `setGlobalRateLimit(int $rps, int $burst)` | Limite globale en requetes/seconde + burst |
-| `setSensitiveRateLimit(int $rps, int $burst)` | Limite renforcee pour les endpoints sensibles |
-| `setMaxConnectionsPerIp(int)` | Connexions simultanees max par IP |
-| `setBlockEmptyUserAgent(bool)` | Bloquer les requetes sans User-Agent |
+| `setBlockedUserAgents(string[])` | Replace the list of blocked User-Agents |
+| `addBlockedUserAgents(string[])` | Add User-Agents to the existing list |
+| `setBlockedIps(string[])` | Set IP/CIDR ranges to block |
+| `setSensitiveEndpoints(string[])` | Set URI patterns with stricter rate limiting |
+| `setGlobalRateLimit(int $rps, int $burst)` | Global limit in requests/second + burst |
+| `setSensitiveRateLimit(int $rps, int $burst)` | Stricter limit for sensitive endpoints |
+| `setMaxConnectionsPerIp(int)` | Max simultaneous connections per IP |
+| `setBlockEmptyUserAgent(bool)` | Block requests with no User-Agent header |
 
-Tous les setters retournent `$this` (fluent interface).
+All setters return `$this` (fluent interface).
 
 ### Generation
 
-| Methode | Description |
+| Method | Description |
 |---|---|
-| `generateNginx(): string` | Retourne la configuration Nginx complete |
-| `generateApache(): string` | Retourne la configuration Apache complete |
-| `writeNginx(string $path): bool` | Ecrit la configuration Nginx dans un fichier |
-| `writeApache(string $path): bool` | Ecrit la configuration Apache dans un fichier |
-| `getConfiguration(): array` | Retourne la configuration courante |
+| `generateNginx(): string` | Returns the complete Nginx configuration |
+| `generateApache(): string` | Returns the complete Apache configuration |
+| `writeNginx(string $path): bool` | Writes the Nginx configuration to a file |
+| `writeApache(string $path): bool` | Writes the Apache configuration to a file |
+| `getConfiguration(): array` | Returns the current configuration |
 
-### `getConfiguration()` — Format de retour
+### `getConfiguration()` — Return format
 
 ```php
 [
@@ -51,11 +51,11 @@ Tous les setters retournent `$this` (fluent interface).
 ]
 ```
 
-## Sortie generee — Nginx
+## Generated output — Nginx
 
-Le fichier genere contient deux sections :
+The generated file contains two sections:
 
-**Section 1 — bloc `http {}`** (zones de rate limiting) :
+**Section 1 — `http {}` block** (rate limiting zones):
 
 ```nginx
 limit_req_zone $binary_remote_addr zone=backto_global:10m rate=10r/s;
@@ -63,27 +63,27 @@ limit_req_zone $binary_remote_addr zone=backto_sensitive:10m rate=2r/s;
 limit_conn_zone $binary_remote_addr zone=backto_conn:10m;
 ```
 
-**Section 2 — bloc `server {}`** :
+**Section 2 — `server {}` block**:
 
-- Blocage User-Agent (`if` + `return 403`)
-- Blocage User-Agent vide
-- `deny` des IP bloquees
-- `location /` avec `limit_req` et `limit_conn`
-- `location ~` pour les endpoints sensibles
+- User-Agent blocking (`if` + `return 403`)
+- Empty User-Agent blocking
+- IP `deny` directives
+- `location /` with `limit_req` and `limit_conn`
+- `location ~` for sensitive endpoints
 
-## Sortie generee — Apache
+## Generated output — Apache
 
-Le fichier genere contient :
+The generated file contains:
 
-- `mod_rewrite` : blocage par User-Agent (`RewriteCond` + `RewriteRule`)
-- `mod_authz_core` : blocage IP (`Require not ip`)
-- `mod_evasive24` : rate limiting (`DOSPageCount`, `DOSSiteCount`, etc.)
+- `mod_rewrite`: User-Agent blocking (`RewriteCond` + `RewriteRule`)
+- `mod_authz_core`: IP blocking (`Require not ip`)
+- `mod_evasive24`: rate limiting (`DOSPageCount`, `DOSSiteCount`, etc.)
 
-## Compiler Pass
+## Compiler pass
 
-`ConfigureServerConfigGeneratorPass` lit les parametres du conteneur et appelle les setters :
+`ConfigureServerConfigGeneratorPass` reads container parameters and calls the corresponding setters:
 
-| Parametre DI | Methode appelee |
+| DI Parameter | Method called |
 |---|---|
 | `security.bot_protection.blocked_user_agents` | `setBlockedUserAgents()` |
 | `security.bot_protection.blocked_ips` | `setBlockedIps()` |
@@ -93,20 +93,20 @@ Le fichier genere contient :
 | `security.bot_protection.max_connections_per_ip` | `setMaxConnectionsPerIp()` |
 | `security.bot_protection.block_empty_user_agent` | `setBlockEmptyUserAgent()` |
 
-## Commande WP-CLI
+## WP-CLI command
 
 ```
 wp backto:generate-server-config [--server=<nginx|apache|both>] [--output=<stdout|file>] [--dir=<path>] [--blocked-ips=<ips>] [--extra-bots=<bots>]
 ```
 
-| Option | Description | Defaut |
+| Option | Description | Default |
 |---|---|---|
-| `--server` | Type de serveur web | `nginx` |
-| `--output` | Mode de sortie | `stdout` |
-| `--dir` | Repertoire de sortie (mode `file`) | `.` |
-| `--blocked-ips` | IP/CIDR supplementaires (separes par virgule) | — |
-| `--extra-bots` | User-Agents supplementaires (separes par virgule) | — |
+| `--server` | Web server type | `nginx` |
+| `--output` | Output mode | `stdout` |
+| `--dir` | Output directory (`file` mode) | `.` |
+| `--blocked-ips` | Additional IPs/CIDRs (comma-separated) | — |
+| `--extra-bots` | Additional User-Agent names (comma-separated) | — |
 
-Fichiers generes :
-- Nginx : `backto-bot-protection.conf`
-- Apache : `.htaccess-bot-protection`
+Generated files:
+- Nginx: `backto-bot-protection.conf`
+- Apache: `.htaccess-bot-protection`

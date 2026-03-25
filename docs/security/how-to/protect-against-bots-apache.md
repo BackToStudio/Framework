@@ -1,34 +1,34 @@
-# Proteger un site contre les bots avec Apache
+# Protect against bots with Apache
 
-*How-to — Oriente tache*
+*How-to — Task-oriented*
 
-Ce guide couvre la mise en place d'une protection anti-bots complete sur un serveur Apache, de l'infrastructure au serveur web.
+This guide covers setting up full bot protection on an Apache server, from infrastructure to web server to application.
 
-## Prerequis
+## Prerequisites
 
-- Acces root/sudo au serveur Apache
-- Modules actives : `mod_rewrite`, `mod_evasive` (optionnel), `mod_authz_core`
-- Un site WordPress utilisant le BackTo Framework avec le Security Bundle active
-- (Recommande) Un compte Cloudflare ou un CDN equivalent
+- Root/sudo access to the Apache server
+- Modules enabled: `mod_rewrite`, `mod_evasive` (optional), `mod_authz_core`
+- A WordPress site using the BackTo Framework with the Security Bundle enabled
+- (Recommended) A Cloudflare account or equivalent CDN
 
-## Etape 1 : Activer la protection au niveau CDN
+## Step 1: Enable CDN-level protection
 
-La methode la plus efficace. Le trafic est bloque avant d'atteindre votre serveur.
+The most effective method. Traffic is blocked before reaching your server.
 
-1. Passez votre domaine sous Cloudflare (proxy active, icone orange).
-2. Activez **Bot Fight Mode** dans Security > Bots.
-3. Creez une regle de rate limiting dans Security > WAF > Rate limiting rules :
-   - Si les requetes d'une meme IP depassent **60 par minute** → **Block**.
-4. Creez des regles de firewall pour bloquer les bots de scraping connus :
-   - Condition : `User-Agent contains "SemrushBot" OR "AhrefsBot" OR "DotBot"`
-   - Action : **Block**
-5. Configurez une Page Rule pour mettre en cache les pages publiques :
-   - URL : `example.com/*`
-   - Cache Level : Cache Everything, Edge Cache TTL : 2 heures
+1. Put your domain behind Cloudflare (proxy enabled, orange cloud icon).
+2. Enable **Bot Fight Mode** in Security > Bots.
+3. Create a rate limiting rule in Security > WAF > Rate limiting rules:
+   - If requests from the same IP exceed **60 per minute** → **Block**.
+4. Create firewall rules to block known scraping bots:
+   - Condition: `User-Agent contains "SemrushBot" OR "AhrefsBot" OR "DotBot"`
+   - Action: **Block**
+5. Set up a Page Rule to cache public pages:
+   - URL: `example.com/*`
+   - Cache Level: Cache Everything, Edge Cache TTL: 2 hours
 
-## Etape 2 : Generer la configuration Apache via le Security Bundle
+## Step 2: Generate the Apache configuration via the Security Bundle
 
-Le Security Bundle genere la configuration Apache a partir de vos parametres dans `config/security.php` :
+The Security Bundle generates Apache configuration from your `config/security.php` parameters:
 
 ```php
 <?php
@@ -51,23 +51,23 @@ return static function (SecurityConfigurator $security): void {
 };
 ```
 
-Generez le fichier de configuration :
+Generate the configuration file:
 
 ```bash
 wp backto:generate-server-config --server=apache --output=file --dir=/var/www/html
 ```
 
-Cela cree `/var/www/html/.htaccess-bot-protection`.
+This creates `/var/www/html/.htaccess-bot-protection`.
 
-### Integrer dans la configuration Apache
+### Include in the Apache configuration
 
-#### Option A : Fusionner dans .htaccess
+#### Option A: Merge into .htaccess
 
 ```bash
 cat /var/www/html/.htaccess-bot-protection >> /var/www/html/.htaccess
 ```
 
-#### Option B : Inclure dans le VirtualHost
+#### Option B: Include in VirtualHost
 
 ```apache
 # /etc/apache2/sites-available/example.com.conf
@@ -77,37 +77,37 @@ cat /var/www/html/.htaccess-bot-protection >> /var/www/html/.htaccess
 
     Include /var/www/html/.htaccess-bot-protection
 
-    # ... reste de la config
+    # ... rest of config
 </VirtualHost>
 ```
 
-Rechargez Apache :
+Reload Apache:
 
 ```bash
 sudo apachectl configtest && sudo systemctl reload apache2
 ```
 
-### Configuration manuelle (sans le generateur)
+### Manual configuration (without the generator)
 
-Si vous preferez configurer manuellement, ajoutez dans `.htaccess` ou le VirtualHost :
+If you prefer to configure manually, add the following to `.htaccess` or the VirtualHost:
 
-#### Blocage des User-Agents de bots
+#### Block bot User-Agents
 
 ```apache
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
-    # Bloquer les bots de scraping connus
+    # Block known scraping bots
     RewriteCond %{HTTP_USER_AGENT} (SemrushBot|AhrefsBot|DotBot|MJ12bot|BLEXBot|PetalBot|DataForSeoBot|GPTBot|CCBot) [NC]
     RewriteRule .* - [F,L]
 
-    # Bloquer les requetes sans User-Agent
+    # Block requests with empty User-Agent
     RewriteCond %{HTTP_USER_AGENT} ^$ [NC]
     RewriteRule .* - [F,L]
 </IfModule>
 ```
 
-#### Blocage d'IP specifiques
+#### Block specific IPs
 
 ```apache
 # Apache 2.4+ (mod_authz_core)
@@ -118,7 +118,7 @@ Si vous preferez configurer manuellement, ajoutez dans `.htaccess` ou le Virtual
 </RequireAll>
 ```
 
-Pour Apache 2.2 :
+For Apache 2.2:
 
 ```apache
 <IfModule !mod_authz_core.c>
@@ -129,7 +129,7 @@ Pour Apache 2.2 :
 </IfModule>
 ```
 
-#### Rate limiting avec mod_evasive
+#### Rate limiting with mod_evasive
 
 ```bash
 sudo a2enmod evasive
@@ -138,11 +138,11 @@ sudo a2enmod evasive
 ```apache
 <IfModule mod_evasive24.c>
     DOSHashTableSize    3097
-    DOSPageCount        5         # max 5 requetes sur la meme page/seconde
-    DOSSiteCount        50        # max 50 requetes sur le site/seconde
+    DOSPageCount        5         # max 5 requests to the same page/second
+    DOSSiteCount        50        # max 50 requests to the site/second
     DOSPageInterval     1
     DOSSiteInterval     1
-    DOSBlockingPeriod   60        # bannir 60 secondes
+    DOSBlockingPeriod   60        # ban for 60 seconds
     DOSEmailNotify      admin@example.com
     DOSLogDir           "/var/log/mod_evasive"
 </IfModule>
@@ -153,18 +153,10 @@ sudo mkdir -p /var/log/mod_evasive
 sudo chown www-data:www-data /var/log/mod_evasive
 ```
 
-#### Protection des endpoints sensibles
+#### Protect sensitive endpoints
 
 ```apache
-# Rate limiting specifique pour wp-login.php
-<Files "wp-login.php">
-    <IfModule mod_evasive24.c>
-        DOSPageCount    3
-        DOSPageInterval 1
-    </IfModule>
-</Files>
-
-# Bloquer xmlrpc.php completement (si non utilise)
+# Block xmlrpc.php entirely (if not used)
 <Files "xmlrpc.php">
     <IfModule mod_authz_core.c>
         Require all denied
@@ -176,9 +168,9 @@ sudo chown www-data:www-data /var/log/mod_evasive
 </Files>
 ```
 
-## Etape 3 : Installer fail2ban pour bannir les recidivistes
+## Step 3: Install fail2ban to ban repeat offenders
 
-Creez un filtre qui detecte les IP bloquees dans les logs Apache :
+Create a filter that detects blocked IPs in Apache logs:
 
 ```bash
 sudo tee /etc/fail2ban/filter.d/wordpress-bot.conf > /dev/null << 'EOF'
@@ -188,7 +180,7 @@ ignoreregex =
 EOF
 ```
 
-Ajoutez la jail (adaptez le chemin des logs) :
+Add the jail (adjust the log path for your setup):
 
 ```bash
 sudo tee -a /etc/fail2ban/jail.local > /dev/null << 'EOF'
@@ -208,13 +200,13 @@ EOF
 sudo systemctl restart fail2ban
 ```
 
-Toute IP generant plus de 30 requetes bloquees en 1 minute est bannie 1 heure au niveau du pare-feu.
+Any IP generating more than 30 blocked requests within 1 minute is banned for 1 hour at the firewall level.
 
-## Etape 4 : Configurer la couche applicative
+## Step 4: Configure the application layer
 
-Voir [Configurer la protection applicative contre les bots](./configure-application-bot-protection.md).
+See [Configure application bot protection](./configure-application-bot-protection.md).
 
-## Etape 5 : Ajuster PHP
+## Step 5: Tune PHP
 
 ### PHP-FPM (mod_proxy_fcgi)
 
@@ -248,36 +240,35 @@ sudo systemctl reload php8.2-fpm
 sudo systemctl reload apache2
 ```
 
-## Modules Apache recommandes
+## Recommended Apache modules
 
-| Module | Role | Commande d'activation |
+| Module | Purpose | Activation |
 |---|---|---|
-| `mod_rewrite` | Blocage par User-Agent, redirection | `sudo a2enmod rewrite` |
+| `mod_rewrite` | User-Agent blocking, redirects | `sudo a2enmod rewrite` |
 | `mod_evasive` | Rate limiting / anti-DDoS | `sudo apt install libapache2-mod-evasive` |
 | `mod_security2` | WAF (Web Application Firewall) | `sudo apt install libapache2-mod-security2` |
-| `mod_authz_core` | Controle d'acces IP (Apache 2.4+) | Active par defaut |
-| `mod_headers` | Headers de securite | `sudo a2enmod headers` |
+| `mod_authz_core` | IP access control (Apache 2.4+) | Enabled by default |
+| `mod_headers` | Security headers | `sudo a2enmod headers` |
 
 ## Verification
 
 ```bash
-# Verifier les 403 dans les logs Apache
+# Check for 403 in Apache logs
 grep -c " 403 " /var/log/apache2/access.log
 
-# IP bannies par fail2ban
+# IPs banned by fail2ban
 sudo fail2ban-client status wordpress-bot
 
-# Processus PHP actifs
+# Active PHP processes
 ps aux | grep php | wc -l
 
-# Tester le blocage User-Agent
+# Test User-Agent blocking (should return 403)
 curl -s -o /dev/null -w "%{http_code}\n" -A "SemrushBot" https://example.com/
-# Doit renvoyer 403
 ```
 
-## Voir aussi
+## See also
 
-- [Proteger un site contre les bots avec Nginx](./protect-against-bots-nginx.md)
-- [Configurer la protection applicative contre les bots](./configure-application-bot-protection.md)
-- [Generer la configuration serveur](./generate-server-bot-protection-config.md)
-- [Strategie de protection contre les bots (explication)](../explanation/bot-protection-strategy.md)
+- [Protect against bots with Nginx](./protect-against-bots-nginx.md)
+- [Configure application bot protection](./configure-application-bot-protection.md)
+- [Generate server bot protection config](./generate-server-bot-protection-config.md)
+- [Bot protection strategy (explanation)](../explanation/bot-protection-strategy.md)
