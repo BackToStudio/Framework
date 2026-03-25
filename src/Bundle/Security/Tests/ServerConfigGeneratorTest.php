@@ -6,6 +6,7 @@ namespace BackTo\Framework\Bundle\Security\Tests;
 
 use BackTo\Framework\Bundle\Security\Contracts\FileWriterInterface;
 use BackTo\Framework\Bundle\Security\Network\ServerConfigGenerator;
+use BackTo\Framework\Bundle\Security\SecurityConfiguration;
 use PHPUnit\Framework\TestCase;
 
 class ServerConfigGeneratorTest extends TestCase
@@ -15,6 +16,23 @@ class ServerConfigGeneratorTest extends TestCase
     protected function setUp(): void
     {
         $this->generator = new ServerConfigGenerator();
+
+        // Apply defaults as the compiler pass would
+        $defaults = SecurityConfiguration::getDefaults();
+        $this->generator
+            ->setBlockedUserAgents($defaults['security.bot_protection.blocked_user_agents'])
+            ->setBlockedIps($defaults['security.bot_protection.blocked_ips'])
+            ->setSensitiveEndpoints($defaults['security.bot_protection.sensitive_endpoints'])
+            ->setGlobalRateLimit(
+                $defaults['security.bot_protection.global_rate_limit'],
+                $defaults['security.bot_protection.global_burst'],
+            )
+            ->setSensitiveRateLimit(
+                $defaults['security.bot_protection.sensitive_rate_limit'],
+                $defaults['security.bot_protection.sensitive_burst'],
+            )
+            ->setMaxConnectionsPerIp($defaults['security.bot_protection.max_connections_per_ip'])
+            ->setBlockEmptyUserAgent($defaults['security.bot_protection.block_empty_user_agent']);
     }
 
     public function testGenerateNginxContainsRateLimitZones(): void
@@ -27,7 +45,7 @@ class ServerConfigGeneratorTest extends TestCase
         $this->assertStringContainsString('limit_conn_zone', $output);
     }
 
-    public function testGenerateNginxContainsDefaultUserAgentBlocking(): void
+    public function testGenerateNginxContainsConfiguredUserAgentBlocking(): void
     {
         $output = $this->generator->generateNginx();
 
@@ -136,7 +154,7 @@ class ServerConfigGeneratorTest extends TestCase
         $this->assertStringNotContainsString('Require not ip', $output);
     }
 
-    public function testSetBlockedUserAgentsReplacesDefaults(): void
+    public function testSetBlockedUserAgentsReplacesConfig(): void
     {
         $this->generator->setBlockedUserAgents(['CustomBot']);
         $output = $this->generator->generateNginx();
@@ -145,7 +163,7 @@ class ServerConfigGeneratorTest extends TestCase
         $this->assertStringNotContainsString('SemrushBot', $output);
     }
 
-    public function testAddBlockedUserAgentsMergesWithDefaults(): void
+    public function testAddBlockedUserAgentsMergesWithExisting(): void
     {
         $this->generator->addBlockedUserAgents(['CustomBot']);
         $output = $this->generator->generateNginx();
@@ -218,5 +236,33 @@ class ServerConfigGeneratorTest extends TestCase
         $output = $this->generator->generateApache();
 
         $this->assertStringContainsString('BackTo Framework Security Bundle', $output);
+    }
+
+    public function testGetConfigurationReturnsCurrentState(): void
+    {
+        $this->generator
+            ->setBlockedUserAgents(['Bot1'])
+            ->setBlockedIps(['10.0.0.1'])
+            ->setGlobalRateLimit(5, 10)
+            ->setMaxConnectionsPerIp(15);
+
+        $config = $this->generator->getConfiguration();
+
+        $this->assertSame(['Bot1'], $config['blocked_user_agents']);
+        $this->assertSame(['10.0.0.1'], $config['blocked_ips']);
+        $this->assertSame(5, $config['global_rate_limit']);
+        $this->assertSame(10, $config['global_burst']);
+        $this->assertSame(15, $config['max_connections_per_ip']);
+    }
+
+    public function testEmptyGeneratorProducesMinimalOutput(): void
+    {
+        $bare = new ServerConfigGenerator();
+        $output = $bare->generateNginx();
+
+        // Should still have rate limiting zones even without user agents
+        $this->assertStringContainsString('limit_req_zone', $output);
+        // No user agent block
+        $this->assertStringNotContainsString('http_user_agent ~*', $output);
     }
 }

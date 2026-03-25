@@ -23,6 +23,7 @@ use BackTo\Framework\Bundle\Security\Contracts\SecurityNotifierInterface;
 use BackTo\Framework\Bundle\Security\Contracts\SecurityRuleInterface;
 use BackTo\Framework\Bundle\Security\Contracts\SubresourceIntegrityInterface;
 use BackTo\Framework\Bundle\Security\DependencyInjection\Compiler\ConfigureAutoUpdatePolicyPass;
+use BackTo\Framework\Bundle\Security\DependencyInjection\Compiler\ConfigureServerConfigGeneratorPass;
 use BackTo\Framework\Bundle\Security\DependencyInjection\Compiler\RegisterSecurityRulePass;
 use BackTo\Framework\Bundle\Security\Headers\ContentSecurityPolicyManager;
 use BackTo\Framework\Bundle\Security\Headers\CorsManager;
@@ -126,6 +127,7 @@ final class SecurityExtension extends AbstractExtension
 
         $containerBuilder->addCompilerPass(new RegisterSecurityRulePass());
         $containerBuilder->addCompilerPass(new ConfigureAutoUpdatePolicyPass());
+        $containerBuilder->addCompilerPass(new ConfigureServerConfigGeneratorPass());
 
         $this->registerPortBindings($containerBuilder);
     }

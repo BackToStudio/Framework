@@ -149,6 +149,68 @@ final class SecurityConfigurator implements ModuleConfiguratorInterface
         return $this;
     }
 
+    // --- Bot protection ---
+
+    /**
+     * @param string[] $userAgents User-Agent names to block (e.g. ['SemrushBot', 'AhrefsBot'])
+     */
+    public function botBlockedUserAgents(array $userAgents): self
+    {
+        $this->overrides['security.bot_protection.blocked_user_agents'] = $userAgents;
+
+        return $this;
+    }
+
+    /**
+     * @param string[] $ips IP addresses or CIDR ranges to block (e.g. ['192.0.2.0/24'])
+     */
+    public function botBlockedIps(array $ips): self
+    {
+        $this->overrides['security.bot_protection.blocked_ips'] = $ips;
+
+        return $this;
+    }
+
+    /**
+     * @param string[] $endpoints URI patterns for stricter rate limiting (e.g. ['wp-login.php'])
+     */
+    public function botSensitiveEndpoints(array $endpoints): self
+    {
+        $this->overrides['security.bot_protection.sensitive_endpoints'] = $endpoints;
+
+        return $this;
+    }
+
+    public function botGlobalRateLimit(int $requestsPerSecond, int $burst): self
+    {
+        $this->overrides['security.bot_protection.global_rate_limit'] = $requestsPerSecond;
+        $this->overrides['security.bot_protection.global_burst'] = $burst;
+
+        return $this;
+    }
+
+    public function botSensitiveRateLimit(int $requestsPerSecond, int $burst): self
+    {
+        $this->overrides['security.bot_protection.sensitive_rate_limit'] = $requestsPerSecond;
+        $this->overrides['security.bot_protection.sensitive_burst'] = $burst;
+
+        return $this;
+    }
+
+    public function botMaxConnectionsPerIp(int $max): self
+    {
+        $this->overrides['security.bot_protection.max_connections_per_ip'] = $max;
+
+        return $this;
+    }
+
+    public function botBlockEmptyUserAgent(bool $block): self
+    {
+        $this->overrides['security.bot_protection.block_empty_user_agent'] = $block;
+
+        return $this;
+    }
+
     /**
      * @return array<string, mixed>
      */

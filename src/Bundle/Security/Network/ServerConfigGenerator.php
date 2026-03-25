@@ -10,31 +10,17 @@ use BackTo\Framework\Bundle\Security\Infrastructure\NativeFileWriter;
 /**
  * Generates Nginx and Apache configuration snippets for bot protection.
  *
- * Reads the current SecurityConfiguration (rate limits, blocked User-Agents,
- * IP blacklist) and produces server-level config files that block malicious
- * traffic before PHP is invoked.
+ * All settings are injected via setters from the DI container
+ * (see ConfigureServerConfigGeneratorPass). Defaults match those
+ * defined in SecurityConfiguration::getDefaults().
  */
 final class ServerConfigGenerator
 {
     /** @var string[] User-Agent patterns to block */
-    private array $blockedUserAgents = [
-        'SemrushBot',
-        'AhrefsBot',
-        'DotBot',
-        'MJ12bot',
-        'BLEXBot',
-        'PetalBot',
-        'DataForSeoBot',
-        'GPTBot',
-        'CCBot',
-    ];
+    private array $blockedUserAgents = [];
 
     /** @var string[] URI patterns considered sensitive */
-    private array $sensitiveEndpoints = [
-        'wp-login.php',
-        'xmlrpc.php',
-        'wp-cron.php',
-    ];
+    private array $sensitiveEndpoints = [];
 
     private int $globalRateLimit = 10;
     private int $globalBurst = 20;
@@ -123,6 +109,24 @@ final class ServerConfigGenerator
         $this->blockedIps = $ips;
 
         return $this;
+    }
+
+    /**
+     * @return array{blocked_user_agents: string[], blocked_ips: string[], sensitive_endpoints: string[], global_rate_limit: int, global_burst: int, sensitive_rate_limit: int, sensitive_burst: int, max_connections_per_ip: int, block_empty_user_agent: bool}
+     */
+    public function getConfiguration(): array
+    {
+        return [
+            'blocked_user_agents' => $this->blockedUserAgents,
+            'blocked_ips' => $this->blockedIps,
+            'sensitive_endpoints' => $this->sensitiveEndpoints,
+            'global_rate_limit' => $this->globalRateLimit,
+            'global_burst' => $this->globalBurst,
+            'sensitive_rate_limit' => $this->sensitiveRateLimit,
+            'sensitive_burst' => $this->sensitiveBurst,
+            'max_connections_per_ip' => $this->maxConnPerIp,
+            'block_empty_user_agent' => $this->blockEmptyUserAgent,
+        ];
     }
 
     public function generateNginx(): string
