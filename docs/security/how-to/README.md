@@ -31,3 +31,4 @@ Practical recipes for common security tasks.
 - [Escape output in the right context](./escape-output-in-the-right-context.md)
 - [Manage nonces for CSRF protection](./manage-nonces-for-csrf-protection.md)
 - [Protect against bot traffic](./protect-against-bot-traffic.md)
+- [Generate server bot protection config](./generate-server-bot-protection-config.md)

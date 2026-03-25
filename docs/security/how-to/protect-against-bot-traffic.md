@@ -32,6 +32,20 @@ Configurez des Page Rules pour mettre en cache les pages publiques et eviter qu'
 
 ## Etape 2 : Configurer le rate limiting au niveau du serveur web
 
+Le Security Bundle peut generer ces configurations automatiquement via WP-CLI :
+
+```bash
+# Generer la config Nginx
+wp backto:generate-server-config --server=nginx --output=file --dir=/etc/nginx/conf.d
+
+# Generer la config Apache
+wp backto:generate-server-config --server=apache --output=file --dir=/var/www/html
+```
+
+Voir [Generate server bot protection config](./generate-server-bot-protection-config.md) pour plus de details.
+
+Si vous preferez configurer manuellement :
+
 ### Nginx
 
 Ajoutez dans votre configuration Nginx :
