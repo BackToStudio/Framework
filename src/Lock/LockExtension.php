@@ -6,9 +6,11 @@ namespace BackTo\Framework\Lock;
 
 use BackTo\Framework\Compose\AbstractExtension;
 use BackTo\Framework\Lock\Contracts\LockFactoryInterface;
-use BackTo\Framework\Lock\Contracts\LockStoreInterface;
 use BackTo\Framework\Lock\Infrastructure\CacheStoreLockStore;
+use BackToVendor\Symfony\Component\Lock\LockFactory as SymfonyLockFactory;
+use BackToVendor\Symfony\Component\Lock\PersistingStoreInterface;
 use BackToVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
+use BackToVendor\Symfony\Component\DependencyInjection\Reference;
 
 final class LockExtension extends AbstractExtension
 {
@@ -23,14 +25,18 @@ final class LockExtension extends AbstractExtension
 
     public function register(ContainerBuilder $containerBuilder): void
     {
-        // Store: CacheStoreLockStore (backed by whatever cache strategy is active).
-        $containerBuilder->register(LockStoreInterface::class, CacheStoreLockStore::class)
+        // Store: CacheStoreLockStore implements Symfony's PersistingStoreInterface.
+        $containerBuilder->register(PersistingStoreInterface::class, CacheStoreLockStore::class)
             ->setAutowired(true);
-        $containerBuilder->setAlias(CacheStoreLockStore::class, LockStoreInterface::class);
+        $containerBuilder->setAlias(CacheStoreLockStore::class, PersistingStoreInterface::class);
 
-        // Factory: create locks via the port interface.
+        // Symfony LockFactory: creates Symfony Lock instances.
+        $containerBuilder->register(SymfonyLockFactory::class, SymfonyLockFactory::class)
+            ->setArguments([new Reference(PersistingStoreInterface::class)]);
+
+        // Framework LockFactory adapter: wraps Symfony LockFactory.
         $containerBuilder->register(LockFactoryInterface::class, LockFactory::class)
-            ->setAutowired(true);
+            ->setArguments([new Reference(SymfonyLockFactory::class)]);
         $containerBuilder->setAlias(LockFactory::class, LockFactoryInterface::class);
     }
 }

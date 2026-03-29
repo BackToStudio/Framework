@@ -5,19 +5,21 @@ declare(strict_types=1);
 namespace BackTo\Framework\Lock\Infrastructure;
 
 use BackTo\Framework\Cache\Contracts\CacheStoreInterface;
-use BackTo\Framework\Lock\Contracts\LockStoreInterface;
+use BackToVendor\Symfony\Component\Lock\Exception\LockConflictedException;
+use BackToVendor\Symfony\Component\Lock\Key;
+use BackToVendor\Symfony\Component\Lock\PersistingStoreInterface;
 
 /**
- * Lock store backed by the framework's CacheStoreInterface.
+ * Symfony Lock store backed by the framework's CacheStoreInterface.
  *
  * Uses WordPress transients, Redis, or any cache backend
  * depending on the configured cache strategy. The TTL ensures
  * automatic expiration if the holder crashes.
  *
  * Note: check-then-set is not fully atomic with WordPress transients.
- * For truly concurrent environments, use DatabaseLockStore instead.
+ * For truly concurrent environments, use a database-backed store instead.
  */
-final class CacheStoreLockStore implements LockStoreInterface
+final class CacheStoreLockStore implements PersistingStoreInterface
 {
     private const KEY_PREFIX = 'backto_lock_';
 
@@ -28,41 +30,63 @@ final class CacheStoreLockStore implements LockStoreInterface
         $this->cacheStore = $cacheStore;
     }
 
-    public function acquire(string $resource, string $token, int $ttl): bool
+    public function save(Key $key): void
     {
-        $key = self::KEY_PREFIX . $resource;
-        $existing = $this->cacheStore->get($key);
+        $resource = (string) $key;
+        $cacheKey = self::KEY_PREFIX . $resource;
+        $token = $this->getUniqueToken($key);
+        $existing = $this->cacheStore->get($cacheKey);
 
-        if ($existing !== false && $existing !== null) {
-            // Already locked — check if we own it (re-entrant).
-            if ($existing === $token) {
-                return true;
-            }
-
-            return false;
+        if ($existing !== false && $existing !== null && $existing !== $token) {
+            throw new LockConflictedException();
         }
 
-        $this->cacheStore->set($key, $token, $ttl);
-
-        return true;
+        $this->cacheStore->set($cacheKey, $token, 300);
     }
 
-    public function release(string $resource, string $token): void
+    public function delete(Key $key): void
     {
-        $key = self::KEY_PREFIX . $resource;
-        $existing = $this->cacheStore->get($key);
+        $resource = (string) $key;
+        $cacheKey = self::KEY_PREFIX . $resource;
+        $token = $this->getUniqueToken($key);
+        $existing = $this->cacheStore->get($cacheKey);
 
-        // Only release if we own the lock.
         if ($existing === $token) {
-            $this->cacheStore->delete($key);
+            $this->cacheStore->delete($cacheKey);
         }
     }
 
-    public function exists(string $resource): bool
+    public function exists(Key $key): bool
     {
-        $key = self::KEY_PREFIX . $resource;
-        $value = $this->cacheStore->get($key);
+        $resource = (string) $key;
+        $cacheKey = self::KEY_PREFIX . $resource;
+        $token = $this->getUniqueToken($key);
+        $existing = $this->cacheStore->get($cacheKey);
 
-        return $value !== false && $value !== null;
+        return $existing === $token;
+    }
+
+    public function putOffExpiration(Key $key, float $ttl): void
+    {
+        $resource = (string) $key;
+        $cacheKey = self::KEY_PREFIX . $resource;
+        $token = $this->getUniqueToken($key);
+        $existing = $this->cacheStore->get($cacheKey);
+
+        if ($existing !== $token) {
+            throw new LockConflictedException();
+        }
+
+        $this->cacheStore->set($cacheKey, $token, (int) ceil($ttl));
+        $key->reduceLifetime($ttl);
+    }
+
+    private function getUniqueToken(Key $key): string
+    {
+        if (!$key->hasState(__CLASS__)) {
+            $key->setState(__CLASS__, bin2hex(random_bytes(16)));
+        }
+
+        return $key->getState(__CLASS__);
     }
 }

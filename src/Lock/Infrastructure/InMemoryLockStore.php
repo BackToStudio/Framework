@@ -4,61 +4,86 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Lock\Infrastructure;
 
-use BackTo\Framework\Lock\Contracts\LockStoreInterface;
+use BackToVendor\Symfony\Component\Lock\Exception\LockConflictedException;
+use BackToVendor\Symfony\Component\Lock\Key;
+use BackToVendor\Symfony\Component\Lock\PersistingStoreInterface;
 
 /**
  * In-memory lock store for testing and single-process use cases.
  *
- * Locks are held in a static array and do not survive across requests.
- * TTL is tracked but only checked on acquire/exists (no background expiry).
+ * Implements Symfony's PersistingStoreInterface for compatibility with
+ * the Symfony Lock component. Locks are held in an array and do not
+ * survive across requests. TTL is tracked and checked on save/exists.
  */
-final class InMemoryLockStore implements LockStoreInterface
+final class InMemoryLockStore implements PersistingStoreInterface
 {
-    /** @var array<string, array{token: string, expires: int}> */
+    /** @var array<string, array{token: string, expires: float}> */
     private array $locks = [];
 
-    public function acquire(string $resource, string $token, int $ttl): bool
+    public function save(Key $key): void
     {
+        $resource = (string) $key;
+        $token = $this->getUniqueToken($key);
+
         $this->evictExpired($resource);
 
-        if (isset($this->locks[$resource])) {
-            // Re-entrant: same owner can re-acquire.
-            if ($this->locks[$resource]['token'] === $token) {
-                return true;
-            }
-
-            return false;
+        if (isset($this->locks[$resource]) && $this->locks[$resource]['token'] !== $token) {
+            throw new LockConflictedException();
         }
 
         $this->locks[$resource] = [
             'token' => $token,
-            'expires' => time() + $ttl,
+            'expires' => microtime(true) + 300.0,
         ];
 
-        return true;
+        $key->reduceLifetime(300.0);
     }
 
-    public function release(string $resource, string $token): void
+    public function delete(Key $key): void
     {
-        if (!isset($this->locks[$resource])) {
-            return;
-        }
+        $resource = (string) $key;
+        $token = $this->getUniqueToken($key);
 
-        if ($this->locks[$resource]['token'] === $token) {
+        if (isset($this->locks[$resource]) && $this->locks[$resource]['token'] === $token) {
             unset($this->locks[$resource]);
         }
     }
 
-    public function exists(string $resource): bool
+    public function exists(Key $key): bool
     {
+        $resource = (string) $key;
+        $token = $this->getUniqueToken($key);
+
         $this->evictExpired($resource);
 
-        return isset($this->locks[$resource]);
+        return isset($this->locks[$resource]) && $this->locks[$resource]['token'] === $token;
+    }
+
+    public function putOffExpiration(Key $key, float $ttl): void
+    {
+        $resource = (string) $key;
+        $token = $this->getUniqueToken($key);
+
+        if (!isset($this->locks[$resource]) || $this->locks[$resource]['token'] !== $token) {
+            throw new LockConflictedException();
+        }
+
+        $this->locks[$resource]['expires'] = microtime(true) + $ttl;
+        $key->reduceLifetime($ttl);
+    }
+
+    private function getUniqueToken(Key $key): string
+    {
+        if (!$key->hasState(__CLASS__)) {
+            $key->setState(__CLASS__, bin2hex(random_bytes(16)));
+        }
+
+        return $key->getState(__CLASS__);
     }
 
     private function evictExpired(string $resource): void
     {
-        if (isset($this->locks[$resource]) && $this->locks[$resource]['expires'] <= time()) {
+        if (isset($this->locks[$resource]) && $this->locks[$resource]['expires'] <= microtime(true)) {
             unset($this->locks[$resource]);
         }
     }

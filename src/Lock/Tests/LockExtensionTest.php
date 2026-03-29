@@ -6,11 +6,12 @@ namespace BackTo\Framework\Lock\Tests;
 
 use BackTo\Framework\Contracts\ExtensionInterface;
 use BackTo\Framework\Lock\Contracts\LockFactoryInterface;
-use BackTo\Framework\Lock\Contracts\LockStoreInterface;
 use BackTo\Framework\Lock\Infrastructure\CacheStoreLockStore;
 use BackTo\Framework\Lock\LockExtension;
 use BackTo\Framework\Lock\LockFactory;
 use BackToVendor\Symfony\Component\DependencyInjection\ContainerBuilder;
+use BackToVendor\Symfony\Component\Lock\LockFactory as SymfonyLockFactory;
+use BackToVendor\Symfony\Component\Lock\PersistingStoreInterface;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -57,11 +58,11 @@ class LockExtensionTest extends TestCase
         $this->assertStringContainsString('Infrastructure', $bundle['exclude']);
     }
 
-    public function testRegisterBindsLockStoreInterface(): void
+    public function testRegisterBindsPersistingStoreInterface(): void
     {
         $this->extension->register($this->container);
 
-        $this->assertTrue($this->container->has(LockStoreInterface::class));
+        $this->assertTrue($this->container->has(PersistingStoreInterface::class));
     }
 
     public function testRegisterAliasesCacheStoreLockStore(): void
@@ -69,6 +70,13 @@ class LockExtensionTest extends TestCase
         $this->extension->register($this->container);
 
         $this->assertTrue($this->container->has(CacheStoreLockStore::class));
+    }
+
+    public function testRegisterBindsSymfonyLockFactory(): void
+    {
+        $this->extension->register($this->container);
+
+        $this->assertTrue($this->container->has(SymfonyLockFactory::class));
     }
 
     public function testRegisterBindsLockFactoryInterface(): void

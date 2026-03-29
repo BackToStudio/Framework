@@ -5,37 +5,28 @@ declare(strict_types=1);
 namespace BackTo\Framework\Lock;
 
 use BackTo\Framework\Lock\Contracts\LockInterface;
-use BackTo\Framework\Lock\Contracts\LockStoreInterface;
+use BackToVendor\Symfony\Component\Lock\LockInterface as SymfonyLockInterface;
 
 /**
- * Default lock implementation backed by a LockStoreInterface.
+ * Lock adapter backed by Symfony's Lock component.
  *
- * Each Lock instance holds a unique token to ensure only the owner
- * can release it. The TTL acts as a safety net — if the holder crashes
- * without releasing, the lock auto-expires.
+ * Wraps a Symfony Lock instance and exposes it through the framework's
+ * LockInterface port. Validates resource name and TTL at creation time (fail-fast).
  */
 final class Lock implements LockInterface
 {
-    private readonly LockStoreInterface $store;
+    private readonly SymfonyLockInterface $lock;
     private readonly string $resource;
-    private readonly string $token;
-    private readonly int $ttl;
     private bool $acquired = false;
 
-    public function __construct(LockStoreInterface $store, string $resource, int $ttl, ?string $token = null)
+    public function __construct(SymfonyLockInterface $lock, string $resource)
     {
         if ($resource === '') {
             throw new \InvalidArgumentException('Lock resource name must not be empty.');
         }
 
-        if ($ttl < 1) {
-            throw new \InvalidArgumentException(sprintf('Lock TTL must be at least 1 second, got %d.', $ttl));
-        }
-
-        $this->store = $store;
+        $this->lock = $lock;
         $this->resource = $resource;
-        $this->ttl = $ttl;
-        $this->token = $token ?? bin2hex(random_bytes(16));
     }
 
     public function acquire(): bool
@@ -44,7 +35,7 @@ final class Lock implements LockInterface
             return true;
         }
 
-        $this->acquired = $this->store->acquire($this->resource, $this->token, $this->ttl);
+        $this->acquired = $this->lock->acquire();
 
         return $this->acquired;
     }
@@ -55,7 +46,7 @@ final class Lock implements LockInterface
             return;
         }
 
-        $this->store->release($this->resource, $this->token);
+        $this->lock->release();
         $this->acquired = false;
     }
 

@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Lock\Tests;
 
-use BackTo\Framework\Lock\Contracts\LockStoreInterface;
 use BackTo\Framework\Lock\Infrastructure\InMemoryLockStore;
+use BackToVendor\Symfony\Component\Lock\Exception\LockConflictedException;
+use BackToVendor\Symfony\Component\Lock\Key;
+use BackToVendor\Symfony\Component\Lock\PersistingStoreInterface;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -13,85 +15,120 @@ use PHPUnit\Framework\TestCase;
  */
 class InMemoryLockStoreTest extends TestCase
 {
-    public function testImplementsLockStoreInterface(): void
+    public function testImplementsPersistingStoreInterface(): void
     {
         $store = new InMemoryLockStore();
-        $this->assertInstanceOf(LockStoreInterface::class, $store);
+        $this->assertInstanceOf(PersistingStoreInterface::class, $store);
     }
 
-    public function testAcquireOnFreeResource(): void
+    public function testSaveOnFreeResource(): void
     {
         $store = new InMemoryLockStore();
-        $this->assertTrue($store->acquire('res', 'token-a', 60));
+        $key = new Key('res');
+
+        $store->save($key);
+
+        $this->assertTrue($store->exists($key));
     }
 
-    public function testAcquireOnLockedResourceFails(): void
+    public function testSaveOnLockedResourceThrows(): void
     {
         $store = new InMemoryLockStore();
-        $store->acquire('res', 'token-a', 60);
+        $key1 = new Key('res');
+        $key2 = new Key('res');
 
-        $this->assertFalse($store->acquire('res', 'token-b', 60));
+        $store->save($key1);
+
+        $this->expectException(LockConflictedException::class);
+        $store->save($key2);
     }
 
-    public function testReentrantAcquire(): void
+    public function testReentrantSave(): void
     {
         $store = new InMemoryLockStore();
-        $store->acquire('res', 'token-a', 60);
+        $key = new Key('res');
 
-        $this->assertTrue($store->acquire('res', 'token-a', 60));
+        $store->save($key);
+        $store->save($key); // Same key, should not throw
+
+        $this->assertTrue($store->exists($key));
     }
 
-    public function testReleaseByOwner(): void
+    public function testDeleteByOwner(): void
     {
         $store = new InMemoryLockStore();
-        $store->acquire('res', 'token-a', 60);
-        $store->release('res', 'token-a');
+        $key = new Key('res');
 
-        $this->assertFalse($store->exists('res'));
+        $store->save($key);
+        $store->delete($key);
+
+        $this->assertFalse($store->exists($key));
     }
 
-    public function testReleaseByNonOwnerIsIgnored(): void
+    public function testDeleteByNonOwnerIsIgnored(): void
     {
         $store = new InMemoryLockStore();
-        $store->acquire('res', 'token-a', 60);
-        $store->release('res', 'token-b');
+        $key1 = new Key('res');
+        $key2 = new Key('res');
 
-        $this->assertTrue($store->exists('res'));
+        $store->save($key1);
+        $store->delete($key2); // Different key instance = different token
+
+        $this->assertTrue($store->exists($key1));
     }
 
     public function testExistsReturnsFalseForFreeResource(): void
     {
         $store = new InMemoryLockStore();
-        $this->assertFalse($store->exists('unknown'));
-    }
+        $key = new Key('unknown');
 
-    public function testExpiredLockIsEvicted(): void
-    {
-        $store = new InMemoryLockStore();
-        // TTL of 1 second — will expire quickly in practice.
-        // We test the eviction logic by directly checking exists after TTL.
-        $store->acquire('res', 'token', 1);
-
-        // The lock exists right after acquire.
-        $this->assertTrue($store->exists('res'));
+        $this->assertFalse($store->exists($key));
     }
 
     public function testMultipleResourcesAreIndependent(): void
     {
         $store = new InMemoryLockStore();
-        $store->acquire('a', 'token-1', 60);
-        $store->acquire('b', 'token-2', 60);
+        $keyA = new Key('a');
+        $keyB = new Key('b');
 
-        $store->release('a', 'token-1');
+        $store->save($keyA);
+        $store->save($keyB);
 
-        $this->assertFalse($store->exists('a'));
-        $this->assertTrue($store->exists('b'));
+        $store->delete($keyA);
+
+        $this->assertFalse($store->exists($keyA));
+        $this->assertTrue($store->exists($keyB));
     }
 
-    public function testReleaseNonexistentIsNoOp(): void
+    public function testDeleteNonexistentIsNoOp(): void
     {
         $store = new InMemoryLockStore();
-        $store->release('nonexistent', 'token'); // No exception
-        $this->assertFalse($store->exists('nonexistent'));
+        $key = new Key('nonexistent');
+
+        $store->delete($key); // No exception
+        $this->assertFalse($store->exists($key));
+    }
+
+    public function testPutOffExpiration(): void
+    {
+        $store = new InMemoryLockStore();
+        $key = new Key('res');
+
+        $store->save($key);
+        $store->putOffExpiration($key, 600.0);
+
+        $this->assertTrue($store->exists($key));
+    }
+
+    public function testPutOffExpirationThrowsForNonOwner(): void
+    {
+        $store = new InMemoryLockStore();
+        $key1 = new Key('res');
+        $key2 = new Key('res');
+
+        $store->save($key1);
+
+        $this->expectException(LockConflictedException::class);
+        $store->putOffExpiration($key2, 600.0);
     }
 }

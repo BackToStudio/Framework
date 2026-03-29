@@ -86,7 +86,6 @@ class MultiListenerSubscriber implements EventSubscriberInterface
 
 /**
  * @covers \BackTo\Framework\EventDispatcher\EventDispatcher
- * @covers \BackTo\Framework\EventDispatcher\ListenerDescriptor
  * @covers \BackTo\Framework\EventDispatcher\Event
  */
 class EventDispatcherTest extends TestCase

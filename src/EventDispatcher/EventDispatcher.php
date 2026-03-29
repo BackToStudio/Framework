@@ -6,35 +6,27 @@ namespace BackTo\Framework\EventDispatcher;
 
 use BackTo\Framework\EventDispatcher\Contracts\EventDispatcherInterface;
 use BackTo\Framework\EventDispatcher\Contracts\EventSubscriberInterface;
-use BackTo\Framework\EventDispatcher\Contracts\StoppableEventInterface;
+use BackToVendor\Symfony\Component\EventDispatcher\EventDispatcher as SymfonyEventDispatcher;
 
 /**
- * In-memory event dispatcher.
+ * Event dispatcher backed by Symfony's EventDispatcher component.
  *
- * Supports both direct listener registration and subscriber-based registration.
- * Listeners are called in descending priority order (higher = earlier).
+ * Delegates listener management and event dispatching to the vendor-scoped
+ * Symfony EventDispatcher. The framework's EventSubscriberInterface is
+ * translated into Symfony listener registrations.
  */
 final class EventDispatcher implements EventDispatcherInterface
 {
-    /** @var array<class-string, ListenerDescriptor[]> */
-    private array $listeners = [];
+    private readonly SymfonyEventDispatcher $dispatcher;
 
-    /** @var array<class-string, bool> Track which event types have been sorted */
-    private array $sorted = [];
+    public function __construct()
+    {
+        $this->dispatcher = new SymfonyEventDispatcher();
+    }
 
     public function dispatch(object $event): object
     {
-        $eventClass = $event::class;
-
-        foreach ($this->getListenersForEvent($eventClass) as $descriptor) {
-            if ($event instanceof StoppableEventInterface && $event->isPropagationStopped()) {
-                break;
-            }
-
-            ($descriptor->getListener())($event);
-        }
-
-        return $event;
+        return $this->dispatcher->dispatch($event, $event::class);
     }
 
     /**
@@ -50,8 +42,7 @@ final class EventDispatcher implements EventDispatcherInterface
             throw new \InvalidArgumentException('Event class name must not be empty.');
         }
 
-        $this->listeners[$eventClass][] = new ListenerDescriptor($listener, $priority);
-        unset($this->sorted[$eventClass]);
+        $this->dispatcher->addListener($eventClass, $listener, $priority);
     }
 
     /**
@@ -73,7 +64,6 @@ final class EventDispatcher implements EventDispatcherInterface
                 continue;
             }
 
-            // ['methodName', priority] or [['methodName', priority], ...]
             if (is_array($params)) {
                 $this->addSubscriberParams($subscriber, $eventClass, $params);
             }
@@ -88,20 +78,7 @@ final class EventDispatcher implements EventDispatcherInterface
      */
     public function removeListener(string $eventClass, callable $listener): void
     {
-        if (!isset($this->listeners[$eventClass])) {
-            return;
-        }
-
-        $this->listeners[$eventClass] = array_values(array_filter(
-            $this->listeners[$eventClass],
-            static fn (ListenerDescriptor $d): bool => $d->getListener() !== $listener
-        ));
-
-        if ($this->listeners[$eventClass] === []) {
-            unset($this->listeners[$eventClass], $this->sorted[$eventClass]);
-        } else {
-            unset($this->sorted[$eventClass]);
-        }
+        $this->dispatcher->removeListener($eventClass, $listener);
     }
 
     /**
@@ -111,28 +88,7 @@ final class EventDispatcher implements EventDispatcherInterface
      */
     public function hasListeners(string $eventClass): bool
     {
-        return isset($this->listeners[$eventClass]) && $this->listeners[$eventClass] !== [];
-    }
-
-    /**
-     * @param class-string $eventClass
-     * @return ListenerDescriptor[]
-     */
-    private function getListenersForEvent(string $eventClass): array
-    {
-        if (!isset($this->listeners[$eventClass])) {
-            return [];
-        }
-
-        if (!isset($this->sorted[$eventClass])) {
-            usort(
-                $this->listeners[$eventClass],
-                static fn (ListenerDescriptor $a, ListenerDescriptor $b): int => $b->getPriority() <=> $a->getPriority()
-            );
-            $this->sorted[$eventClass] = true;
-        }
-
-        return $this->listeners[$eventClass];
+        return $this->dispatcher->hasListeners($eventClass);
     }
 
     /**

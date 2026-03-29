@@ -53,7 +53,10 @@
     "szepeviktor/phpstan-wordpress": "^2.0",
     "wp-phpunit/wp-phpunit": "^6.7",
     "yoast/phpunit-polyfills": "^3.0",
-    "symfony/cache": "^5.3"
+    "symfony/cache": "^5.3",
+    "symfony/event-dispatcher": "^5.3",
+    "symfony/options-resolver": "^5.3",
+    "symfony/lock": "^5.3"
   },
   "autoload": {
     "psr-4": {
@@ -66,7 +69,12 @@
       "BackToVendor\\Symfony\\Contracts\\Cache\\": "vendor-scoped/symfony/cache-contracts/",
       "BackToVendor\\Psr\\Cache\\": "vendor-scoped/psr/cache/",
       "BackToVendor\\Psr\\Log\\": "vendor-scoped/psr/log/",
-      "BackToVendor\\Psr\\Container\\": "vendor-scoped/psr/container/"
+      "BackToVendor\\Psr\\Container\\": "vendor-scoped/psr/container/",
+      "BackToVendor\\Symfony\\Component\\EventDispatcher\\": "vendor-scoped/symfony/event-dispatcher/",
+      "BackToVendor\\Symfony\\Contracts\\EventDispatcher\\": "vendor-scoped/symfony/event-dispatcher-contracts/",
+      "BackToVendor\\Psr\\EventDispatcher\\": "vendor-scoped/psr/event-dispatcher/",
+      "BackToVendor\\Symfony\\Component\\OptionsResolver\\": "vendor-scoped/symfony/options-resolver/",
+      "BackToVendor\\Symfony\\Component\\Lock\\": "vendor-scoped/symfony/lock/"
     }
   },
   "scripts": {
@@ -93,7 +101,12 @@
       "composer prefix-symfony-cache-contracts",
       "composer prefix-psr-cache",
       "composer prefix-psr-log",
-      "composer prefix-psr-container"
+      "composer prefix-psr-container",
+      "composer prefix-symfony-event-dispatcher",
+      "composer prefix-symfony-event-dispatcher-contracts",
+      "composer prefix-psr-event-dispatcher",
+      "composer prefix-symfony-options-resolver",
+      "composer prefix-symfony-lock"
     ],
     "prefix-symfony-dependency-injection": "php ./vendor/bin/php-scoper add-prefix --prefix=BackToVendor --output-dir=./vendor-scoped/symfony/dependency-injection --config=config/php-scoper/symfony-dependency-injection.inc.php --quiet",
     "prefix-symfony-config": "php ./vendor/bin/php-scoper add-prefix --prefix=BackToVendor --output-dir=./vendor-scoped/symfony/config --config=config/php-scoper/symfony-config.inc.php --quiet",
@@ -103,7 +116,12 @@
     "prefix-symfony-cache-contracts": "php ./vendor/bin/php-scoper add-prefix --prefix=BackToVendor --output-dir=./vendor-scoped/symfony/cache-contracts --config=config/php-scoper/symfony-cache-contracts.inc.php --quiet",
     "prefix-psr-cache": "php ./vendor/bin/php-scoper add-prefix --prefix=BackToVendor --output-dir=./vendor-scoped/psr/cache --config=config/php-scoper/psr-cache.inc.php --quiet",
     "prefix-psr-log": "php ./vendor/bin/php-scoper add-prefix --prefix=BackToVendor --output-dir=./vendor-scoped/psr/log --config=config/php-scoper/psr-log.inc.php --quiet",
-    "prefix-psr-container": "php ./vendor/bin/php-scoper add-prefix --prefix=BackToVendor --output-dir=./vendor-scoped/psr/container --config=config/php-scoper/psr-container.inc.php --quiet"
+    "prefix-psr-container": "php ./vendor/bin/php-scoper add-prefix --prefix=BackToVendor --output-dir=./vendor-scoped/psr/container --config=config/php-scoper/psr-container.inc.php --quiet",
+    "prefix-symfony-event-dispatcher": "php ./vendor/bin/php-scoper add-prefix --prefix=BackToVendor --output-dir=./vendor-scoped/symfony/event-dispatcher --config=config/php-scoper/symfony-event-dispatcher.inc.php --quiet",
+    "prefix-symfony-event-dispatcher-contracts": "php ./vendor/bin/php-scoper add-prefix --prefix=BackToVendor --output-dir=./vendor-scoped/symfony/event-dispatcher-contracts --config=config/php-scoper/symfony-event-dispatcher-contracts.inc.php --quiet",
+    "prefix-psr-event-dispatcher": "php ./vendor/bin/php-scoper add-prefix --prefix=BackToVendor --output-dir=./vendor-scoped/psr/event-dispatcher --config=config/php-scoper/psr-event-dispatcher.inc.php --quiet",
+    "prefix-symfony-options-resolver": "php ./vendor/bin/php-scoper add-prefix --prefix=BackToVendor --output-dir=./vendor-scoped/symfony/options-resolver --config=config/php-scoper/symfony-options-resolver.inc.php --quiet",
+    "prefix-symfony-lock": "php ./vendor/bin/php-scoper add-prefix --prefix=BackToVendor --output-dir=./vendor-scoped/symfony/lock --config=config/php-scoper/symfony-lock.inc.php --quiet"
   },
   "config": {
     "allow-plugins": {
