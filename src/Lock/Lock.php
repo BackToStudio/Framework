@@ -31,7 +31,7 @@ final class Lock implements LockInterface
 
     public function acquire(): bool
     {
-        if ($this->acquired) {
+        if ($this->acquired && $this->lock->isAcquired()) {
             return true;
         }
 

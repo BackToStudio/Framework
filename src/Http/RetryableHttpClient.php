@@ -15,7 +15,8 @@ use Psr\Http\Message\ResponseInterface;
  *   - The response status code is in the retryable set (default: 429, 502, 503, 504)
  *   - An exception is thrown during the request
  *
- * Backoff formula: delay × 2^(attempt - 1) with optional jitter.
+ * Only idempotent methods are retried by default (GET, HEAD, OPTIONS).
+ * Backoff formula: delay × 2^(attempt - 1).
  */
 final class RetryableHttpClient implements HttpClientInterface
 {
@@ -26,16 +27,26 @@ final class RetryableHttpClient implements HttpClientInterface
     /** @var int[] */
     private readonly array $retryableStatusCodes;
 
+    /** @var string[] HTTP methods safe to retry (idempotent) */
+    private readonly array $retryableMethods;
+
+    /** @var callable(int): void */
+    private $sleepFn;
+
     /**
      * @param int $maxRetries Maximum number of retries (not total attempts).
      * @param int $delayMs Base delay in milliseconds before first retry.
      * @param int[] $retryableStatusCodes HTTP status codes that trigger a retry.
+     * @param string[] $retryableMethods HTTP methods safe to retry (default: idempotent only).
+     * @param callable(int): void|null $sleepFn Custom sleep function (for testing).
      */
     public function __construct(
         HttpClientInterface $inner,
         int $maxRetries = 3,
         int $delayMs = 1000,
         array $retryableStatusCodes = [429, 502, 503, 504],
+        array $retryableMethods = ['GET', 'HEAD', 'OPTIONS'],
+        ?callable $sleepFn = null,
     ) {
         if ($maxRetries < 0) {
             throw new \InvalidArgumentException('Max retries must be zero or positive.');
@@ -49,87 +60,72 @@ final class RetryableHttpClient implements HttpClientInterface
         $this->maxRetries = $maxRetries;
         $this->delayMs = $delayMs;
         $this->retryableStatusCodes = $retryableStatusCodes;
+        $this->retryableMethods = array_map('strtoupper', $retryableMethods);
+        $this->sleepFn = $sleepFn ?? static function (int $microseconds): void {
+            usleep($microseconds);
+        };
     }
 
     public function sendRequest(RequestInterface $request): ResponseInterface
     {
-        $attempt = 0;
-        $lastException = null;
+        $method = strtoupper($request->getMethod());
 
-        while (true) {
-            try {
-                $response = $this->inner->sendRequest($request);
-
-                if ($attempt < $this->maxRetries && in_array($response->getStatusCode(), $this->retryableStatusCodes, true)) {
-                    $this->sleep($attempt);
-                    $attempt++;
-                    continue;
-                }
-
-                return $response;
-            } catch (\Throwable $e) {
-                $lastException = $e;
-
-                if ($attempt >= $this->maxRetries) {
-                    throw $e;
-                }
-
-                $this->sleep($attempt);
-                $attempt++;
-            }
-        }
+        return $this->retry($method, fn (): ResponseInterface => $this->inner->sendRequest($request));
     }
 
     public function get(string $url, array $options = []): ResponseInterface
     {
-        return $this->retryRequest('GET', $url, $options);
+        return $this->request('GET', $url, $options);
     }
 
     public function post(string $url, array $options = []): ResponseInterface
     {
-        return $this->retryRequest('POST', $url, $options);
+        return $this->request('POST', $url, $options);
     }
 
     public function request(string $method, string $url, array $options = []): ResponseInterface
     {
-        return $this->retryRequest($method, $url, $options);
+        return $this->retry(
+            strtoupper($method),
+            fn (): ResponseInterface => $this->inner->request($method, $url, $options),
+        );
     }
 
     /**
-     * @param array<string, mixed> $options
+     * Execute a request with retry logic.
+     *
+     * @param callable(): ResponseInterface $attempt
      */
-    private function retryRequest(string $method, string $url, array $options): ResponseInterface
+    private function retry(string $method, callable $attempt): ResponseInterface
     {
-        $attempt = 0;
+        $canRetry = in_array($method, $this->retryableMethods, true);
+        $retryCount = 0;
 
         while (true) {
             try {
-                $response = $this->inner->request($method, $url, $options);
+                $response = $attempt();
 
-                if ($attempt < $this->maxRetries && in_array($response->getStatusCode(), $this->retryableStatusCodes, true)) {
-                    $this->sleep($attempt);
-                    $attempt++;
+                if ($canRetry && $retryCount < $this->maxRetries && in_array($response->getStatusCode(), $this->retryableStatusCodes, true)) {
+                    $this->sleep($retryCount);
+                    $retryCount++;
                     continue;
                 }
 
                 return $response;
             } catch (\Throwable $e) {
-                if ($attempt >= $this->maxRetries) {
+                if (!$canRetry || $retryCount >= $this->maxRetries) {
                     throw $e;
                 }
 
-                $this->sleep($attempt);
-                $attempt++;
+                $this->sleep($retryCount);
+                $retryCount++;
             }
         }
     }
 
-    /**
-     * Sleep with exponential backoff: delayMs × 2^attempt.
-     */
-    protected function sleep(int $attempt): void
+    private function sleep(int $attempt): void
     {
         $microseconds = $this->delayMs * (int) pow(2, $attempt) * 1000;
-        usleep($microseconds);
+        ($this->sleepFn)($microseconds);
     }
 }

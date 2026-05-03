@@ -24,10 +24,16 @@ final class CacheStoreLockStore implements PersistingStoreInterface
     private const KEY_PREFIX = 'backto_lock_';
 
     private readonly CacheStoreInterface $cacheStore;
+    private readonly int $defaultTtl;
 
-    public function __construct(CacheStoreInterface $cacheStore)
+    public function __construct(CacheStoreInterface $cacheStore, int $defaultTtl = 300)
     {
+        if ($defaultTtl < 1) {
+            throw new \InvalidArgumentException(\sprintf('Lock store default TTL must be at least 1 second, got %d.', $defaultTtl));
+        }
+
         $this->cacheStore = $cacheStore;
+        $this->defaultTtl = $defaultTtl;
     }
 
     public function save(Key $key): void
@@ -41,7 +47,7 @@ final class CacheStoreLockStore implements PersistingStoreInterface
             throw new LockConflictedException();
         }
 
-        $this->cacheStore->set($cacheKey, $token, 300);
+        $this->cacheStore->set($cacheKey, $token, $this->defaultTtl);
     }
 
     public function delete(Key $key): void
