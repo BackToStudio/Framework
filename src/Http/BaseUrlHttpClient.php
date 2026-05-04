@@ -27,6 +27,10 @@ final class BaseUrlHttpClient implements HttpClientInterface
             throw new \InvalidArgumentException('Base URL must not be empty.');
         }
 
+        if (!str_starts_with($baseUrl, 'http://') && !str_starts_with($baseUrl, 'https://')) {
+            throw new \InvalidArgumentException('Base URL must use http:// or https:// scheme.');
+        }
+
         $this->inner = $inner;
         $this->baseUrl = rtrim($baseUrl, '/');
     }

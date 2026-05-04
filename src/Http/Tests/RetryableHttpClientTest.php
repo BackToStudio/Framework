@@ -227,9 +227,19 @@ class RetryableHttpClientTest extends TestCase
         $inner = $this->createMock(HttpClientInterface::class);
 
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Max retries must be zero or positive');
+        $this->expectExceptionMessage('Max retries must be between 0 and 10');
 
         new RetryableHttpClient($inner, maxRetries: -1);
+    }
+
+    public function testExcessiveMaxRetriesThrows(): void
+    {
+        $inner = $this->createMock(HttpClientInterface::class);
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Max retries must be between 0 and 10');
+
+        new RetryableHttpClient($inner, maxRetries: 20);
     }
 
     public function testNegativeDelayThrows(): void
@@ -261,6 +271,7 @@ class RetryableHttpClientTest extends TestCase
         $client->get('https://example.com');
 
         $this->assertCount(1, $sleepCalls);
+        // delayMs=100, attempt=0: min(100 * (1 << 0), 60000) * 1000 = 100 * 1000 = 100000µs
         $this->assertSame(100000, $sleepCalls[0]);
     }
 }

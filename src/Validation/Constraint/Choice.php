@@ -32,7 +32,7 @@ final class Choice extends AbstractConstraint
 
     public function validate(mixed $value): ?string
     {
-        if ($value === null || $value === '') {
+        if ($value === null) {
             return null;
         }
 

@@ -20,6 +20,9 @@ use Psr\Http\Message\ResponseInterface;
  */
 final class RetryableHttpClient implements HttpClientInterface
 {
+    private const MAX_RETRIES_LIMIT = 10;
+    private const MAX_BACKOFF_MS = 60000;
+
     private readonly HttpClientInterface $inner;
     private readonly int $maxRetries;
     private readonly int $delayMs;
@@ -34,7 +37,7 @@ final class RetryableHttpClient implements HttpClientInterface
     private $sleepFn;
 
     /**
-     * @param int $maxRetries Maximum number of retries (not total attempts).
+     * @param int $maxRetries Maximum number of retries (0-10, not total attempts).
      * @param int $delayMs Base delay in milliseconds before first retry.
      * @param int[] $retryableStatusCodes HTTP status codes that trigger a retry.
      * @param string[] $retryableMethods HTTP methods safe to retry (default: idempotent only).
@@ -48,8 +51,8 @@ final class RetryableHttpClient implements HttpClientInterface
         array $retryableMethods = ['GET', 'HEAD', 'OPTIONS'],
         ?callable $sleepFn = null,
     ) {
-        if ($maxRetries < 0) {
-            throw new \InvalidArgumentException('Max retries must be zero or positive.');
+        if ($maxRetries < 0 || $maxRetries > self::MAX_RETRIES_LIMIT) {
+            throw new \InvalidArgumentException(\sprintf('Max retries must be between 0 and %d.', self::MAX_RETRIES_LIMIT));
         }
 
         if ($delayMs < 0) {
@@ -125,7 +128,7 @@ final class RetryableHttpClient implements HttpClientInterface
 
     private function sleep(int $attempt): void
     {
-        $microseconds = $this->delayMs * (int) pow(2, $attempt) * 1000;
-        ($this->sleepFn)($microseconds);
+        $backoffMs = min($this->delayMs * (1 << $attempt), self::MAX_BACKOFF_MS);
+        ($this->sleepFn)($backoffMs * 1000);
     }
 }

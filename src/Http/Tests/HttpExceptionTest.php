@@ -51,17 +51,33 @@ class HttpExceptionTest extends TestCase
 
     public function testNetworkExceptionWithReason(): void
     {
-        $exception = new NetworkException('https://api.example.com', 'Connection refused');
+        $exception = new NetworkException('https://api.example.com/path', 'Connection refused');
 
-        $this->assertStringContainsString('https://api.example.com', $exception->getMessage());
+        $this->assertStringContainsString('api.example.com', $exception->getMessage());
         $this->assertStringContainsString('Connection refused', $exception->getMessage());
     }
 
     public function testNetworkExceptionWithoutReason(): void
     {
-        $exception = new NetworkException('https://api.example.com');
+        $exception = new NetworkException('https://api.example.com/path');
 
-        $this->assertSame('Network error for "https://api.example.com"', $exception->getMessage());
+        $this->assertStringContainsString('api.example.com/path', $exception->getMessage());
+    }
+
+    public function testNetworkExceptionRedactsQueryString(): void
+    {
+        $exception = new NetworkException('https://api.example.com/path?api_key=SECRET&token=xyz');
+
+        $this->assertStringContainsString('api.example.com/path', $exception->getMessage());
+        $this->assertStringNotContainsString('SECRET', $exception->getMessage());
+        $this->assertStringNotContainsString('token', $exception->getMessage());
+    }
+
+    public function testNetworkExceptionRedactsUserInfo(): void
+    {
+        $exception = new NetworkException('https://user:pass@api.example.com/path');
+
+        $this->assertStringNotContainsString('pass', $exception->getMessage());
     }
 
     public function testNetworkExceptionWithPreviousException(): void

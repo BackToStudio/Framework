@@ -12,12 +12,17 @@ use BackToVendor\Symfony\Component\Lock\PersistingStoreInterface;
 /**
  * Symfony Lock store backed by the framework's CacheStoreInterface.
  *
- * Uses WordPress transients, Redis, or any cache backend
- * depending on the configured cache strategy. The TTL ensures
- * automatic expiration if the holder crashes.
+ * WARNING: This store is advisory-only. The check-then-set pattern is NOT
+ * atomic with WordPress transients and most cache backends. Two concurrent
+ * processes CAN both acquire the same lock under high concurrency.
  *
- * Note: check-then-set is not fully atomic with WordPress transients.
- * For truly concurrent environments, use a database-backed store instead.
+ * For production environments requiring strict mutual exclusion, use:
+ * - Symfony's FlockStore (filesystem-based, single-server only)
+ * - Symfony's RedisStore with SETNX (multi-server safe)
+ * - A database-backed store with INSERT ... ON DUPLICATE KEY
+ *
+ * This store is suitable for best-effort duplicate prevention (e.g., cron
+ * overlap protection) where occasional double-execution is tolerable.
  */
 final class CacheStoreLockStore implements PersistingStoreInterface
 {
@@ -48,6 +53,12 @@ final class CacheStoreLockStore implements PersistingStoreInterface
         }
 
         $this->cacheStore->set($cacheKey, $token, $this->defaultTtl);
+
+        // Double-check: re-read to narrow the TOCTOU window.
+        $verification = $this->cacheStore->get($cacheKey);
+        if ($verification !== $token) {
+            throw new LockConflictedException();
+        }
     }
 
     public function delete(Key $key): void

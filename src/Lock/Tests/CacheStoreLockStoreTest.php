@@ -127,21 +127,13 @@ class CacheStoreLockStoreTest extends TestCase
 
     public function testCacheKeyIsPrefixed(): void
     {
-        $cacheStore = $this->createMock(CacheStoreInterface::class);
+        $data = new \ArrayObject();
+        $store = $this->createStoreWithData($data);
 
-        $cacheStore->method('get')->willReturn(false);
-        $cacheStore->expects($this->once())
-            ->method('set')
-            ->with(
-                $this->stringStartsWith('backto_lock_my-resource'),
-                $this->isType('string'),
-                300
-            )
-            ->willReturn(true);
-
-        $store = new CacheStoreLockStore($cacheStore);
         $key = new Key('my-resource');
         $store->save($key);
+
+        $this->assertArrayHasKey('backto_lock_my-resource', (array) $data);
     }
 
     public function testPutOffExpiration(): void

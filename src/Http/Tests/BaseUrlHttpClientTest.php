@@ -115,4 +115,23 @@ class BaseUrlHttpClientTest extends TestCase
 
         new BaseUrlHttpClient($inner, '');
     }
+
+    public function testNonHttpSchemeThrows(): void
+    {
+        $inner = $this->createMock(HttpClientInterface::class);
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('http:// or https://');
+
+        new BaseUrlHttpClient($inner, 'file:///etc/passwd');
+    }
+
+    public function testFtpSchemeThrows(): void
+    {
+        $inner = $this->createMock(HttpClientInterface::class);
+
+        $this->expectException(\InvalidArgumentException::class);
+
+        new BaseUrlHttpClient($inner, 'ftp://evil.com');
+    }
 }
