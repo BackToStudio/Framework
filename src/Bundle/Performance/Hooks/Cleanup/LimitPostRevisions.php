@@ -19,6 +19,10 @@ final class LimitPostRevisions implements Hooks
 
     public function __construct(HookDispatcherInterface $hookDispatcher, int $maxRevisions = 5)
     {
+        if ($maxRevisions < 0) {
+            throw new \InvalidArgumentException(\sprintf('Max revisions must be non-negative, got %d.', $maxRevisions));
+        }
+
         $this->hookDispatcher = $hookDispatcher;
         $this->maxRevisions = $maxRevisions;
     }

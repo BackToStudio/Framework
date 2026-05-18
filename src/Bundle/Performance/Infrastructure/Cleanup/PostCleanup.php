@@ -38,7 +38,7 @@ final class PostCleanup implements CleanupStrategyInterface
         $posts = $db->prefix() . 'posts';
 
         return (int) $db->query(
-            "DELETE FROM {$posts} WHERE post_status = '{$this->status}'"
+            $db->prepare("DELETE FROM {$posts} WHERE post_status = %s", $this->status)
         );
     }
 }

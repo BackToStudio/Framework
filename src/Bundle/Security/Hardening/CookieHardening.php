@@ -65,10 +65,12 @@ class CookieHardening implements Hooks, SecurityRuleInterface
     {
         $validValues = ['Strict', 'Lax', 'None'];
 
-        if (in_array($sameSite, $validValues, true)) {
-            /** @var 'Strict'|'Lax'|'None' $sameSite */
-            $this->sameSite = $sameSite;
+        if (!in_array($sameSite, $validValues, true)) {
+            throw new \InvalidArgumentException(\sprintf('Invalid SameSite value "%s". Allowed: %s.', $sameSite, implode(', ', $validValues)));
         }
+
+        /** @var 'Strict'|'Lax'|'None' $sameSite */
+        $this->sameSite = $sameSite;
 
         return $this;
     }

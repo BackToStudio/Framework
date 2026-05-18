@@ -16,11 +16,11 @@ final class WebhookAlertChannelTest extends TestCase
         $this->assertSame('webhook', $channel->getName());
     }
 
-    public function test_returns_false_for_empty_url(): void
+    public function test_throws_for_empty_url(): void
     {
-        $channel = new WebhookAlertChannel('');
+        $this->expectException(\InvalidArgumentException::class);
 
-        $this->assertFalse($channel->send('critical', 'Test alert'));
+        new WebhookAlertChannel('');
     }
 
     public function test_builds_slack_payload(): void

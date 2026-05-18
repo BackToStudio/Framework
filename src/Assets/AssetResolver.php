@@ -16,6 +16,9 @@ class AssetResolver
     private readonly string $assetDirectory;
     private readonly string $assetDirectoryUri;
 
+    /** @var array<string, array{dependencies: string[], version: string|null, uri: string}> */
+    private array $resolvedAssets = [];
+
     public function __construct(string $assetDirectory, string $assetDirectoryUri)
     {
         $this->assetDirectory = $assetDirectory;
@@ -29,6 +32,10 @@ class AssetResolver
      */
     public function getAsset(string $relativePath): array
     {
+        if (isset($this->resolvedAssets[$relativePath])) {
+            return $this->resolvedAssets[$relativePath];
+        }
+
         if (str_contains($relativePath, '..') || str_contains($relativePath, "\0")) {
             throw new \InvalidArgumentException('Invalid asset path: directory traversal is not allowed.');
         }
@@ -47,7 +54,7 @@ class AssetResolver
 
         $asset['uri'] = $this->getBuildFolderUri() . '/' . $relativePath;
 
-        return $asset;
+        return $this->resolvedAssets[$relativePath] = $asset;
     }
 
     /**

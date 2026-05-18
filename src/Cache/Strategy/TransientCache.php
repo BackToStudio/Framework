@@ -21,6 +21,11 @@ final class TransientCache extends AbstractCache
     private readonly CacheCleanerInterface $cacheCleaner;
     private readonly CacheStoreInterface $cacheStore;
 
+    /** @var array<string, mixed> First-level in-memory cache to avoid repeated deserialization */
+    private array $memoryCache = [];
+
+    private const MISS_SENTINEL = "\x00__MISS__\x00";
+
     public function __construct(
         CacheCleanerInterface $cacheCleaner,
         CacheStoreInterface $cacheStore,
@@ -35,13 +40,22 @@ final class TransientCache extends AbstractCache
     {
         $this->validateKey($key);
 
+        if (\array_key_exists($key, $this->memoryCache)) {
+            return $this->memoryCache[$key] === self::MISS_SENTINEL ? $default : $this->memoryCache[$key];
+        }
+
         $value = $this->cacheStore->get($this->prefixKey($key));
 
         if ($value === false) {
+            $this->memoryCache[$key] = self::MISS_SENTINEL;
+
             return $default;
         }
 
-        return \unserialize($value, ['allowed_classes' => false]);
+        $deserialized = \unserialize($value, ['allowed_classes' => false]);
+        $this->memoryCache[$key] = $deserialized;
+
+        return $deserialized;
     }
 
     public function set(string $key, mixed $value, null|int|DateInterval $ttl = null): bool
@@ -54,28 +68,42 @@ final class TransientCache extends AbstractCache
             return $this->delete($key);
         }
 
-        return $this->cacheStore->set(
+        $result = $this->cacheStore->set(
             $this->prefixKey($key),
             serialize($value),
             $seconds ?? 0
         );
+
+        if ($result) {
+            $this->memoryCache[$key] = $value;
+        }
+
+        return $result;
     }
 
     public function delete(string $key): bool
     {
         $this->validateKey($key);
 
+        unset($this->memoryCache[$key]);
+
         return $this->cacheStore->delete($this->prefixKey($key));
     }
 
     public function clear(): bool
     {
+        $this->memoryCache = [];
+
         return $this->cacheCleaner->clearByPrefix($this->prefix);
     }
 
     public function has(string $key): bool
     {
         $this->validateKey($key);
+
+        if (\array_key_exists($key, $this->memoryCache)) {
+            return $this->memoryCache[$key] !== self::MISS_SENTINEL;
+        }
 
         return $this->cacheStore->get($this->prefixKey($key)) !== false;
     }

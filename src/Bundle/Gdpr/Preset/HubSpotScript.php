@@ -8,9 +8,15 @@ use BackTo\Framework\Bundle\Gdpr\Contracts\TrackingScriptInterface;
 
 final class HubSpotScript implements TrackingScriptInterface
 {
+    /**
+     * @param string $portalId HubSpot numeric portal ID.
+     */
     public function __construct(
         private readonly string $portalId,
     ) {
+        if (\preg_match('/^\d+$/', $portalId) !== 1) {
+            throw new \InvalidArgumentException(\sprintf('Invalid HubSpot portal ID: "%s". Must be numeric.', $portalId));
+        }
     }
 
     public function getHandle(): string

@@ -30,7 +30,16 @@ final class CookieConsentStorage implements ConsentStorageInterface
 
         $decoded = json_decode($raw, true);
 
-        return is_array($decoded) ? $decoded : [];
+        if (!is_array($decoded)) {
+            return [];
+        }
+
+        // Only keep string-keyed boolean values to prevent type confusion.
+        return array_filter(
+            $decoded,
+            static fn (mixed $value, mixed $key): bool => \is_string($key) && \is_bool($value),
+            \ARRAY_FILTER_USE_BOTH,
+        );
     }
 
     public function hasConsent(string $categoryKey): bool

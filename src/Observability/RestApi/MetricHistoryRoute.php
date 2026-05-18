@@ -5,8 +5,12 @@ declare(strict_types=1);
 namespace BackTo\Framework\Observability\RestApi;
 
 use BackTo\Framework\Observability\Contracts\MetricStoreInterface;
-use BackTo\Framework\RestApi\Contracts\RestRouteInterface;
-use WP_REST_Response;
+use BackTo\Framework\RestApi\Contracts\RestRequest;
+use BackTo\Framework\RestApi\Contracts\RestResponse;
+use BackTo\Framework\Validation\Constraint\NotBlank;
+use BackTo\Framework\Validation\Constraint\Regex;
+use BackTo\Framework\Validation\Constraint\Type;
+use BackTo\Framework\Validation\Contracts\ValidatedRestRouteInterface;
 
 /**
  * REST endpoint for metric history.
@@ -16,7 +20,7 @@ use WP_REST_Response;
  * Returns historical data points for a specific metric.
  * Requires manage_options capability.
  */
-final class MetricHistoryRoute implements RestRouteInterface
+final class MetricHistoryRoute implements ValidatedRestRouteInterface
 {
     private readonly MetricStoreInterface $metricStore;
 
@@ -40,22 +44,31 @@ final class MetricHistoryRoute implements RestRouteInterface
         return ['GET'];
     }
 
-    public function handle(mixed $request): mixed
+    public function rules(): array
     {
-        $name = (string) $request['name'];
-        $since = (int) ($request['since'] ?? (\time() - 86400));
-        $until = (int) ($request['until'] ?? 0);
+        return [
+            'name' => [new NotBlank(), new Regex('/^[a-zA-Z0-9._-]+$/')],
+            'since' => new Type('numeric'),
+            'until' => new Type('numeric'),
+        ];
+    }
+
+    public function handle(RestRequest $request): RestResponse
+    {
+        $name = (string) $request->getParam('name');
+        $since = (int) ($request->getParam('since') ?? (\time() - 86400));
+        $until = (int) ($request->getParam('until') ?? 0);
 
         $history = $this->metricStore->history($name, $since, $until);
         $latest = $this->metricStore->latest($name);
 
         if ($history === [] && $latest === null) {
-            return new WP_REST_Response([
+            return new RestResponse([
                 'error' => 'Metric not found: ' . $name,
             ], 404);
         }
 
-        return new WP_REST_Response([
+        return new RestResponse([
             'name' => $name,
             'latest' => $latest,
             'history' => $history,

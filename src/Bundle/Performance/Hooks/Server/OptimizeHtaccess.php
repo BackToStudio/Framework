@@ -53,6 +53,10 @@ class OptimizeHtaccess implements Hooks, ActivationHooks
         bool $keepAlive = true,
         int $staticTtl = 31536000
     ) {
+        if ($staticTtl < 0) {
+            throw new \InvalidArgumentException(\sprintf('Static TTL must be non-negative, got %d.', $staticTtl));
+        }
+
         $this->hookDispatcher = $hookDispatcher;
         $this->gzip = $gzip;
         $this->browserCache = $browserCache;

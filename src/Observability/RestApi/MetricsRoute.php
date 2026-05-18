@@ -6,8 +6,10 @@ namespace BackTo\Framework\Observability\RestApi;
 
 use BackTo\Framework\Observability\Contracts\MetricStoreInterface;
 use BackTo\Framework\Observability\HealthCheckRegistry;
-use BackTo\Framework\RestApi\Contracts\RestRouteInterface;
-use WP_REST_Response;
+use BackTo\Framework\RestApi\Contracts\RestRequest;
+use BackTo\Framework\RestApi\Contracts\RestResponse;
+use BackTo\Framework\Validation\Constraint\Type;
+use BackTo\Framework\Validation\Contracts\ValidatedRestRouteInterface;
 
 /**
  * REST endpoint for operational metrics.
@@ -17,7 +19,7 @@ use WP_REST_Response;
  * Returns health check results, metric summary, and system status.
  * Requires manage_options capability.
  */
-final class MetricsRoute implements RestRouteInterface
+final class MetricsRoute implements ValidatedRestRouteInterface
 {
     private const SUMMARY_WINDOW = 86400; // 24 hours
 
@@ -47,9 +49,16 @@ final class MetricsRoute implements RestRouteInterface
         return ['GET'];
     }
 
-    public function handle(mixed $request): mixed
+    public function rules(): array
     {
-        $since = (int) ($request['since'] ?? (\time() - self::SUMMARY_WINDOW));
+        return [
+            'since' => new Type('numeric'),
+        ];
+    }
+
+    public function handle(RestRequest $request): RestResponse
+    {
+        $since = (int) ($request->getParam('since') ?? (\time() - self::SUMMARY_WINDOW));
 
         $healthResults = $this->healthCheckRegistry->runAll();
         $healthData = [];
@@ -59,7 +68,7 @@ final class MetricsRoute implements RestRouteInterface
 
         $summary = $this->metricStore->summary($since);
 
-        return new WP_REST_Response([
+        return new RestResponse([
             'health_checks' => $healthData,
             'metrics_summary' => $summary,
             'period_start' => \gmdate('Y-m-d\TH:i:s\Z', $since),

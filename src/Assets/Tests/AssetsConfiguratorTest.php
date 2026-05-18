@@ -45,9 +45,16 @@ class AssetsConfiguratorTest extends TestCase
     public function testLastCallWins(): void
     {
         $configurator = (new AssetsConfigurator())
-            ->versionStrategy('file')
+            ->versionStrategy('content_hash')
             ->versionStrategy('timestamp');
 
         $this->assertSame('timestamp', $configurator->toParameters()['assets.version_strategy']);
+    }
+
+    public function testInvalidVersionStrategyThrows(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        (new AssetsConfigurator())->versionStrategy('invalid');
     }
 }

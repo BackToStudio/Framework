@@ -54,6 +54,10 @@ final class SecurityConfigurator implements ModuleConfiguratorInterface
 
     public function passwordMinLength(int $length): self
     {
+        if ($length < 1) {
+            throw new \InvalidArgumentException('Password minimum length must be at least 1.');
+        }
+
         $this->overrides['security.password_min_length'] = $length;
 
         return $this;
@@ -61,6 +65,10 @@ final class SecurityConfigurator implements ModuleConfiguratorInterface
 
     public function maxConcurrentSessions(int $max): self
     {
+        if ($max < 1) {
+            throw new \InvalidArgumentException('Max concurrent sessions must be at least 1.');
+        }
+
         $this->overrides['security.max_concurrent_sessions'] = $max;
 
         return $this;
@@ -89,6 +97,10 @@ final class SecurityConfigurator implements ModuleConfiguratorInterface
 
     public function twoFactorIssuer(string $issuer): self
     {
+        if ($issuer === '') {
+            throw new \InvalidArgumentException('Two-factor issuer cannot be empty.');
+        }
+
         $this->overrides['security.two_factor_issuer'] = $issuer;
 
         return $this;

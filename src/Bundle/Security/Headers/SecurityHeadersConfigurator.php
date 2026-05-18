@@ -52,10 +52,14 @@ class SecurityHeadersConfigurator implements Hooks, SecurityRuleInterface
         ResponseEmitterInterface $responseEmitter,
         string $environment = 'production',
     ) {
+        if (!isset(self::ENVIRONMENT_PRESETS[$environment])) {
+            throw new \InvalidArgumentException(\sprintf('Invalid environment "%s". Allowed: %s.', $environment, implode(', ', array_keys(self::ENVIRONMENT_PRESETS))));
+        }
+
         $this->hookDispatcher = $hookDispatcher;
         $this->responseEmitter = $responseEmitter;
         $this->environment = $environment;
-        $this->headers = self::ENVIRONMENT_PRESETS[$environment] ?? self::ENVIRONMENT_PRESETS['production'];
+        $this->headers = self::ENVIRONMENT_PRESETS[$environment];
     }
 
     public function getName(): string
@@ -98,6 +102,10 @@ class SecurityHeadersConfigurator implements Hooks, SecurityRuleInterface
 
     public function setHstsMaxAge(int $seconds, bool $includeSubDomains = true, bool $preload = false): self
     {
+        if ($seconds < 0) {
+            throw new \InvalidArgumentException('HSTS max-age must be zero or positive.');
+        }
+
         $value = 'max-age=' . $seconds;
 
         if ($includeSubDomains) {
@@ -115,6 +123,11 @@ class SecurityHeadersConfigurator implements Hooks, SecurityRuleInterface
 
     public function setFrameOptions(string $value): self
     {
+        $allowed = ['DENY', 'SAMEORIGIN'];
+        if (!\in_array($value, $allowed, true)) {
+            throw new \InvalidArgumentException(\sprintf('Invalid X-Frame-Options value "%s". Allowed: %s.', $value, \implode(', ', $allowed)));
+        }
+
         $this->headers['X-Frame-Options'] = $value;
 
         return $this;
@@ -122,6 +135,14 @@ class SecurityHeadersConfigurator implements Hooks, SecurityRuleInterface
 
     public function setReferrerPolicy(string $policy): self
     {
+        $allowed = [
+            'no-referrer', 'no-referrer-when-downgrade', 'origin', 'origin-when-cross-origin',
+            'same-origin', 'strict-origin', 'strict-origin-when-cross-origin', 'unsafe-url',
+        ];
+        if (!\in_array($policy, $allowed, true)) {
+            throw new \InvalidArgumentException(\sprintf('Invalid Referrer-Policy "%s". Allowed: %s.', $policy, \implode(', ', $allowed)));
+        }
+
         $this->headers['Referrer-Policy'] = $policy;
 
         return $this;

@@ -35,15 +35,15 @@ final class AuditLogCsvExporter
      */
     public function export(array $filters): void
     {
-        $events = $this->repository->getEvents($filters, self::EXPORT_LIMIT, 0);
-
-        $this->sendCsvHeaders();
-
         $output = $this->openOutputStream();
 
         if ($output === false) {
             return;
         }
+
+        $events = $this->repository->getEvents($filters, self::EXPORT_LIMIT, 0);
+
+        $this->sendCsvHeaders();
 
         fputcsv($output, self::csvHeader());
 

@@ -4,53 +4,42 @@ declare(strict_types=1);
 
 namespace BackTo\Framework\Cache\Strategy;
 
-use BackToVendor\Symfony\Component\Filesystem\Filesystem;
+use BackToVendor\Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use DateInterval;
 
 /**
- * PSR-16 cache backed by the filesystem.
+ * PSR-16 cache backed by Symfony's FilesystemAdapter.
  *
- * Each cache entry is stored as a serialized PHP file.
- * Uses Symfony Filesystem (already scoped) for file operations.
+ * Delegates to the Symfony Cache component which provides:
+ * - SHA256-based file naming (no MD5 collisions)
+ * - Atomic writes (temp file + rename)
+ * - Two-level directory sharding for performance
+ * - OPcache-friendly file format
+ * - Built-in pruning of expired entries
  */
 final class FilesystemCache extends AbstractCache
 {
-    private readonly Filesystem $filesystem;
-    private readonly string $directory;
+    private readonly FilesystemAdapter $adapter;
 
-    public function __construct(string $directory, ?Filesystem $filesystem = null)
-    {
-        $this->directory = rtrim($directory, '/');
-        $this->filesystem = $filesystem ?? new Filesystem();
-
-        if (!$this->filesystem->exists($this->directory)) {
-            $this->filesystem->mkdir($this->directory, 0755);
-        }
+    public function __construct(
+        string $directory,
+        string $namespace = 'btf',
+        int $defaultLifetime = 0,
+    ) {
+        $this->adapter = new FilesystemAdapter($namespace, $defaultLifetime, $directory);
     }
 
     public function get(string $key, mixed $default = null): mixed
     {
         $this->validateKey($key);
 
-        $file = $this->getFilePath($key);
+        $item = $this->adapter->getItem($key);
 
-        if (!$this->filesystem->exists($file)) {
+        if (!$item->isHit()) {
             return $default;
         }
 
-        $data = $this->readEntry($file);
-
-        if ($data === null) {
-            return $default;
-        }
-
-        if ($data['expiry'] !== null && $data['expiry'] < time()) {
-            $this->filesystem->remove($file);
-
-            return $default;
-        }
-
-        return $data['value'];
+        return $item->get();
     }
 
     public function set(string $key, mixed $value, null|int|DateInterval $ttl = null): bool
@@ -63,87 +52,98 @@ final class FilesystemCache extends AbstractCache
             return $this->delete($key);
         }
 
-        $data = [
-            'value' => $value,
-            'expiry' => $seconds !== null ? time() + $seconds : null,
-        ];
+        $item = $this->adapter->getItem($key);
+        $item->set($value);
 
-        $file = $this->getFilePath($key);
-        $this->filesystem->dumpFile($file, serialize($data));
+        if ($seconds !== null) {
+            $item->expiresAfter($seconds);
+        }
 
-        return true;
+        return $this->adapter->save($item);
     }
 
     public function delete(string $key): bool
     {
         $this->validateKey($key);
 
-        $file = $this->getFilePath($key);
-
-        if ($this->filesystem->exists($file)) {
-            $this->filesystem->remove($file);
-        }
-
-        return true;
+        return $this->adapter->deleteItem($key);
     }
 
     public function clear(): bool
     {
-        if ($this->filesystem->exists($this->directory)) {
-            $this->filesystem->remove($this->directory);
-            $this->filesystem->mkdir($this->directory, 0755);
-        }
-
-        return true;
+        return $this->adapter->clear();
     }
 
     public function has(string $key): bool
     {
         $this->validateKey($key);
 
-        $file = $this->getFilePath($key);
-
-        if (!$this->filesystem->exists($file)) {
-            return false;
-        }
-
-        $data = $this->readEntry($file);
-
-        if ($data === null) {
-            return false;
-        }
-
-        if ($data['expiry'] !== null && $data['expiry'] < time()) {
-            $this->filesystem->remove($file);
-
-            return false;
-        }
-
-        return true;
+        return $this->adapter->hasItem($key);
     }
 
-    private function getFilePath(string $key): string
+    public function getMultiple(iterable $keys, mixed $default = null): iterable
     {
-        return $this->directory . '/' . md5($key) . '.cache';
+        $keyArray = $keys instanceof \Traversable ? iterator_to_array($keys, false) : (array) $keys;
+
+        foreach ($keyArray as $key) {
+            $this->validateKey($key);
+        }
+
+        $items = $this->adapter->getItems($keyArray);
+        $result = [];
+
+        foreach ($items as $key => $item) {
+            $result[$key] = $item->isHit() ? $item->get() : $default;
+        }
+
+        return $result;
+    }
+
+    public function setMultiple(iterable $values, null|int|DateInterval $ttl = null): bool
+    {
+        $seconds = $this->ttlToSeconds($ttl);
+
+        if ($seconds !== null && $seconds <= 0) {
+            $keys = [];
+            foreach ($values as $key => $value) {
+                $keys[] = $key;
+            }
+
+            return $this->deleteMultiple($keys);
+        }
+
+        foreach ($values as $key => $value) {
+            $this->validateKey((string) $key);
+
+            $item = $this->adapter->getItem((string) $key);
+            $item->set($value);
+
+            if ($seconds !== null) {
+                $item->expiresAfter($seconds);
+            }
+
+            $this->adapter->saveDeferred($item);
+        }
+
+        return $this->adapter->commit();
+    }
+
+    public function deleteMultiple(iterable $keys): bool
+    {
+        $keyArray = $keys instanceof \Traversable ? iterator_to_array($keys, false) : (array) $keys;
+
+        foreach ($keyArray as $key) {
+            $this->validateKey($key);
+        }
+
+        return $this->adapter->deleteItems($keyArray);
     }
 
     /**
-     * @return array{value: mixed, expiry: int|null}|null
+     * Remove all expired cache entries from the filesystem.
      */
-    private function readEntry(string $file): ?array
+    public function prune(): bool
     {
-        $content = file_get_contents($file);
-
-        if ($content === false) {
-            return null;
-        }
-
-        $data = @\unserialize($content, ['allowed_classes' => false]);
-
-        if (!is_array($data) || !array_key_exists('value', $data) || !array_key_exists('expiry', $data)) {
-            return null;
-        }
-
-        return $data;
+        return $this->adapter->prune();
     }
 }

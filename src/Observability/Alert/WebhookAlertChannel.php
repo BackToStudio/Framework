@@ -25,6 +25,14 @@ final class WebhookAlertChannel implements AlertChannelInterface
 
     public function __construct(string $url, int $timeout = 5)
     {
+        if ($url === '') {
+            throw new \InvalidArgumentException('Webhook URL cannot be empty.');
+        }
+
+        if ($timeout < 1) {
+            throw new \InvalidArgumentException('Webhook timeout must be at least 1 second.');
+        }
+
         $this->url = $url;
         $this->timeout = $timeout;
     }
@@ -36,10 +44,6 @@ final class WebhookAlertChannel implements AlertChannelInterface
 
     public function send(string $level, string $message, array $context = []): bool
     {
-        if ($this->url === '') {
-            return false;
-        }
-
         $payload = $this->buildPayload($level, $message, $context);
 
         $response = \wp_remote_post($this->url, [

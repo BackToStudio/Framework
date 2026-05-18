@@ -40,6 +40,10 @@ class PreloadUrlCollector
      */
     public function getPostRelatedUrls(int $postId): array
     {
+        if ($postId <= 0) {
+            return [];
+        }
+
         $postType = $this->contentQuery->getPostType($postId) ?: 'post';
         $post = $this->contentQuery->getPost($postId);
 

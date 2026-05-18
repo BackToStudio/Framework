@@ -71,25 +71,14 @@ class DeferScriptsTest extends TestCase
         $this->assertSame(1, substr_count($result, 'defer'));
     }
 
-    public function testSkipsDeferOnAdmin(): void
+    public function testSkipsHookRegistrationOnAdmin(): void
     {
         $this->queryContext->method('isAdmin')->willReturn(true);
+
+        $this->dispatcher->expects($this->never())
+            ->method('addFilter');
+
         $hook = new DeferScripts($this->dispatcher, $this->queryContext);
-
-        $tag = '<script src="https://example.com/script.js"></script>';
-        $result = $hook->addDeferAttribute($tag, 'my-script');
-
-        $this->assertStringNotContainsString('defer', $result);
-    }
-
-    public function testSkipsQueryStringRemovalOnAdmin(): void
-    {
-        $this->queryContext->method('isAdmin')->willReturn(true);
-        $hook = new DeferScripts($this->dispatcher, $this->queryContext);
-
-        $src = 'https://example.com/style.css?ver=1.0';
-        $result = $hook->removeVersionQueryString($src);
-
-        $this->assertSame($src, $result);
+        $hook->hooks();
     }
 }

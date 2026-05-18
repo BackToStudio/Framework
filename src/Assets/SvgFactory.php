@@ -15,12 +15,15 @@ final class SvgFactory
 {
     private readonly FileLocatorInterface $fileLocator;
 
+    /** @var array<string, string> In-memory cache keyed by file path */
+    private array $cache = [];
+
     public function __construct(FileLocatorInterface $fileLocator)
     {
         $this->fileLocator = $fileLocator;
     }
 
-    
+
     public function getFromId(int $image_id): string
     {
         $path = $this->fileLocator->getAttachedFile($image_id);
@@ -28,7 +31,7 @@ final class SvgFactory
         return $this->getFromPath($path);
     }
 
-    
+
     public function getFromSrc(string $src): string
     {
         $path = $src;
@@ -42,16 +45,20 @@ final class SvgFactory
         return $this->getFromPath($path);
     }
 
-    
+
     public function getFromPath(string $path): string
     {
+        if (isset($this->cache[$path])) {
+            return $this->cache[$path];
+        }
+
         $res = file_get_contents($path);
 
         if ($res === false) {
-            return '';
+            return $this->cache[$path] = '';
         }
 
-        return $this->sanitizeSvg(html_entity_decode($res));
+        return $this->cache[$path] = $this->sanitizeSvg(html_entity_decode($res));
     }
 
     /**

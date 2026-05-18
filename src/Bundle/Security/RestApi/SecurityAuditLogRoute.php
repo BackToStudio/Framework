@@ -5,17 +5,21 @@ declare(strict_types=1);
 namespace BackTo\Framework\Bundle\Security\RestApi;
 
 use BackTo\Framework\Bundle\Admin\Contracts\CapabilityManagerInterface;
+use BackTo\Framework\Bundle\Security\Contracts\AuditLogRepositoryInterface;
+use BackTo\Framework\Bundle\Security\Contracts\AuditLogSeverity;
 use BackTo\Framework\RestApi\Contracts\RestRequest;
 use BackTo\Framework\RestApi\Contracts\RestResponse;
-use BackTo\Framework\RestApi\Contracts\RestRouteInterface;
-use BackTo\Framework\Bundle\Security\Contracts\AuditLogRepositoryInterface;
+use BackTo\Framework\Validation\Constraint\Choice;
+use BackTo\Framework\Validation\Constraint\Range;
+use BackTo\Framework\Validation\Constraint\Type;
+use BackTo\Framework\Validation\Contracts\ValidatedRestRouteInterface;
 
 /**
  * REST endpoint to retrieve security audit log events.
  *
  * GET /backto/v1/security/audit-log?event=login_failed&severity=warning&per_page=50&page=1
  */
-final class SecurityAuditLogRoute implements RestRouteInterface
+final class SecurityAuditLogRoute implements ValidatedRestRouteInterface
 {
     private readonly AuditLogRepositoryInterface $repository;
     private readonly CapabilityManagerInterface $capabilityManager;
@@ -69,6 +73,31 @@ final class SecurityAuditLogRoute implements RestRouteInterface
             'page' => $page,
             'per_page' => $perPage,
         ], 200);
+    }
+
+    public function rules(): array
+    {
+        return [
+            'event' => new Choice([
+                'login_success',
+                'login_failed',
+                'user_role_changed',
+                'critical_option_changed',
+                'plugin_activated',
+                'plugin_deactivated',
+                'theme_switched',
+                'user_created',
+                'user_deleted',
+                'self_promotion_blocked',
+                'privileged_role_granted',
+            ]),
+            'severity' => new Choice(array_map(
+                static fn (AuditLogSeverity $s): string => $s->value,
+                AuditLogSeverity::cases(),
+            )),
+            'page' => [new Type('numeric'), new Range(min: 1)],
+            'per_page' => [new Type('numeric'), new Range(min: 1, max: 100)],
+        ];
     }
 
     public function getPermissionCallback(): ?callable

@@ -86,24 +86,32 @@ class AuditLogAdminPage implements AdminPageInterface
         if ($this->isExportRequest()) {
             if (! $this->verifyNonce('backto_audit_export', '_export_nonce')) {
                 $this->renderer->renderNotice('Security check failed. Please try again.');
-            } elseif (! $this->csvExporter->canExport()) {
-                $this->renderer->renderNotice('Please wait before exporting again.');
-            } else {
-                $this->csvExporter->markExported();
-                $this->csvExporter->export($filters);
 
                 return;
             }
+
+            if (! $this->csvExporter->canExport()) {
+                $this->renderer->renderNotice('Please wait before exporting again.');
+
+                return;
+            }
+
+            $this->csvExporter->markExported();
+            $this->csvExporter->export($filters);
+
+            return;
         }
 
         if ($this->isPurgeRequest()) {
             if (! $this->verifyNonce('backto_audit_purge', '_purge_nonce')) {
                 $this->renderer->renderNotice('Security check failed. Please try again.');
-            } else {
-                $days = $this->getPurgeDays();
-                $purged = $this->repository->purge($days);
-                $this->renderer->renderNotice('Purged ' . $purged . ' events older than ' . $days . ' days.');
+
+                return;
             }
+
+            $days = $this->getPurgeDays();
+            $purged = $this->repository->purge($days);
+            $this->renderer->renderNotice('Purged ' . $purged . ' events older than ' . $days . ' days.');
         }
 
         $events = $this->repository->getEvents($filters, $this->perPage, $offset);

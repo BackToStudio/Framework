@@ -16,6 +16,10 @@ final class LoginUrlFilter
 
     public function __construct(string $loginSlug)
     {
+        if ($loginSlug === '') {
+            throw new \InvalidArgumentException('Login slug cannot be empty.');
+        }
+
         $this->loginSlug = $loginSlug;
     }
 

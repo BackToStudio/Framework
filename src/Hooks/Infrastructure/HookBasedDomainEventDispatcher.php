@@ -16,13 +16,26 @@ use BackTo\Framework\Contracts\HookDispatcherInterface;
  *
  * This enables any WordPress plugin/theme to listen to domain events
  * through the standard add_action() mechanism.
+ *
+ * @deprecated Since BackTo Framework 1.x. Use {@see \BackTo\Framework\EventDispatcher\Contracts\EventDispatcherInterface}
+ *             with the EventDispatcher module instead. Events dispatched through EventDispatcher are automatically
+ *             bridged to WordPress hooks via WordPressEventBridge (backto.event.{snake_case}).
+ *             This class will be removed in the next major version.
  */
 final class HookBasedDomainEventDispatcher implements DomainEventDispatcherInterface
 {
     private readonly HookDispatcherInterface $hookDispatcher;
 
+    /** @var array<class-string, string> */
+    private static array $eventNameCache = [];
+
     public function __construct(HookDispatcherInterface $hookDispatcher)
     {
+        trigger_error(
+            sprintf('%s is deprecated. Use %s with the EventDispatcher module instead.', self::class, \BackTo\Framework\EventDispatcher\Contracts\EventDispatcherInterface::class),
+            \E_USER_DEPRECATED
+        );
+
         $this->hookDispatcher = $hookDispatcher;
     }
 
@@ -41,9 +54,15 @@ final class HookBasedDomainEventDispatcher implements DomainEventDispatcherInter
      */
     private static function resolveEventName(DomainEventInterface $event): string
     {
+        $class = $event::class;
+
+        if (isset(self::$eventNameCache[$class])) {
+            return self::$eventNameCache[$class];
+        }
+
         $className = (new \ReflectionClass($event))->getShortName();
         $snakeCase = strtolower((string) preg_replace('/[A-Z]/', '_$0', lcfirst($className)));
 
-        return 'backto.domain_event.' . $snakeCase;
+        return self::$eventNameCache[$class] = 'backto.domain_event.' . $snakeCase;
     }
 }

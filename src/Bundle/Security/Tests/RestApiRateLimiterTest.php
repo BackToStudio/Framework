@@ -170,17 +170,11 @@ class RestApiRateLimiterTest extends TestCase
         $this->assertSame($this->limiter, $result);
     }
 
-    public function testZeroLimitBlocksAllRequests(): void
+    public function testZeroLimitThrows(): void
     {
+        $this->expectException(\InvalidArgumentException::class);
+
         $this->limiter->setDefaultLimit(0);
-
-        // Even 1 hit exceeds limit of 0
-        $this->repository->method('increment')->willReturn(1);
-
-        $result = $this->limiter->checkRateLimit(null, null, '/wp/v2/posts');
-
-        $this->assertIsArray($result);
-        $this->assertSame(429, $result['status']);
     }
 
     public function testZeroWindowRouteLimit(): void

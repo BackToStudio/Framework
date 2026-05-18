@@ -11,6 +11,9 @@ use BackTo\Framework\RestApi\Contracts\RestRequest;
 use BackTo\Framework\RestApi\Contracts\RestResponse;
 use BackTo\Framework\RestApi\Contracts\RestRouteInterface;
 use BackTo\Framework\RestApi\Contracts\RestRouteRegistrarInterface;
+use BackTo\Framework\Validation\Contracts\ValidatedRestRouteInterface;
+use BackTo\Framework\Validation\Contracts\ValidatorInterface;
+use BackTo\Framework\Validation\Validator;
 
 final class RegisterRestRoute implements Hooks
 {
@@ -18,17 +21,20 @@ final class RegisterRestRoute implements Hooks
     private readonly RestRouteRegistrarInterface $registrar;
     private readonly HookDispatcherInterface $hookDispatcher;
     private readonly UserContextInterface $userContext;
+    private readonly ValidatorInterface $validator;
 
     public function __construct(
         RestRouteRegistry $registry,
         RestRouteRegistrarInterface $registrar,
         HookDispatcherInterface $hookDispatcher,
         UserContextInterface $userContext,
+        ValidatorInterface $validator,
     ) {
         $this->registry = $registry;
         $this->registrar = $registrar;
         $this->hookDispatcher = $hookDispatcher;
         $this->userContext = $userContext;
+        $this->validator = $validator;
     }
 
     public function hooks(): void
@@ -49,7 +55,7 @@ final class RegisterRestRoute implements Hooks
         foreach ($this->registry->getRoutes() as $route) {
             $args = [
                 'methods' => $route->getMethods(),
-                'callback' => self::adaptHandler($route),
+                'callback' => self::adaptHandler($route, $this->validator),
             ];
 
             $permissionCallback = $route->getPermissionCallback();
@@ -69,11 +75,12 @@ final class RegisterRestRoute implements Hooks
 
     /**
      * Create a callback that converts WP_REST_Request → RestRequest,
-     * calls the route handler, and converts RestResponse → WP_REST_Response.
+     * optionally validates the payload, calls the route handler,
+     * and converts RestResponse → WP_REST_Response.
      */
-    private static function adaptHandler(RestRouteInterface $route): \Closure
+    private static function adaptHandler(RestRouteInterface $route, ValidatorInterface $validator): \Closure
     {
-        return static function (\WP_REST_Request $wpRequest) use ($route): \WP_REST_Response {
+        return static function (\WP_REST_Request $wpRequest) use ($route, $validator): \WP_REST_Response {
             $params = $wpRequest->get_params();
             $method = $wpRequest->get_method();
             $body = $wpRequest->get_body();
@@ -83,6 +90,26 @@ final class RegisterRestRoute implements Hooks
                 static fn (array|string $v): string => \is_array($v) ? ($v[0] ?? '') : $v,
                 $wpRequest->get_headers(),
             );
+
+            // Validate request parameters when the route declares rules.
+            if ($route instanceof ValidatedRestRouteInterface) {
+                $rules = $route->rules();
+
+                if ($rules !== []) {
+                    $result = $validator->validate($params, $rules);
+
+                    if (!$result->isValid()) {
+                        return new \WP_REST_Response(
+                            [
+                                'code' => 'validation_error',
+                                'message' => 'Validation failed.',
+                                'errors' => $result->toArray(),
+                            ],
+                            400,
+                        );
+                    }
+                }
+            }
 
             $request = new RestRequest($params, $method, $headers, $body);
             $response = $route->handle($request);

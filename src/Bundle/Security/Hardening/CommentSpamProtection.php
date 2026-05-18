@@ -76,6 +76,10 @@ class CommentSpamProtection implements Hooks, SecurityRuleInterface
 
     public function setMaxLinksAllowed(int $max): self
     {
+        if ($max < 0) {
+            throw new \InvalidArgumentException(\sprintf('Max links allowed must be non-negative, got %d.', $max));
+        }
+
         $this->maxLinksAllowed = $max;
 
         return $this;

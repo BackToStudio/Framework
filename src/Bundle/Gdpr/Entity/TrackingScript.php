@@ -22,8 +22,16 @@ final class TrackingScript implements TrackingScriptInterface
             throw new \InvalidArgumentException('Tracking script handle cannot be empty.');
         }
 
+        if ($categoryKey === '') {
+            throw new \InvalidArgumentException('Tracking script category key cannot be empty.');
+        }
+
         if ($source === '') {
             throw new \InvalidArgumentException('Tracking script source cannot be empty.');
+        }
+
+        if ($inline && \preg_match('/<\/script/i', $source)) {
+            throw new \InvalidArgumentException('Inline tracking script source must not contain "</script" (prevents HTML injection).');
         }
 
         if (!in_array($location, self::ALLOWED_LOCATIONS, true)) {

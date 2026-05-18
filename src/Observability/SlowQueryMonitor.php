@@ -41,6 +41,10 @@ final class SlowQueryMonitor implements Hooks
         HookDispatcherInterface $hookDispatcher,
         float $thresholdMs = self::DEFAULT_THRESHOLD_MS,
     ) {
+        if ($thresholdMs <= 0.0) {
+            throw new \InvalidArgumentException('Slow query threshold must be positive.');
+        }
+
         $this->queryMonitor = $queryMonitor;
         $this->metricStore = $metricStore;
         $this->alertDispatcher = $alertDispatcher;
@@ -51,6 +55,10 @@ final class SlowQueryMonitor implements Hooks
 
     public function hooks(): void
     {
+        if (!$this->isSaveQueriesEnabled()) {
+            return;
+        }
+
         $this->hookDispatcher->addAction('shutdown', [$this, 'analyze'], 998);
     }
 
@@ -107,5 +115,10 @@ final class SlowQueryMonitor implements Hooks
                 $stats['total_time_ms'],
             ));
         }
+    }
+
+    protected function isSaveQueriesEnabled(): bool
+    {
+        return \defined('SAVEQUERIES') && SAVEQUERIES;
     }
 }

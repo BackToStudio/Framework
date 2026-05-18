@@ -8,10 +8,16 @@ use BackTo\Framework\Bundle\Gdpr\Contracts\TrackingScriptInterface;
 
 final class GtagLoaderScript implements TrackingScriptInterface
 {
+    /**
+     * @param string $trackingId Google tracking ID (e.g. "G-XXXXXXXXXX", "AW-XXXXXXXXX").
+     */
     public function __construct(
         private readonly string $trackingId,
         private string $categoryKey = 'analytics',
     ) {
+        if (\preg_match('/^[A-Z0-9]+-[A-Z0-9]+$/i', $trackingId) !== 1) {
+            throw new \InvalidArgumentException(\sprintf('Invalid tracking ID: "%s".', $trackingId));
+        }
     }
 
     public function getHandle(): string

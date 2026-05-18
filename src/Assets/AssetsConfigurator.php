@@ -21,8 +21,14 @@ final class AssetsConfigurator implements ModuleConfiguratorInterface
     /** @var array<string, mixed> */
     private array $overrides = [];
 
+    private const ALLOWED_VERSION_STRATEGIES = ['content_hash', 'timestamp', 'version'];
+
     public function versionStrategy(string $strategy): self
     {
+        if (!in_array($strategy, self::ALLOWED_VERSION_STRATEGIES, true)) {
+            throw new \InvalidArgumentException(\sprintf('Invalid version strategy "%s". Allowed: %s.', $strategy, implode(', ', self::ALLOWED_VERSION_STRATEGIES)));
+        }
+
         $this->overrides['assets.version_strategy'] = $strategy;
 
         return $this;

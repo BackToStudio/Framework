@@ -13,10 +13,13 @@ use BackTo\Framework\Cache\CacheExtension;
 use BackTo\Framework\Compose\DependencyInjection\Compiler\ResolveInstanceOfConditionalPassWithVendorPrefix;
 use BackTo\Framework\Contracts\ExtensionInterface;
 use BackTo\Framework\Contracts\RegistryInterface;
+use BackTo\Framework\EventDispatcher\EventDispatcherExtension;
 use BackTo\Framework\Hooks\HooksExtension;
 use BackTo\Framework\Http\HttpExtension;
+use BackTo\Framework\Lock\LockExtension;
 use BackTo\Framework\Hooks\Contracts\HookRegistryInterface;
 use BackTo\Framework\Observability\ObservabilityConfigurator;
+use BackTo\Framework\OptionsResolver\OptionsResolverExtension;
 use BackTo\Framework\Observability\ObservabilityExtension;
 use BackTo\Framework\Options\OptionsExtension;
 use BackTo\Framework\PostMeta\PostMetaExtension;
@@ -32,6 +35,7 @@ use BackTo\Framework\Bundle\Security\SecurityExtension;
 use BackTo\Framework\Bundle\Seo\SeoConfigurator;
 use BackTo\Framework\Bundle\Seo\SeoExtension;
 use BackTo\Framework\Taxonomy\TaxonomyExtension;
+use BackTo\Framework\Validation\ValidationExtension;
 use BackTo\Framework\WordPress\WordPressExtension;
 use Exception;
 use LogicException;
@@ -238,9 +242,13 @@ trait WordPressContainer
             new TaxonomyExtension(),
             new PostMetaExtension(),
             new CacheExtension(),
+            new LockExtension(),
             new SeoExtension(),
             new AdminExtension(),
             new OptionsExtension(),
+            new OptionsResolverExtension(),
+            new EventDispatcherExtension(),
+            new ValidationExtension(),
             new RestApiExtension(),
             new ObservabilityExtension(),
             new SecurityExtension(),

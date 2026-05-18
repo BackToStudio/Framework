@@ -25,6 +25,10 @@ final class CacheConfigurator implements ModuleConfiguratorInterface
 
     public function ttl(int $seconds): self
     {
+        if ($seconds < 0) {
+            throw new \InvalidArgumentException('Cache TTL must be zero or positive.');
+        }
+
         $this->overrides['cache.ttl'] = $seconds;
 
         return $this;
@@ -40,8 +44,16 @@ final class CacheConfigurator implements ModuleConfiguratorInterface
     /**
      * Set the cache strategy: 'transient', 'redis', 'filesystem', or 'memory'.
      */
+    /**
+     * Set the cache strategy: 'transient', 'redis', 'filesystem', or 'memory'.
+     */
     public function strategy(string $strategy): self
     {
+        $allowed = ['transient', 'redis', 'filesystem', 'memory'];
+        if (!\in_array($strategy, $allowed, true)) {
+            throw new \InvalidArgumentException(\sprintf('Invalid cache strategy "%s". Allowed: %s.', $strategy, \implode(', ', $allowed)));
+        }
+
         $this->overrides['cache.strategy'] = $strategy;
 
         return $this;
@@ -49,6 +61,10 @@ final class CacheConfigurator implements ModuleConfiguratorInterface
 
     public function redisHost(string $host): self
     {
+        if (\trim($host) === '') {
+            throw new \InvalidArgumentException('Redis host cannot be empty.');
+        }
+
         $this->overrides['cache.redis.host'] = $host;
 
         return $this;
@@ -56,6 +72,10 @@ final class CacheConfigurator implements ModuleConfiguratorInterface
 
     public function redisPort(int $port): self
     {
+        if ($port < 1 || $port > 65535) {
+            throw new \InvalidArgumentException(\sprintf('Redis port must be between 1 and 65535, got %d.', $port));
+        }
+
         $this->overrides['cache.redis.port'] = $port;
 
         return $this;
@@ -77,6 +97,10 @@ final class CacheConfigurator implements ModuleConfiguratorInterface
 
     public function redisTimeout(float $timeout): self
     {
+        if ($timeout < 0) {
+            throw new \InvalidArgumentException('Redis timeout must be zero or positive.');
+        }
+
         $this->overrides['cache.redis.timeout'] = $timeout;
 
         return $this;

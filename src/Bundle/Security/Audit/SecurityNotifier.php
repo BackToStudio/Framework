@@ -133,6 +133,10 @@ final class SecurityNotifier implements Hooks, SecurityRuleInterface, SecurityNo
 
     public function setFailedLoginThreshold(int $threshold): self
     {
+        if ($threshold < 1) {
+            throw new \InvalidArgumentException(\sprintf('Failed login threshold must be at least 1, got %d.', $threshold));
+        }
+
         $this->failedLoginThreshold = $threshold;
 
         return $this;

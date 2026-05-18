@@ -39,6 +39,10 @@ final class DeferScripts implements Hooks
 
     public function hooks(): void
     {
+        if ($this->queryContext->isAdmin()) {
+            return;
+        }
+
         $this->hookDispatcher->addFilter('script_loader_tag', [$this, 'addDeferAttribute'], 10, 2);
 
         if ($this->removeQueryStrings) {
@@ -56,10 +60,6 @@ final class DeferScripts implements Hooks
             return $tag;
         }
 
-        if ($this->queryContext->isAdmin()) {
-            return $tag;
-        }
-
         if (str_contains($tag, 'defer') || str_contains($tag, 'async')) {
             return $tag;
         }
@@ -72,10 +72,6 @@ final class DeferScripts implements Hooks
      */
     public function removeVersionQueryString(string $src): string
     {
-        if ($this->queryContext->isAdmin()) {
-            return $src;
-        }
-
         if (str_contains($src, '?ver=') || str_contains($src, '&ver=')) {
             $src = (string) remove_query_arg('ver', $src);
         }

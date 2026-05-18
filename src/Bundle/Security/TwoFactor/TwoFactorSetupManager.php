@@ -44,6 +44,14 @@ final class TwoFactorSetupManager
      */
     public function setup(int $userId, string $accountName): array
     {
+        if ($userId <= 0) {
+            throw new \InvalidArgumentException(\sprintf('User ID must be positive, got %d.', $userId));
+        }
+
+        if ($accountName === '') {
+            throw new \InvalidArgumentException('Account name cannot be empty.');
+        }
+
         $secret = $this->totpProvider->generateSecret();
         $this->repository->setSecret($userId, $secret);
 

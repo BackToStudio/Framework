@@ -25,6 +25,11 @@ final class ObservabilityConfigurator implements ModuleConfiguratorInterface
 
     public function logLevel(string $level): self
     {
+        $allowed = ['emergency', 'alert', 'critical', 'error', 'warning', 'notice', 'info', 'debug'];
+        if (!\in_array($level, $allowed, true)) {
+            throw new \InvalidArgumentException(\sprintf('Invalid log level "%s". Allowed: %s.', $level, \implode(', ', $allowed)));
+        }
+
         $this->overrides['observability.log_level'] = $level;
 
         return $this;
